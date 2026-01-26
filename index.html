@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>StabiX Step-1</title>
+  <title>StabiX Pay</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Telegram Mini App SDK -->
@@ -12,32 +12,47 @@
     body {
       background:#0f172a;
       color:#e5e7eb;
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       padding:20px;
+      margin:0;
     }
     .box {
       background:#020617;
       border:1px solid #1e293b;
-      border-radius:12px;
+      border-radius:14px;
       padding:20px;
       max-width:420px;
       margin:auto;
     }
-    button {
+    input, button {
       width:100%;
       padding:12px;
       margin-top:10px;
-      border-radius:8px;
+      border-radius:10px;
       border:none;
       font-size:15px;
+    }
+    button {
       background:#2563eb;
       color:white;
       font-weight:bold;
     }
+    hr {
+      border:0;
+      border-top:1px solid #1e293b;
+      margin:16px 0;
+    }
     .small {
       font-size:12px;
       opacity:0.7;
+    }
+    .tx {
+      background:#020617;
+      border:1px solid #1e293b;
+      border-radius:10px;
+      padding:8px;
       margin-top:8px;
+      font-size:13px;
     }
   </style>
 </head>
@@ -46,62 +61,122 @@
 <div id="app"></div>
 
 <script>
-/* ===== TELEGRAM INIT ===== */
-const tg = window.Telegram.WebApp;
-tg.ready();
+/* ================= SAFE TELEGRAM INIT ================= */
+let tgUser = { id: "browser", username: "BrowserUser" };
 
-/* ===== USER ===== */
-const user = tg.initDataUnsafe.user;
-const USER_KEY = "stabix_data";
+try {
+  if (window.Telegram && Telegram.WebApp) {
+    Telegram.WebApp.ready();
+    if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+      tgUser = Telegram.WebApp.initDataUnsafe.user;
+    }
+  }
+} catch (e) {}
 
-/* ===== CLOUD STORAGE ===== */
-const cs = tg.CloudStorage;
+/* ================= USER ID ================= */
+const WALLET = "TG_" + tgUser.id;
 
-/* ===== UI ===== */
-document.getElementById("app").innerHTML = `
-  <div class="box">
-    <h2>Hello ${user.first_name}</h2>
-    <p class="small">TG ID: ${user.id}</p>
-
-    <button onclick="saveData()">Save Test Data</button>
-    <button onclick="loadData()">Load Data</button>
-
-    <div id="output" class="small"></div>
-  </div>
-`;
-
-/* ===== SAVE ===== */
-function saveData() {
-  const data = {
-    balance: 100,
-    history: [
-      {
-        type: "credit",
-        amount: 100,
-        time: Date.now()
-      }
-    ]
-  };
-
-  cs.setItem(USER_KEY, JSON.stringify(data), (ok, err) => {
-    document.getElementById("output").innerText =
-      ok ? "✅ Data Saved Successfully" : "❌ Save Failed";
-  });
+/* ================= STORAGE (SAFE) ================= */
+function load(key, def) {
+  try {
+    return JSON.parse(localStorage.getItem(key)) || def;
+  } catch {
+    return def;
+  }
+}
+function save(key, val) {
+  try {
+    localStorage.setItem(key, JSON.stringify(val));
+  } catch {}
 }
 
-/* ===== LOAD ===== */
-function loadData() {
-  cs.getItem(USER_KEY, (value, err) => {
-    if (!value) {
-      document.getElementById("output").innerText = "⚠️ No data found";
-      return;
-    }
+let users = load("stabix_users", {});
+let txs   = load("stabix_txs", []);
 
-    const data = JSON.parse(value);
-    document.getElementById("output").innerText =
-      "Balance: " + data.balance +
-      "\nLast Tx Amount: " + data.history[0].amount;
+/* ================= INIT USER ================= */
+if (!users[WALLET]) {
+  users[WALLET] = {
+    username: tgUser.username || tgUser.first_name || "User",
+    balance: 0
+  };
+  save("stabix_users", users);
+}
+
+render();
+
+/* ================= UI ================= */
+function render() {
+  const user = users[WALLET];
+
+  const history = txs
+    .filter(t => t.from === WALLET || t.to === WALLET)
+    .slice(-10)
+    .reverse()
+    .map(t => `
+      <div class="tx">
+        <b>${t.type}</b> ${t.amount} USDC<br>
+        <span class="small">${new Date(t.time).toLocaleString()}</span>
+      </div>
+    `).join("") || `<p class="small">No transactions yet</p>`;
+
+  document.getElementById("app").innerHTML = `
+    <div class="box">
+      <h2>${user.username}</h2>
+      <p class="small">${WALLET}</p>
+
+      <hr>
+      <h3>Balance</h3>
+      <b>${user.balance.toFixed(2)} USDC</b>
+
+      <hr>
+      <h3>Send USDC</h3>
+      <input id="to" placeholder="Receiver Wallet (TG_123)" />
+      <input id="amt" type="number" placeholder="Amount" />
+      <button onclick="send()">Send</button>
+
+      <hr>
+      <h3>Transaction History</h3>
+      ${history}
+
+      <hr>
+      <h3>Change Username</h3>
+      <input id="newname" placeholder="New username" />
+      <button onclick="changeName()">Update</button>
+    </div>
+  `;
+}
+
+/* ================= ACTIONS ================= */
+function send() {
+  const to = document.getElementById("to").value.trim();
+  const amt = Number(document.getElementById("amt").value);
+
+  if (!users[to]) return alert("User not found");
+  if (amt <= 0) return alert("Invalid amount");
+  if (users[WALLET].balance < amt) return alert("Insufficient balance");
+
+  users[WALLET].balance -= amt;
+  users[to].balance += amt;
+
+  txs.push({
+    from: WALLET,
+    to: to,
+    amount: amt,
+    type: "Sent",
+    time: Date.now()
   });
+
+  save("stabix_users", users);
+  save("stabix_txs", txs);
+  render();
+}
+
+function changeName() {
+  const n = document.getElementById("newname").value.trim();
+  if (!n) return;
+  users[WALLET].username = n;
+  save("stabix_users", users);
+  render();
 }
 </script>
 </body>
