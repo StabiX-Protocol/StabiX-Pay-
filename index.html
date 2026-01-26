@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>StabiX Off-Chain Ledger</title>
+  <title>StabiX Ledger</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     body {
       background:#0f172a;
       color:#e5e7eb;
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       padding:20px;
     }
     .box {
       background:#020617;
       border:1px solid #1e293b;
-      border-radius:10px;
+      border-radius:12px;
       padding:20px;
       max-width:420px;
       margin:auto;
+    }
+    h2,h3 {
+      margin-top:0;
     }
     input, button {
       width:100%;
@@ -32,15 +35,25 @@
       color:white;
       font-weight:bold;
     }
+    button.secondary {
+      background:#1e293b;
+    }
     .small {
       font-size:12px;
-      opacity:0.7;
+      opacity:0.75;
       margin-top:10px;
     }
     hr {
       border:0;
       border-top:1px solid #1e293b;
       margin:15px 0;
+    }
+    ul {
+      padding-left:18px;
+    }
+    li {
+      font-size:14px;
+      margin-bottom:6px;
     }
   </style>
 </head>
@@ -51,13 +64,19 @@
 
 <script>
 /* ===============================
+   STATE
+================================ */
+let balance = 0;
+let transactions = [];
+
+/* ===============================
    CHECK REGISTRATION
 ================================ */
 const wallet = localStorage.getItem("stabix_wallet");
 const username = localStorage.getItem("stabix_username");
 
 /* ===============================
-   DASHBOARD (REGISTERED USER)
+   DASHBOARD
 ================================ */
 if (wallet && username) {
 
@@ -65,39 +84,49 @@ if (wallet && username) {
     <div class="box">
       <h2>Welcome, ${username}</h2>
 
-      <p><b>Wallet</b><br>${wallet}</p>
+      <p class="small"><b>Wallet</b><br>${wallet}</p>
 
       <hr>
 
       <h3>Balance</h3>
-      <p>USDC: <b>0.00</b></p>
+      <p>USDC: <b><span id="balance">0.00</span></b></p>
+
+      <hr>
+
+      <h3>Send USDC</h3>
+      <input id="toUser" placeholder="Recipient Username" />
+      <input id="amount" type="number" placeholder="Amount" />
+      <button onclick="sendUSDC()">Send</button>
 
       <hr>
 
       <h3>Transaction History</h3>
-      <p class="small">No transactions yet</p>
+      <ul id="txList">
+        <li>No transactions yet</li>
+      </ul>
 
       <hr>
 
       <p class="small">
-  🔐 Secure Ledger System<br>
-  ⚡ Fast internal transfers<br>
-  📊 Balance updated automatically
-</p>
+        🔐 Secure internal ledger<br>
+        ⚡ Instant transfers<br>
+        📊 Balance updates in real-time
+      </p>
 
-      <button onclick="logout()">Logout</button>
+      <button class="secondary" onclick="logout()">Logout</button>
     </div>
   `;
 
+  updateUI();
 }
+
 /* ===============================
-   REGISTRATION UI (NEW USER)
+   REGISTRATION
 ================================ */
 else {
-
   document.getElementById("app").innerHTML = `
     <div class="box">
-      <h2>Register on StabiX Ledger</h2>
+      <h2>Register on StabiX</h2>
 
       <input id="walletInput" placeholder="Wallet Address" />
       <input id="usernameInput" placeholder="Choose Username (one-time)" />
@@ -105,15 +134,14 @@ else {
       <button onclick="register()">Register</button>
 
       <p class="small">
-        ⚠️ Username cannot be changed later<br>
-        Ledger is off-chain, settlement by admin
+        ⚠️ Username cannot be changed later
       </p>
     </div>
   `;
 }
 
 /* ===============================
-   REGISTER FUNCTION
+   FUNCTIONS
 ================================ */
 function register() {
   const w = document.getElementById("walletInput").value.trim();
@@ -131,9 +159,43 @@ function register() {
   location.reload();
 }
 
-/* ===============================
-   LOGOUT (TESTING ONLY)
-================================ */
+function sendUSDC() {
+  const to = document.getElementById("toUser").value.trim();
+  const amt = Number(document.getElementById("amount").value);
+
+  if (!to || amt <= 0) {
+    alert("Invalid input");
+    return;
+  }
+
+  if (balance < amt) {
+    alert("Insufficient balance");
+    return;
+  }
+
+  balance -= amt;
+  transactions.unshift(`Sent ${amt} USDC to @${to}`);
+  updateUI();
+}
+
+function updateUI() {
+  document.getElementById("balance").innerText = balance.toFixed(2);
+
+  const txList = document.getElementById("txList");
+  txList.innerHTML = "";
+
+  if (transactions.length === 0) {
+    txList.innerHTML = "<li>No transactions yet</li>";
+    return;
+  }
+
+  transactions.forEach(tx => {
+    const li = document.createElement("li");
+    li.innerText = tx;
+    txList.appendChild(li);
+  });
+}
+
 function logout() {
   localStorage.clear();
   location.reload();
