@@ -46,7 +46,9 @@
     }
     .tx {
       font-size:13px;
-      margin-top:6px;
+      margin-top:8px;
+      padding-bottom:8px;
+      border-bottom:1px solid #1e293b;
     }
   </style>
 </head>
@@ -55,10 +57,14 @@
 <div id="app"></div>
 
 <script>
-/* ============ TELEGRAM INIT ============ */
+/* ================= TELEGRAM INIT ================= */
 const tg = window.Telegram?.WebApp;
-tg?.ready();
+if (tg) {
+  tg.ready();
+  tg.expand();
+}
 
+/* ================= USER IDENTITY ================= */
 let tgUser = tg?.initDataUnsafe?.user || {
   id: "browser_user",
   username: "BrowserUser"
@@ -66,11 +72,11 @@ let tgUser = tg?.initDataUnsafe?.user || {
 
 const WALLET = "TG_" + tgUser.id;
 
-/* ============ STORAGE ============ */
+/* ================= STORAGE ================= */
 let users = JSON.parse(localStorage.getItem("stabix_users") || "{}");
 let txs   = JSON.parse(localStorage.getItem("stabix_txs") || []);
 
-/* ============ INIT USER ============ */
+/* ================= INIT USER ================= */
 if (!users[WALLET]) {
   users[WALLET] = {
     username: tgUser.username || "User",
@@ -79,21 +85,25 @@ if (!users[WALLET]) {
   save();
 }
 
+/* ================= RENDER ================= */
 render();
 
-/* ============ UI ============ */
 function render() {
   const user = users[WALLET];
 
-  const history = txs
-    .filter(t => t.from === WALLET || t.to === WALLET)
-    .reverse()
-    .map(t => `
+  const myTxs = txs.filter(t => t.from === WALLET || t.to === WALLET);
+  let historyHtml = "";
+
+  if (myTxs.length === 0) {
+    historyHtml = `<p class="small">No transactions yet</p>`;
+  } else {
+    historyHtml = myTxs.slice().reverse().map(t => `
       <div class="tx">
         <b>${t.type}</b> ${t.amount} USDC<br>
         <span class="small">${new Date(t.time).toLocaleString()}</span>
       </div>
-    `).join("") || `<p class="small">No transactions yet</p>`;
+    `).join("");
+  }
 
   document.getElementById("app").innerHTML = `
     <div class="box">
@@ -106,13 +116,13 @@ function render() {
 
       <hr>
       <h3>Send USDC</h3>
-      <input id="to" placeholder="Receiver Wallet (TG_123)" />
+      <input id="to" placeholder="Receiver Wallet (TG_123456)" />
       <input id="amt" type="number" placeholder="Amount" />
       <button onclick="send()">Send</button>
 
       <hr>
       <h3>Transaction History</h3>
-      ${history}
+      ${historyHtml}
 
       <hr>
       <h3>Change Username</h3>
@@ -122,12 +132,12 @@ function render() {
   `;
 }
 
-/* ============ ACTIONS ============ */
+/* ================= ACTIONS ================= */
 function send() {
   const to = document.getElementById("to").value.trim();
   const amt = Number(document.getElementById("amt").value);
 
-  if (!users[to]) return alert("User not found");
+  if (!users[to]) return alert("Receiver not found");
   if (amt <= 0) return alert("Invalid amount");
   if (users[WALLET].balance < amt) return alert("Insufficient balance");
 
@@ -139,6 +149,14 @@ function send() {
     to,
     amount: amt,
     type: "Sent",
+    time: Date.now()
+  });
+
+  txs.push({
+    from: WALLET,
+    to,
+    amount: amt,
+    type: "Received",
     time: Date.now()
   });
 
