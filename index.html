@@ -45,6 +45,13 @@
       margin-top:6px;
       opacity:0.9;
     }
+    .admin {
+      background:#020617;
+      border:1px dashed #334155;
+      padding:15px;
+      margin-top:15px;
+      border-radius:10px;
+    }
   </style>
 </head>
 
@@ -58,34 +65,39 @@
 const ADMIN_WALLET = "0x6b7caa5b11106dfac2a415fd98e01e38c42f0e8d";
 
 /* =========================
-   LOAD USER
+   LOAD STORAGE (SAFE)
 ========================= */
-const wallet = localStorage.getItem("stabix_wallet");
-const username = localStorage.getItem("stabix_username");
+let wallet = localStorage.getItem("stabix_wallet");
+let username = localStorage.getItem("stabix_username");
 
 let users = JSON.parse(localStorage.getItem("stabix_users") || "{}");
-let txs = JSON.parse(localStorage.getItem("stabix_txs") || []);
+if (!users || typeof users !== "object") users = {};
+
+let txs = JSON.parse(localStorage.getItem("stabix_txs") || "[]");
+if (!Array.isArray(txs)) txs = [];
 
 /* =========================
-   DASHBOARD
+   INIT
 ========================= */
 if (wallet && username) {
-
   if (!users[username]) {
     users[username] = { balance: 0 };
-    localStorage.setItem("stabix_users", JSON.stringify(users));
+    save();
   }
-
   render();
-
 } else {
   renderRegister();
 }
 
 /* =========================
-   RENDER FUNCTIONS
+   RENDER
 ========================= */
 function render() {
+  if (!users[username]) {
+    users[username] = { balance: 0 };
+    save();
+  }
+
   const balance = users[username].balance;
 
   let history = txs
@@ -100,6 +112,19 @@ function render() {
 
   if (!history) history = `<p class="small">No transactions yet</p>`;
 
+  let adminPanel = "";
+  if (wallet.toLowerCase() === ADMIN_WALLET.toLowerCase()) {
+    adminPanel = `
+      <hr>
+      <div class="admin">
+        <h3>System Panel</h3>
+        <input id="adminUser" placeholder="Username" />
+        <input id="adminAmt" type="number" placeholder="Amount" />
+        <button onclick="adminCredit()">Add Balance</button>
+      </div>
+    `;
+  }
+
   document.getElementById("app").innerHTML = `
     <div class="box">
       <h2>${username}</h2>
@@ -112,18 +137,19 @@ function render() {
 
       <hr>
 
-      <h3>Send USDC</h3>
+      <h3>Send</h3>
       <input id="toUser" placeholder="Receiver Username" />
       <input id="amount" type="number" placeholder="Amount" />
       <button onclick="send()">Send</button>
 
       <hr>
 
-      <h3>Recent Activity</h3>
+      <h3>Activity</h3>
       ${history}
 
-      <hr>
+      ${adminPanel}
 
+      <hr>
       <button onclick="logout()">Logout</button>
     </div>
   `;
@@ -146,7 +172,6 @@ function renderRegister() {
 function register() {
   const w = walletInput.value.trim();
   const u = usernameInput.value.trim();
-
   if (!w || !u) return alert("Fill all fields");
 
   localStorage.setItem("stabix_wallet", w);
@@ -166,11 +191,27 @@ function send() {
   users[to].balance += amt;
 
   txs.push({ from: username, to, amount: amt });
+  save();
+  render();
+}
 
+function adminCredit() {
+  const u = document.getElementById("adminUser").value.trim();
+  const a = parseFloat(document.getElementById("adminAmt").value);
+
+  if (!users[u]) return alert("User not found");
+  if (a <= 0) return alert("Invalid amount");
+
+  users[u].balance += a;
+  txs.push({ from: "system", to: u, amount: a });
+
+  save();
+  render();
+}
+
+function save() {
   localStorage.setItem("stabix_users", JSON.stringify(users));
   localStorage.setItem("stabix_txs", JSON.stringify(txs));
-
-  render();
 }
 
 function logout() {
