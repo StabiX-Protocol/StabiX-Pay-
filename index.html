@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>StabiX</title>
+  <meta charset="UTF-8">
+  <title>StabiX Step-1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Telegram Mini App SDK -->
@@ -22,33 +23,21 @@
       max-width:420px;
       margin:auto;
     }
-    input, button {
+    button {
       width:100%;
       padding:12px;
       margin-top:10px;
       border-radius:8px;
       border:none;
       font-size:15px;
-    }
-    button {
       background:#2563eb;
       color:white;
       font-weight:bold;
     }
-    hr {
-      border:0;
-      border-top:1px solid #1e293b;
-      margin:15px 0;
-    }
     .small {
       font-size:12px;
       opacity:0.7;
-    }
-    .tx {
-      font-size:13px;
       margin-top:8px;
-      padding-bottom:8px;
-      border-bottom:1px solid #1e293b;
     }
   </style>
 </head>
@@ -57,124 +46,62 @@
 <div id="app"></div>
 
 <script>
-/* ================= TELEGRAM INIT ================= */
-const tg = window.Telegram?.WebApp;
-if (tg) {
-  tg.ready();
-  tg.expand();
-}
+/* ===== TELEGRAM INIT ===== */
+const tg = window.Telegram.WebApp;
+tg.ready();
 
-/* ================= USER IDENTITY ================= */
-let tgUser = tg?.initDataUnsafe?.user || {
-  id: "browser_user",
-  username: "BrowserUser"
-};
+/* ===== USER ===== */
+const user = tg.initDataUnsafe.user;
+const USER_KEY = "stabix_data";
 
-const WALLET = "TG_" + tgUser.id;
+/* ===== CLOUD STORAGE ===== */
+const cs = tg.CloudStorage;
 
-/* ================= STORAGE ================= */
-let users = JSON.parse(localStorage.getItem("stabix_users") || "{}");
-let txs   = JSON.parse(localStorage.getItem("stabix_txs") || []);
+/* ===== UI ===== */
+document.getElementById("app").innerHTML = `
+  <div class="box">
+    <h2>Hello ${user.first_name}</h2>
+    <p class="small">TG ID: ${user.id}</p>
 
-/* ================= INIT USER ================= */
-if (!users[WALLET]) {
-  users[WALLET] = {
-    username: tgUser.username || "User",
-    balance: 0
+    <button onclick="saveData()">Save Test Data</button>
+    <button onclick="loadData()">Load Data</button>
+
+    <div id="output" class="small"></div>
+  </div>
+`;
+
+/* ===== SAVE ===== */
+function saveData() {
+  const data = {
+    balance: 100,
+    history: [
+      {
+        type: "credit",
+        amount: 100,
+        time: Date.now()
+      }
+    ]
   };
-  save();
-}
 
-/* ================= RENDER ================= */
-render();
-
-function render() {
-  const user = users[WALLET];
-
-  const myTxs = txs.filter(t => t.from === WALLET || t.to === WALLET);
-  let historyHtml = "";
-
-  if (myTxs.length === 0) {
-    historyHtml = `<p class="small">No transactions yet</p>`;
-  } else {
-    historyHtml = myTxs.slice().reverse().map(t => `
-      <div class="tx">
-        <b>${t.type}</b> ${t.amount} USDC<br>
-        <span class="small">${new Date(t.time).toLocaleString()}</span>
-      </div>
-    `).join("");
-  }
-
-  document.getElementById("app").innerHTML = `
-    <div class="box">
-      <h2>${user.username}</h2>
-      <p class="small">${WALLET}</p>
-
-      <hr>
-      <h3>Balance</h3>
-      <b>${user.balance.toFixed(2)} USDC</b>
-
-      <hr>
-      <h3>Send USDC</h3>
-      <input id="to" placeholder="Receiver Wallet (TG_123456)" />
-      <input id="amt" type="number" placeholder="Amount" />
-      <button onclick="send()">Send</button>
-
-      <hr>
-      <h3>Transaction History</h3>
-      ${historyHtml}
-
-      <hr>
-      <h3>Change Username</h3>
-      <input id="newname" placeholder="New username" />
-      <button onclick="changeName()">Update</button>
-    </div>
-  `;
-}
-
-/* ================= ACTIONS ================= */
-function send() {
-  const to = document.getElementById("to").value.trim();
-  const amt = Number(document.getElementById("amt").value);
-
-  if (!users[to]) return alert("Receiver not found");
-  if (amt <= 0) return alert("Invalid amount");
-  if (users[WALLET].balance < amt) return alert("Insufficient balance");
-
-  users[WALLET].balance -= amt;
-  users[to].balance += amt;
-
-  txs.push({
-    from: WALLET,
-    to,
-    amount: amt,
-    type: "Sent",
-    time: Date.now()
+  cs.setItem(USER_KEY, JSON.stringify(data), (ok, err) => {
+    document.getElementById("output").innerText =
+      ok ? "✅ Data Saved Successfully" : "❌ Save Failed";
   });
+}
 
-  txs.push({
-    from: WALLET,
-    to,
-    amount: amt,
-    type: "Received",
-    time: Date.now()
+/* ===== LOAD ===== */
+function loadData() {
+  cs.getItem(USER_KEY, (value, err) => {
+    if (!value) {
+      document.getElementById("output").innerText = "⚠️ No data found";
+      return;
+    }
+
+    const data = JSON.parse(value);
+    document.getElementById("output").innerText =
+      "Balance: " + data.balance +
+      "\nLast Tx Amount: " + data.history[0].amount;
   });
-
-  save();
-  render();
-}
-
-function changeName() {
-  const n = document.getElementById("newname").value.trim();
-  if (!n) return;
-  users[WALLET].username = n;
-  save();
-  render();
-}
-
-function save() {
-  localStorage.setItem("stabix_users", JSON.stringify(users));
-  localStorage.setItem("stabix_txs", JSON.stringify(txs));
 }
 </script>
 </body>
