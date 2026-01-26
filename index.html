@@ -4,7 +4,6 @@
   <title>StabiX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
@@ -40,14 +39,8 @@
       border-top:1px solid #1e293b;
       margin:15px 0;
     }
-    .small {
-      font-size:12px;
-      opacity:0.7;
-    }
-    .tx {
-      font-size:13px;
-      margin-top:6px;
-    }
+    .small { font-size:12px; opacity:0.7; }
+    .tx { font-size:13px; margin-top:6px; }
   </style>
 </head>
 
@@ -57,7 +50,11 @@
 <script type="module">
 /* ================= FIREBASE ================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import {
+  getFirestore, doc, setDoc, getDoc,
+  updateDoc, collection, addDoc,
+  query, where, orderBy, getDocs
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBWWPgitPhLIYbR-ZmezpaP155cpn1_KPY",
@@ -69,43 +66,79 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+const db = getFirestore(app);
 
 /* ================= TELEGRAM ================= */
-const tg = window.Telegram?.WebApp;
-tg?.ready();
+const tg = window.Telegram.WebApp;
+tg.ready();
 
-const ADMIN_TG_ID = "1303497305"; 
+const ADMIN_TG_ID = "1303497305";
 
-let tgUser = tg?.initDataUnsafe?.user || {
-  id: "browser_user",
-  username: "BrowserUser"
-};
-
+const tgUser = tg.initDataUnsafe.user;
 const wallet = "TG_" + tgUser.id;
-const username = tgUser.username || "User";
 
-/* ================= INIT USER ================= */
+/* ================= INIT ================= */
 const userRef = doc(db, "users", wallet);
 
 async function init() {
   const snap = await getDoc(userRef);
   if (!snap.exists()) {
-    await setDoc(userRef, {
-      username,
-      balance: 0,
-      created: Date.now()
-    });
+    renderRegister();
+  } else {
+    renderDashboard();
   }
-  render();
 }
 
-/* ================= UI ================= */
-async function render() {
+/* ================= REGISTER ================= */
+function renderRegister() {
+  document.getElementById("app").innerHTML = `
+    <div class="box">
+      <h2>Create Username</h2>
+      <input id="uname" placeholder="Choose username (one time)" />
+      <button onclick="register()">Continue</button>
+      <p class="small">Telegram ID = identity<br>Username sirf display ke liye</p>
+    </div>
+  `;
+}
+
+window.register = async function () {
+  const uname = document.getElementById("uname").value.trim();
+  if (!uname) return alert("Username required");
+
+  await setDoc(userRef, {
+    username: uname,
+    balance: 0,
+    createdAt: Date.now()
+  });
+
+  renderDashboard();
+};
+
+/* ================= DASHBOARD ================= */
+async function renderDashboard() {
   const snap = await getDoc(userRef);
   const user = snap.data();
-
   const isAdmin = String(tgUser.id) === ADMIN_TG_ID;
+
+  const txQuery = query(
+    collection(db, "transactions"),
+    where("participants", "array-contains", wallet),
+    orderBy("timestamp", "desc")
+  );
+
+  const txSnap = await getDocs(txQuery);
+  let history = "";
+  txSnap.forEach(d => {
+    const t = d.data();
+    history += `
+      <div class="tx">
+        ${t.from} → ${t.to} : ${t.amount} USDC<br>
+        <span class="small">${new Date(t.timestamp).toLocaleString()}</span>
+      </div>
+    `;
+  });
+
+  if (!history) history = `<p class="small">No transactions yet</p>`;
 
   document.getElementById("app").innerHTML = `
     <div class="box">
@@ -117,10 +150,14 @@ async function render() {
       <b>${user.balance.toFixed(2)} USDC</b>
 
       <hr>
-      <h3>Send USDC</h3>
-      <input id="to" placeholder="Receiver Wallet (TG_123)" />
+      <h3>Send</h3>
+      <input id="to" placeholder="Receiver Wallet (TG_...)" />
       <input id="amt" type="number" placeholder="Amount" />
       <button onclick="send()">Send</button>
+
+      <hr>
+      <h3>History</h3>
+      ${history}
 
       ${isAdmin ? adminPanel() : ""}
     </div>
@@ -154,13 +191,20 @@ window.send = async function () {
   await updateDoc(userRef, { balance: fromSnap.data().balance - amt });
   await updateDoc(toRef, { balance: toSnap.data().balance + amt });
 
-  render();
+  await addDoc(collection(db, "transactions"), {
+    from: wallet,
+    to,
+    amount: amt,
+    participants: [wallet, to],
+    timestamp: Date.now()
+  });
+
+  renderDashboard();
 };
 
 window.addBalance = async function () {
   const w = document.getElementById("aw").value.trim();
   const a = Number(document.getElementById("aa").value);
-
   if (!w || a <= 0) return alert("Invalid");
 
   const ref = doc(db, "users", w);
@@ -168,7 +212,16 @@ window.addBalance = async function () {
   if (!snap.exists()) return alert("User not found");
 
   await updateDoc(ref, { balance: snap.data().balance + a });
-  render();
+
+  await addDoc(collection(db, "transactions"), {
+    from: "SYSTEM",
+    to: w,
+    amount: a,
+    participants: [w],
+    timestamp: Date.now()
+  });
+
+  renderDashboard();
 };
 
 init();
