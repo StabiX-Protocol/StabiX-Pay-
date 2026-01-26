@@ -4,197 +4,168 @@
   <title>StabiX Pay</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    body {
-      background:#0f172a;
-      color:#e5e7eb;
-      font-family: Arial;
-      padding:20px;
-    }
-    .box {
-      background:#020617;
-      border:1px solid #1e293b;
-      border-radius:14px;
-      padding:20px;
-      max-width:420px;
-      margin:auto;
-    }
-    input, button {
-      width:100%;
-      padding:12px;
-      margin-top:10px;
-      border-radius:8px;
-      border:none;
-      font-size:15px;
-    }
-    button {
-      background:#2563eb;
-      color:white;
-      font-weight:bold;
-    }
-    hr {
-      border:0;
-      border-top:1px solid #1e293b;
-      margin:16px 0;
-    }
-    .tx {
-      font-size:13px;
-      margin-top:10px;
-      padding:10px;
-      background:#020617;
-      border-radius:8px;
-      border:1px solid #1e293b;
-    }
-    .small { opacity:0.7; font-size:12px; }
+    body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px }
+    .box { background:#020617; border-radius:14px; padding:20px; max-width:420px; margin:auto }
+    input,button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none }
+    button { background:#2563eb; color:white; font-weight:bold }
+    .tx { font-size:13px; margin-top:8px }
+    .small { font-size:12px; opacity:.7 }
+    hr { border:0; border-top:1px solid #1e293b; margin:15px 0 }
   </style>
 </head>
 
 <body>
-<div id="app"></div>
+<div id="app">Loading...</div>
 
-<script>
-/* ================= TELEGRAM INIT ================= */
-const tg = window.Telegram?.WebApp;
-tg?.ready();
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import {
+  getFirestore, doc, getDoc, setDoc,
+  updateDoc, collection, addDoc,
+  query, where, orderBy, getDocs
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-const tgUser = tg?.initDataUnsafe?.user || {
-  id: "browser_user",
-  first_name: "Browser"
+const firebaseConfig = {
+  apiKey: "AIzaSyBWWPgitPhLIYbR-ZmezpaP155cpn1_KPY",
+  authDomain: "stabix-49cc6.firebaseapp.com",
+  projectId: "stabix-49cc6",
+  storageBucket: "stabix-49cc6.appspot.com",
+  messagingSenderId: "68502925473",
+  appId: "1:68502925473:web:86959dae39a377413800e0"
 };
 
-const WALLET = "TG_" + tgUser.id;
-const ADMIN_TG_ID = "1303497305"; // <- apna TG numeric ID
+const appFB = initializeApp(firebaseConfig);
+const db = getFirestore(appFB);
 
-/* ================= STORAGE ================= */
-let users = JSON.parse(localStorage.getItem("stabix_users") || "{}");
-let txs   = JSON.parse(localStorage.getItem("stabix_txs") || "[]");
+const tg = window.Telegram.WebApp;
+tg.ready();
 
-/* ================= FIRST TIME USER ================= */
-if (!users[WALLET]) {
-  renderUsername();
-} else {
-  renderApp();
+const ADMIN_TG_ID = "1303497305";
+
+const tgUser = tg.initDataUnsafe.user;
+const wallet = "TG_" + tgUser.id;
+
+const userRef = doc(db, "users", wallet);
+
+async function init() {
+  const snap = await getDoc(userRef);
+  if (!snap.exists()) {
+    await setDoc(userRef, {
+      username: tgUser.username || "User",
+      balance: 0,
+      created: Date.now()
+    });
+  }
+  render();
 }
 
-/* ================= UI ================= */
-function renderUsername() {
-  document.getElementById("app").innerHTML = `
-    <div class="box">
-      <h2>Welcome</h2>
-      <p class="small">Set username (only once)</p>
-      <input id="uname" placeholder="Username" />
-      <button onclick="saveUsername()">Continue</button>
-    </div>
-  `;
-}
+async function render() {
+  const snap = await getDoc(userRef);
+  const user = snap.data();
 
-function renderApp() {
-  const user = users[WALLET];
-  const isAdmin = String(tgUser.id) === ADMIN_TG_ID;
+  const txRef = collection(db, "txs");
+  const q = query(
+    txRef,
+    where("users", "array-contains", wallet),
+    orderBy("time", "desc")
+  );
+  const txSnap = await getDocs(q);
 
-  const history = txs
-    .filter(t => t.from === WALLET || t.to === WALLET)
-    .reverse()
-    .map(t => `
+  let history = "";
+  txSnap.forEach(d => {
+    const t = d.data();
+    history += `
       <div class="tx">
-        <b>${t.type}</b> ${t.amount} USDC<br>
+        ${t.from} → ${t.to} : ${t.amount} USDC<br>
         <span class="small">${new Date(t.time).toLocaleString()}</span>
       </div>
-    `).join("") || `<p class="small">No transactions yet</p>`;
+    `;
+  });
 
   document.getElementById("app").innerHTML = `
     <div class="box">
       <h2>${user.username}</h2>
-      <p class="small">${WALLET}</p>
+      <p class="small">${wallet}</p>
 
       <hr>
-      <h3>Balance</h3>
-      <b>${user.balance.toFixed(2)} USDC</b>
+      <b>Balance: ${user.balance} USDC</b>
 
       <hr>
-      <h3>Send USDC</h3>
-      <input id="to" placeholder="Receiver Wallet (TG_123)" />
-      <input id="amt" type="number" placeholder="Amount" />
+      <input id="to" placeholder="Receiver wallet (TG_xxx)">
+      <input id="amt" type="number" placeholder="Amount">
       <button onclick="send()">Send</button>
 
       <hr>
       <h3>History</h3>
-      ${history}
+      ${history || "<p class='small'>No transactions</p>"}
 
-      ${isAdmin ? adminPanel() : ""}
+      ${tgUser.id == ADMIN_TG_ID ? adminPanel() : ""}
     </div>
   `;
 }
+
+window.send = async function () {
+  const to = document.getElementById("to").value.trim();
+  const amt = Number(document.getElementById("amt").value);
+
+  if (!to || amt <= 0) return alert("Invalid");
+
+  const fromSnap = await getDoc(userRef);
+  if (fromSnap.data().balance < amt) return alert("No balance");
+
+  const toRef = doc(db, "users", to);
+  const toSnap = await getDoc(toRef);
+  if (!toSnap.exists()) return alert("Receiver not found");
+
+  await updateDoc(userRef, { balance: fromSnap.data().balance - amt });
+  await updateDoc(toRef, { balance: toSnap.data().balance + amt });
+
+  await addDoc(collection(db, "txs"), {
+    from: wallet,
+    to,
+    amount: amt,
+    users: [wallet, to],
+    time: Date.now()
+  });
+
+  render();
+};
 
 function adminPanel() {
   return `
     <hr>
     <h3>Admin Panel</h3>
-    <input id="aw" placeholder="User Wallet" />
-    <input id="aa" type="number" placeholder="Amount" />
-    <button onclick="addBalance()">Add Balance</button>
+    <input id="aw" placeholder="User wallet">
+    <input id="aa" type="number" placeholder="Amount">
+    <button onclick="mint()">Add Balance</button>
   `;
 }
 
-/* ================= ACTIONS ================= */
-function saveUsername() {
-  const u = document.getElementById("uname").value.trim();
-  if (!u) return alert("Username required");
-
-  users[WALLET] = { username: u, balance: 0 };
-  save();
-  renderApp();
-}
-
-function send() {
-  const to = document.getElementById("to").value.trim();
-  const amt = Number(document.getElementById("amt").value);
-
-  if (!users[to]) return alert("User not found");
-  if (amt <= 0) return alert("Invalid amount");
-  if (users[WALLET].balance < amt) return alert("Insufficient balance");
-
-  users[WALLET].balance -= amt;
-  users[to].balance += amt;
-
-  txs.push({
-    from: WALLET,
-    to,
-    amount: amt,
-    type: "Sent",
-    time: Date.now()
-  });
-
-  save();
-  renderApp();
-}
-
-function addBalance() {
+window.mint = async function () {
   const w = document.getElementById("aw").value.trim();
   const a = Number(document.getElementById("aa").value);
 
-  if (!users[w] || a <= 0) return alert("Invalid");
+  const ref = doc(db, "users", w);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return alert("User not found");
 
-  users[w].balance += a;
-  txs.push({
+  await updateDoc(ref, { balance: snap.data().balance + a });
+
+  await addDoc(collection(db, "txs"), {
     from: "SYSTEM",
     to: w,
     amount: a,
-    type: "Admin Credit",
+    users: [w],
     time: Date.now()
   });
 
-  save();
-  renderApp();
-}
+  render();
+};
 
-function save() {
-  localStorage.setItem("stabix_users", JSON.stringify(users));
-  localStorage.setItem("stabix_txs", JSON.stringify(txs));
-}
+init();
 </script>
 </body>
 </html>
