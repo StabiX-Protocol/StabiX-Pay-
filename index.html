@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>StabiX Ledger</title>
+  <title>StabiX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <style>
     body {
       background:#0f172a;
       color:#e5e7eb;
-      font-family: Arial, sans-serif;
+      font-family: Arial;
       padding:20px;
     }
     .box {
@@ -19,14 +18,11 @@
       max-width:420px;
       margin:auto;
     }
-    h2,h3 {
-      margin-top:0;
-    }
     input, button {
       width:100%;
-      padding:10px;
+      padding:12px;
       margin-top:10px;
-      border-radius:6px;
+      border-radius:8px;
       border:none;
       font-size:15px;
     }
@@ -35,12 +31,9 @@
       color:white;
       font-weight:bold;
     }
-    button.secondary {
-      background:#1e293b;
-    }
     .small {
       font-size:12px;
-      opacity:0.75;
+      opacity:0.7;
       margin-top:10px;
     }
     hr {
@@ -48,101 +41,100 @@
       border-top:1px solid #1e293b;
       margin:15px 0;
     }
-    ul {
-      padding-left:18px;
-    }
-    li {
-      font-size:14px;
-      margin-bottom:6px;
+    .admin {
+      border:1px solid #334155;
+      padding:12px;
+      border-radius:10px;
+      background:#020617;
+      margin-top:15px;
     }
   </style>
 </head>
 
 <body>
-
 <div id="app"></div>
 
 <script>
-/* ===============================
-   STATE
-================================ */
-let balance = 0;
-let transactions = [];
+/* =========================
+   CONFIG
+========================= */
+const ADMIN_WALLET = "0x6b7caa5b11106dfac2a415fd98e01e38c42f0e8d";
 
-/* ===============================
-   CHECK REGISTRATION
-================================ */
+/* =========================
+   STORAGE
+========================= */
 const wallet = localStorage.getItem("stabix_wallet");
 const username = localStorage.getItem("stabix_username");
 
-/* ===============================
+/* =========================
    DASHBOARD
-================================ */
+========================= */
 if (wallet && username) {
+
+  let adminPanel = "";
+  if (wallet.toLowerCase() === ADMIN_WALLET.toLowerCase()) {
+    adminPanel = `
+      <div class="admin">
+        <h3>System Panel</h3>
+        <p class="small">• Credit / Debit users<br>
+        • Review transactions<br>
+        • Sync balances</p>
+      </div>
+    `;
+  }
 
   document.getElementById("app").innerHTML = `
     <div class="box">
       <h2>Welcome, ${username}</h2>
 
-      <p class="small"><b>Wallet</b><br>${wallet}</p>
+      <p class="small">Wallet</p>
+      <p>${wallet}</p>
 
       <hr>
 
       <h3>Balance</h3>
-      <p>USDC: <b><span id="balance">0.00</span></b></p>
+      <p><b>USDC 0.00</b></p>
 
       <hr>
 
-      <h3>Send USDC</h3>
-      <input id="toUser" placeholder="Recipient Username" />
-      <input id="amount" type="number" placeholder="Amount" />
-      <button onclick="sendUSDC()">Send</button>
+      <h3>Transactions</h3>
+      <p class="small">No activity yet</p>
 
-      <hr>
-
-      <h3>Transaction History</h3>
-      <ul id="txList">
-        <li>No transactions yet</li>
-      </ul>
+      ${adminPanel}
 
       <hr>
 
       <p class="small">
-        🔐 Secure internal ledger<br>
-        ⚡ Instant transfers<br>
-        📊 Balance updates in real-time
+        🔐 Secure account<br>
+        ⚡ Instant internal transfers<br>
+        📈 Balance updates in real time
       </p>
 
-      <button class="secondary" onclick="logout()">Logout</button>
+      <button onclick="logout()">Logout</button>
     </div>
   `;
-
-  updateUI();
 }
 
-/* ===============================
+/* =========================
    REGISTRATION
-================================ */
+========================= */
 else {
   document.getElementById("app").innerHTML = `
     <div class="box">
-      <h2>Register on StabiX</h2>
+      <h2>Create Account</h2>
 
       <input id="walletInput" placeholder="Wallet Address" />
-      <input id="usernameInput" placeholder="Choose Username (one-time)" />
+      <input id="usernameInput" placeholder="Username (one-time)" />
 
-      <button onclick="register()">Register</button>
+      <button onclick="register()">Continue</button>
 
       <p class="small">
-        ⚠️ Username cannot be changed later
+        Username cannot be changed later
       </p>
     </div>
   `;
 }
 
-/* ===============================
-   FUNCTIONS
-================================ */
 function register() {
   const w = document.getElementById("walletInput").value.trim();
   const u = document.getElementById("usernameInput").value.trim();
@@ -154,46 +146,7 @@ function register() {
 
   localStorage.setItem("stabix_wallet", w);
   localStorage.setItem("stabix_username", u);
-
-  alert("Registered Successfully");
   location.reload();
-}
-
-function sendUSDC() {
-  const to = document.getElementById("toUser").value.trim();
-  const amt = Number(document.getElementById("amount").value);
-
-  if (!to || amt <= 0) {
-    alert("Invalid input");
-    return;
-  }
-
-  if (balance < amt) {
-    alert("Insufficient balance");
-    return;
-  }
-
-  balance -= amt;
-  transactions.unshift(`Sent ${amt} USDC to @${to}`);
-  updateUI();
-}
-
-function updateUI() {
-  document.getElementById("balance").innerText = balance.toFixed(2);
-
-  const txList = document.getElementById("txList");
-  txList.innerHTML = "";
-
-  if (transactions.length === 0) {
-    txList.innerHTML = "<li>No transactions yet</li>";
-    return;
-  }
-
-  transactions.forEach(tx => {
-    const li = document.createElement("li");
-    li.innerText = tx;
-    txList.appendChild(li);
-  });
 }
 
 function logout() {
@@ -201,6 +154,5 @@ function logout() {
   location.reload();
 }
 </script>
-
 </body>
 </html>
