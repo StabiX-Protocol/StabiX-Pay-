@@ -4,7 +4,7 @@
   <title>StabiX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- TELEGRAM MINI APP SDK -->
+  <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
@@ -54,53 +54,56 @@
 <body>
 <div id="app"></div>
 
-<script>
-/* ================= TELEGRAM INIT ================= */
+<script type="module">
+/* ================= FIREBASE ================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBWWPgitPhLIYbR-ZmezpaP155cpn1_KPY",
+  authDomain: "stabix-49cc6.firebaseapp.com",
+  projectId: "stabix-49cc6",
+  storageBucket: "stabix-49cc6.appspot.com",
+  messagingSenderId: "68502925473",
+  appId: "1:68502925473:web:86959dae39a377413800e0"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+/* ================= TELEGRAM ================= */
 const tg = window.Telegram?.WebApp;
 tg?.ready();
 
-/* ================= CONFIG ================= */
-const ADMIN_TG_ID = "123456789"; // <- apna Telegram numeric ID daal
-const ADMIN_WALLET = "ADMIN";
+const ADMIN_TG_ID = "123456789"; // 🔴 apna numeric Telegram ID daal
 
-/* ================= USER FROM TELEGRAM ================= */
-let tgUser = tg?.initDataUnsafe?.user || null;
-
-// Fallback for browser testing
-if (!tgUser) {
-  tgUser = {
-    id: "browser_user",
-    username: "BrowserUser",
-    first_name: "Browser"
-  };
-}
+let tgUser = tg?.initDataUnsafe?.user || {
+  id: "browser_user",
+  username: "BrowserUser"
+};
 
 const wallet = "TG_" + tgUser.id;
-const username = tgUser.username || tgUser.first_name || "User";
+const username = tgUser.username || "User";
 
-/* ================= STORAGE ================= */
-let users = JSON.parse(localStorage.getItem("stabix_users") || "{}");
-let txs   = JSON.parse(localStorage.getItem("stabix_txs") || []);
+/* ================= INIT USER ================= */
+const userRef = doc(db, "users", wallet);
 
-/* ================= INIT ================= */
-if (!users[wallet]) {
-  users[wallet] = { username, balance: 0 };
-  save();
+async function init() {
+  const snap = await getDoc(userRef);
+  if (!snap.exists()) {
+    await setDoc(userRef, {
+      username,
+      balance: 0,
+      created: Date.now()
+    });
+  }
+  render();
 }
-renderDashboard();
 
 /* ================= UI ================= */
-function renderDashboard() {
-  const user = users[wallet];
-
-  const history = txs
-    .filter(t => t.from === wallet || t.to === wallet)
-    .slice(-5).reverse()
-    .map(t => `
-      <div class="tx">
-        ${t.from} → ${t.to} : ${t.amount} USDC
-      </div>
-    `).join("") || `<p class="small">No activity yet</p>`;
+async function render() {
+  const snap = await getDoc(userRef);
+  const user = snap.data();
 
   const isAdmin = String(tgUser.id) === ADMIN_TG_ID;
 
@@ -115,16 +118,11 @@ function renderDashboard() {
 
       <hr>
       <h3>Send USDC</h3>
-      <input id="toWallet" placeholder="Receiver Wallet (TG_123)" />
+      <input id="to" placeholder="Receiver Wallet (TG_123)" />
       <input id="amt" type="number" placeholder="Amount" />
       <button onclick="send()">Send</button>
 
-      <hr>
-      <h3>Activity</h3>
-      ${history}
-
       ${isAdmin ? adminPanel() : ""}
-
     </div>
   `;
 }
@@ -140,35 +138,40 @@ function adminPanel() {
 }
 
 /* ================= ACTIONS ================= */
-function send() {
-  const to = document.getElementById("toWallet").value.trim();
-  const amt = parseFloat(document.getElementById("amt").value);
+window.send = async function () {
+  const to = document.getElementById("to").value.trim();
+  const amt = Number(document.getElementById("amt").value);
 
-  if (!users[to]) return alert("Wallet not registered");
-  if (amt <= 0) return alert("Invalid amount");
-  if (users[wallet].balance < amt) return alert("Insufficient balance");
+  if (!to || amt <= 0) return alert("Invalid input");
 
-  users[wallet].balance -= amt;
-  users[to].balance += amt;
-  txs.push({ from: wallet, to, amount: amt });
-  save();
-  renderDashboard();
-}
+  const fromSnap = await getDoc(userRef);
+  if (fromSnap.data().balance < amt) return alert("Insufficient balance");
 
-function addBalance() {
+  const toRef = doc(db, "users", to);
+  const toSnap = await getDoc(toRef);
+  if (!toSnap.exists()) return alert("User not found");
+
+  await updateDoc(userRef, { balance: fromSnap.data().balance - amt });
+  await updateDoc(toRef, { balance: toSnap.data().balance + amt });
+
+  render();
+};
+
+window.addBalance = async function () {
   const w = document.getElementById("aw").value.trim();
-  const a = parseFloat(document.getElementById("aa").value);
-  if (!users[w]) return alert("Wallet not found");
-  users[w].balance += a;
-  txs.push({ from: "SYSTEM", to: w, amount: a });
-  save();
-  renderDashboard();
-}
+  const a = Number(document.getElementById("aa").value);
 
-function save() {
-  localStorage.setItem("stabix_users", JSON.stringify(users));
-  localStorage.setItem("stabix_txs", JSON.stringify(txs));
-}
+  if (!w || a <= 0) return alert("Invalid");
+
+  const ref = doc(db, "users", w);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return alert("User not found");
+
+  await updateDoc(ref, { balance: snap.data().balance + a });
+  render();
+};
+
+init();
 </script>
 </body>
 </html>
