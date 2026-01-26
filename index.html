@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>StabiX Ledger - Register</title>
+  <title>StabiX Off-Chain Ledger</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
     body {
       background:#0f172a;
@@ -24,6 +25,7 @@
       margin-top:10px;
       border-radius:6px;
       border:none;
+      font-size:15px;
     }
     button {
       background:#2563eb;
@@ -33,41 +35,108 @@
     .small {
       font-size:12px;
       opacity:0.7;
+      margin-top:10px;
+    }
+    hr {
+      border:0;
+      border-top:1px solid #1e293b;
+      margin:15px 0;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="box">
-    <h2>Register on StabiX Ledger</h2>
-
-    <input id="wallet" placeholder="Wallet Address" />
-    <input id="username" placeholder="Choose Username (one-time)" />
-
-    <button onclick="register()">Register</button>
-
-    <p class="small">
-      ⚠️ Username cannot be changed later  
-      <br>Ledger is off-chain, settlement by admin
-    </p>
-  </div>
+<div id="app"></div>
 
 <script>
-function register() {
-  const wallet = document.getElementById("wallet").value;
-  const username = document.getElementById("username").value;
+/* ===============================
+   CHECK REGISTRATION
+================================ */
+const wallet = localStorage.getItem("stabix_wallet");
+const username = localStorage.getItem("stabix_username");
 
-  if (!wallet || !username) {
+/* ===============================
+   DASHBOARD (REGISTERED USER)
+================================ */
+if (wallet && username) {
+
+  document.getElementById("app").innerHTML = `
+    <div class="box">
+      <h2>Welcome, ${username}</h2>
+
+      <p><b>Wallet</b><br>${wallet}</p>
+
+      <hr>
+
+      <h3>Balance</h3>
+      <p>USDC: <b>0.00</b></p>
+
+      <hr>
+
+      <h3>Transaction History</h3>
+      <p class="small">No transactions yet</p>
+
+      <hr>
+
+      <p class="small">
+        🔒 Off-chain ledger<br>
+        💼 Deposits & withdrawals handled by admin<br>
+        📄 On-chain settlement happens later
+      </p>
+
+      <button onclick="logout()">Logout</button>
+    </div>
+  `;
+
+}
+/* ===============================
+   REGISTRATION UI (NEW USER)
+================================ */
+else {
+
+  document.getElementById("app").innerHTML = `
+    <div class="box">
+      <h2>Register on StabiX Ledger</h2>
+
+      <input id="walletInput" placeholder="Wallet Address" />
+      <input id="usernameInput" placeholder="Choose Username (one-time)" />
+
+      <button onclick="register()">Register</button>
+
+      <p class="small">
+        ⚠️ Username cannot be changed later<br>
+        Ledger is off-chain, settlement by admin
+      </p>
+    </div>
+  `;
+}
+
+/* ===============================
+   REGISTER FUNCTION
+================================ */
+function register() {
+  const w = document.getElementById("walletInput").value.trim();
+  const u = document.getElementById("usernameInput").value.trim();
+
+  if (!w || !u) {
     alert("Fill all fields");
     return;
   }
 
-  alert(
-    "Registered Successfully\n\nWallet: " + wallet +
-    "\nUsername: " + username +
-    "\n\n(Next step UI will unlock later)"
-  );
+  localStorage.setItem("stabix_wallet", w);
+  localStorage.setItem("stabix_username", u);
+
+  alert("Registered Successfully");
+  location.reload();
+}
+
+/* ===============================
+   LOGOUT (TESTING ONLY)
+================================ */
+function logout() {
+  localStorage.clear();
+  location.reload();
 }
 </script>
 
