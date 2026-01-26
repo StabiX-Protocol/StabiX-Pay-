@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>StabiX Pay</title>
+  <title>StabiX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
     body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px }
-    .box { background:#020617; border-radius:14px; padding:20px; max-width:420px; margin:auto }
+    .box { background:#020617; border:1px solid #1e293b; border-radius:12px; padding:20px; max-width:420px; margin:auto }
     input,button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none }
     button { background:#2563eb; color:white; font-weight:bold }
-    .tx { font-size:13px; margin-top:8px }
-    .small { font-size:12px; opacity:.7 }
     hr { border:0; border-top:1px solid #1e293b; margin:15px 0 }
+    .tx { font-size:13px; margin-top:6px }
+    .small { font-size:12px; opacity:.7 }
   </style>
 </head>
 
@@ -22,11 +21,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import {
-  getFirestore, doc, getDoc, setDoc,
-  updateDoc, collection, addDoc,
-  query, where, orderBy, getDocs
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBWWPgitPhLIYbR-ZmezpaP155cpn1_KPY",
@@ -47,7 +42,6 @@ const ADMIN_TG_ID = "1303497305";
 
 const tgUser = tg.initDataUnsafe.user;
 const wallet = "TG_" + tgUser.id;
-
 const userRef = doc(db, "users", wallet);
 
 async function init() {
@@ -56,7 +50,8 @@ async function init() {
     await setDoc(userRef, {
       username: tgUser.username || "User",
       balance: 0,
-      created: Date.now()
+      created: Date.now(),
+      history: []
     });
   }
   render();
@@ -66,18 +61,9 @@ async function render() {
   const snap = await getDoc(userRef);
   const user = snap.data();
 
-  const txRef = collection(db, "txs");
-  const q = query(
-    txRef,
-    where("users", "array-contains", wallet),
-    orderBy("time", "desc")
-  );
-  const txSnap = await getDocs(q);
-
-  let history = "";
-  txSnap.forEach(d => {
-    const t = d.data();
-    history += `
+  let historyHTML = "";
+  user.history.slice().reverse().forEach(t => {
+    historyHTML += `
       <div class="tx">
         ${t.from} → ${t.to} : ${t.amount} USDC<br>
         <span class="small">${new Date(t.time).toLocaleString()}</span>
@@ -94,13 +80,13 @@ async function render() {
       <b>Balance: ${user.balance} USDC</b>
 
       <hr>
-      <input id="to" placeholder="Receiver wallet (TG_xxx)">
+      <input id="to" placeholder="Receiver Wallet (TG_xxx)">
       <input id="amt" type="number" placeholder="Amount">
       <button onclick="send()">Send</button>
 
       <hr>
       <h3>History</h3>
-      ${history || "<p class='small'>No transactions</p>"}
+      ${historyHTML || "<p class='small'>No transactions</p>"}
 
       ${tgUser.id == ADMIN_TG_ID ? adminPanel() : ""}
     </div>
@@ -110,25 +96,25 @@ async function render() {
 window.send = async function () {
   const to = document.getElementById("to").value.trim();
   const amt = Number(document.getElementById("amt").value);
-
   if (!to || amt <= 0) return alert("Invalid");
 
   const fromSnap = await getDoc(userRef);
-  if (fromSnap.data().balance < amt) return alert("No balance");
+  if (fromSnap.data().balance < amt) return alert("Insufficient");
 
   const toRef = doc(db, "users", to);
   const toSnap = await getDoc(toRef);
-  if (!toSnap.exists()) return alert("Receiver not found");
+  if (!toSnap.exists()) return alert("User not found");
 
-  await updateDoc(userRef, { balance: fromSnap.data().balance - amt });
-  await updateDoc(toRef, { balance: toSnap.data().balance + amt });
+  const tx = { from: wallet, to, amount: amt, time: Date.now() };
 
-  await addDoc(collection(db, "txs"), {
-    from: wallet,
-    to,
-    amount: amt,
-    users: [wallet, to],
-    time: Date.now()
+  await updateDoc(userRef, {
+    balance: fromSnap.data().balance - amt,
+    history: [...fromSnap.data().history, tx]
+  });
+
+  await updateDoc(toRef, {
+    balance: toSnap.data().balance + amt,
+    history: [...toSnap.data().history, tx]
   });
 
   render();
@@ -147,19 +133,17 @@ function adminPanel() {
 window.mint = async function () {
   const w = document.getElementById("aw").value.trim();
   const a = Number(document.getElementById("aa").value);
+  if (!w || a <= 0) return alert("Invalid");
 
   const ref = doc(db, "users", w);
   const snap = await getDoc(ref);
   if (!snap.exists()) return alert("User not found");
 
-  await updateDoc(ref, { balance: snap.data().balance + a });
+  const tx = { from: "SYSTEM", to: w, amount: a, time: Date.now() };
 
-  await addDoc(collection(db, "txs"), {
-    from: "SYSTEM",
-    to: w,
-    amount: a,
-    users: [w],
-    time: Date.now()
+  await updateDoc(ref, {
+    balance: snap.data().balance + a,
+    history: [...snap.data().history, tx]
   });
 
   render();
