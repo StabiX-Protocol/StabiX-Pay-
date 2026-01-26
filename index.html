@@ -3,6 +3,10 @@
 <head>
   <title>StabiX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- TELEGRAM MINI APP SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <style>
     body {
       background:#0f172a;
@@ -51,54 +55,54 @@
 <div id="app"></div>
 
 <script>
+/* ================= TELEGRAM INIT ================= */
+const tg = window.Telegram?.WebApp;
+tg?.ready();
+
 /* ================= CONFIG ================= */
-const ADMIN_WALLET = "0x6b7caa5b11106dfac2a415fd98e01e38c42f0e8d".toLowerCase();
+const ADMIN_TG_ID = "123456789"; // <- apna Telegram numeric ID daal
+const ADMIN_WALLET = "ADMIN";
+
+/* ================= USER FROM TELEGRAM ================= */
+let tgUser = tg?.initDataUnsafe?.user || null;
+
+// Fallback for browser testing
+if (!tgUser) {
+  tgUser = {
+    id: "browser_user",
+    username: "BrowserUser",
+    first_name: "Browser"
+  };
+}
+
+const wallet = "TG_" + tgUser.id;
+const username = tgUser.username || tgUser.first_name || "User";
 
 /* ================= STORAGE ================= */
 let users = JSON.parse(localStorage.getItem("stabix_users") || "{}");
 let txs   = JSON.parse(localStorage.getItem("stabix_txs") || []);
 
-const wallet = localStorage.getItem("stabix_wallet");
-const username = localStorage.getItem("stabix_username");
-
 /* ================= INIT ================= */
-if (!wallet || !username) {
-  renderRegister();
-} else {
-  if (!users[wallet]) {
-    users[wallet] = { username, balance: 0 };
-    save();
-  }
-  renderDashboard();
+if (!users[wallet]) {
+  users[wallet] = { username, balance: 0 };
+  save();
 }
+renderDashboard();
 
 /* ================= UI ================= */
-function renderRegister() {
-  document.getElementById("app").innerHTML = `
-    <div class="box">
-      <h2>Create Account</h2>
-      <input id="w" placeholder="Wallet Address" />
-      <input id="u" placeholder="Username (one-time)" />
-      <button onclick="register()">Continue</button>
-      <p class="small">Username sirf identification ke liye hai</p>
-    </div>
-  `;
-}
-
 function renderDashboard() {
   const user = users[wallet];
+
   const history = txs
     .filter(t => t.from === wallet || t.to === wallet)
     .slice(-5).reverse()
     .map(t => `
       <div class="tx">
-        ${users[t.from]?.username || t.from.slice(0,6)} →
-        ${users[t.to]?.username || t.to.slice(0,6)}
-        : ${t.amount} USDC
+        ${t.from} → ${t.to} : ${t.amount} USDC
       </div>
     `).join("") || `<p class="small">No activity yet</p>`;
 
-  const isAdmin = wallet.toLowerCase() === ADMIN_WALLET;
+  const isAdmin = String(tgUser.id) === ADMIN_TG_ID;
 
   document.getElementById("app").innerHTML = `
     <div class="box">
@@ -111,7 +115,7 @@ function renderDashboard() {
 
       <hr>
       <h3>Send USDC</h3>
-      <input id="toWallet" placeholder="Receiver Wallet Address" />
+      <input id="toWallet" placeholder="Receiver Wallet (TG_123)" />
       <input id="amt" type="number" placeholder="Amount" />
       <button onclick="send()">Send</button>
 
@@ -121,8 +125,6 @@ function renderDashboard() {
 
       ${isAdmin ? adminPanel() : ""}
 
-      <hr>
-      <button onclick="logout()">Logout</button>
     </div>
   `;
 }
@@ -138,25 +140,16 @@ function adminPanel() {
 }
 
 /* ================= ACTIONS ================= */
-function register() {
-  const w = document.getElementById("w").value.trim();
-  const u = document.getElementById("u").value.trim();
-  if (!w || !u) return alert("Fill all fields");
-  localStorage.setItem("stabix_wallet", w);
-  localStorage.setItem("stabix_username", u);
-  location.reload();
-}
-
 function send() {
   const to = document.getElementById("toWallet").value.trim();
   const amt = parseFloat(document.getElementById("amt").value);
+
   if (!users[to]) return alert("Wallet not registered");
   if (amt <= 0) return alert("Invalid amount");
   if (users[wallet].balance < amt) return alert("Insufficient balance");
 
   users[wallet].balance -= amt;
   users[to].balance += amt;
-
   txs.push({ from: wallet, to, amount: amt });
   save();
   renderDashboard();
@@ -170,11 +163,6 @@ function addBalance() {
   txs.push({ from: "SYSTEM", to: w, amount: a });
   save();
   renderDashboard();
-}
-
-function logout() {
-  localStorage.clear();
-  location.reload();
 }
 
 function save() {
