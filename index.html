@@ -34,19 +34,16 @@
     .small {
       font-size:12px;
       opacity:0.7;
-      margin-top:10px;
     }
     hr {
       border:0;
       border-top:1px solid #1e293b;
       margin:15px 0;
     }
-    .admin {
-      border:1px solid #334155;
-      padding:12px;
-      border-radius:10px;
-      background:#020617;
-      margin-top:15px;
+    .tx {
+      font-size:13px;
+      margin-top:6px;
+      opacity:0.9;
     }
   </style>
 </head>
@@ -61,92 +58,119 @@
 const ADMIN_WALLET = "0x6b7caa5b11106dfac2a415fd98e01e38c42f0e8d";
 
 /* =========================
-   STORAGE
+   LOAD USER
 ========================= */
 const wallet = localStorage.getItem("stabix_wallet");
 const username = localStorage.getItem("stabix_username");
+
+let users = JSON.parse(localStorage.getItem("stabix_users") || "{}");
+let txs = JSON.parse(localStorage.getItem("stabix_txs") || []);
 
 /* =========================
    DASHBOARD
 ========================= */
 if (wallet && username) {
 
-  let adminPanel = "";
-  if (wallet.toLowerCase() === ADMIN_WALLET.toLowerCase()) {
-    adminPanel = `
-      <div class="admin">
-        <h3>System Panel</h3>
-        <p class="small">• Credit / Debit users<br>
-        • Review transactions<br>
-        • Sync balances</p>
-      </div>
-    `;
+  if (!users[username]) {
+    users[username] = { balance: 0 };
+    localStorage.setItem("stabix_users", JSON.stringify(users));
   }
+
+  render();
+
+} else {
+  renderRegister();
+}
+
+/* =========================
+   RENDER FUNCTIONS
+========================= */
+function render() {
+  const balance = users[username].balance;
+
+  let history = txs
+    .filter(t => t.from === username || t.to === username)
+    .slice(-5)
+    .reverse()
+    .map(t => `
+      <div class="tx">
+        ${t.from} → ${t.to} : ${t.amount} USDC
+      </div>
+    `).join("");
+
+  if (!history) history = `<p class="small">No transactions yet</p>`;
 
   document.getElementById("app").innerHTML = `
     <div class="box">
-      <h2>Welcome, ${username}</h2>
-
-      <p class="small">Wallet</p>
-      <p>${wallet}</p>
+      <h2>${username}</h2>
+      <p class="small">${wallet}</p>
 
       <hr>
 
       <h3>Balance</h3>
-      <p><b>USDC 0.00</b></p>
+      <p><b>${balance.toFixed(2)} USDC</b></p>
 
       <hr>
 
-      <h3>Transactions</h3>
-      <p class="small">No activity yet</p>
-
-      ${adminPanel}
+      <h3>Send USDC</h3>
+      <input id="toUser" placeholder="Receiver Username" />
+      <input id="amount" type="number" placeholder="Amount" />
+      <button onclick="send()">Send</button>
 
       <hr>
 
-      <p class="small">
-        🔐 Secure account<br>
-        ⚡ Instant internal transfers<br>
-        📈 Balance updates in real time
-      </p>
+      <h3>Recent Activity</h3>
+      ${history}
+
+      <hr>
 
       <button onclick="logout()">Logout</button>
     </div>
   `;
 }
 
-/* =========================
-   REGISTRATION
-========================= */
-else {
+function renderRegister() {
   document.getElementById("app").innerHTML = `
     <div class="box">
       <h2>Create Account</h2>
-
       <input id="walletInput" placeholder="Wallet Address" />
       <input id="usernameInput" placeholder="Username (one-time)" />
-
       <button onclick="register()">Continue</button>
-
-      <p class="small">
-        Username cannot be changed later
-      </p>
     </div>
   `;
 }
 
+/* =========================
+   ACTIONS
+========================= */
 function register() {
-  const w = document.getElementById("walletInput").value.trim();
-  const u = document.getElementById("usernameInput").value.trim();
+  const w = walletInput.value.trim();
+  const u = usernameInput.value.trim();
 
-  if (!w || !u) {
-    alert("Fill all fields");
-    return;
-  }
+  if (!w || !u) return alert("Fill all fields");
 
   localStorage.setItem("stabix_wallet", w);
   localStorage.setItem("stabix_username", u);
   location.reload();
+}
+
+function send() {
+  const to = document.getElementById("toUser").value.trim();
+  const amt = parseFloat(document.getElementById("amount").value);
+
+  if (!users[to]) return alert("User not found");
+  if (amt <= 0) return alert("Invalid amount");
+  if (users[username].balance < amt) return alert("Insufficient balance");
+
+  users[username].balance -= amt;
+  users[to].balance += amt;
+
+  txs.push({ from: username, to, amount: amt });
+
+  localStorage.setItem("stabix_users", JSON.stringify(users));
+  localStorage.setItem("stabix_txs", JSON.stringify(txs));
+
+  render();
 }
 
 function logout() {
