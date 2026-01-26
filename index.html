@@ -1,80 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>StabiX Off-Chain Ledger</title>
+  <title>StabiX Ledger - Register</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #e5e7eb;
-      padding: 20px;
+      background:#0f172a;
+      color:#e5e7eb;
+      font-family: Arial;
+      padding:20px;
     }
     .box {
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 15px;
-    }
-    h2 {
-      margin-top: 0;
+      background:#020617;
+      border:1px solid #1e293b;
+      border-radius:10px;
+      padding:20px;
+      max-width:420px;
+      margin:auto;
     }
     input, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 8px;
-      border-radius: 6px;
-      border: none;
+      width:100%;
+      padding:10px;
+      margin-top:10px;
+      border-radius:6px;
+      border:none;
     }
     button {
-      background: #2563eb;
-      color: white;
-      font-weight: bold;
+      background:#2563eb;
+      color:white;
+      font-weight:bold;
     }
     .small {
-      font-size: 12px;
-      opacity: 0.7;
+      font-size:12px;
+      opacity:0.7;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>StabiX Off-Chain Ledger</h1>
-  <p class="small">Manual ledger · GitHub hosted · Admin controlled</p>
-
-  <!-- USER PANEL -->
   <div class="box">
-    <h2>User Panel</h2>
-    <input placeholder="Wallet Address / User ID" />
-    <button>View Balance</button>
-    <p class="small">Balance: -- USDC</p>
+    <h2>Register on StabiX Ledger</h2>
+
+    <input id="wallet" placeholder="Wallet Address" />
+    <input id="username" placeholder="Choose Username (one-time)" />
+
+    <button onclick="register()">Register</button>
+
+    <p class="small">
+      ⚠️ Username cannot be changed later  
+      <br>Ledger is off-chain, settlement by admin
+    </p>
   </div>
 
-  <!-- SEND / RECEIVE -->
-  <div class="box">
-    <h2>Send / Receive (Ledger Only)</h2>
-    <input placeholder="To User ID" />
-    <input placeholder="Amount (USDC)" />
-    <button>Submit</button>
-    <p class="small">⚠️ Off-chain only. On-chain settlement by admin.</p>
-  </div>
+<script>
+function register() {
+  const wallet = document.getElementById("wallet").value;
+  const username = document.getElementById("username").value;
 
-  <!-- TRANSACTION HISTORY -->
-  <div class="box">
-    <h2>Transaction History</h2>
-    <p class="small">No transactions yet</p>
-  </div>
+  if (!wallet || !username) {
+    alert("Fill all fields");
+    return;
+  }
 
-  <!-- ADMIN PANEL -->
-  <div class="box">
-    <h2>Admin Panel</h2>
-    <input placeholder="User ID" />
-    <input placeholder="Credit / Debit Amount" />
-    <button>Update Ledger</button>
-    <p class="small">Admin controlled · Manual settlement</p>
-  </div>
+  alert(
+    "Registered Successfully\n\nWallet: " + wallet +
+    "\nUsername: " + username +
+    "\n\n(Next step UI will unlock later)"
+  );
+}
+</script>
 
 </body>
 </html>
