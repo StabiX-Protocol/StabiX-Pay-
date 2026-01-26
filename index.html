@@ -31,26 +31,18 @@
       color:white;
       font-weight:bold;
     }
-    .small {
-      font-size:12px;
-      opacity:0.7;
-    }
     hr {
       border:0;
       border-top:1px solid #1e293b;
       margin:15px 0;
     }
+    .small {
+      font-size:12px;
+      opacity:0.7;
+    }
     .tx {
       font-size:13px;
       margin-top:6px;
-      opacity:0.9;
-    }
-    .admin {
-      background:#020617;
-      border:1px dashed #334155;
-      padding:15px;
-      margin-top:15px;
-      border-radius:10px;
     }
   </style>
 </head>
@@ -59,95 +51,75 @@
 <div id="app"></div>
 
 <script>
-/* =========================
-   CONFIG
-========================= */
-const ADMIN_WALLET = "0x6b7caa5b11106dfac2a415fd98e01e38c42f0e8d";
+/* ================= CONFIG ================= */
+const ADMIN_WALLET = "0x6b7caa5b11106dfac2a415fd98e01e38c42f0e8d".toLowerCase();
 
-/* =========================
-   LOAD STORAGE (SAFE)
-========================= */
-let wallet = localStorage.getItem("stabix_wallet");
-let username = localStorage.getItem("stabix_username");
-
+/* ================= STORAGE ================= */
 let users = JSON.parse(localStorage.getItem("stabix_users") || "{}");
-if (!users || typeof users !== "object") users = {};
+let txs   = JSON.parse(localStorage.getItem("stabix_txs") || []);
 
-let txs = JSON.parse(localStorage.getItem("stabix_txs") || "[]");
-if (!Array.isArray(txs)) txs = [];
+const wallet = localStorage.getItem("stabix_wallet");
+const username = localStorage.getItem("stabix_username");
 
-/* =========================
-   INIT
-========================= */
-if (wallet && username) {
-  if (!users[username]) {
-    users[username] = { balance: 0 };
+/* ================= INIT ================= */
+if (!wallet || !username) {
+  renderRegister();
+} else {
+  if (!users[wallet]) {
+    users[wallet] = { username, balance: 0 };
     save();
   }
-  render();
-} else {
-  renderRegister();
+  renderDashboard();
 }
 
-/* =========================
-   RENDER
-========================= */
-function render() {
-  if (!users[username]) {
-    users[username] = { balance: 0 };
-    save();
-  }
+/* ================= UI ================= */
+function renderRegister() {
+  document.getElementById("app").innerHTML = `
+    <div class="box">
+      <h2>Create Account</h2>
+      <input id="w" placeholder="Wallet Address" />
+      <input id="u" placeholder="Username (one-time)" />
+      <button onclick="register()">Continue</button>
+      <p class="small">Username sirf identification ke liye hai</p>
+    </div>
+  `;
+}
 
-  const balance = users[username].balance;
-
-  let history = txs
-    .filter(t => t.from === username || t.to === username)
-    .slice(-5)
-    .reverse()
+function renderDashboard() {
+  const user = users[wallet];
+  const history = txs
+    .filter(t => t.from === wallet || t.to === wallet)
+    .slice(-5).reverse()
     .map(t => `
       <div class="tx">
-        ${t.from} → ${t.to} : ${t.amount} USDC
+        ${users[t.from]?.username || t.from.slice(0,6)} →
+        ${users[t.to]?.username || t.to.slice(0,6)}
+        : ${t.amount} USDC
       </div>
-    `).join("");
+    `).join("") || `<p class="small">No activity yet</p>`;
 
-  if (!history) history = `<p class="small">No transactions yet</p>`;
-
-  let adminPanel = "";
-  if (wallet.toLowerCase() === ADMIN_WALLET.toLowerCase()) {
-    adminPanel = `
-      <hr>
-      <div class="admin">
-        <h3>System Panel</h3>
-        <input id="adminUser" placeholder="Username" />
-        <input id="adminAmt" type="number" placeholder="Amount" />
-        <button onclick="adminCredit()">Add Balance</button>
-      </div>
-    `;
-  }
+  const isAdmin = wallet.toLowerCase() === ADMIN_WALLET;
 
   document.getElementById("app").innerHTML = `
     <div class="box">
-      <h2>${username}</h2>
+      <h2>${user.username}</h2>
       <p class="small">${wallet}</p>
 
       <hr>
-
       <h3>Balance</h3>
-      <p><b>${balance.toFixed(2)} USDC</b></p>
+      <b>${user.balance.toFixed(2)} USDC</b>
 
       <hr>
-
-      <h3>Send</h3>
-      <input id="toUser" placeholder="Receiver Username" />
-      <input id="amount" type="number" placeholder="Amount" />
+      <h3>Send USDC</h3>
+      <input id="toWallet" placeholder="Receiver Wallet Address" />
+      <input id="amt" type="number" placeholder="Amount" />
       <button onclick="send()">Send</button>
 
       <hr>
-
       <h3>Activity</h3>
       ${history}
 
-      ${adminPanel}
+      ${isAdmin ? adminPanel() : ""}
 
       <hr>
       <button onclick="logout()">Logout</button>
@@ -155,68 +127,59 @@ function render() {
   `;
 }
 
-function renderRegister() {
-  document.getElementById("app").innerHTML = `
-    <div class="box">
-      <h2>Create Account</h2>
-      <input id="walletInput" placeholder="Wallet Address" />
-      <input id="usernameInput" placeholder="Username (one-time)" />
-      <button onclick="register()">Continue</button>
-    </div>
+function adminPanel() {
+  return `
+    <hr>
+    <h3>System Panel</h3>
+    <input id="aw" placeholder="User Wallet" />
+    <input id="aa" type="number" placeholder="Amount" />
+    <button onclick="addBalance()">Add Balance</button>
   `;
 }
 
-/* =========================
-   ACTIONS
-========================= */
+/* ================= ACTIONS ================= */
 function register() {
-  const w = walletInput.value.trim();
-  const u = usernameInput.value.trim();
+  const w = document.getElementById("w").value.trim();
+  const u = document.getElementById("u").value.trim();
   if (!w || !u) return alert("Fill all fields");
-
   localStorage.setItem("stabix_wallet", w);
   localStorage.setItem("stabix_username", u);
   location.reload();
 }
 
 function send() {
-  const to = document.getElementById("toUser").value.trim();
-  const amt = parseFloat(document.getElementById("amount").value);
-
-  if (!users[to]) return alert("User not found");
+  const to = document.getElementById("toWallet").value.trim();
+  const amt = parseFloat(document.getElementById("amt").value);
+  if (!users[to]) return alert("Wallet not registered");
   if (amt <= 0) return alert("Invalid amount");
-  if (users[username].balance < amt) return alert("Insufficient balance");
+  if (users[wallet].balance < amt) return alert("Insufficient balance");
 
-  users[username].balance -= amt;
+  users[wallet].balance -= amt;
   users[to].balance += amt;
 
-  txs.push({ from: username, to, amount: amt });
+  txs.push({ from: wallet, to, amount: amt });
   save();
-  render();
+  renderDashboard();
 }
 
-function adminCredit() {
-  const u = document.getElementById("adminUser").value.trim();
-  const a = parseFloat(document.getElementById("adminAmt").value);
-
-  if (!users[u]) return alert("User not found");
-  if (a <= 0) return alert("Invalid amount");
-
-  users[u].balance += a;
-  txs.push({ from: "system", to: u, amount: a });
-
+function addBalance() {
+  const w = document.getElementById("aw").value.trim();
+  const a = parseFloat(document.getElementById("aa").value);
+  if (!users[w]) return alert("Wallet not found");
+  users[w].balance += a;
+  txs.push({ from: "SYSTEM", to: w, amount: a });
   save();
-  render();
-}
-
-function save() {
-  localStorage.setItem("stabix_users", JSON.stringify(users));
-  localStorage.setItem("stabix_txs", JSON.stringify(txs));
+  renderDashboard();
 }
 
 function logout() {
   localStorage.clear();
   location.reload();
+}
+
+function save() {
+  localStorage.setItem("stabix_users", JSON.stringify(users));
+  localStorage.setItem("stabix_txs", JSON.stringify(txs));
 }
 </script>
 </body>
