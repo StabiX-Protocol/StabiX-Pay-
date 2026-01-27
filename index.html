@@ -125,16 +125,20 @@ async function render() {
 
   const isAdmin = String(tgUser.id) === ADMIN_TG_ID;
 
-  const historyHtml = (user.history || []).slice().reverse().map(tx => `
-    <div class="tx">
-      <b>${tx.type}</b> — ${tx.amount} USDC<br>
-      <span class="small">
-        From: ${tx.from}<br>
-        To: ${tx.to}<br>
+  const historyHtml = (user.history || []).slice().reverse().map(tx => {
+
+  const color = tx.type === "Sent" ? "#ef4444" : "#22c55e"; // red / green
+  const sign  = tx.type === "Sent" ? "-" : "+";
+
+  return `
+    <div class="tx" style="color:${color}">
+      ${tx.type}: ${sign}${tx.amount} USDC<br>
+      <span class="small" style="color:#94a3b8">
         ${new Date(tx.time).toLocaleString()}
       </span>
     </div>
-  `).join("") || `<p class="small">No transactions yet</p>`;
+  `;
+}).join("") || `<p class="small">No transactions yet</p>`;
 
   document.getElementById("app").innerHTML = `
     <div class="box">
