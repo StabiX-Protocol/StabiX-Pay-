@@ -5,160 +5,61 @@
   <title>StabiX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Telegram SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- Firebase COMPAT (IMPORTANT) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
   <style>
-    body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px; }
-    .box { background:#020617; border:1px solid #1e293b; border-radius:12px; padding:20px; max-width:420px; margin:auto; }
-    input,button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; }
-    button { background:#2563eb; color:white; font-weight:bold; }
-    .tx { font-size:13px; margin-top:6px; }
-    .small { font-size:12px; opacity:0.7; }
-    hr { border:0; border-top:1px solid #1e293b; margin:15px 0; }
+    body {
+      background:#0f172a;
+      color:#e5e7eb;
+      font-family:Arial;
+      padding:20px;
+    }
+    .box {
+      background:#020617;
+      border:1px solid #1e293b;
+      border-radius:12px;
+      padding:20px;
+      max-width:420px;
+      margin:auto;
+    }
   </style>
 </head>
 
 <body>
-<div id="app">Loading…</div>
+<div id="app">Booting…</div>
 
 <script>
-/* ================= TELEGRAM ================= */
-const tg = window.Telegram.WebApp;
-tg.ready();
+/* ================= SAFE TELEGRAM INIT ================= */
+let tgUser = null;
 
-const tgUser = tg.initDataUnsafe.user;
-const WALLET = "TG_" + tgUser.id;
-const USERNAME = tgUser.username || tgUser.first_name || "User";
-const ADMIN_ID = "1303497305"; // apna TG numeric id
-
-/* ================= FIREBASE ================= */
-firebase.initializeApp({
-  apiKey: "AIzaSyBWWPgitPhLIYbR-ZmezpaP155cpn1_KPY",
-  authDomain: "stabix-49cc6.firebaseapp.com",
-  projectId: "stabix-49cc6",
-});
-
-const db = firebase.firestore();
-
-/* ================= INIT ================= */
-const userRef = db.collection("users").doc(WALLET);
-
-async function init() {
-  const snap = await userRef.get();
-  if (!snap.exists) {
-    await userRef.set({
-      username: USERNAME,
-      balance: 0,
-      createdAt: Date.now()
-    });
+try {
+  if (window.Telegram && window.Telegram.WebApp) {
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tgUser = tg.initDataUnsafe?.user || null;
   }
-  render();
+} catch (e) {
+  console.log("Telegram not available");
 }
 
-/* ================= UI ================= */
-async function render() {
-  const snap = await userRef.get();
-  const user = snap.data();
-
-  const txSnap = await db.collection("txs")
-    .where("users", "array-contains", WALLET)
-    .orderBy("time", "desc")
-    .limit(10)
-    .get();
-
-  let history = "";
-  txSnap.forEach(d => {
-    const t = d.data();
-    history += `
-      <div class="tx">
-        ${t.from} → ${t.to} : ${t.amount} USDC<br>
-        <span class="small">${new Date(t.time).toLocaleString()}</span>
-      </div>
-    `;
-  });
-  if (!history) history = "<p class='small'>No history</p>";
-
-  const isAdmin = String(tgUser.id) === ADMIN_ID;
-
-  document.getElementById("app").innerHTML = `
-    <div class="box">
-      <h2>${user.username}</h2>
-      <p class="small">${WALLET}</p>
-
-      <hr>
-      <b>${user.balance.toFixed(2)} USDC</b>
-
-      <hr>
-      <input id="to" placeholder="Receiver TG_xxx">
-      <input id="amt" type="number" placeholder="Amount">
-      <button onclick="send()">Send</button>
-
-      ${isAdmin ? `
-        <hr>
-        <input id="aw" placeholder="User Wallet">
-        <input id="aa" type="number" placeholder="Amount">
-        <button onclick="credit()">Add Balance</button>
-      ` : ""}
-
-      <hr>
-      <h3>History</h3>
-      ${history}
-    </div>
-  `;
+/* ================= USER FALLBACK ================= */
+if (!tgUser) {
+  tgUser = {
+    id: "browser_test",
+    username: "BrowserUser"
+  };
 }
 
-/* ================= ACTIONS ================= */
-async function send() {
-  const to = document.getElementById("to").value.trim();
-  const amt = Number(document.getElementById("amt").value);
-  if (!to || amt <= 0) return alert("Invalid");
+const WALLET = "TG_" + tgUser.id;
+const USERNAME = tgUser.username || "User";
 
-  const fromSnap = await userRef.get();
-  if (fromSnap.data().balance < amt) return alert("Insufficient");
-
-  const toRef = db.collection("users").doc(to);
-  const toSnap = await toRef.get();
-  if (!toSnap.exists) return alert("User not found");
-
-  await userRef.update({ balance: firebase.firestore.FieldValue.increment(-amt) });
-  await toRef.update({ balance: firebase.firestore.FieldValue.increment(amt) });
-
-  await db.collection("txs").add({
-    from: WALLET,
-    to,
-    amount: amt,
-    users: [WALLET, to],
-    time: Date.now()
-  });
-
-  render();
-}
-
-async function credit() {
-  const w = document.getElementById("aw").value.trim();
-  const a = Number(document.getElementById("aa").value);
-  if (!w || a <= 0) return;
-
-  await db.collection("users").doc(w)
-    .update({ balance: firebase.firestore.FieldValue.increment(a) });
-
-  await db.collection("txs").add({
-    from: "SYSTEM",
-    to: w,
-    amount: a,
-    users: [w],
-    time: Date.now()
-  });
-
-  render();
-}
-
-init();
+/* ================= RENDER ================= */
+document.getElementById("app").innerHTML = `
+  <div class="box">
+    <h2>StabiX Loaded ✅</h2>
+    <p>User: ${USERNAME}</p>
+    <p>Wallet: ${WALLET}</p>
+    <p>Status: No crash</p>
+  </div>
+`;
 </script>
 </body>
 </html>
