@@ -6,45 +6,13 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    body {
-      background:#0f172a;
-      color:#e5e7eb;
-      font-family: Arial;
-      padding:20px;
-    }
-    .box {
-      background:#020617;
-      border:1px solid #1e293b;
-      border-radius:12px;
-      padding:20px;
-      max-width:420px;
-      margin:auto;
-    }
-    input, button {
-      width:100%;
-      padding:12px;
-      margin-top:10px;
-      border-radius:8px;
-      border:none;
-      font-size:15px;
-    }
-    button {
-      background:#2563eb;
-      color:white;
-      font-weight:bold;
-    }
-    hr {
-      border:0;
-      border-top:1px solid #1e293b;
-      margin:15px 0;
-    }
-    .small { font-size:12px; opacity:0.7; }
-    .tx {
-      font-size:13px;
-      margin-top:8px;
-      padding-bottom:8px;
-      border-bottom:1px dashed #1e293b;
-    }
+    body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px; }
+    .box { background:#020617; border:1px solid #1e293b; border-radius:12px; padding:20px; max-width:420px; margin:auto; }
+    input, button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; font-size:15px; }
+    button { background:#2563eb; color:white; font-weight:bold; }
+    hr { border:0; border-top:1px solid #1e293b; margin:15px 0; }
+    .small { font-size:12px; opacity:.7; }
+    .tx { font-size:13px; margin-top:8px; padding-bottom:8px; border-bottom:1px dashed #1e293b; }
   </style>
 </head>
 
@@ -77,68 +45,55 @@ tg?.ready();
 
 const ADMIN_TG_ID = "1303497305";
 
-let tgUser = tg?.initDataUnsafe?.user || {
-  id:"browser_user",
-  username:"BrowserUser"
-};
-
+let tgUser = tg?.initDataUnsafe?.user || { id:"browser", username:"Browser" };
 const wallet = "TG_" + tgUser.id;
-const userRef = doc(db, "users", wallet);
-const requestsRef = collection(db, "requests");
+
+const userRef     = doc(db,"users",wallet);
+const requestsRef = collection(db,"requests");
 
 /* ================= INIT ================= */
-async function init() {
+async function init(){
   const snap = await getDoc(userRef);
-  if (!snap.exists()) {
-    document.getElementById("app").innerHTML = `
+  if(!snap.exists()){
+    appDiv(`
       <div class="box">
         <h3>Create Username (one time)</h3>
         <input id="uname" placeholder="Username" />
         <button onclick="saveUsername()">Save</button>
-      </div>`;
+      </div>
+    `);
     return;
   }
   render();
 }
 
-window.saveUsername = async () => {
-  const u = document.getElementById("uname").value.trim();
-  if (!u) return alert("Enter username");
-
-  await setDoc(userRef,{
-    username:u,
-    balance:0,
-    created:Date.now(),
-    history:[]
-  });
+window.saveUsername = async ()=>{
+  const u = uname.value.trim();
+  if(!u) return alert("Enter username");
+  await setDoc(userRef,{ username:u, balance:0, created:Date.now(), history:[] });
   render();
 };
 
 /* ================= RENDER ================= */
-async function render() {
+async function render(){
   const snap = await getDoc(userRef);
   const user = snap.data();
   const isAdmin = String(tgUser.id) === ADMIN_TG_ID;
 
-  const historyHtml = (user.history || []).slice().reverse().map(tx => {
-    const isSent = tx.type === "Sent";
+  const historyHtml = (user.history||[]).slice().reverse().map(tx=>{
+    const isSent = tx.type==="Sent";
     const color  = isSent ? "#ef4444" : "#22c55e";
     const sign   = isSent ? "-" : "+";
-
     return `
       <div class="tx" style="color:${color}">
         <b>${tx.type}</b>: ${sign}${tx.amount} USDC<br>
-        <span class="small">
-          From: ${tx.from}<br>
-          To: ${tx.to}
-        </span><br>
-        <span class="small" style="color:#94a3b8">
-          ${new Date(tx.time).toLocaleString()}
-        </span>
-      </div>`;
+        <span class="small">From: ${tx.from}<br>To: ${tx.to}</span><br>
+        <span class="small" style="color:#94a3b8">${new Date(tx.time).toLocaleString()}</span>
+      </div>
+    `;
   }).join("") || `<p class="small">No transactions yet</p>`;
 
-  document.getElementById("app").innerHTML = `
+  appDiv(`
     <div class="box">
       <h2>${user.username}</h2>
       <p class="small">${wallet}</p>
@@ -146,133 +101,126 @@ async function render() {
       <hr><h3>Balance</h3>
       <b>${user.balance.toFixed(2)} USDC</b>
 
-      <hr><h3>Request Deposit / Withdraw</h3>
-      <input id="reqAmount" type="number" placeholder="Amount" />
-      <input id="reqWallet" placeholder="Your Wallet Address" />
-      <input id="reqHash" placeholder="Tx Hash (for deposit)" />
-      <button onclick="requestDeposit()">Request Deposit</button>
-      <button onclick="requestWithdraw()">Request Withdraw</button>
+      <hr><h3>Send USDC</h3>
+      <input id="to" placeholder="Receiver Wallet (TG_xxx)" />
+      <input id="amt" type="number" placeholder="Amount" />
+      <button onclick="send()">Send</button>
+
+      <hr><h3>Deposit / Withdraw</h3>
+      <input id="rw" placeholder="Your Wallet Address" />
+      <input id="ra" type="number" placeholder="Amount" />
+      <input id="rh" placeholder="Tx Hash (deposit only)" />
+      <button onclick="deposit()">Deposit</button>
+      <button onclick="withdraw()">Withdraw</button>
 
       <hr><h3>Transaction History</h3>
       ${historyHtml}
 
       ${isAdmin ? adminPanel() : ""}
-    </div>`;
+    </div>
+  `);
 }
 
-/* ================= ADMIN PANEL ================= */
-function adminPanel() {
+function adminPanel(){
   return `
     <hr><h3>Admin Panel</h3>
 
     <input id="aw" placeholder="User Wallet (TG_xxx)" />
     <input id="aa" type="number" placeholder="Amount" />
-    <button onclick="addBalance()">Credit User</button>
+    <button onclick="adminCredit()">Admin Deposit</button>
+    <button onclick="adminWithdraw()">Admin Withdraw</button>
 
-    <hr><h4>Pending Requests</h4>
+    <hr><h4>Pending Deposit / Withdraw</h4>
     <button onclick="loadRequests()">Refresh</button>
     <div id="reqList"></div>
-
-    <hr><h4>View Any User History</h4>
-    <input id="hw" placeholder="User Wallet (TG_xxx)" />
-    <button onclick="viewUserHistory()">View History</button>
-    <div id="adminHistory"></div>
   `;
 }
 
-/* ================= USER REQUESTS ================= */
-window.requestDeposit = async () => {
-  const amt = Number(reqAmount.value);
-  const w   = reqWallet.value.trim();
-  const h   = reqHash.value.trim();
-  if (!amt || !w) return alert("Fill all fields");
+/* ================= USER SEND ================= */
+window.send = async ()=>{
+  const to = document.getElementById("to").value.trim();
+  const amt = Number(document.getElementById("amt").value);
+  if(!to||amt<=0) return alert("Invalid");
+  if(to===wallet) return alert("Self transfer not allowed");
 
-  await addDoc(requestsRef,{
-    type:"deposit",
-    user:wallet,
-    amount:amt,
-    walletAddress:w,
-    txHash:h,
-    status:"pending",
-    time:serverTimestamp()
+  const fromSnap = await getDoc(userRef);
+  if(fromSnap.data().balance<amt) return alert("Insufficient balance");
+
+  const toRef = doc(db,"users",to);
+  const toSnap = await getDoc(toRef);
+  if(!toSnap.exists()) return alert("User not found");
+
+  await updateDoc(userRef,{
+    balance: fromSnap.data().balance-amt,
+    history: arrayUnion({ type:"Sent", from:wallet, to, amount:amt, time:Date.now() })
   });
-  alert("Deposit request sent");
+
+  await updateDoc(toRef,{
+    balance: toSnap.data().balance+amt,
+    history: arrayUnion({ type:"Received", from:wallet, to, amount:amt, time:Date.now() })
+  });
+
+  render();
 };
 
-window.requestWithdraw = async () => {
-  const amt = Number(reqAmount.value);
-  const w   = reqWallet.value.trim();
-  if (!amt || !w) return alert("Fill all fields");
-
+/* ================= USER DEPOSIT / WITHDRAW ================= */
+window.deposit = async ()=>{
+  if(!ra.value||!rw.value) return alert("Fill fields");
   await addDoc(requestsRef,{
-    type:"withdraw",
-    user:wallet,
-    amount:amt,
-    walletAddress:w,
-    txHash:"",
-    status:"pending",
-    time:serverTimestamp()
+    type:"deposit", user:wallet, amount:Number(ra.value),
+    walletAddress:rw.value, txHash:rh.value,
+    status:"pending", time:serverTimestamp()
   });
-  alert("Withdraw request sent");
+  alert("Deposit submitted");
+};
+
+window.withdraw = async ()=>{
+  if(!ra.value||!rw.value) return alert("Fill fields");
+  await addDoc(requestsRef,{
+    type:"withdraw", user:wallet, amount:Number(ra.value),
+    walletAddress:rw.value, txHash:"",
+    status:"pending", time:serverTimestamp()
+  });
+  alert("Withdraw submitted");
 };
 
 /* ================= ADMIN ACTIONS ================= */
-window.addBalance = async () => {
-  const w = aw.value.trim();
-  const a = Number(aa.value);
-  if (!w || a<=0) return alert("Invalid");
-
-  const ref = doc(db,"users",w);
+window.adminCredit = async ()=>{
+  const ref = doc(db,"users",aw.value.trim());
   const snap = await getDoc(ref);
-  if (!snap.exists()) return alert("User not found");
-
+  if(!snap.exists()) return alert("User not found");
   await updateDoc(ref,{
-    balance: snap.data().balance + a,
-    history: arrayUnion({
-      type:"Received",
-      from:"ADMIN",
-      to:w,
-      amount:a,
-      time:Date.now()
-    })
+    balance: snap.data().balance+Number(aa.value),
+    history: arrayUnion({ type:"Deposit", from:"ADMIN", to:aw.value, amount:Number(aa.value), time:Date.now() })
   });
   render();
 };
 
-window.loadRequests = async () => {
-  const snap = await getDocs(requestsRef);
-  let html = "";
-  snap.forEach(d=>{
-    const r = d.data();
-    if (r.status!=="pending") return;
-    html+=`
-      <div class="tx">
-        <b>${r.type.toUpperCase()}</b><br>
-        User: ${r.user}<br>
-        Amount: ${r.amount}<br>
-        Wallet: ${r.walletAddress}<br>
-        Hash: ${r.txHash || "-"}<br>
-      </div>`;
-  });
-  reqList.innerHTML = html || "<p class='small'>No pending requests</p>";
-};
-
-window.viewUserHistory = async () => {
-  const w = hw.value.trim();
-  if (!w) return;
-  const ref = doc(db,"users",w);
+window.adminWithdraw = async ()=>{
+  const ref = doc(db,"users",aw.value.trim());
   const snap = await getDoc(ref);
-  if (!snap.exists()) return alert("User not found");
-
-  adminHistory.innerHTML =
-    (snap.data().history||[]).slice().reverse().map(tx=>`
-      <div class="tx">
-        <b>${tx.type}</b>: ${tx.amount}<br>
-        From: ${tx.from}<br>
-        To: ${tx.to}<br>
-        ${new Date(tx.time).toLocaleString()}
-      </div>`).join("") || "No history";
+  if(!snap.exists()) return alert("User not found");
+  if(snap.data().balance<Number(aa.value)) return alert("Insufficient");
+  await updateDoc(ref,{
+    balance: snap.data().balance-Number(aa.value),
+    history: arrayUnion({ type:"Withdraw", from:aw.value, to:"ADMIN", amount:Number(aa.value), time:Date.now() })
+  });
+  render();
 };
+
+window.loadRequests = async ()=>{
+  const snap = await getDocs(requestsRef);
+  let h="";
+  snap.forEach(d=>{
+    const r=d.data();
+    if(r.status!=="pending") return;
+    h+=`<div class="tx"><b>${r.type.toUpperCase()}</b><br>User:${r.user}<br>Amt:${r.amount}<br>Wallet:${r.walletAddress}<br>Hash:${r.txHash||"-"}</div>`;
+  });
+  reqList.innerHTML = h || "<p class='small'>No pending</p>";
+};
+
+/* ================= UTIL ================= */
+function appDiv(html){ document.getElementById("app").innerHTML = html; }
 
 init();
 </script>
