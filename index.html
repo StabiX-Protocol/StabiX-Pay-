@@ -52,10 +52,13 @@
 <div id="app">Loading…</div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-
 /* ================= FIREBASE ================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import {
+  getFirestore, doc, setDoc, getDoc, updateDoc,
+  arrayUnion, collection, addDoc, getDocs, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyBWWPgitPhLIYbR-ZmezpaP155cpn1_KPY",
   authDomain: "stabix-49cc6.firebaseapp.com",
@@ -73,10 +76,15 @@ const tg = window.Telegram?.WebApp;
 tg?.ready();
 
 const ADMIN_TG_ID = "1303497305";
-let tgUser = tg?.initDataUnsafe?.user || { id:"browser", username:"Browser" };
+
+let tgUser = tg?.initDataUnsafe?.user || {
+  id:"browser_user",
+  username:"BrowserUser"
+};
 
 const wallet = "TG_" + tgUser.id;
 const userRef = doc(db, "users", wallet);
+const requestsRef = collection(db, "requests");
 
 /* ================= INIT ================= */
 async function init() {
@@ -96,6 +104,7 @@ async function init() {
 window.saveUsername = async () => {
   const u = document.getElementById("uname").value.trim();
   if (!u) return alert("Enter username");
+
   await setDoc(userRef,{
     username:u,
     balance:0,
@@ -111,34 +120,23 @@ async function render() {
   const user = snap.data();
   const isAdmin = String(tgUser.id) === ADMIN_TG_ID;
 
-  const historyHtml = (user.history || [])
-    .slice()
-    .reverse()
-    .map(tx => {
+  const historyHtml = (user.history || []).slice().reverse().map(tx => {
+    const isSent = tx.type === "Sent";
+    const color  = isSent ? "#ef4444" : "#22c55e";
+    const sign   = isSent ? "-" : "+";
 
-      /* 🔥 TRANSFER AUTO FIX */
-      let type = tx.type;
-      if (type === "Transfer") {
-        type = tx.from === wallet ? "Sent" : "Received";
-      }
-
-      const isSent = type === "Sent";
-      const color  = isSent ? "#ef4444" : "#22c55e";
-      const sign   = isSent ? "-" : "+";
-
-      return `
-        <div class="tx" style="color:${color}">
-          <b>${type}</b>: ${sign}${tx.amount} USDC<br>
-          <span class="small">
-            From: ${tx.from}<br>
-            To: ${tx.to}
-          </span><br>
-          <span class="small" style="color:#94a3b8">
-            ${new Date(tx.time).toLocaleString()}
-          </span>
-        </div>
-      `;
-    }).join("") || `<p class="small">No transactions yet</p>`;
+    return `
+      <div class="tx" style="color:${color}">
+        <b>${tx.type}</b>: ${sign}${tx.amount} USDC<br>
+        <span class="small">
+          From: ${tx.from}<br>
+          To: ${tx.to}
+        </span><br>
+        <span class="small" style="color:#94a3b8">
+          ${new Date(tx.time).toLocaleString()}
+        </span>
+      </div>`;
+  }).join("") || `<p class="small">No transactions yet</p>`;
 
   document.getElementById("app").innerHTML = `
     <div class="box">
@@ -148,25 +146,32 @@ async function render() {
       <hr><h3>Balance</h3>
       <b>${user.balance.toFixed(2)} USDC</b>
 
-      <hr><h3>Send USDC</h3>
-      <input id="to" placeholder="Receiver Wallet (TG_xxx)" />
-      <input id="amt" type="number" placeholder="Amount" />
-      <button onclick="send()">Send</button>
+      <hr><h3>Request Deposit / Withdraw</h3>
+      <input id="reqAmount" type="number" placeholder="Amount" />
+      <input id="reqWallet" placeholder="Your Wallet Address" />
+      <input id="reqHash" placeholder="Tx Hash (for deposit)" />
+      <button onclick="requestDeposit()">Request Deposit</button>
+      <button onclick="requestWithdraw()">Request Withdraw</button>
 
       <hr><h3>Transaction History</h3>
       ${historyHtml}
 
       ${isAdmin ? adminPanel() : ""}
-    </div>
-  `;
+    </div>`;
 }
 
+/* ================= ADMIN PANEL ================= */
 function adminPanel() {
   return `
     <hr><h3>Admin Panel</h3>
+
     <input id="aw" placeholder="User Wallet (TG_xxx)" />
     <input id="aa" type="number" placeholder="Amount" />
-    <button onclick="addBalance()">Add Balance</button>
+    <button onclick="addBalance()">Credit User</button>
+
+    <hr><h4>Pending Requests</h4>
+    <button onclick="loadRequests()">Refresh</button>
+    <div id="reqList"></div>
 
     <hr><h4>View Any User History</h4>
     <input id="hw" placeholder="User Wallet (TG_xxx)" />
@@ -175,49 +180,46 @@ function adminPanel() {
   `;
 }
 
-/* ================= ACTIONS ================= */
-window.send = async () => {
-  const to = document.getElementById("to").value.trim();
-  const amt = Number(document.getElementById("amt").value);
+/* ================= USER REQUESTS ================= */
+window.requestDeposit = async () => {
+  const amt = Number(reqAmount.value);
+  const w   = reqWallet.value.trim();
+  const h   = reqHash.value.trim();
+  if (!amt || !w) return alert("Fill all fields");
 
-  if (!to || amt<=0) return alert("Invalid input");
-  if (to === wallet) return alert("You cannot send to yourself");
-
-  const fromSnap = await getDoc(userRef);
-  if (fromSnap.data().balance < amt) return alert("Insufficient balance");
-
-  const toRef = doc(db,"users",to);
-  const toSnap = await getDoc(toRef);
-  if (!toSnap.exists()) return alert("User not found");
-
-  await updateDoc(userRef,{
-    balance: fromSnap.data().balance - amt,
-    history: arrayUnion({
-      type:"Sent",
-      from:wallet,
-      to:to,
-      amount:amt,
-      time:Date.now()
-    })
+  await addDoc(requestsRef,{
+    type:"deposit",
+    user:wallet,
+    amount:amt,
+    walletAddress:w,
+    txHash:h,
+    status:"pending",
+    time:serverTimestamp()
   });
-
-  await updateDoc(toRef,{
-    balance: toSnap.data().balance + amt,
-    history: arrayUnion({
-      type:"Received",
-      from:wallet,
-      to:to,
-      amount:amt,
-      time:Date.now()
-    })
-  });
-
-  render();
+  alert("Deposit request sent");
 };
 
+window.requestWithdraw = async () => {
+  const amt = Number(reqAmount.value);
+  const w   = reqWallet.value.trim();
+  if (!amt || !w) return alert("Fill all fields");
+
+  await addDoc(requestsRef,{
+    type:"withdraw",
+    user:wallet,
+    amount:amt,
+    walletAddress:w,
+    txHash:"",
+    status:"pending",
+    time:serverTimestamp()
+  });
+  alert("Withdraw request sent");
+};
+
+/* ================= ADMIN ACTIONS ================= */
 window.addBalance = async () => {
-  const w = document.getElementById("aw").value.trim();
-  const a = Number(document.getElementById("aa").value);
+  const w = aw.value.trim();
+  const a = Number(aa.value);
   if (!w || a<=0) return alert("Invalid");
 
   const ref = doc(db,"users",w);
@@ -234,32 +236,42 @@ window.addBalance = async () => {
       time:Date.now()
     })
   });
-
   render();
 };
 
-window.viewUserHistory = async () => {
-  const w = document.getElementById("hw").value.trim();
-  if (!w) return;
+window.loadRequests = async () => {
+  const snap = await getDocs(requestsRef);
+  let html = "";
+  snap.forEach(d=>{
+    const r = d.data();
+    if (r.status!=="pending") return;
+    html+=`
+      <div class="tx">
+        <b>${r.type.toUpperCase()}</b><br>
+        User: ${r.user}<br>
+        Amount: ${r.amount}<br>
+        Wallet: ${r.walletAddress}<br>
+        Hash: ${r.txHash || "-"}<br>
+      </div>`;
+  });
+  reqList.innerHTML = html || "<p class='small'>No pending requests</p>";
+};
 
+window.viewUserHistory = async () => {
+  const w = hw.value.trim();
+  if (!w) return;
   const ref = doc(db,"users",w);
   const snap = await getDoc(ref);
   if (!snap.exists()) return alert("User not found");
 
-  document.getElementById("adminHistory").innerHTML =
-    (snap.data().history||[])
-    .slice()
-    .reverse()
-    .map(tx=>`
+  adminHistory.innerHTML =
+    (snap.data().history||[]).slice().reverse().map(tx=>`
       <div class="tx">
-        <b>${tx.type}</b>: ${tx.amount} USDC<br>
-        <span class="small">
-          From: ${tx.from}<br>
-          To: ${tx.to}<br>
-          ${new Date(tx.time).toLocaleString()}
-        </span>
-      </div>
-    `).join("") || "<p class='small'>No history</p>";
+        <b>${tx.type}</b>: ${tx.amount}<br>
+        From: ${tx.from}<br>
+        To: ${tx.to}<br>
+        ${new Date(tx.time).toLocaleString()}
+      </div>`).join("") || "No history";
 };
 
 init();
