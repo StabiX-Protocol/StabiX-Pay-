@@ -3,8 +3,6 @@
 <head>
   <title>StabiX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
@@ -40,10 +38,7 @@
       border-top:1px solid #1e293b;
       margin:15px 0;
     }
-    .small {
-      font-size:12px;
-      opacity:0.7;
-    }
+    .small { font-size:12px; opacity:0.7; }
     .tx {
       font-size:13px;
       margin-top:8px;
@@ -57,7 +52,6 @@
 <div id="app">Loading…</div>
 
 <script type="module">
-/* ================= FIREBASE ================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
@@ -73,24 +67,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
-/* ================= TELEGRAM ================= */
+/* Telegram */
 const tg = window.Telegram?.WebApp;
 tg?.ready();
 
 const ADMIN_TG_ID = "1303497305";
-
-let tgUser = tg?.initDataUnsafe?.user || {
-  id: "browser_user",
-  username: "BrowserUser"
-};
+let tgUser = tg?.initDataUnsafe?.user || { id:"browser", username:"Browser" };
 
 const wallet = "TG_" + tgUser.id;
 const userRef = doc(db, "users", wallet);
 
-/* ================= INIT ================= */
+/* INIT */
 async function init() {
   const snap = await getDoc(userRef);
-
   if (!snap.exists()) {
     document.getElementById("app").innerHTML = `
       <div class="box">
@@ -100,36 +89,28 @@ async function init() {
       </div>`;
     return;
   }
-
   render();
 }
 
-window.saveUsername = async function () {
-  const uname = document.getElementById("uname").value.trim();
-  if (!uname) return alert("Enter username");
-
+window.saveUsername = async () => {
+  const u = document.getElementById("uname").value.trim();
+  if (!u) return alert("Enter username");
   await setDoc(userRef, {
-    username: uname,
-    balance: 0,
-    created: Date.now(),
-    history: []
+    username:u,
+    balance:0,
+    created:Date.now(),
+    history:[]
   });
-
   render();
 };
 
-/* ================= UI ================= */
+/* RENDER */
 async function render() {
   const snap = await getDoc(userRef);
   const user = snap.data();
-
   const isAdmin = String(tgUser.id) === ADMIN_TG_ID;
 
-  const historyHtml = (user.history || [])
-  .slice()
-  .reverse()
-  .map(tx => {
-
+  const historyHtml = (user.history || []).slice().reverse().map(tx => {
     const isSent = tx.type === "Sent";
     const color  = isSent ? "#ef4444" : "#22c55e";
     const sign   = isSent ? "-" : "+";
@@ -137,142 +118,129 @@ async function render() {
     return `
       <div class="tx" style="color:${color}">
         <b>${tx.type}</b>: ${sign}${tx.amount} USDC<br>
-
         <span class="small">
-          From: ${tx.from || "SYSTEM"}<br>
-          To: ${tx.to || wallet}
+          From: ${tx.from}<br>
+          To: ${tx.to}
         </span><br>
-
         <span class="small" style="color:#94a3b8">
           ${new Date(tx.time).toLocaleString()}
         </span>
-      </div>
-    `;
-  })
-  .join("") || `<p class="small">No transactions yet</p>`;
+      </div>`;
+  }).join("") || `<p class="small">No transactions yet</p>`;
 
   document.getElementById("app").innerHTML = `
     <div class="box">
       <h2>${user.username}</h2>
       <p class="small">${wallet}</p>
 
-      <hr>
-      <h3>Balance</h3>
+      <hr><h3>Balance</h3>
       <b>${user.balance.toFixed(2)} USDC</b>
 
-      <hr>
-      <h3>Send USDC</h3>
-      <input id="to" placeholder="Receiver Wallet (TG_123)" />
+      <hr><h3>Send USDC</h3>
+      <input id="to" placeholder="Receiver Wallet (TG_xxx)" />
       <input id="amt" type="number" placeholder="Amount" />
       <button onclick="send()">Send</button>
 
-      <hr>
-      <h3>Transaction History</h3>
+      <hr><h3>Transaction History</h3>
       ${historyHtml}
 
       ${isAdmin ? adminPanel() : ""}
-    </div>
-  `;
+    </div>`;
 }
 
 function adminPanel() {
   return `
-    <hr>
-    <h3>Admin Panel</h3>
+    <hr><h3>Admin Panel</h3>
     <input id="aw" placeholder="User Wallet (TG_xxx)" />
     <input id="aa" type="number" placeholder="Amount" />
     <button onclick="addBalance()">Add Balance</button>
 
-    <hr>
-    <h4>View Any User History</h4>
+    <hr><h4>View Any User History</h4>
     <input id="hw" placeholder="User Wallet (TG_xxx)" />
     <button onclick="viewUserHistory()">View History</button>
-
-    <div id="adminHistory"></div>
-  `;
+    <div id="adminHistory"></div>`;
 }
 
-/* ================= ACTIONS ================= */
-window.send = async function () {
+/* ACTIONS */
+window.send = async () => {
   const to = document.getElementById("to").value.trim();
   const amt = Number(document.getElementById("amt").value);
-
-  if (!to || amt <= 0) return alert("Invalid input");
+  if (!to || amt<=0) return alert("Invalid input");
+  if (to === wallet) return alert("You cannot send to yourself");
 
   const fromSnap = await getDoc(userRef);
   if (fromSnap.data().balance < amt) return alert("Insufficient balance");
 
-  const toRef = doc(db, "users", to);
+  const toRef = doc(db,"users",to);
   const toSnap = await getDoc(toRef);
   if (!toSnap.exists()) return alert("User not found");
 
-  const tx = {
-    type: "Transfer",
-    from: wallet,
-    to: to,
-    amount: amt,
-    time: Date.now()
+  const sentTx = {
+    type:"Sent",
+    from:wallet,
+    to:to,
+    amount:amt,
+    time:Date.now()
   };
 
-  await updateDoc(userRef, {
+  const recvTx = {
+    type:"Received",
+    from:wallet,
+    to:to,
+    amount:amt,
+    time:Date.now()
+  };
+
+  await updateDoc(userRef,{
     balance: fromSnap.data().balance - amt,
-    history: arrayUnion(tx)
+    history: arrayUnion(sentTx)
   });
 
-  await updateDoc(toRef, {
+  await updateDoc(toRef,{
     balance: toSnap.data().balance + amt,
-    history: arrayUnion(tx)
+    history: arrayUnion(recvTx)
   });
 
   render();
 };
 
-window.addBalance = async function () {
+window.addBalance = async () => {
   const w = document.getElementById("aw").value.trim();
   const a = Number(document.getElementById("aa").value);
+  if (!w || a<=0) return alert("Invalid");
 
-  if (!w || a <= 0) return alert("Invalid");
-
-  const ref = doc(db, "users", w);
+  const ref = doc(db,"users",w);
   const snap = await getDoc(ref);
   if (!snap.exists()) return alert("User not found");
 
-  const tx = {
-    type: "Admin Credit",
-    from: "ADMIN",
-    to: w,
-    amount: a,
-    time: Date.now()
-  };
-
-  await updateDoc(ref, {
+  await updateDoc(ref,{
     balance: snap.data().balance + a,
-    history: arrayUnion(tx)
+    history: arrayUnion({
+      type:"Admin Credit",
+      from:"ADMIN",
+      to:w,
+      amount:a,
+      time:Date.now()
+    })
   });
 
   render();
 };
 
-window.viewUserHistory = async function () {
+window.viewUserHistory = async () => {
   const w = document.getElementById("hw").value.trim();
   if (!w) return;
-
-  const ref = doc(db, "users", w);
+  const ref = doc(db,"users",w);
   const snap = await getDoc(ref);
   if (!snap.exists()) return alert("User not found");
 
-  const history = (snap.data().history || []).slice().reverse().map(tx => `
-    <div class="tx">
-      <b>${tx.type}</b> — ${tx.amount} USDC<br>
-      <span class="small">
-        From: ${tx.from}<br>
-        To: ${tx.to}<br>
-        ${new Date(tx.time).toLocaleString()}
-      </span>
-    </div>
-  `).join("") || `<p class="small">No history</p>`;
-
-  document.getElementById("adminHistory").innerHTML = history;
+  document.getElementById("adminHistory").innerHTML =
+    (snap.data().history||[]).slice().reverse().map(tx=>`
+      <div class="tx">
+        <b>${tx.type}</b>: ${tx.amount} USDC<br>
+        <span class="small">From: ${tx.from}<br>To: ${tx.to}</span><br>
+        <span class="small">${new Date(tx.time).toLocaleString()}</span>
+      </div>`).join("") || "<p class='small'>No history</p>";
 };
 
 init();
