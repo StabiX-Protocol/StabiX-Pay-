@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>StabiX</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
     body {
@@ -20,46 +21,186 @@
       max-width:420px;
       margin:auto;
     }
+    input,button {
+      width:100%;
+      padding:12px;
+      margin-top:10px;
+      border-radius:8px;
+      border:none;
+    }
+    button { background:#2563eb;color:#fff;font-weight:bold; }
+    .small { font-size:12px;opacity:.7 }
+    .tx { font-size:13px;margin-top:6px }
   </style>
 </head>
 
 <body>
-<div id="app">Booting…</div>
+<div id="app">Loading…</div>
 
-<script>
-/* ================= SAFE TELEGRAM INIT ================= */
+<script type="module">
+/* ========== SAFE TELEGRAM INIT ========== */
 let tgUser = null;
-
 try {
-  if (window.Telegram && window.Telegram.WebApp) {
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tgUser = tg.initDataUnsafe?.user || null;
+  if (window.Telegram?.WebApp) {
+    Telegram.WebApp.ready();
+    tgUser = Telegram.WebApp.initDataUnsafe?.user || null;
   }
-} catch (e) {
-  console.log("Telegram not available");
-}
+} catch(e){}
 
-/* ================= USER FALLBACK ================= */
 if (!tgUser) {
-  tgUser = {
-    id: "browser_test",
-    username: "BrowserUser"
-  };
+  tgUser = { id:"browser_test", username:"BrowserUser" };
 }
 
 const WALLET = "TG_" + tgUser.id;
-const USERNAME = tgUser.username || "User";
+let USERNAME = tgUser.username || "";
 
-/* ================= RENDER ================= */
-document.getElementById("app").innerHTML = `
-  <div class="box">
-    <h2>StabiX Loaded ✅</h2>
-    <p>User: ${USERNAME}</p>
-    <p>Wallet: ${WALLET}</p>
-    <p>Status: No crash</p>
-  </div>
-`;
+/* ========== ADMIN ========== */
+const ADMIN_TG_ID = "1303497305"; // <- apna TG ID
+
+/* ========== SAFE FIREBASE LOAD ========== */
+let db = null, firebaseOK = false;
+
+try {
+  const { initializeApp } = await import("https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js");
+  const { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion } =
+    await import("https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js");
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBWWPgitPhLIYbR-ZmezpaP155cpn1_KPY",
+    authDomain: "stabix-49cc6.firebaseapp.com",
+    projectId: "stabix-49cc6",
+    storageBucket: "stabix-49cc6.appspot.com",
+    messagingSenderId: "68502925473",
+    appId: "1:68502925473:web:86959dae39a377413800e0"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  firebaseOK = true;
+} catch(e) {
+  console.log("Firebase offline, UI still alive");
+}
+
+/* ========== FIRESTORE HELPERS ========== */
+const userRef = firebaseOK ? (w)=>doc(db,"users",w) : null;
+
+async function ensureUser() {
+  if (!firebaseOK) return;
+  const snap = await getDoc(userRef(WALLET));
+  if (!snap.exists()) {
+    if (!USERNAME) {
+      renderUsername();
+      return;
+    }
+    await setDoc(userRef(WALLET), {
+      username: USERNAME,
+      balance: 0,
+      created: Date.now(),
+      history: []
+    });
+  }
+  render();
+}
+
+/* ========== UI ========== */
+function renderUsername() {
+  document.getElementById("app").innerHTML = `
+    <div class="box">
+      <h3>Create Username</h3>
+      <input id="uname" placeholder="Username (one time)" />
+      <button onclick="saveUsername()">Save</button>
+    </div>`;
+}
+
+window.saveUsername = async function() {
+  USERNAME = document.getElementById("uname").value.trim();
+  if (!USERNAME) return alert("Enter username");
+  await ensureUser();
+};
+
+async function render() {
+  const snap = firebaseOK ? await getDoc(userRef(WALLET)) : null;
+  const user = snap?.data() || { balance:0, history:[] };
+
+  const isAdmin = String(tgUser.id) === ADMIN_TG_ID;
+
+  const historyHtml = (user.history||[]).slice().reverse().map(h=>`
+    <div class="tx">
+      ${h.type} ${h.amount} USDC<br>
+      <span class="small">${new Date(h.time).toLocaleString()}</span>
+    </div>`).join("") || `<p class="small">No transactions</p>`;
+
+  document.getElementById("app").innerHTML = `
+    <div class="box">
+      <h2>${user.username}</h2>
+      <p class="small">${WALLET}</p>
+
+      <h3>Balance</h3>
+      <b>${user.balance.toFixed(2)} USDC</b>
+
+      <hr>
+      <h3>Send</h3>
+      <input id="to" placeholder="TG_123" />
+      <input id="amt" type="number" />
+      <button onclick="send()">Send</button>
+
+      <hr>
+      <h3>History</h3>
+      ${historyHtml}
+
+      ${isAdmin ? adminPanel() : ""}
+    </div>`;
+}
+
+function adminPanel() {
+  return `
+    <hr>
+    <h3>Admin Panel</h3>
+    <input id="aw" placeholder="TG_123" />
+    <input id="aa" type="number" />
+    <button onclick="addBalance()">Add Balance</button>`;
+}
+
+/* ========== ACTIONS ========== */
+window.send = async function() {
+  if (!firebaseOK) return alert("Offline");
+  const to = document.getElementById("to").value.trim();
+  const amt = Number(document.getElementById("amt").value);
+  if (!to || amt<=0) return alert("Invalid");
+
+  const fromSnap = await getDoc(userRef(WALLET));
+  const toSnap   = await getDoc(userRef(to));
+  if (!toSnap.exists()) return alert("User not found");
+  if (fromSnap.data().balance < amt) return alert("No balance");
+
+  await updateDoc(userRef(WALLET), {
+    balance: fromSnap.data().balance - amt,
+    history: arrayUnion({ type:"Sent", amount:amt, time:Date.now() })
+  });
+  await updateDoc(userRef(to), {
+    balance: toSnap.data().balance + amt,
+    history: arrayUnion({ type:"Received", amount:amt, time:Date.now() })
+  });
+  render();
+};
+
+window.addBalance = async function() {
+  const w = document.getElementById("aw").value.trim();
+  const a = Number(document.getElementById("aa").value);
+  if (!w || a<=0) return;
+  const snap = await getDoc(userRef(w));
+  if (!snap.exists()) return alert("User not found");
+
+  await updateDoc(userRef(w), {
+    balance: snap.data().balance + a,
+    history: arrayUnion({ type:"Admin credit", amount:a, time:Date.now() })
+  });
+  render();
+};
+
+/* ========== START ========== */
+firebaseOK ? ensureUser() : document.getElementById("app").innerHTML =
+  `<div class="box"><h2>StabiX Loaded ✅</h2><p>Offline mode</p></div>`;
 </script>
 </body>
 </html>
