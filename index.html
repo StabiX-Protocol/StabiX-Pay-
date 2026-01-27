@@ -46,7 +46,9 @@
     }
     .tx {
       font-size:13px;
-      margin-top:6px;
+      margin-top:8px;
+      padding-bottom:8px;
+      border-bottom:1px dashed #1e293b;
     }
   </style>
 </head>
@@ -75,7 +77,7 @@ const db  = getFirestore(app);
 const tg = window.Telegram?.WebApp;
 tg?.ready();
 
-const ADMIN_TG_ID = "1303497305"; 
+const ADMIN_TG_ID = "1303497305";
 
 let tgUser = tg?.initDataUnsafe?.user || {
   id: "browser_user",
@@ -83,8 +85,6 @@ let tgUser = tg?.initDataUnsafe?.user || {
 };
 
 const wallet = "TG_" + tgUser.id;
-
-/* ================= USER REF ================= */
 const userRef = doc(db, "users", wallet);
 
 /* ================= INIT ================= */
@@ -127,8 +127,12 @@ async function render() {
 
   const historyHtml = (user.history || []).slice().reverse().map(tx => `
     <div class="tx">
-      ${tx.type} ${tx.amount} USDC<br>
-      <span class="small">${new Date(tx.time).toLocaleString()}</span>
+      <b>${tx.type}</b> — ${tx.amount} USDC<br>
+      <span class="small">
+        From: ${tx.from}<br>
+        To: ${tx.to}<br>
+        ${new Date(tx.time).toLocaleString()}
+      </span>
     </div>
   `).join("") || `<p class="small">No transactions yet</p>`;
 
@@ -160,9 +164,16 @@ function adminPanel() {
   return `
     <hr>
     <h3>Admin Panel</h3>
-    <input id="aw" placeholder="User Wallet" />
+    <input id="aw" placeholder="User Wallet (TG_xxx)" />
     <input id="aa" type="number" placeholder="Amount" />
     <button onclick="addBalance()">Add Balance</button>
+
+    <hr>
+    <h4>View Any User History</h4>
+    <input id="hw" placeholder="User Wallet (TG_xxx)" />
+    <button onclick="viewUserHistory()">View History</button>
+
+    <div id="adminHistory"></div>
   `;
 }
 
@@ -180,14 +191,22 @@ window.send = async function () {
   const toSnap = await getDoc(toRef);
   if (!toSnap.exists()) return alert("User not found");
 
+  const tx = {
+    type: "Transfer",
+    from: wallet,
+    to: to,
+    amount: amt,
+    time: Date.now()
+  };
+
   await updateDoc(userRef, {
     balance: fromSnap.data().balance - amt,
-    history: arrayUnion({ type: "Sent", amount: amt, time: Date.now() })
+    history: arrayUnion(tx)
   });
 
   await updateDoc(toRef, {
     balance: toSnap.data().balance + amt,
-    history: arrayUnion({ type: "Received", amount: amt, time: Date.now() })
+    history: arrayUnion(tx)
   });
 
   render();
@@ -203,12 +222,42 @@ window.addBalance = async function () {
   const snap = await getDoc(ref);
   if (!snap.exists()) return alert("User not found");
 
+  const tx = {
+    type: "Admin Credit",
+    from: "ADMIN",
+    to: w,
+    amount: a,
+    time: Date.now()
+  };
+
   await updateDoc(ref, {
     balance: snap.data().balance + a,
-    history: arrayUnion({ type: "Admin Credit", amount: a, time: Date.now() })
+    history: arrayUnion(tx)
   });
 
   render();
+};
+
+window.viewUserHistory = async function () {
+  const w = document.getElementById("hw").value.trim();
+  if (!w) return;
+
+  const ref = doc(db, "users", w);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return alert("User not found");
+
+  const history = (snap.data().history || []).slice().reverse().map(tx => `
+    <div class="tx">
+      <b>${tx.type}</b> — ${tx.amount} USDC<br>
+      <span class="small">
+        From: ${tx.from}<br>
+        To: ${tx.to}<br>
+        ${new Date(tx.time).toLocaleString()}
+      </span>
+    </div>
+  `).join("") || `<p class="small">No history</p>`;
+
+  document.getElementById("adminHistory").innerHTML = history;
 };
 
 init();
