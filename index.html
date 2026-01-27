@@ -20,13 +20,13 @@
 <div id="app">Loading…</div>
 
 <script type="module">
-/* ================= FIREBASE ================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import {
   getFirestore, doc, setDoc, getDoc, updateDoc,
   arrayUnion, collection, addDoc, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+/* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyBWWPgitPhLIYbR-ZmezpaP155cpn1_KPY",
   authDomain: "stabix-49cc6.firebaseapp.com",
@@ -44,11 +44,10 @@ const tg = window.Telegram?.WebApp;
 tg?.ready();
 
 const ADMIN_TG_ID = "1303497305";
-
 let tgUser = tg?.initDataUnsafe?.user || { id:"browser", username:"Browser" };
-const wallet = "TG_" + tgUser.id;
 
-const userRef     = doc(db,"users",wallet);
+const wallet = "TG_" + tgUser.id;
+const userRef = doc(db,"users",wallet);
 const requestsRef = collection(db,"requests");
 
 /* ================= INIT ================= */
@@ -88,9 +87,10 @@ async function render(){
       <div class="tx" style="color:${color}">
         <b>${tx.type}</b>: ${sign}${tx.amount} USDC<br>
         <span class="small">From: ${tx.from}<br>To: ${tx.to}</span><br>
-        <span class="small" style="color:#94a3b8">${new Date(tx.time).toLocaleString()}</span>
-      </div>
-    `;
+        <span class="small" style="color:#94a3b8">
+          ${new Date(tx.time).toLocaleString()}
+        </span>
+      </div>`;
   }).join("") || `<p class="small">No transactions yet</p>`;
 
   appDiv(`
@@ -121,6 +121,7 @@ async function render(){
   `);
 }
 
+/* ================= ADMIN PANEL ================= */
 function adminPanel(){
   return `
     <hr><h3>Admin Panel</h3>
@@ -130,21 +131,26 @@ function adminPanel(){
     <button onclick="adminCredit()">Admin Deposit</button>
     <button onclick="adminWithdraw()">Admin Withdraw</button>
 
+    <hr><h4>View User History</h4>
+    <input id="vh" placeholder="User Wallet (TG_xxx)" />
+    <button onclick="viewUserHistory()">View History</button>
+    <div id="userHistory"></div>
+
     <hr><h4>Pending Deposit / Withdraw</h4>
     <button onclick="loadRequests()">Refresh</button>
     <div id="reqList"></div>
   `;
 }
 
-/* ================= USER SEND ================= */
+/* ================= SEND ================= */
 window.send = async ()=>{
-  const to = document.getElementById("to").value.trim();
-  const amt = Number(document.getElementById("amt").value);
+  const to = to.value.trim();
+  const amt = Number(amt.value);
   if(!to||amt<=0) return alert("Invalid");
   if(to===wallet) return alert("Self transfer not allowed");
 
   const fromSnap = await getDoc(userRef);
-  if(fromSnap.data().balance<amt) return alert("Insufficient balance");
+  if(fromSnap.data().balance<amt) return alert("Insufficient");
 
   const toRef = doc(db,"users",to);
   const toSnap = await getDoc(toRef);
@@ -163,23 +169,26 @@ window.send = async ()=>{
   render();
 };
 
-/* ================= USER DEPOSIT / WITHDRAW ================= */
+/* ================= REQUESTS ================= */
 window.deposit = async ()=>{
-  if(!ra.value||!rw.value) return alert("Fill fields");
   await addDoc(requestsRef,{
-    type:"deposit", user:wallet, amount:Number(ra.value),
-    walletAddress:rw.value, txHash:rh.value,
-    status:"pending", time:serverTimestamp()
+    type:"deposit", user:wallet,
+    amount:Number(ra.value),
+    walletAddress:rw.value,
+    txHash:rh.value,
+    status:"pending",
+    time:Date.now()
   });
   alert("Deposit submitted");
 };
 
 window.withdraw = async ()=>{
-  if(!ra.value||!rw.value) return alert("Fill fields");
   await addDoc(requestsRef,{
-    type:"withdraw", user:wallet, amount:Number(ra.value),
-    walletAddress:rw.value, txHash:"",
-    status:"pending", time:serverTimestamp()
+    type:"withdraw", user:wallet,
+    amount:Number(ra.value),
+    walletAddress:rw.value,
+    status:"pending",
+    time:Date.now()
   });
   alert("Withdraw submitted");
 };
@@ -188,7 +197,6 @@ window.withdraw = async ()=>{
 window.adminCredit = async ()=>{
   const ref = doc(db,"users",aw.value.trim());
   const snap = await getDoc(ref);
-  if(!snap.exists()) return alert("User not found");
   await updateDoc(ref,{
     balance: snap.data().balance+Number(aa.value),
     history: arrayUnion({ type:"Deposit", from:"ADMIN", to:aw.value, amount:Number(aa.value), time:Date.now() })
@@ -199,8 +207,6 @@ window.adminCredit = async ()=>{
 window.adminWithdraw = async ()=>{
   const ref = doc(db,"users",aw.value.trim());
   const snap = await getDoc(ref);
-  if(!snap.exists()) return alert("User not found");
-  if(snap.data().balance<Number(aa.value)) return alert("Insufficient");
   await updateDoc(ref,{
     balance: snap.data().balance-Number(aa.value),
     history: arrayUnion({ type:"Withdraw", from:aw.value, to:"ADMIN", amount:Number(aa.value), time:Date.now() })
@@ -208,19 +214,47 @@ window.adminWithdraw = async ()=>{
   render();
 };
 
+/* ================= VIEW USER HISTORY ================= */
+window.viewUserHistory = async ()=>{
+  const ref = doc(db,"users",vh.value.trim());
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return alert("User not found");
+
+  userHistory.innerHTML =
+    (snap.data().history||[]).slice().reverse().map(tx=>`
+      <div class="tx">
+        <b>${tx.type}</b> ${tx.amount} USDC<br>
+        <span class="small">
+          From: ${tx.from}<br>
+          To: ${tx.to}<br>
+          ${new Date(tx.time).toLocaleString()}
+        </span>
+      </div>
+    `).join("");
+};
+
+/* ================= LOAD REQUESTS (WITH TIMESTAMP) ================= */
 window.loadRequests = async ()=>{
   const snap = await getDocs(requestsRef);
   let h="";
   snap.forEach(d=>{
     const r=d.data();
     if(r.status!=="pending") return;
-    h+=`<div class="tx"><b>${r.type.toUpperCase()}</b><br>User:${r.user}<br>Amt:${r.amount}<br>Wallet:${r.walletAddress}<br>Hash:${r.txHash||"-"}</div>`;
+    h+=`
+      <div class="tx">
+        <b>${r.type.toUpperCase()}</b><br>
+        User: ${r.user}<br>
+        Amount: ${r.amount}<br>
+        Wallet: ${r.walletAddress}<br>
+        Hash: ${r.txHash||"-"}<br>
+        <span class="small">${new Date(r.time).toLocaleString()}</span>
+      </div>`;
   });
   reqList.innerHTML = h || "<p class='small'>No pending</p>";
 };
 
 /* ================= UTIL ================= */
-function appDiv(html){ document.getElementById("app").innerHTML = html; }
+function appDiv(html){ app.innerHTML = html; }
 
 init();
 </script>
