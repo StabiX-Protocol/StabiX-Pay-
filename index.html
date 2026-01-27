@@ -125,20 +125,31 @@ async function render() {
 
   const isAdmin = String(tgUser.id) === ADMIN_TG_ID;
 
-  const historyHtml = (user.history || []).slice().reverse().map(tx => {
+  const historyHtml = (user.history || [])
+  .slice()
+  .reverse()
+  .map(tx => {
 
-  const color = tx.type === "Sent" ? "#ef4444" : "#22c55e"; // red / green
-  const sign  = tx.type === "Sent" ? "-" : "+";
+    const isSent = tx.type === "Sent";
+    const color  = isSent ? "#ef4444" : "#22c55e";
+    const sign   = isSent ? "-" : "+";
 
-  return `
-    <div class="tx" style="color:${color}">
-      ${tx.type}: ${sign}${tx.amount} USDC<br>
-      <span class="small" style="color:#94a3b8">
-        ${new Date(tx.time).toLocaleString()}
-      </span>
-    </div>
-  `;
-}).join("") || `<p class="small">No transactions yet</p>`;
+    return `
+      <div class="tx" style="color:${color}">
+        <b>${tx.type}</b>: ${sign}${tx.amount} USDC<br>
+
+        <span class="small">
+          From: ${tx.from || "SYSTEM"}<br>
+          To: ${tx.to || wallet}
+        </span><br>
+
+        <span class="small" style="color:#94a3b8">
+          ${new Date(tx.time).toLocaleString()}
+        </span>
+      </div>
+    `;
+  })
+  .join("") || `<p class="small">No transactions yet</p>`;
 
   document.getElementById("app").innerHTML = `
     <div class="box">
