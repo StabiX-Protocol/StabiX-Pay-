@@ -26,7 +26,7 @@ import {
   arrayUnion, collection, addDoc, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-/* FIREBASE */
+/* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyBWWPgitPhLIYbR-ZmezpaP155cpn1_KPY",
   authDomain: "stabix-49cc6.firebaseapp.com",
@@ -39,7 +39,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
-/* TELEGRAM */
+/* ================= TELEGRAM ================= */
 const tg = window.Telegram?.WebApp;
 tg?.ready();
 
@@ -50,7 +50,7 @@ const wallet = "TG_" + tgUser.id;
 const userRef = doc(db,"users",wallet);
 const requestsRef = collection(db,"requests");
 
-/* INIT */
+/* ================= INIT ================= */
 async function init(){
   const snap = await getDoc(userRef);
   if(!snap.exists()){
@@ -69,11 +69,16 @@ async function init(){
 window.saveUsername = async ()=>{
   const u = uname.value.trim();
   if(!u) return alert("Enter username");
-  await setDoc(userRef,{ username:u, balance:0, created:Date.now(), history:[] });
+  await setDoc(userRef,{
+    username:u,
+    balance:0,
+    created:Date.now(),
+    history:[]
+  });
   render();
 };
 
-/* RENDER */
+/* ================= RENDER ================= */
 async function render(){
   const snap = await getDoc(userRef);
   const user = snap.data();
@@ -120,7 +125,7 @@ async function render(){
   `);
 }
 
-/* ADMIN PANEL */
+/* ================= ADMIN PANEL ================= */
 function adminPanel(){
   return `
     <hr><h3>Admin Panel</h3>
@@ -141,7 +146,92 @@ function adminPanel(){
   `;
 }
 
-/* ADMIN VIEW USER HISTORY */
+/* ================= USER SEND ================= */
+window.send = async ()=>{
+  const to = document.getElementById("to").value.trim();
+  const amt = Number(document.getElementById("amt").value);
+
+  if(!to || amt<=0) return alert("Invalid input");
+  if(to === wallet) return alert("Self transfer not allowed");
+
+  const fromSnap = await getDoc(userRef);
+  if(fromSnap.data().balance < amt) return alert("Insufficient balance");
+
+  const toRef = doc(db,"users",to);
+  const toSnap = await getDoc(toRef);
+  if(!toSnap.exists()) return alert("User not found");
+
+  await updateDoc(userRef,{
+    balance: fromSnap.data().balance - amt,
+    history: arrayUnion({ type:"Sent", from:wallet, to, amount:amt, time:Date.now() })
+  });
+
+  await updateDoc(toRef,{
+    balance: toSnap.data().balance + amt,
+    history: arrayUnion({ type:"Received", from:wallet, to, amount:amt, time:Date.now() })
+  });
+
+  render();
+};
+
+/* ================= USER REQUEST ================= */
+window.deposit = async ()=>{
+  if(!rw.value || !ra.value) return alert("Fill fields");
+  await addDoc(requestsRef,{
+    type:"deposit",
+    user:wallet,
+    amount:Number(ra.value),
+    walletAddress:rw.value,
+    txHash:rh.value,
+    status:"pending",
+    time:serverTimestamp()
+  });
+  alert("Deposit request sent");
+};
+
+window.withdraw = async ()=>{
+  if(!rw.value || !ra.value) return alert("Fill fields");
+  await addDoc(requestsRef,{
+    type:"withdraw",
+    user:wallet,
+    amount:Number(ra.value),
+    walletAddress:rw.value,
+    txHash:"",
+    status:"pending",
+    time:serverTimestamp()
+  });
+  alert("Withdraw request sent");
+};
+
+/* ================= ADMIN ACTIONS ================= */
+window.adminCredit = async ()=>{
+  const ref = doc(db,"users",aw.value.trim());
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return alert("User not found");
+
+  await updateDoc(ref,{
+    balance: snap.data().balance + Number(aa.value),
+    history: arrayUnion({ type:"Deposit", from:"ADMIN", to:aw.value, amount:Number(aa.value), time:Date.now() })
+  });
+
+  render();
+};
+
+window.adminWithdraw = async ()=>{
+  const ref = doc(db,"users",aw.value.trim());
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return alert("User not found");
+  if(snap.data().balance < Number(aa.value)) return alert("Insufficient");
+
+  await updateDoc(ref,{
+    balance: snap.data().balance - Number(aa.value),
+    history: arrayUnion({ type:"Withdraw", from:aw.value, to:"ADMIN", amount:Number(aa.value), time:Date.now() })
+  });
+
+  render();
+};
+
+/* ================= ADMIN VIEW ================= */
 window.viewUserHistory = async ()=>{
   const w = vh.value.trim();
   if(!w) return;
@@ -160,7 +250,6 @@ window.viewUserHistory = async ()=>{
     `).join("") || "<p class='small'>No history</p>";
 };
 
-/* REQUESTS WITH TIMESTAMP */
 window.loadRequests = async ()=>{
   const snap = await getDocs(requestsRef);
   let h="";
@@ -170,21 +259,17 @@ window.loadRequests = async ()=>{
     h+=`
       <div class="tx">
         <b>${r.type.toUpperCase()}</b><br>
-        User: ${r.user}<br>
-        Amount: ${r.amount}<br>
-        Wallet: ${r.walletAddress}<br>
-        Hash: ${r.txHash||"-"}<br>
-        <span class="small">
-          ${r.time?.toDate ? r.time.toDate().toLocaleString() : ""}
-        </span>
+        User:${r.user}<br>
+        Amount:${r.amount}<br>
+        Wallet:${r.walletAddress}<br>
+        Hash:${r.txHash||"-"}<br>
+        <span class="small">${r.time?.toDate?.().toLocaleString()||""}</span>
       </div>`;
   });
   reqList.innerHTML = h || "<p class='small'>No pending</p>";
 };
 
-/* UTIL */
 function appDiv(html){ document.getElementById("app").innerHTML = html; }
-
 init();
 </script>
 </body>
