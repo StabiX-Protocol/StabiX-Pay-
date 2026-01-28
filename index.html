@@ -28,7 +28,6 @@ import {
   arrayUnion, collection, addDoc, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-/* FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyBWWPgitPhLIYbR-ZmezpaP155cpn1_KPY",
   authDomain: "stabix-49cc6.firebaseapp.com",
@@ -41,7 +40,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
-/* TELEGRAM */
 const tg = window.Telegram?.WebApp;
 tg?.ready();
 
@@ -52,7 +50,6 @@ const wallet = "TG_" + tgUser.id;
 const userRef = doc(db,"users",wallet);
 const requestsRef = collection(db,"requests");
 
-/* INIT */
 async function init(){
   const snap = await getDoc(userRef);
   if(!snap.exists()){
@@ -79,7 +76,6 @@ window.saveUsername = async ()=>{
   render();
 };
 
-/* RENDER */
 async function render(){
   const snap = await getDoc(userRef);
   const user = snap.data();
@@ -145,10 +141,8 @@ async function render(){
   toggleHash();
 }
 
-/* TOGGLE HASH */
 window.toggleHash=()=>rh.style.display=txType.value==="deposit"?"block":"none";
 
-/* SUBMIT REQUEST */
 window.submitRequest=async()=>{
   const snap=await getDoc(userRef);
   if(txType.value==="withdraw" && ra.value>snap.data().balance)
@@ -170,14 +164,68 @@ window.submitRequest=async()=>{
   render();
 };
 
-/* ADMIN PANEL (ORIGINAL + APPROVE REJECT ADDON) */
 function adminPanel(){
   return `
     <hr><h3>Admin Panel</h3>
+
+    <h4>Manual Balance Control</h4>
+    <input id="adminUser" placeholder="User Wallet (TG_xxx)">
+    <input id="adminAmt" type="number" placeholder="Amount">
+    <button onclick="adminDeposit()">Admin Deposit</button>
+    <button onclick="adminWithdraw()">Admin Withdraw</button>
+
+    <hr>
     <button onclick="loadRequests()">Refresh Requests</button>
     <div id="reqList"></div>
   `;
 }
+
+window.adminDeposit = async ()=>{
+  const u = adminUser.value.trim();
+  const amt = Number(adminAmt.value);
+  if(!u || !amt) return alert("Fill all fields");
+
+  const ref = doc(db,"users",u);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return alert("User not found");
+
+  await updateDoc(ref,{
+    balance: snap.data().balance + amt,
+    history: arrayUnion({
+      type:"Deposit",
+      amount:amt,
+      from:"ADMIN",
+      to:u,
+      user:u,
+      time:Date.now()
+    })
+  });
+  alert("Admin deposit successful");
+};
+
+window.adminWithdraw = async ()=>{
+  const u = adminUser.value.trim();
+  const amt = Number(adminAmt.value);
+  if(!u || !amt) return alert("Fill all fields");
+
+  const ref = doc(db,"users",u);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return alert("User not found");
+  if(amt > snap.data().balance) return alert("Insufficient balance");
+
+  await updateDoc(ref,{
+    balance: snap.data().balance - amt,
+    history: arrayUnion({
+      type:"Withdraw",
+      amount:amt,
+      from:u,
+      to:"ADMIN",
+      user:u,
+      time:Date.now()
+    })
+  });
+  alert("Admin withdraw successful");
+};
 
 window.loadRequests=async()=>{
   const snap=await getDocs(requestsRef);
@@ -213,7 +261,6 @@ window.reject=async(id,u)=>{
   loadRequests();
 };
 
-/* FILTER HISTORY */
 window.filterDate=(d)=>{
   document.querySelectorAll(".tx").forEach(t=>{
     t.style.display = t.innerHTML.includes(d) ? "block":"none";
