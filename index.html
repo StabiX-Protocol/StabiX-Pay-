@@ -15,7 +15,7 @@
     .small { font-size:12px; opacity:.7; }
     .tx { font-size:13px; margin-top:8px; padding-bottom:8px; border-bottom:1px dashed #1e293b; }
     .warn { color:#facc15; font-size:13px; margin-top:10px; }
-    .date-block { display:block; }
+    .date-group { display:block; }
   </style>
 </head>
 
@@ -93,13 +93,13 @@ async function render(){
   let historyHtml="";
   Object.keys(grouped).sort().reverse().forEach(date=>{
     historyHtml+=`
-      <div class="date-block" data-date="${date}">
+      <div class="date-group" data-date="${date}">
         <hr><b>${date}</b>
     `;
     grouped[date].reverse().forEach(tx=>{
       const red=["Sent","Withdraw"].includes(tx.type);
       historyHtml+=`
-        <div class="tx" data-date="${date}" style="color:${red?"#ef4444":"#22c55e"}">
+        <div class="tx" style="color:${red?"#ef4444":"#22c55e"}">
           <b>${tx.type}</b>: ${tx.amount} USDC<br>
           <span class="small">From: ${tx.from}<br>To: ${tx.to}</span><br>
           <span class="small">TG ID: ${tx.user}</span><br>
@@ -151,15 +151,15 @@ async function render(){
 window.toggleHash=()=>rh.style.display=txType.value==="deposit"?"block":"none";
 
 window.filterDate=(d)=>{
-  document.querySelectorAll("#historyBox .date-block").forEach(b=>{
-    b.style.display = !d || b.dataset.date===d ? "block":"none";
+  document.querySelectorAll("#historyBox .date-group").forEach(g=>{
+    g.style.display = !d || g.dataset.date===d ? "block" : "none";
   });
 };
 
 window.filterAdminDate=()=>{
   const d = viewDate.value;
-  document.querySelectorAll("#adminHistory .date-block").forEach(b=>{
-    b.style.display = !d || b.dataset.date===d ? "block":"none";
+  document.querySelectorAll("#adminHistory .date-group").forEach(g=>{
+    g.style.display = !d || g.dataset.date===d ? "block" : "none";
   });
 };
 
