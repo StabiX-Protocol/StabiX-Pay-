@@ -106,6 +106,8 @@ async function render(){
 
   if(!historyHtml) historyHtml="<p class='small'>No transactions</p>";
 
+  const today = new Date().toISOString().slice(0,10);
+
   appDiv(`
     <div class="box">
       <h2>${user.username}</h2>
@@ -132,10 +134,10 @@ async function render(){
       <button onclick="submitRequest()" ${locked?"disabled":""}>Submit Request</button>
 
       <hr><h3>Transaction History</h3>
-      <input type="date" onchange="filterDate(this.value)">
+      <input type="date" max="${today}" onchange="filterDate(this.value)">
       <div id="historyBox">${historyHtml}</div>
 
-      ${isAdmin?adminPanel():""}
+      ${isAdmin?adminPanel(today):""}
     </div>
   `);
   toggleHash();
@@ -164,7 +166,7 @@ window.submitRequest=async()=>{
   render();
 };
 
-function adminPanel(){
+function adminPanel(today){
   return `
     <hr><h3>Admin Panel</h3>
 
@@ -174,17 +176,56 @@ function adminPanel(){
     <button onclick="adminDeposit()">Admin Deposit</button>
     <button onclick="adminWithdraw()">Admin Withdraw</button>
 
+    <hr><h4>View Any User History</h4>
+    <input id="viewUser" placeholder="User Wallet (TG_xxx)">
+    <input type="date" id="viewDate" max="${today}">
+    <button onclick="viewUserHistory()">View History</button>
+    <div id="adminHistory"></div>
+
     <hr>
     <button onclick="loadRequests()">Refresh Requests</button>
     <div id="reqList"></div>
   `;
 }
 
+window.viewUserHistory = async ()=>{
+  const u = viewUser.value.trim();
+  if(!u) return;
+  const ref = doc(db,"users",u);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return alert("User not found");
+
+  const date = viewDate.value;
+  let grouped={};
+  snap.data().history.forEach(tx=>{
+    const d=new Date(tx.time).toISOString().slice(0,10);
+    if(date && d!==date) return;
+    if(!grouped[d]) grouped[d]=[];
+    grouped[d].push(tx);
+  });
+
+  let html="";
+  Object.keys(grouped).sort().reverse().forEach(d=>{
+    html+=`<hr><b>${d}</b>`;
+    grouped[d].reverse().forEach(tx=>{
+      const red=["Sent","Withdraw"].includes(tx.type);
+      html+=`
+        <div class="tx" style="color:${red?"#ef4444":"#22c55e"}">
+          <b>${tx.type}</b>: ${tx.amount} USDC<br>
+          <span class="small">From: ${tx.from}<br>To: ${tx.to}</span><br>
+          <span class="small">TG ID: ${tx.user}</span><br>
+          <span class="small">${new Date(tx.time).toLocaleString()}</span>
+        </div>`;
+    });
+  });
+
+  adminHistory.innerHTML = html || "<p class='small'>No history</p>";
+};
+
 window.adminDeposit = async ()=>{
   const u = adminUser.value.trim();
   const amt = Number(adminAmt.value);
   if(!u || !amt) return alert("Fill all fields");
-
   const ref = doc(db,"users",u);
   const snap = await getDoc(ref);
   if(!snap.exists()) return alert("User not found");
@@ -200,14 +241,12 @@ window.adminDeposit = async ()=>{
       time:Date.now()
     })
   });
-  alert("Admin deposit successful");
 };
 
 window.adminWithdraw = async ()=>{
   const u = adminUser.value.trim();
   const amt = Number(adminAmt.value);
   if(!u || !amt) return alert("Fill all fields");
-
   const ref = doc(db,"users",u);
   const snap = await getDoc(ref);
   if(!snap.exists()) return alert("User not found");
@@ -224,7 +263,6 @@ window.adminWithdraw = async ()=>{
       time:Date.now()
     })
   });
-  alert("Admin withdraw successful");
 };
 
 window.loadRequests=async()=>{
@@ -250,15 +288,11 @@ window.loadRequests=async()=>{
 window.approve=async(id,u)=>{
   await updateDoc(doc(db,"requests",id),{status:"approved"});
   await updateDoc(doc(db,"users",u),{pendingRequest:false});
-  alert("Approved");
-  loadRequests();
 };
 
 window.reject=async(id,u)=>{
   await updateDoc(doc(db,"requests",id),{status:"rejected"});
   await updateDoc(doc(db,"users",u),{pendingRequest:false});
-  alert("Rejected");
-  loadRequests();
 };
 
 window.filterDate=(d)=>{
