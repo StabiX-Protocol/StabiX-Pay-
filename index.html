@@ -8,11 +8,13 @@
   <style>
     body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px; }
     .box { background:#020617; border:1px solid #1e293b; border-radius:12px; padding:20px; max-width:420px; margin:auto; }
-    input, button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; font-size:15px; }
-    button { background:#2563eb; color:white; font-weight:bold; }
+    input, button, select { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; font-size:15px; }
+    button { background:#2563eb; color:white; font-weight:bold; cursor:pointer; }
+    button:disabled { background:#334155; cursor:not-allowed; }
     hr { border:0; border-top:1px solid #1e293b; margin:15px 0; }
     .small { font-size:12px; opacity:.7; }
     .tx { font-size:13px; margin-top:8px; padding-bottom:8px; border-bottom:1px dashed #1e293b; }
+    .warn { color:#facc15; font-size:13px; margin-top:10px; }
   </style>
 </head>
 
@@ -26,7 +28,7 @@ import {
   arrayUnion, collection, addDoc, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-/* ================= FIREBASE ================= */
+/* FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyBWWPgitPhLIYbR-ZmezpaP155cpn1_KPY",
   authDomain: "stabix-49cc6.firebaseapp.com",
@@ -39,7 +41,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
-/* ================= TELEGRAM ================= */
+/* TELEGRAM */
 const tg = window.Telegram?.WebApp;
 tg?.ready();
 
@@ -50,7 +52,7 @@ const wallet = "TG_" + tgUser.id;
 const userRef = doc(db,"users",wallet);
 const requestsRef = collection(db,"requests");
 
-/* ================= INIT ================= */
+/* INIT */
 async function init(){
   const snap = await getDoc(userRef);
   if(!snap.exists()){
@@ -73,59 +75,106 @@ window.saveUsername = async ()=>{
     username:u,
     balance:0,
     created:Date.now(),
-    history:[]
+    history:[],
+    pendingRequest:false
   });
   render();
 };
 
-/* ================= RENDER ================= */
+/* RENDER */
 async function render(){
   const snap = await getDoc(userRef);
   const user = snap.data();
   const isAdmin = String(tgUser.id) === ADMIN_TG_ID;
+  const locked = user.pendingRequest === true;
 
-  const historyHtml = (user.history||[]).slice().reverse().map(tx=>{
-    const isSent = tx.type==="Sent";
-    const color  = isSent ? "#ef4444" : "#22c55e";
-    const sign   = isSent ? "-" : "+";
-    return `
-      <div class="tx" style="color:${color}">
-        <b>${tx.type}</b>: ${sign}${tx.amount} USDC<br>
-        <span class="small">From: ${tx.from}<br>To: ${tx.to}</span><br>
-        <span class="small" style="color:#94a3b8">${new Date(tx.time).toLocaleString()}</span>
+  const historyHtml = (user.history||[])
+    .slice(-5)
+    .reverse()
+    .map(tx=>`
+      <div class="tx">
+        <b>${tx.type}</b>: ${tx.amount} USDC<br>
+        <span class="small">${new Date(tx.time).toLocaleDateString()}</span>
       </div>
-    `;
-  }).join("") || `<p class="small">No transactions yet</p>`;
+    `).join("") || `<p class="small">No transactions</p>`;
 
   appDiv(`
     <div class="box">
       <h2>${user.username}</h2>
       <p class="small">${wallet}</p>
 
-      <hr><h3>Balance</h3>
+      <hr>
+      <h3>Balance</h3>
       <b>${user.balance.toFixed(2)} USDC</b>
 
-      <hr><h3>Send USDC</h3>
-      <input id="to" placeholder="Receiver Wallet (TG_xxx)" />
-      <input id="amt" type="number" placeholder="Amount" />
-      <button onclick="send()">Send</button>
+      ${locked ? `<div class="warn">⏳ Request pending. All actions locked.</div>` : ``}
 
-      <hr><h3>Deposit / Withdraw</h3>
-      <input id="rw" placeholder="Your Wallet Address" />
-      <input id="ra" type="number" placeholder="Amount" />
+      <hr>
+      <h3>Send USDC</h3>
+      <input id="to" placeholder="Receiver Wallet (TG_xxx)" ${locked?"disabled":""}/>
+      <input id="amt" type="number" placeholder="Amount" ${locked?"disabled":""}/>
+      <button onclick="send()" ${locked?"disabled":""}>Send</button>
+
+      <hr>
+      <h3>Deposit / Withdraw</h3>
+
+      <select id="txType" onchange="toggleTxFields()" ${locked?"disabled":""}>
+        <option value="deposit">Deposit</option>
+        <option value="withdraw">Withdraw</option>
+      </select>
+
+      <input id="rw" placeholder="Your Wallet Address" ${locked?"disabled":""}/>
+      <input id="ra" type="number" placeholder="Amount" ${locked?"disabled":""}/>
       <input id="rh" placeholder="Tx Hash (deposit only)" />
-      <button onclick="deposit()">Deposit</button>
-      <button onclick="withdraw()">Withdraw</button>
 
-      <hr><h3>Transaction History</h3>
+      <button onclick="submitRequest()" ${locked?"disabled":""}>Submit Request</button>
+
+      <hr>
+      <h3>Recent Transactions</h3>
       ${historyHtml}
 
       ${isAdmin ? adminPanel() : ""}
     </div>
   `);
+
+  toggleTxFields();
 }
 
-/* ================= ADMIN PANEL ================= */
+/* TOGGLE INPUTS */
+window.toggleTxFields = ()=>{
+  const type = document.getElementById("txType")?.value;
+  const hash = document.getElementById("rh");
+  if(!hash) return;
+  hash.style.display = type === "deposit" ? "block" : "none";
+};
+
+/* SUBMIT REQUEST */
+window.submitRequest = async ()=>{
+  const type = txType.value;
+  const walletAddress = rw.value.trim();
+  const amount = Number(ra.value);
+  const txHash = rh.value.trim();
+
+  if(!walletAddress || !amount) return alert("Fill all fields");
+  if(type==="deposit" && !txHash) return alert("Tx hash required");
+
+  await addDoc(requestsRef,{
+    user: wallet,
+    type,
+    amount,
+    walletAddress,
+    txHash: type==="deposit" ? txHash : "",
+    status: "pending",
+    time: serverTimestamp()
+  });
+
+  await updateDoc(userRef,{ pendingRequest:true });
+
+  alert("Request submitted. Await admin approval.");
+  render();
+};
+
+/* ADMIN PANEL (UNCHANGED LOGIC) */
 function adminPanel(){
   return `
     <hr><h3>Admin Panel</h3>
@@ -146,96 +195,10 @@ function adminPanel(){
   `;
 }
 
-/* ================= USER SEND ================= */
-window.send = async ()=>{
-  const to = document.getElementById("to").value.trim();
-  const amt = Number(document.getElementById("amt").value);
-
-  if(!to || amt<=0) return alert("Invalid input");
-  if(to === wallet) return alert("Self transfer not allowed");
-
-  const fromSnap = await getDoc(userRef);
-  if(fromSnap.data().balance < amt) return alert("Insufficient balance");
-
-  const toRef = doc(db,"users",to);
-  const toSnap = await getDoc(toRef);
-  if(!toSnap.exists()) return alert("User not found");
-
-  await updateDoc(userRef,{
-    balance: fromSnap.data().balance - amt,
-    history: arrayUnion({ type:"Sent", from:wallet, to, amount:amt, time:Date.now() })
-  });
-
-  await updateDoc(toRef,{
-    balance: toSnap.data().balance + amt,
-    history: arrayUnion({ type:"Received", from:wallet, to, amount:amt, time:Date.now() })
-  });
-
-  render();
-};
-
-/* ================= USER REQUEST ================= */
-window.deposit = async ()=>{
-  if(!rw.value || !ra.value) return alert("Fill fields");
-  await addDoc(requestsRef,{
-    type:"deposit",
-    user:wallet,
-    amount:Number(ra.value),
-    walletAddress:rw.value,
-    txHash:rh.value,
-    status:"pending",
-    time:serverTimestamp()
-  });
-  alert("Deposit request sent");
-};
-
-window.withdraw = async ()=>{
-  if(!rw.value || !ra.value) return alert("Fill fields");
-  await addDoc(requestsRef,{
-    type:"withdraw",
-    user:wallet,
-    amount:Number(ra.value),
-    walletAddress:rw.value,
-    txHash:"",
-    status:"pending",
-    time:serverTimestamp()
-  });
-  alert("Withdraw request sent");
-};
-
-/* ================= ADMIN ACTIONS ================= */
-window.adminCredit = async ()=>{
-  const ref = doc(db,"users",aw.value.trim());
-  const snap = await getDoc(ref);
-  if(!snap.exists()) return alert("User not found");
-
-  await updateDoc(ref,{
-    balance: snap.data().balance + Number(aa.value),
-    history: arrayUnion({ type:"Deposit", from:"ADMIN", to:aw.value, amount:Number(aa.value), time:Date.now() })
-  });
-
-  render();
-};
-
-window.adminWithdraw = async ()=>{
-  const ref = doc(db,"users",aw.value.trim());
-  const snap = await getDoc(ref);
-  if(!snap.exists()) return alert("User not found");
-  if(snap.data().balance < Number(aa.value)) return alert("Insufficient");
-
-  await updateDoc(ref,{
-    balance: snap.data().balance - Number(aa.value),
-    history: arrayUnion({ type:"Withdraw", from:aw.value, to:"ADMIN", amount:Number(aa.value), time:Date.now() })
-  });
-
-  render();
-};
-
-/* ================= ADMIN VIEW ================= */
+/* VIEW USER HISTORY */
 window.viewUserHistory = async ()=>{
   const w = vh.value.trim();
   if(!w) return;
-
   const ref = doc(db,"users",w);
   const snap = await getDoc(ref);
   if(!snap.exists()) return alert("User not found");
@@ -244,12 +207,12 @@ window.viewUserHistory = async ()=>{
     (snap.data().history||[]).slice().reverse().map(tx=>`
       <div class="tx">
         <b>${tx.type}</b>: ${tx.amount} USDC<br>
-        <span class="small">From: ${tx.from}<br>To: ${tx.to}</span><br>
         <span class="small">${new Date(tx.time).toLocaleString()}</span>
       </div>
     `).join("") || "<p class='small'>No history</p>";
 };
 
+/* LOAD REQUESTS */
 window.loadRequests = async ()=>{
   const snap = await getDocs(requestsRef);
   let h="";
@@ -259,17 +222,21 @@ window.loadRequests = async ()=>{
     h+=`
       <div class="tx">
         <b>${r.type.toUpperCase()}</b><br>
-        User:${r.user}<br>
-        Amount:${r.amount}<br>
-        Wallet:${r.walletAddress}<br>
-        Hash:${r.txHash||"-"}<br>
-        <span class="small">${r.time?.toDate?.().toLocaleString()||""}</span>
+        User: ${r.user}<br>
+        Amount: ${r.amount}<br>
+        Wallet: ${r.walletAddress}<br>
+        Hash: ${r.txHash||"-"}<br>
+        <span class="small">
+          ${r.time?.toDate ? r.time.toDate().toLocaleString() : ""}
+        </span>
       </div>`;
   });
   reqList.innerHTML = h || "<p class='small'>No pending</p>";
 };
 
+/* UTIL */
 function appDiv(html){ document.getElementById("app").innerHTML = html; }
+
 init();
 </script>
 </body>
