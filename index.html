@@ -15,7 +15,6 @@
     .small { font-size:12px; opacity:.7; }
     .tx { font-size:13px; margin-top:8px; padding-bottom:8px; border-bottom:1px dashed #1e293b; }
     .warn { color:#facc15; font-size:13px; margin-top:10px; }
-    .date-group { display:block; }
   </style>
 </head>
 
@@ -92,21 +91,17 @@ async function render(){
 
   let historyHtml="";
   Object.keys(grouped).sort().reverse().forEach(date=>{
-    historyHtml+=`
-      <div class="date-group" data-date="${date}">
-        <hr><b>${date}</b>
-    `;
+    historyHtml+=`<hr data-date="${date}"><b data-date="${date}">${date}</b>`;
     grouped[date].reverse().forEach(tx=>{
       const red=["Sent","Withdraw"].includes(tx.type);
       historyHtml+=`
-        <div class="tx" style="color:${red?"#ef4444":"#22c55e"}">
+        <div class="tx" data-date="${date}" style="color:${red?"#ef4444":"#22c55e"}">
           <b>${tx.type}</b>: ${tx.amount} USDC<br>
           <span class="small">From: ${tx.from}<br>To: ${tx.to}</span><br>
           <span class="small">TG ID: ${tx.user}</span><br>
           <span class="small">${new Date(tx.time).toLocaleString()}</span>
         </div>`;
     });
-    historyHtml+=`</div>`;
   });
 
   if(!historyHtml) historyHtml="<p class='small'>No transactions</p>";
@@ -139,27 +134,23 @@ async function render(){
       <button onclick="submitRequest()" ${locked?"disabled":""}>Submit Request</button>
 
       <hr><h3>Transaction History</h3>
-      <input type="date" max="${today}" onchange="filterDate(this.value)">
+      <input type="date" id="historyDate" max="${today}">
       <div id="historyBox">${historyHtml}</div>
 
       ${isAdmin?adminPanel(today):""}
     </div>
   `);
+
+  document.getElementById("historyDate").value = today;
+  filterDate(today);
   toggleHash();
 }
 
 window.toggleHash=()=>rh.style.display=txType.value==="deposit"?"block":"none";
 
 window.filterDate=(d)=>{
-  document.querySelectorAll("#historyBox .date-group").forEach(g=>{
-    g.style.display = !d || g.dataset.date===d ? "block" : "none";
-  });
-};
-
-window.filterAdminDate=()=>{
-  const d = viewDate.value;
-  document.querySelectorAll("#adminHistory .date-group").forEach(g=>{
-    g.style.display = !d || g.dataset.date===d ? "block" : "none";
+  document.querySelectorAll("#historyBox [data-date]").forEach(el=>{
+    el.style.display = el.dataset.date===d ? "block" : "none";
   });
 };
 
