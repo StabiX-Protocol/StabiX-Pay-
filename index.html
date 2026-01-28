@@ -46,7 +46,7 @@ const tg = window.Telegram?.WebApp;
 tg?.ready();
 
 const ADMIN_TG_ID = "1303497305";
-let tgUser = tg?.initDataUnsafe?.user || { id:"browser", username:"Browser" };
+const tgUser = tg?.initDataUnsafe?.user || { id:"browser", username:"Browser" };
 
 const wallet = "TG_" + tgUser.id;
 const userRef = doc(db,"users",wallet);
@@ -58,7 +58,7 @@ async function init(){
   if(!snap.exists()){
     appDiv(`
       <div class="box">
-        <h3>Create Username (one time)</h3>
+        <h3>Create Username</h3>
         <input id="uname" placeholder="Username" />
         <button onclick="saveUsername()">Save</button>
       </div>
@@ -69,12 +69,10 @@ async function init(){
 }
 
 window.saveUsername = async ()=>{
-  const u = uname.value.trim();
-  if(!u) return alert("Enter username");
+  if(!uname.value.trim()) return alert("Enter username");
   await setDoc(userRef,{
-    username:u,
+    username:uname.value.trim(),
     balance:0,
-    created:Date.now(),
     history:[],
     pendingRequest:false
   });
@@ -85,33 +83,32 @@ window.saveUsername = async ()=>{
 async function render(){
   const snap = await getDoc(userRef);
   const user = snap.data();
-  const isAdmin = String(tgUser.id) === ADMIN_TG_ID;
-  const locked = user.pendingRequest === true;
+  const locked = user.pendingRequest===true;
+  const isAdmin = String(tgUser.id)===ADMIN_TG_ID;
 
-  /* DATE-WISE HISTORY */
-  let grouped = {};
-  (user.history||[]).forEach(tx=>{
-    const d = new Date(tx.time).toLocaleDateString();
+  let grouped={};
+  user.history.forEach(tx=>{
+    const d=new Date(tx.time).toISOString().slice(0,10);
     if(!grouped[d]) grouped[d]=[];
     grouped[d].push(tx);
   });
 
-  let historyHtml = "";
-  Object.keys(grouped).reverse().forEach(date=>{
-    historyHtml += `<hr><b>${date}</b>`;
+  let historyHtml="";
+  Object.keys(grouped).sort().reverse().forEach(date=>{
+    historyHtml+=`<hr><b>${date}</b>`;
     grouped[date].reverse().forEach(tx=>{
-      const isRed = ["Sent","Withdraw"].includes(tx.type);
-      historyHtml += `
-        <div class="tx" style="color:${isRed?"#ef4444":"#22c55e"}">
+      const red=["Sent","Withdraw"].includes(tx.type);
+      historyHtml+=`
+        <div class="tx" style="color:${red?"#ef4444":"#22c55e"}">
           <b>${tx.type}</b>: ${tx.amount} USDC<br>
           <span class="small">From: ${tx.from}<br>To: ${tx.to}</span><br>
+          <span class="small">TG ID: ${tx.user}</span><br>
           <span class="small">${new Date(tx.time).toLocaleString()}</span>
-        </div>
-      `;
+        </div>`;
     });
   });
 
-  if(!historyHtml) historyHtml = `<p class="small">No transactions</p>`;
+  if(!historyHtml) historyHtml="<p class='small'>No transactions</p>";
 
   appDiv(`
     <div class="box">
@@ -121,55 +118,59 @@ async function render(){
       <hr><h3>Balance</h3>
       <b>${user.balance.toFixed(2)} USDC</b>
 
-      ${locked ? `<div class="warn">⏳ Request pending. Actions locked.</div>` : ``}
+      ${locked?`<div class="warn">⏳ Pending admin approval</div>`:""}
 
       <hr><h3>Send USDC</h3>
-      <input id="to" placeholder="Receiver Wallet" ${locked?"disabled":""}/>
-      <input id="amt" type="number" placeholder="Amount" ${locked?"disabled":""}/>
+      <input id="to" placeholder="Receiver Wallet" ${locked?"disabled":""}>
+      <input id="amt" type="number" placeholder="Amount" ${locked?"disabled":""}>
       <button onclick="send()" ${locked?"disabled":""}>Send</button>
 
       <hr><h3>Deposit / Withdraw</h3>
-      <select id="txType" onchange="toggleTxFields()" ${locked?"disabled":""}>
+      <select id="txType" onchange="toggleHash()" ${locked?"disabled":""}>
         <option value="deposit">Deposit</option>
         <option value="withdraw">Withdraw</option>
       </select>
-      <input id="rw" placeholder="Your Wallet Address" ${locked?"disabled":""}/>
-      <input id="ra" type="number" placeholder="Amount" ${locked?"disabled":""}/>
-      <input id="rh" placeholder="Tx Hash (deposit only)" />
+      <input id="rw" placeholder="Wallet Address" ${locked?"disabled":""}>
+      <input id="ra" type="number" placeholder="Amount" ${locked?"disabled":""}>
+      <input id="rh" placeholder="Tx Hash (deposit only)">
       <button onclick="submitRequest()" ${locked?"disabled":""}>Submit Request</button>
 
       <hr><h3>Transaction History</h3>
-      ${historyHtml}
+      <input type="date" onchange="filterDate(this.value)">
+      <div id="historyBox">${historyHtml}</div>
 
-      ${isAdmin ? adminPanel() : ""}
+      ${isAdmin?adminPanel():""}
     </div>
   `);
-
-  toggleTxFields();
+  toggleHash();
 }
 
 /* TOGGLE HASH */
-window.toggleTxFields = ()=>{
-  rh.style.display = txType.value==="deposit"?"block":"none";
-};
+window.toggleHash=()=>rh.style.display=txType.value==="deposit"?"block":"none";
 
 /* SUBMIT REQUEST */
-window.submitRequest = async ()=>{
+window.submitRequest=async()=>{
+  const snap=await getDoc(userRef);
+  if(txType.value==="withdraw" && ra.value>snap.data().balance)
+    return alert("Incorrect amount");
+
   await addDoc(requestsRef,{
-    user: wallet,
-    type: txType.value,
-    amount: Number(ra.value),
-    walletAddress: rw.value,
-    txHash: txType.value==="deposit"?rh.value:"",
+    user:wallet,
+    userId:tgUser.id,
+    type:txType.value,
+    amount:Number(ra.value),
+    walletAddress:rw.value,
+    txHash:txType.value==="deposit"?rh.value:"",
     status:"pending",
-    time: serverTimestamp()
+    time:serverTimestamp()
   });
-  await updateDoc(userRef,{ pendingRequest:true });
+
+  await updateDoc(userRef,{pendingRequest:true});
   alert("Request sent");
   render();
 };
 
-/* ADMIN PANEL */
+/* ADMIN PANEL (ORIGINAL + APPROVE REJECT ADDON) */
 function adminPanel(){
   return `
     <hr><h3>Admin Panel</h3>
@@ -178,9 +179,8 @@ function adminPanel(){
   `;
 }
 
-/* LOAD REQUESTS + APPROVE / REJECT */
-window.loadRequests = async ()=>{
-  const snap = await getDocs(requestsRef);
+window.loadRequests=async()=>{
+  const snap=await getDocs(requestsRef);
   let h="";
   snap.forEach(d=>{
     const r=d.data();
@@ -190,31 +190,37 @@ window.loadRequests = async ()=>{
         <b>${r.type.toUpperCase()}</b><br>
         User: ${r.user}<br>
         Amount: ${r.amount}<br>
+        Wallet: ${r.walletAddress}<br>
+        <span class="small">${r.time?.toDate().toLocaleString()}</span><br>
         <button onclick="approve('${d.id}','${r.user}')">Approve</button>
         <button onclick="reject('${d.id}','${r.user}')">Reject</button>
-      </div>
-    `;
+      </div>`;
   });
-  reqList.innerHTML = h || "<p class='small'>No pending</p>";
+  reqList.innerHTML=h||"<p class='small'>No pending</p>";
 };
 
-window.approve = async (id,userWallet)=>{
+window.approve=async(id,u)=>{
   await updateDoc(doc(db,"requests",id),{status:"approved"});
-  await updateDoc(doc(db,"users",userWallet),{pendingRequest:false});
+  await updateDoc(doc(db,"users",u),{pendingRequest:false});
   alert("Approved");
   loadRequests();
 };
 
-window.reject = async (id,userWallet)=>{
+window.reject=async(id,u)=>{
   await updateDoc(doc(db,"requests",id),{status:"rejected"});
-  await updateDoc(doc(db,"users",userWallet),{pendingRequest:false});
+  await updateDoc(doc(db,"users",u),{pendingRequest:false});
   alert("Rejected");
   loadRequests();
 };
 
-/* UTIL */
-function appDiv(h){ document.getElementById("app").innerHTML=h; }
+/* FILTER HISTORY */
+window.filterDate=(d)=>{
+  document.querySelectorAll(".tx").forEach(t=>{
+    t.style.display = t.innerHTML.includes(d) ? "block":"none";
+  });
+};
 
+function appDiv(h){document.getElementById("app").innerHTML=h;}
 init();
 </script>
 </body>
