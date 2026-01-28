@@ -95,7 +95,7 @@ async function render(){
     grouped[date].reverse().forEach(tx=>{
       const red=["Sent","Withdraw"].includes(tx.type);
       historyHtml+=`
-        <div class="tx" style="color:${red?"#ef4444":"#22c55e"}">
+        <div class="tx" data-date="${date}" style="color:${red?"#ef4444":"#22c55e"}">
           <b>${tx.type}</b>: ${tx.amount} USDC<br>
           <span class="small">From: ${tx.from}<br>To: ${tx.to}</span><br>
           <span class="small">TG ID: ${tx.user}</span><br>
@@ -195,11 +195,9 @@ window.viewUserHistory = async ()=>{
   const snap = await getDoc(ref);
   if(!snap.exists()) return alert("User not found");
 
-  const date = viewDate.value;
   let grouped={};
   snap.data().history.forEach(tx=>{
     const d=new Date(tx.time).toISOString().slice(0,10);
-    if(date && d!==date) return;
     if(!grouped[d]) grouped[d]=[];
     grouped[d].push(tx);
   });
@@ -210,7 +208,7 @@ window.viewUserHistory = async ()=>{
     grouped[d].reverse().forEach(tx=>{
       const red=["Sent","Withdraw"].includes(tx.type);
       html+=`
-        <div class="tx" style="color:${red?"#ef4444":"#22c55e"}">
+        <div class="tx" data-date="${d}" style="color:${red?"#ef4444":"#22c55e"}">
           <b>${tx.type}</b>: ${tx.amount} USDC<br>
           <span class="small">From: ${tx.from}<br>To: ${tx.to}</span><br>
           <span class="small">TG ID: ${tx.user}</span><br>
@@ -220,6 +218,7 @@ window.viewUserHistory = async ()=>{
   });
 
   adminHistory.innerHTML = html || "<p class='small'>No history</p>";
+  filterAdminDate();
 };
 
 window.adminDeposit = async ()=>{
@@ -296,10 +295,21 @@ window.reject=async(id,u)=>{
 };
 
 window.filterDate=(d)=>{
-  document.querySelectorAll(".tx").forEach(t=>{
-    t.style.display = t.innerHTML.includes(d) ? "block":"none";
+  document.querySelectorAll("#historyBox .tx").forEach(t=>{
+    t.style.display = !d || t.dataset.date===d ? "block":"none";
   });
 };
+
+window.filterAdminDate=()=>{
+  const d = viewDate.value;
+  document.querySelectorAll("#adminHistory .tx").forEach(t=>{
+    t.style.display = !d || t.dataset.date===d ? "block":"none";
+  });
+};
+
+document.addEventListener("change",e=>{
+  if(e.target && e.target.id==="viewDate") filterAdminDate();
+});
 
 function appDiv(h){document.getElementById("app").innerHTML=h;}
 init();
