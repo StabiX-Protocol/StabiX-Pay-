@@ -15,7 +15,6 @@
     .small { font-size:12px; opacity:.7; }
     .tx { font-size:13px; margin-top:8px; padding-bottom:8px; border-bottom:1px dashed #1e293b; }
     .warn { color:#facc15; font-size:13px; margin-top:10px; }
-    .date-group { display:block; }
   </style>
 </head>
 
@@ -92,21 +91,17 @@ async function render(){
 
   let historyHtml="";
   Object.keys(grouped).sort().reverse().forEach(date=>{
-    historyHtml+=`
-      <div class="date-group" data-date="${date}">
-        <hr><b>${date}</b>
-    `;
+    historyHtml+=`<hr><b>${date}</b>`;
     grouped[date].reverse().forEach(tx=>{
       const red=["Sent","Withdraw"].includes(tx.type);
       historyHtml+=`
-        <div class="tx" style="color:${red?"#ef4444":"#22c55e"}">
+        <div class="tx" data-date="${date}" style="color:${red?"#ef4444":"#22c55e"}">
           <b>${tx.type}</b>: ${tx.amount} USDC<br>
           <span class="small">From: ${tx.from}<br>To: ${tx.to}</span><br>
           <span class="small">TG ID: ${tx.user}</span><br>
           <span class="small">${new Date(tx.time).toLocaleString()}</span>
         </div>`;
     });
-    historyHtml+=`</div>`;
   });
 
   if(!historyHtml) historyHtml="<p class='small'>No transactions</p>";
@@ -150,18 +145,171 @@ async function render(){
 
 window.toggleHash=()=>rh.style.display=txType.value==="deposit"?"block":"none";
 
+window.submitRequest=async()=>{
+  const snap=await getDoc(userRef);
+  if(txType.value==="withdraw" && ra.value>snap.data().balance)
+    return alert("Incorrect amount");
+
+  await addDoc(requestsRef,{
+    user:wallet,
+    userId:tgUser.id,
+    type:txType.value,
+    amount:Number(ra.value),
+    walletAddress:rw.value,
+    txHash:txType.value==="deposit"?rh.value:"",
+    status:"pending",
+    time:serverTimestamp()
+  });
+
+  await updateDoc(userRef,{pendingRequest:true});
+  alert("Request sent");
+  render();
+};
+
+function adminPanel(today){
+  return `
+    <hr><h3>Admin Panel</h3>
+
+    <h4>Manual Balance Control</h4>
+    <input id="adminUser" placeholder="User Wallet (TG_xxx)">
+    <input id="adminAmt" type="number" placeholder="Amount">
+    <button onclick="adminDeposit()">Admin Deposit</button>
+    <button onclick="adminWithdraw()">Admin Withdraw</button>
+
+    <hr><h4>View Any User History</h4>
+    <input id="viewUser" placeholder="User Wallet (TG_xxx)">
+    <input type="date" id="viewDate" max="${today}">
+    <button onclick="viewUserHistory()">View History</button>
+    <div id="adminHistory"></div>
+
+    <hr>
+    <button onclick="loadRequests()">Refresh Requests</button>
+    <div id="reqList"></div>
+  `;
+}
+
+window.viewUserHistory = async ()=>{
+  const u = viewUser.value.trim();
+  if(!u) return;
+  const ref = doc(db,"users",u);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return alert("User not found");
+
+  let grouped={};
+  snap.data().history.forEach(tx=>{
+    const d=new Date(tx.time).toISOString().slice(0,10);
+    if(!grouped[d]) grouped[d]=[];
+    grouped[d].push(tx);
+  });
+
+  let html="";
+  Object.keys(grouped).sort().reverse().forEach(d=>{
+    html+=`<hr><b>${d}</b>`;
+    grouped[d].reverse().forEach(tx=>{
+      const red=["Sent","Withdraw"].includes(tx.type);
+      html+=`
+        <div class="tx" data-date="${d}" style="color:${red?"#ef4444":"#22c55e"}">
+          <b>${tx.type}</b>: ${tx.amount} USDC<br>
+          <span class="small">From: ${tx.from}<br>To: ${tx.to}</span><br>
+          <span class="small">TG ID: ${tx.user}</span><br>
+          <span class="small">${new Date(tx.time).toLocaleString()}</span>
+        </div>`;
+    });
+  });
+
+  adminHistory.innerHTML = html || "<p class='small'>No history</p>";
+  filterAdminDate();
+};
+
+window.adminDeposit = async ()=>{
+  const u = adminUser.value.trim();
+  const amt = Number(adminAmt.value);
+  if(!u || !amt) return alert("Fill all fields");
+  const ref = doc(db,"users",u);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return alert("User not found");
+
+  await updateDoc(ref,{
+    balance: snap.data().balance + amt,
+    history: arrayUnion({
+      type:"Deposit",
+      amount:amt,
+      from:"ADMIN",
+      to:u,
+      user:u,
+      time:Date.now()
+    })
+  });
+};
+
+window.adminWithdraw = async ()=>{
+  const u = adminUser.value.trim();
+  const amt = Number(adminAmt.value);
+  if(!u || !amt) return alert("Fill all fields");
+  const ref = doc(db,"users",u);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return alert("User not found");
+  if(amt > snap.data().balance) return alert("Insufficient balance");
+
+  await updateDoc(ref,{
+    balance: snap.data().balance - amt,
+    history: arrayUnion({
+      type:"Withdraw",
+      amount:amt,
+      from:u,
+      to:"ADMIN",
+      user:u,
+      time:Date.now()
+    })
+  });
+};
+
+window.loadRequests=async()=>{
+  const snap=await getDocs(requestsRef);
+  let h="";
+  snap.forEach(d=>{
+    const r=d.data();
+    if(r.status!=="pending") return;
+    h+=`
+      <div class="tx">
+        <b>${r.type.toUpperCase()}</b><br>
+        User: ${r.user}<br>
+        Amount: ${r.amount}<br>
+        Wallet: ${r.walletAddress}<br>
+        <span class="small">${r.time?.toDate().toLocaleString()}</span><br>
+        <button onclick="approve('${d.id}','${r.user}')">Approve</button>
+        <button onclick="reject('${d.id}','${r.user}')">Reject</button>
+      </div>`;
+  });
+  reqList.innerHTML=h||"<p class='small'>No pending</p>";
+};
+
+window.approve=async(id,u)=>{
+  await updateDoc(doc(db,"requests",id),{status:"approved"});
+  await updateDoc(doc(db,"users",u),{pendingRequest:false});
+};
+
+window.reject=async(id,u)=>{
+  await updateDoc(doc(db,"requests",id),{status:"rejected"});
+  await updateDoc(doc(db,"users",u),{pendingRequest:false});
+};
+
 window.filterDate=(d)=>{
-  document.querySelectorAll("#historyBox .date-group").forEach(g=>{
-    g.style.display = !d || g.dataset.date===d ? "block" : "none";
+  document.querySelectorAll("#historyBox .tx").forEach(t=>{
+    t.style.display = !d || t.dataset.date===d ? "block":"none";
   });
 };
 
 window.filterAdminDate=()=>{
   const d = viewDate.value;
-  document.querySelectorAll("#adminHistory .date-group").forEach(g=>{
-    g.style.display = !d || g.dataset.date===d ? "block" : "none";
+  document.querySelectorAll("#adminHistory .tx").forEach(t=>{
+    t.style.display = !d || t.dataset.date===d ? "block":"none";
   });
 };
+
+document.addEventListener("change",e=>{
+  if(e.target && e.target.id==="viewDate") filterAdminDate();
+});
 
 function appDiv(h){document.getElementById("app").innerHTML=h;}
 init();
