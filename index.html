@@ -3,7 +3,13 @@
 <head>
   <title>StabiX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Telegram -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Firebase COMPAT (Telegram-safe) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
   <style>
     body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px; }
@@ -20,56 +26,44 @@
 <body>
 <div id="app">Loading…</div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import {
-  getFirestore, doc, setDoc, getDoc, updateDoc,
-  collection, addDoc, getDocs, serverTimestamp,
-  query, where, orderBy
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
+<script>
 /* ===== FIREBASE ===== */
-const firebaseConfig = {
+firebase.initializeApp({
   apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
   authDomain: "stabix-backend-v1.firebaseapp.com",
   projectId: "stabix-backend-v1",
-  storageBucket: "stabix-backend-v1.firebasestorage.app",
+  storageBucket: "stabix-backend-v1.appspot.com",
   messagingSenderId: "351361221507",
   appId: "1:351361221507:web:ebaf0d15e86d4b184c6cb6"
-};
+});
 
-const appFB = initializeApp(firebaseConfig);
-const db = getFirestore(appFB);
+const db = firebase.firestore();
 
-/* ===== TELEGRAM / DEBUG FALLBACK ===== */
-let tgUser;
+/* ===== TELEGRAM ===== */
+let tgUser = null;
 
-if (window.Telegram && window.Telegram.WebApp) {
-  const tg = window.Telegram.WebApp;
-  tg.ready();
-  tgUser = tg.initDataUnsafe?.user;
+if (window.Telegram && Telegram.WebApp) {
+  Telegram.WebApp.ready();
+  tgUser = Telegram.WebApp.initDataUnsafe?.user;
 }
 
 if (!tgUser) {
-  // DEBUG MODE (browser)
-  tgUser = {
-    id: "DEBUG_1001",
-    username: "DebugUser"
-  };
+  tgUser = { id: "DEBUG_1001", username: "DebugUser" };
 }
 
 /* ===== IDENTITY ===== */
 const WALLET = "TG_" + tgUser.id;
-const userRef = doc(db, "users", WALLET);
-const validatorRef = doc(db, "validators", String(tgUser.id));
+const userRef = db.collection("users").doc(WALLET);
+const validatorRef = db.collection("validators").doc(String(tgUser.id));
 
 /* ===== INIT ===== */
 async function init(){
-  const snap = await getDoc(userRef);
-  if(!snap.exists()){
-    return renderSetup();
+  const snap = await userRef.get();
+  if(!snap.exists){
+    renderSetup();
+  } else {
+    renderApp();
   }
-  renderApp();
 }
 
 /* ===== SETUP ===== */
@@ -83,24 +77,25 @@ function renderSetup(){
   `);
 }
 
-window.saveProfile = async ()=>{
-  if(!uname.value.trim()) return alert("Enter username");
+async function saveProfile(){
+  const u = uname.value.trim();
+  if(!u) return alert("Enter username");
 
-  await setDoc(userRef,{
-    username: uname.value.trim(),
+  await userRef.set({
+    username: u,
     walletAddress: WALLET,
     balance: 0,
     pendingRequest: false,
-    createdAt: serverTimestamp()
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 
   renderApp();
-};
+}
 
 /* ===== MAIN APP ===== */
 async function renderApp(){
-  const user = (await getDoc(userRef)).data();
-  const isValidator = (await getDoc(validatorRef)).exists();
+  const user = (await userRef.get()).data();
+  const isValidator = (await validatorRef.get()).exists;
 
   appDiv(`
     <div class="box">
@@ -123,7 +118,7 @@ async function renderApp(){
 
       <hr>
       <h3>History</h3>
-      <div id="history"></div>
+      <div id="history">Loading…</div>
 
       ${isValidator ? validatorPanel() : ""}
     </div>
@@ -133,39 +128,39 @@ async function renderApp(){
 }
 
 /* ===== REQUEST ===== */
-window.submitReq = async ()=>{
-  await addDoc(collection(db,"requests"),{
+async function submitReq(){
+  await db.collection("requests").add({
     userId: WALLET,
     amount: Number(amt.value),
     type: type.value,
     walletAddress: waddr.value,
-    txHash: type.value==="deposit"?txh.value:"",
+    txHash: type.value === "deposit" ? txh.value : "",
     status: "pending",
-    createdAt: serverTimestamp()
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 
-  await updateDoc(userRef,{pendingRequest:true});
+  await userRef.update({ pendingRequest: true });
   alert("Request submitted");
-};
+}
 
 /* ===== HISTORY ===== */
 async function loadHistory(){
-  const q = query(
-    collection(db,"transactions"),
-    where("userId","==",WALLET),
-    orderBy("createdAt","desc")
-  );
-  const snap = await getDocs(q);
-  let html="";
+  const snap = await db.collection("transactions")
+    .where("userId","==",WALLET)
+    .orderBy("createdAt","desc")
+    .get();
+
+  let html = "";
   snap.forEach(d=>{
-    const t=d.data();
-    html+=`
+    const t = d.data();
+    html += `
       <div class="tx">
         <b>${t.type}</b> ${t.amount} USDC<br>
-        <span class="small">${t.createdAt.toDate().toLocaleString()}</span>
+        <span class="small">${t.createdAt?.toDate().toLocaleString()}</span>
       </div>`;
   });
-  document.getElementById("history").innerHTML = html || "No history";
+
+  history.innerHTML = html || "No history";
 }
 
 /* ===== VALIDATOR ===== */
@@ -179,17 +174,14 @@ function validatorPanel(){
   `;
 }
 
-window.viewUser = async ()=>{
+async function viewUser(){
   const u = vu.value.trim();
-  const snap = await getDoc(doc(db,"users",u));
-  if(!snap.exists()) return alert("User not found");
+  const snap = await db.collection("users").doc(u).get();
+  if(!snap.exists) return alert("User not found");
+  vout.innerHTML = `<hr>Balance: ${snap.data().balance} USDC`;
+}
 
-  vout.innerHTML = `
-    <hr>
-    Balance: ${snap.data().balance} USDC
-  `;
-};
-
+/* ===== UTIL ===== */
 function appDiv(h){
   document.getElementById("app").innerHTML = h;
 }
