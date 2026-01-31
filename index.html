@@ -28,31 +28,34 @@ import {
   arrayUnion, collection, addDoc, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-/* ---------------- CONFIG ---------------- */
+/* ---------- FIREBASE ---------- */
 
 const firebaseConfig = {
   apiKey: "AIzaSyBWWPgitPhLIYbR-ZmezpaP155cpn1_KPY",
   authDomain: "stabix-49cc6.firebaseapp.com",
   projectId: "stabix-49cc6",
-  storageBucket: "stabix-49cc6.appspot.com",
-  messagingSenderId: "68502925473",
-  appId: "1:68502925473:web:86959dae39a377413800e0"
 };
 
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
+/* ---------- TELEGRAM ---------- */
+
 const tg = window.Telegram?.WebApp;
 tg?.ready();
 
 const ADMIN_TG_ID = "1303497305";
-const tgUser = tg?.initDataUnsafe?.user || { id:"browser", username:"Browser" };
+const tgUser = tg?.initDataUnsafe?.user || { id:"browser" };
 
 const wallet = "TG_" + tgUser.id;
 const userRef = doc(db,"users",wallet);
 const requestsRef = collection(db,"requests");
 
-/* ---------------- HELPERS ---------------- */
+/* ---------- HELPERS ---------- */
+
+function appDiv(html){
+  document.getElementById("app").innerHTML = html;
+}
 
 function safeTime(t){
   if(!t) return Date.now();
@@ -61,55 +64,63 @@ function safeTime(t){
   return Date.now();
 }
 
-function appDiv(h){
-  document.getElementById("app").innerHTML = h;
-}
-
-/* ---------------- INIT ---------------- */
+/* ---------- INIT ---------- */
 
 async function init(){
   try{
     const snap = await getDoc(userRef);
 
     if(!snap.exists()){
-      appDiv(`
-        <div class="box">
-          <h3>Create Username</h3>
-          <input id="uname" placeholder="Username" />
-          <button onclick="saveUsername()">Save</button>
-        </div>
-      `);
+      showSetup();
     } else {
       render();
     }
-
   }catch(e){
-    appDiv("<div class='box'>❌ Firestore Error<br><span class='small'>Check Rules / Internet</span></div>");
+    appDiv(`<div class="box">❌ Firestore Error</div>`);
     console.error(e);
   }
 }
 
-/* ---------------- USER ---------------- */
+/* ---------- SETUP ---------- */
+
+function showSetup(){
+  appDiv(`
+    <div class="box">
+      <h3>Create Username</h3>
+      <input id="uname" placeholder="Username">
+      <button onclick="saveUsername()">Save</button>
+    </div>
+  `);
+}
 
 window.saveUsername = async ()=>{
-  if(!uname.value.trim()) return alert("Enter username");
+  const name = uname.value.trim();
+  if(!name) return alert("Enter username");
+
+  appDiv(`<div class="box">Saving…</div>`);
 
   await setDoc(userRef,{
-    username: uname.value.trim(),
+    username: name,
     balance: 0,
     history: [],
     pendingRequest: false
   });
 
-  render();
+  // ❗ SAFE FLOW (no render here)
+  setTimeout(init, 300);
 };
 
-/* ---------------- RENDER ---------------- */
+/* ---------- SEND (DUMMY TO PREVENT CRASH) ---------- */
+
+window.send = ()=>{
+  alert("Send feature coming soon");
+};
+
+/* ---------- RENDER ---------- */
 
 async function render(){
   const snap = await getDoc(userRef);
   const user = snap.data();
-
   const locked = user.pendingRequest === true;
   const isAdmin = String(tgUser.id) === ADMIN_TG_ID;
 
@@ -124,9 +135,8 @@ async function render(){
   Object.keys(grouped).sort().reverse().forEach(date=>{
     historyHtml += `<hr><b>${date}</b>`;
     grouped[date].reverse().forEach(tx=>{
-      const red = ["Sent","Withdraw"].includes(tx.type);
       historyHtml += `
-        <div class="tx" data-date="${date}" style="color:${red?"#ef4444":"#22c55e"}">
+        <div class="tx">
           <b>${tx.type}</b>: ${tx.amount} USDC<br>
           <span class="small">${new Date(safeTime(tx.time)).toLocaleString()}</span>
         </div>`;
@@ -141,22 +151,22 @@ async function render(){
       <p class="small">${wallet}</p>
 
       <hr><h3>Balance</h3>
-      <b>${user.balance.toFixed(2)} USDC</b>
+      <b>${Number(user.balance).toFixed(2)} USDC</b>
 
       ${locked?`<div class="warn">⏳ Pending admin approval</div>`:""}
 
       <hr><h3>Send USDC</h3>
-      <button disabled>Coming Soon</button>
+      <button onclick="send()">Send</button>
 
       <hr><h3>Transaction History</h3>
-      <div id="historyBox">${historyHtml}</div>
+      ${historyHtml}
 
       ${isAdmin?`<hr><b>Admin Mode Enabled</b>`:""}
     </div>
   `);
 }
 
-/* ---------------- START ---------------- */
+/* ---------- START ---------- */
 
 setTimeout(init, 300);
 </script>
