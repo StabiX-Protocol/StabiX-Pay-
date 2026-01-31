@@ -9,7 +9,7 @@
     body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px; }
     .box { background:#020617; border:1px solid #1e293b; border-radius:12px; padding:20px; max-width:420px; margin:auto; }
     input, button, select { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; }
-    button { background:#2563eb; color:white; font-weight:bold; }
+    button { background:#2563eb; color:white; font-weight:bold; cursor:pointer; }
     hr { border:0; border-top:1px solid #1e293b; margin:15px 0; }
     .small { font-size:12px; opacity:.7; }
     .tx { font-size:13px; border-bottom:1px dashed #1e293b; padding:6px 0; }
@@ -28,7 +28,7 @@ import {
   query, where, orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-/* ===== FIREBASE ===== */
+/* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
   authDomain: "stabix-backend-v1.firebaseapp.com",
@@ -41,38 +41,33 @@ const firebaseConfig = {
 const appFB = initializeApp(firebaseConfig);
 const db = getFirestore(appFB);
 
-/* ===== TELEGRAM / DEBUG FALLBACK ===== */
-let tgUser;
+/* ================= TELEGRAM ================= */
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
 
-if (window.Telegram && window.Telegram.WebApp) {
-  const tg = window.Telegram.WebApp;
-  tg.ready();
-  tgUser = tg.initDataUnsafe?.user;
+const tgUser = tg.initDataUnsafe?.user;
+if(!tgUser || !tgUser.id){
+  document.getElementById("app").innerHTML = "Telegram user not found";
+  throw "";
 }
 
-if (!tgUser) {
-  // DEBUG MODE (browser)
-  tgUser = {
-    id: "DEBUG_1001",
-    username: "DebugUser"
-  };
-}
-
-/* ===== IDENTITY ===== */
+/* ================= IDENTITY ================= */
 const WALLET = "TG_" + tgUser.id;
-const userRef = doc(db, "users", WALLET);
-const validatorRef = doc(db, "validators", String(tgUser.id));
+const userRef = doc(db,"users",WALLET);
+const validatorRef = doc(db,"validators",String(tgUser.id));
 
-/* ===== INIT ===== */
+/* ================= INIT ================= */
 async function init(){
   const snap = await getDoc(userRef);
   if(!snap.exists()){
-    return renderSetup();
+    renderSetup();
+  } else {
+    renderApp();
   }
-  renderApp();
 }
 
-/* ===== SETUP ===== */
+/* ================= SETUP ================= */
 function renderSetup(){
   appDiv(`
     <div class="box">
@@ -90,14 +85,14 @@ window.saveProfile = async ()=>{
     username: uname.value.trim(),
     walletAddress: WALLET,
     balance: 0,
-    pendingRequest: false,
+    pendingRequest:false,
     createdAt: serverTimestamp()
   });
 
   renderApp();
 };
 
-/* ===== MAIN APP ===== */
+/* ================= MAIN APP ================= */
 async function renderApp(){
   const user = (await getDoc(userRef)).data();
   const isValidator = (await getDoc(validatorRef)).exists();
@@ -107,7 +102,8 @@ async function renderApp(){
       <h2>${user.username}</h2>
       <p class="small">${WALLET}</p>
 
-      <hr><b>Balance:</b> ${user.balance.toFixed(2)} USDC
+      <hr>
+      <b>Balance:</b> ${user.balance.toFixed(2)} USDC
       ${user.pendingRequest ? `<div class="warn">Pending approval</div>` : ""}
 
       <hr>
@@ -118,12 +114,12 @@ async function renderApp(){
       </select>
       <input id="amt" type="number" placeholder="Amount">
       <input id="waddr" placeholder="Wallet Address">
-      <input id="txh" placeholder="Tx Hash (deposit)">
+      <input id="txh" placeholder="Tx Hash (deposit only)">
       <button onclick="submitReq()">Submit</button>
 
       <hr>
-      <h3>History</h3>
-      <div id="history"></div>
+      <h3>Transaction History</h3>
+      <div id="history">Loading…</div>
 
       ${isValidator ? validatorPanel() : ""}
     </div>
@@ -132,15 +128,15 @@ async function renderApp(){
   loadHistory();
 }
 
-/* ===== REQUEST ===== */
+/* ================= USER REQUEST ================= */
 window.submitReq = async ()=>{
   await addDoc(collection(db,"requests"),{
     userId: WALLET,
     amount: Number(amt.value),
     type: type.value,
     walletAddress: waddr.value,
-    txHash: type.value==="deposit"?txh.value:"",
-    status: "pending",
+    txHash: type.value==="deposit" ? txh.value : "",
+    status:"pending",
     createdAt: serverTimestamp()
   });
 
@@ -148,7 +144,7 @@ window.submitReq = async ()=>{
   alert("Request submitted");
 };
 
-/* ===== HISTORY ===== */
+/* ================= USER HISTORY ================= */
 async function loadHistory(){
   const q = query(
     collection(db,"transactions"),
@@ -156,6 +152,7 @@ async function loadHistory(){
     orderBy("createdAt","desc")
   );
   const snap = await getDocs(q);
+
   let html="";
   snap.forEach(d=>{
     const t=d.data();
@@ -165,31 +162,91 @@ async function loadHistory(){
         <span class="small">${t.createdAt.toDate().toLocaleString()}</span>
       </div>`;
   });
+
   document.getElementById("history").innerHTML = html || "No history";
 }
 
-/* ===== VALIDATOR ===== */
+/* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
   return `
     <hr>
     <h3>Validator Panel</h3>
+
     <input id="vu" placeholder="User Wallet TG_xxx">
-    <button onclick="viewUser()">View User</button>
+    <button onclick="loadRequests()">Load Pending Requests</button>
+
     <div id="vout"></div>
   `;
 }
 
-window.viewUser = async ()=>{
+/* ================= LOAD REQUESTS ================= */
+window.loadRequests = async ()=>{
   const u = vu.value.trim();
-  const snap = await getDoc(doc(db,"users",u));
-  if(!snap.exists()) return alert("User not found");
+  if(!u) return alert("Enter user wallet");
 
-  vout.innerHTML = `
-    <hr>
-    Balance: ${snap.data().balance} USDC
-  `;
+  const q = query(
+    collection(db,"requests"),
+    where("userId","==",u),
+    where("status","==","pending")
+  );
+
+  const snap = await getDocs(q);
+  if(snap.empty){
+    vout.innerHTML = "<p class='small'>No pending requests</p>";
+    return;
+  }
+
+  let html="<hr>";
+  snap.forEach(d=>{
+    const r=d.data();
+    html+=`
+      <div class="tx">
+        <b>${r.type.toUpperCase()}</b><br>
+        Amount: ${r.amount}<br>
+        <button onclick="approveReq('${d.id}','${r.userId}',${r.amount},'${r.type}')">Approve</button>
+        <button onclick="rejectReq('${d.id}','${r.userId}')">Reject</button>
+      </div>
+    `;
+  });
+
+  vout.innerHTML = html;
 };
 
+/* ================= APPROVE ================= */
+window.approveReq = async (reqId,userId,amount,type)=>{
+  const uref = doc(db,"users",userId);
+  const usnap = await getDoc(uref);
+  if(!usnap.exists()) return alert("User not found");
+
+  let bal = usnap.data().balance;
+  bal = type==="deposit" ? bal+amount : bal-amount;
+  if(bal < 0) return alert("Insufficient balance");
+
+  await updateDoc(uref,{balance:bal,pendingRequest:false});
+
+  await addDoc(collection(db,"transactions"),{
+    userId,
+    type,
+    amount,
+    direction:type==="deposit"?"credit":"debit",
+    counterparty:"VALIDATOR",
+    createdAt: serverTimestamp()
+  });
+
+  await updateDoc(doc(db,"requests",reqId),{status:"approved"});
+  alert("Approved");
+  loadRequests();
+};
+
+/* ================= REJECT ================= */
+window.rejectReq = async (reqId,userId)=>{
+  await updateDoc(doc(db,"requests",reqId),{status:"rejected"});
+  await updateDoc(doc(db,"users",userId),{pendingRequest:false});
+  alert("Rejected");
+  loadRequests();
+};
+
+/* ================= UTIL ================= */
 function appDiv(h){
   document.getElementById("app").innerHTML = h;
 }
