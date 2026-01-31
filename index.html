@@ -8,13 +8,12 @@
   <style>
     body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px; }
     .box { background:#020617; border:1px solid #1e293b; border-radius:12px; padding:20px; max-width:420px; margin:auto; }
-    input, button, select { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; font-size:15px; }
-    button { background:#2563eb; color:white; font-weight:bold; cursor:pointer; }
-    button:disabled { background:#334155; cursor:not-allowed; }
+    input, button, select { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; }
+    button { background:#2563eb; color:white; font-weight:bold; }
     hr { border:0; border-top:1px solid #1e293b; margin:15px 0; }
     .small { font-size:12px; opacity:.7; }
-    .tx { font-size:13px; margin-top:8px; padding-bottom:8px; border-bottom:1px dashed #1e293b; }
-    .warn { color:#facc15; font-size:13px; margin-top:10px; }
+    .tx { font-size:13px; border-bottom:1px dashed #1e293b; padding:6px 0; }
+    .warn { color:#facc15; font-size:13px; }
   </style>
 </head>
 
@@ -22,153 +21,169 @@
 <div id="app">Loading…</div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getFirestore, doc, setDoc, getDoc, updateDoc,
-  arrayUnion, collection, addDoc, getDocs, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+  collection, addDoc, getDocs, serverTimestamp, query, where, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-/* ---------- FIREBASE ---------- */
-
+/* ===== FIREBASE CONFIG (NEW SDK) ===== */
 const firebaseConfig = {
-  apiKey: "AIzaSyBWWPgitPhLIYbR-ZmezpaP155cpn1_KPY",
-  authDomain: "stabix-49cc6.firebaseapp.com",
-  projectId: "stabix-49cc6",
+  apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
+  authDomain: "stabix-backend-v1.firebaseapp.com",
+  projectId: "stabix-backend-v1",
+  storageBucket: "stabix-backend-v1.firebasestorage.app",
+  messagingSenderId: "351361221507",
+  appId: "1:351361221507:web:ebaf0d15e86d4b184c6cb6"
 };
 
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
-/* ---------- TELEGRAM ---------- */
+/* ===== TELEGRAM INIT ===== */
+const tg = window.Telegram.WebApp;
+tg.ready();
 
-const tg = window.Telegram?.WebApp;
-tg?.ready();
-
-const ADMIN_TG_ID = "1303497305";
-const tgUser = tg?.initDataUnsafe?.user || { id:"browser" };
-
-const wallet = "TG_" + tgUser.id;
-const userRef = doc(db,"users",wallet);
-const requestsRef = collection(db,"requests");
-
-/* ---------- HELPERS ---------- */
-
-function appDiv(html){
-  document.getElementById("app").innerHTML = html;
+const tgUser = tg.initDataUnsafe.user;
+if(!tgUser){
+  document.getElementById("app").innerHTML = "Telegram required";
+  throw "";
 }
 
-function safeTime(t){
-  if(!t) return Date.now();
-  if(typeof t === "number") return t;
-  if(t.toMillis) return t.toMillis();
-  return Date.now();
-}
+/* ===== IDENTITY ===== */
+const WALLET = "TG_" + tgUser.id;
+const userRef = doc(db,"users",WALLET);
+const validatorRef = doc(db,"validators",String(tgUser.id));
 
-/* ---------- INIT ---------- */
-
+/* ===== INIT ===== */
 async function init(){
-  try{
-    const snap = await getDoc(userRef);
-
-    if(!snap.exists()){
-      showSetup();
-    } else {
-      render();
-    }
-  }catch(e){
-    appDiv(`<div class="box">❌ Firestore Error</div>`);
-    console.error(e);
+  const userSnap = await getDoc(userRef);
+  if(!userSnap.exists()){
+    return renderSetup();
   }
+  renderApp();
 }
 
-/* ---------- SETUP ---------- */
-
-function showSetup(){
+/* ===== SETUP ===== */
+function renderSetup(){
   appDiv(`
     <div class="box">
       <h3>Create Username</h3>
       <input id="uname" placeholder="Username">
-      <button onclick="saveUsername()">Save</button>
+      <button onclick="saveProfile()">Save</button>
     </div>
   `);
 }
 
-window.saveUsername = async ()=>{
-  const name = uname.value.trim();
-  if(!name) return alert("Enter username");
-
-  appDiv(`<div class="box">Saving…</div>`);
+window.saveProfile = async ()=>{
+  if(!uname.value.trim()) return alert("Enter username");
 
   await setDoc(userRef,{
-    username: name,
+    username: uname.value.trim(),
+    walletAddress: WALLET,
     balance: 0,
-    history: [],
-    pendingRequest: false
+    pendingRequest: false,
+    createdAt: serverTimestamp()
   });
 
-  // ❗ SAFE FLOW (no render here)
-  setTimeout(init, 300);
+  renderApp();
 };
 
-/* ---------- SEND (DUMMY TO PREVENT CRASH) ---------- */
-
-window.send = ()=>{
-  alert("Send feature coming soon");
-};
-
-/* ---------- RENDER ---------- */
-
-async function render(){
-  const snap = await getDoc(userRef);
-  const user = snap.data();
-  const locked = user.pendingRequest === true;
-  const isAdmin = String(tgUser.id) === ADMIN_TG_ID;
-
-  let grouped = {};
-  (user.history || []).forEach(tx=>{
-    const d = new Date(safeTime(tx.time)).toISOString().slice(0,10);
-    grouped[d] = grouped[d] || [];
-    grouped[d].push(tx);
-  });
-
-  let historyHtml = "";
-  Object.keys(grouped).sort().reverse().forEach(date=>{
-    historyHtml += `<hr><b>${date}</b>`;
-    grouped[date].reverse().forEach(tx=>{
-      historyHtml += `
-        <div class="tx">
-          <b>${tx.type}</b>: ${tx.amount} USDC<br>
-          <span class="small">${new Date(safeTime(tx.time)).toLocaleString()}</span>
-        </div>`;
-    });
-  });
-
-  if(!historyHtml) historyHtml = "<p class='small'>No transactions</p>";
+/* ===== MAIN APP ===== */
+async function renderApp(){
+  const user = (await getDoc(userRef)).data();
+  const isValidator = (await getDoc(validatorRef)).exists();
 
   appDiv(`
     <div class="box">
       <h2>${user.username}</h2>
-      <p class="small">${wallet}</p>
+      <p class="small">${WALLET}</p>
 
-      <hr><h3>Balance</h3>
-      <b>${Number(user.balance).toFixed(2)} USDC</b>
+      <hr><b>Balance:</b> ${user.balance.toFixed(2)} USDC
+      ${user.pendingRequest?`<div class="warn">Pending approval</div>`:""}
 
-      ${locked?`<div class="warn">⏳ Pending admin approval</div>`:""}
+      <hr>
+      <h3>Deposit / Withdraw</h3>
+      <select id="type">
+        <option value="deposit">Deposit</option>
+        <option value="withdraw">Withdraw</option>
+      </select>
+      <input id="amt" type="number" placeholder="Amount">
+      <input id="waddr" placeholder="Wallet Address">
+      <input id="txh" placeholder="Tx Hash (deposit)">
+      <button onclick="submitReq()">Submit</button>
 
-      <hr><h3>Send USDC</h3>
-      <button onclick="send()">Send</button>
+      <hr>
+      <h3>History</h3>
+      <div id="history"></div>
 
-      <hr><h3>Transaction History</h3>
-      ${historyHtml}
-
-      ${isAdmin?`<hr><b>Admin Mode Enabled</b>`:""}
+      ${isValidator?validatorPanel():""}
     </div>
   `);
+
+  loadHistory();
 }
 
-/* ---------- START ---------- */
+/* ===== REQUEST ===== */
+window.submitReq = async ()=>{
+  await addDoc(collection(db,"requests"),{
+    userId: WALLET,
+    amount: Number(amt.value),
+    type: type.value,
+    walletAddress: waddr.value,
+    txHash: type.value==="deposit"?txh.value:"",
+    status: "pending",
+    createdAt: serverTimestamp()
+  });
 
-setTimeout(init, 300);
+  await updateDoc(userRef,{pendingRequest:true});
+  alert("Request submitted");
+};
+
+/* ===== HISTORY ===== */
+async function loadHistory(){
+  const q = query(
+    collection(db,"transactions"),
+    where("userId","==",WALLET),
+    orderBy("createdAt","desc")
+  );
+  const snap = await getDocs(q);
+  let html="";
+  snap.forEach(d=>{
+    const t=d.data();
+    html+=`
+      <div class="tx">
+        <b>${t.type}</b> ${t.amount} USDC<br>
+        <span class="small">${t.createdAt.toDate().toLocaleString()}</span>
+      </div>`;
+  });
+  document.getElementById("history").innerHTML = html || "No history";
+}
+
+/* ===== VALIDATOR ===== */
+function validatorPanel(){
+  return `
+    <hr>
+    <h3>Validator Panel</h3>
+    <input id="vu" placeholder="User Wallet TG_xxx">
+    <button onclick="viewUser()">View User</button>
+    <div id="vout"></div>
+  `;
+}
+
+window.viewUser = async ()=>{
+  const u = vu.value.trim();
+  const snap = await getDoc(doc(db,"users",u));
+  if(!snap.exists()) return alert("User not found");
+
+  vout.innerHTML = `
+    <hr>
+    Balance: ${snap.data().balance} USDC
+  `;
+};
+
+function appDiv(h){document.getElementById("app").innerHTML=h;}
+init();
 </script>
 </body>
 </html>
