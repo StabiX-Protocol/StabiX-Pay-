@@ -182,7 +182,7 @@ async function renderApp(){
 
       <hr>
 
-      <!-- SEND FEATURE -->
+      <!-- SEND USDC FEATURE -->
       <h3>Send USDC</h3>
       <input id="sendTo" placeholder="Receiver Wallet (TG_xxx)">
       <input id="sendAmt" type="number" placeholder="Amount">
@@ -210,7 +210,7 @@ async function renderApp(){
   loadHistory();
 }
 
-/* ================= SEND FEATURE ================= */
+/* ================= SEND USDC LOGIC ================= */
 window.sendUSDC = async ()=>{
   const toWallet = sendTo.value.trim();
   const amount = Number(sendAmt.value);
@@ -221,35 +221,40 @@ window.sendUSDC = async ()=>{
   const fromRef = userRef;
   const toRef = doc(db,"users",toWallet);
 
-  await runTransaction(db, async (tx)=>{
-    const fromSnap = await tx.get(fromRef);
-    const toSnap = await tx.get(toRef);
+  try{
+    await runTransaction(db, async (tx)=>{
+      const fromSnap = await tx.get(fromRef);
+      const toSnap = await tx.get(toRef);
 
-    if(!toSnap.exists()) throw "Receiver not found";
-    if(fromSnap.data().balance < amount) throw "Insufficient balance";
+      if(!toSnap.exists()) throw "Receiver not found";
+      if(fromSnap.data().balance < amount) throw "Insufficient balance";
 
-    tx.update(fromRef,{ balance: fromSnap.data().balance - amount });
-    tx.update(toRef,{ balance: toSnap.data().balance + amount });
+      tx.update(fromRef,{ balance: fromSnap.data().balance - amount });
+      tx.update(toRef,{ balance: toSnap.data().balance + amount });
 
-    tx.set(doc(collection(db,"transactions")),{
-      userId: WALLET,
-      type: "send",
-      amount,
-      to: toWallet,
-      createdAt: serverTimestamp()
+      tx.set(doc(collection(db,"transactions")),{
+        userId: WALLET,
+        type: "send",
+        amount,
+        to: toWallet,
+        createdAt: serverTimestamp()
+      });
+
+      tx.set(doc(collection(db,"transactions")),{
+        userId: toWallet,
+        type: "receive",
+        amount,
+        from: WALLET,
+        createdAt: serverTimestamp()
+      });
     });
 
-    tx.set(doc(collection(db,"transactions")),{
-      userId: toWallet,
-      type: "receive",
-      amount,
-      from: WALLET,
-      createdAt: serverTimestamp()
-    });
-  });
+    alert("Transfer successful");
+    renderApp();
 
-  alert("Transfer successful");
-  renderApp();
+  }catch(e){
+    alert(e);
+  }
 };
 
 /* ================= REQUEST ================= */
