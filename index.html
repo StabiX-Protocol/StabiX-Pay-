@@ -60,7 +60,20 @@ const validatorRef = doc(db,"validators",String(tgUser.id));
 /* ================= INIT ================= */
 async function init(){
   const snap = await getDoc(userRef);
-  snap.exists() ? renderApp() : renderSetup();
+
+  if(!snap.exists()){
+    renderSetup();
+    return;
+  }
+
+  const user = snap.data();
+
+  if(!user.password){
+    renderSetPassword();
+    return;
+  }
+
+  renderLogin();
 }
 
 /* ================= SETUP ================= */
@@ -69,22 +82,61 @@ function renderSetup(){
     <div class="box">
       <h3>Create Username</h3>
       <input id="uname" placeholder="Username">
+      <input id="pwd" type="password" placeholder="Password">
       <button onclick="saveProfile()">Save</button>
     </div>
   `);
 }
 
 window.saveProfile = async ()=>{
-  if(!uname.value.trim()) return alert("Enter username");
+  if(!uname.value.trim() || !pwd.value.trim()) return alert("Fill all fields");
 
   await setDoc(userRef,{
     username: uname.value.trim(),
+    password: pwd.value.trim(),
     walletAddress: WALLET,
     balance: 0,
     pendingRequest:false,
     createdAt: serverTimestamp()
   });
 
+  renderApp();
+};
+
+/* ================= SET PASSWORD (RECOVERY) ================= */
+function renderSetPassword(){
+  appDiv(`
+    <div class="box">
+      <h3>Set Password</h3>
+      <input id="pwd" type="password" placeholder="New Password">
+      <button onclick="updatePassword()">Save</button>
+    </div>
+  `);
+}
+
+window.updatePassword = async ()=>{
+  if(!pwd.value.trim()) return alert("Enter password");
+  await updateDoc(userRef,{ password: pwd.value.trim() });
+  renderApp();
+};
+
+/* ================= LOGIN ================= */
+function renderLogin(){
+  appDiv(`
+    <div class="box">
+      <h3>Enter Password</h3>
+      <input id="pwd" type="password" placeholder="Password">
+      <button onclick="login()">Login</button>
+    </div>
+  `);
+}
+
+window.login = async ()=>{
+  const snap = await getDoc(userRef);
+  if(snap.data().password !== pwd.value.trim()){
+    alert("Wrong password");
+    return;
+  }
   renderApp();
 };
 
@@ -137,7 +189,6 @@ window.submitReq = async ()=>{
   });
 
   await updateDoc(userRef,{pendingRequest:true});
-  alert("Request submitted");
 };
 
 /* ================= USER HISTORY ================= */
@@ -167,73 +218,10 @@ function validatorPanel(){
   return `
     <hr>
     <h3>Validator Panel</h3>
-    <button onclick="loadRequests()">Load ALL Pending Requests</button>
+    <button onclick="loadRequests()">Load Pending</button>
     <div id="vout"></div>
   `;
 }
-
-/* ================= LOAD ALL PENDING ================= */
-window.loadRequests = async ()=>{
-  const q = query(
-    collection(db,"requests"),
-    where("status","==","pending"),
-    orderBy("createdAt","asc")
-  );
-
-  const snap = await getDocs(q);
-  if(snap.empty){
-    vout.innerHTML = "<p class='small'>No pending requests</p>";
-    return;
-  }
-
-  let html="<hr>";
-  snap.forEach(d=>{
-    const r=d.data();
-    html+=`
-      <div class="tx">
-        <b>${r.type.toUpperCase()}</b><br>
-        User: ${r.userId}<br>
-        Amount: ${r.amount}<br>
-        <button onclick="approveReq('${d.id}','${r.userId}',${r.amount},'${r.type}')">Approve</button>
-        <button onclick="rejectReq('${d.id}','${r.userId}')">Reject</button>
-      </div>
-    `;
-  });
-
-  vout.innerHTML = html;
-};
-
-/* ================= APPROVE ================= */
-window.approveReq = async (reqId,userId,amount,type)=>{
-  const uref = doc(db,"users",userId);
-  const usnap = await getDoc(uref);
-  if(!usnap.exists()) return alert("User not found");
-
-  let bal = usnap.data().balance;
-  bal = type==="deposit" ? bal+amount : bal-amount;
-  if(bal < 0) return alert("Insufficient balance");
-
-  await updateDoc(uref,{balance:bal,pendingRequest:false});
-
-  await addDoc(collection(db,"transactions"),{
-    userId,
-    type,
-    amount,
-    direction:type==="deposit"?"credit":"debit",
-    counterparty:"VALIDATOR",
-    createdAt: serverTimestamp()
-  });
-
-  await updateDoc(doc(db,"requests",reqId),{status:"approved"});
-  loadRequests();
-};
-
-/* ================= REJECT ================= */
-window.rejectReq = async (reqId,userId)=>{
-  await updateDoc(doc(db,"requests",reqId),{status:"rejected"});
-  await updateDoc(doc(db,"users",userId),{pendingRequest:false});
-  loadRequests();
-};
 
 /* ================= UTIL ================= */
 function appDiv(h){
