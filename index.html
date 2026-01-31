@@ -4,204 +4,172 @@
   <title>StabiX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Telegram -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- Firebase COMPAT -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-
   <style>
     body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px; }
     .box { background:#020617; border:1px solid #1e293b; border-radius:12px; padding:20px; max-width:420px; margin:auto; }
-    input, button, select { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; }
-    button { background:#2563eb; color:white; font-weight:bold; }
+    input, button, select { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; font-size:15px; }
+    button { background:#2563eb; color:white; font-weight:bold; cursor:pointer; }
+    button:disabled { background:#334155; cursor:not-allowed; }
     hr { border:0; border-top:1px solid #1e293b; margin:15px 0; }
     .small { font-size:12px; opacity:.7; }
-    .tx { font-size:13px; border-bottom:1px dashed #1e293b; padding:6px 0; }
-    .warn { color:#facc15; font-size:13px; }
+    .tx { font-size:13px; margin-top:8px; padding-bottom:8px; border-bottom:1px dashed #1e293b; }
+    .warn { color:#facc15; font-size:13px; margin-top:10px; }
   </style>
 </head>
 
 <body>
 <div id="app">Loading…</div>
 
-<script>
-(async function () {
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import {
+  getFirestore, doc, setDoc, getDoc, updateDoc,
+  arrayUnion, collection, addDoc, getDocs
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-  const app = document.getElementById("app");
+/* ---------- FIREBASE ---------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyBWWPgitPhLIYbR-ZmezpaP155cpn1_KPY",
+  authDomain: "stabix-49cc6.firebaseapp.com",
+  projectId: "stabix-49cc6"
+};
 
-  /* ===== TELEGRAM SAFE INIT ===== */
-  let tgUser = null;
-  if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.ready();
-    tgUser = Telegram.WebApp.initDataUnsafe?.user;
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+/* ---------- DEVICE & WALLET ---------- */
+function getDeviceId(){
+  let id = localStorage.getItem("device_id");
+  if(!id){
+    id = "DEV_" + crypto.randomUUID();
+    localStorage.setItem("device_id", id);
   }
+  return id;
+}
 
-  if (!tgUser) {
-    tgUser = { id: "DEBUG_1001", username: "DebugUser" };
+function getWallet(){
+  let w = localStorage.getItem("wallet_id");
+  if(!w){
+    w = "WALLET_" + crypto.randomUUID();
+    localStorage.setItem("wallet_id", w);
   }
+  return w;
+}
 
-  /* ===== FIREBASE INIT ===== */
-  firebase.initializeApp({
-    apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
-    authDomain: "stabix-backend-v1.firebaseapp.com",
-    projectId: "stabix-backend-v1",
-    storageBucket: "stabix-backend-v1.appspot.com",
-    messagingSenderId: "351361221507",
-    appId: "1:351361221507:web:ebaf0d15e86d4b184c6cb6"
-  });
+const deviceId = getDeviceId();
+const wallet   = getWallet();
+const userRef  = doc(db,"users",wallet);
+const requestsRef = collection(db,"requests");
 
-  const db = firebase.firestore();
-
-  /* ===== IDENTITY ===== */
-  const WALLET = "TG_" + tgUser.id;
-  const userRef = db.collection("users").doc(WALLET);
-  const validatorRef = db.collection("validators").doc(String(tgUser.id));
-
-  /* ===== UI RENDER ===== */
-  function render(html) {
-    app.innerHTML = html;
-  }
-
-  /* ===== INIT ===== */
-  async function init() {
-    try {
-      const snap = await userRef.get();
-      snap.exists ? renderApp() : renderSetup();
-    } catch (e) {
-      render("<div class='box'>Error loading app</div>");
-      console.error(e);
-    }
-  }
-
-  /* ===== SETUP ===== */
-  function renderSetup() {
-    render(`
+/* ---------- INIT ---------- */
+async function init(){
+  const snap = await getDoc(userRef);
+  if(!snap.exists()){
+    appDiv(`
       <div class="box">
         <h3>Create Username</h3>
-        <input id="uname" placeholder="Username">
-        <button id="saveBtn">Save</button>
+        <input id="uname" placeholder="Username" />
+        <button onclick="saveUsername()">Continue</button>
       </div>
     `);
-
-    document.getElementById("saveBtn").onclick = saveProfile;
+    return;
   }
+  render();
+}
 
-  async function saveProfile() {
-    const u = document.getElementById("uname").value.trim();
-    if (!u) return alert("Enter username");
+window.saveUsername = async ()=>{
+  const u = uname.value.trim();
+  if(!u) return alert("Enter username");
 
-    await userRef.set({
-      username: u,
-      walletAddress: WALLET,
-      balance: 0,
-      pendingRequest: false,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+  await setDoc(userRef,{
+    username:u,
+    wallet,
+    balance:0,
+    history:[],
+    pendingRequest:false,
+    role:"user"     /* change to 'validator' manually in Firebase for YOU */
+  });
+  render();
+};
 
-    renderApp();
-  }
+/* ---------- RENDER ---------- */
+async function render(){
+  const snap = await getDoc(userRef);
+  const user = snap.data();
 
-  /* ===== MAIN APP ===== */
-  async function renderApp() {
-    const user = (await userRef.get()).data();
-    const isValidator = (await validatorRef.get()).exists;
+  const isValidator =
+    user.role === "validator" &&
+    user.validatorDeviceId === deviceId;
 
-    render(`
-      <div class="box">
-        <h2>${user.username}</h2>
-        <p class="small">${WALLET}</p>
+  appDiv(`
+    <div class="box">
+      <h2>${user.username}</h2>
+      <p class="small">${wallet}</p>
 
-        <hr><b>Balance:</b> ${user.balance.toFixed(2)} USDC
-        ${user.pendingRequest ? `<div class="warn">Pending approval</div>` : ""}
+      <hr><h3>Balance</h3>
+      <b>${user.balance.toFixed(2)} USDC</b>
 
-        <hr>
-        <h3>Deposit / Withdraw</h3>
-        <select id="type">
-          <option value="deposit">Deposit</option>
-          <option value="withdraw">Withdraw</option>
-        </select>
-        <input id="amt" type="number" placeholder="Amount">
-        <input id="waddr" placeholder="Wallet Address">
-        <input id="txh" placeholder="Tx Hash (deposit)">
-        <button id="submitBtn">Submit</button>
+      ${isValidator ? validatorPanel() : ""}
+    </div>
+  `);
+}
 
-        <hr>
-        <h3>History</h3>
-        <div id="historyBox">Loading…</div>
+/* ---------- VALIDATOR PANEL ---------- */
+function validatorPanel(){
+  return `
+    <hr><h3>Validator Panel</h3>
+    <input id="vUser" placeholder="User Wallet">
+    <input id="vAmt" type="number" placeholder="Amount">
+    <button onclick="validatorDeposit()">Deposit</button>
+    <button onclick="validatorWithdraw()">Withdraw</button>
+  `;
+}
 
-        ${isValidator ? validatorPanel() : ""}
-      </div>
-    `);
+window.validatorDeposit = async ()=>{
+  const w = vUser.value.trim();
+  const amt = Number(vAmt.value);
+  if(!w || !amt) return alert("Fill all");
 
-    document.getElementById("submitBtn").onclick = submitReq;
-    loadHistory();
-  }
+  const ref = doc(db,"users",w);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return alert("User not found");
 
-  /* ===== REQUEST ===== */
-  async function submitReq() {
-    await db.collection("requests").add({
-      userId: WALLET,
-      amount: Number(document.getElementById("amt").value),
-      type: document.getElementById("type").value,
-      walletAddress: document.getElementById("waddr").value,
-      txHash: document.getElementById("txh").value || "",
-      status: "pending",
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+  await updateDoc(ref,{
+    balance: snap.data().balance + amt,
+    history: arrayUnion({
+      type:"Deposit",
+      amount:amt,
+      from:"VALIDATOR",
+      to:w,
+      time:Date.now()
+    })
+  });
+};
 
-    await userRef.update({ pendingRequest: true });
-    alert("Request submitted");
-  }
+window.validatorWithdraw = async ()=>{
+  const w = vUser.value.trim();
+  const amt = Number(vAmt.value);
+  if(!w || !amt) return alert("Fill all");
 
-  /* ===== HISTORY ===== */
-  async function loadHistory() {
-    const box = document.getElementById("historyBox");
-    try {
-      const snap = await db.collection("transactions")
-        .where("userId", "==", WALLET)
-        .get();
+  const ref = doc(db,"users",w);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return alert("User not found");
+  if(amt > snap.data().balance) return alert("Insufficient balance");
 
-      let html = "";
-      snap.forEach(d => {
-        const t = d.data();
-        html += `
-          <div class="tx">
-            <b>${t.type}</b> ${t.amount} USDC<br>
-            <span class="small">${t.createdAt?.toDate().toLocaleString() || ""}</span>
-          </div>`;
-      });
+  await updateDoc(ref,{
+    balance: snap.data().balance - amt,
+    history: arrayUnion({
+      type:"Withdraw",
+      amount:amt,
+      from:w,
+      to:"VALIDATOR",
+      time:Date.now()
+    })
+  });
+};
 
-      box.innerHTML = html || "No history";
-    } catch (e) {
-      box.innerHTML = "Failed to load history";
-    }
-  }
-
-  /* ===== VALIDATOR ===== */
-  function validatorPanel() {
-    return `
-      <hr>
-      <h3>Validator Panel</h3>
-      <input id="vu" placeholder="User Wallet TG_xxx">
-      <button onclick="viewUser()">View User</button>
-      <div id="vout"></div>
-    `;
-  }
-
-  window.viewUser = async () => {
-    const u = document.getElementById("vu").value.trim();
-    const snap = await db.collection("users").doc(u).get();
-    if (!snap.exists) return alert("User not found");
-    document.getElementById("vout").innerHTML =
-      `<hr>Balance: ${snap.data().balance} USDC`;
-  };
-
-  /* ===== START ===== */
-  init();
-
-})();
+function appDiv(h){ document.getElementById("app").innerHTML=h; }
+init();
 </script>
 </body>
 </html>
