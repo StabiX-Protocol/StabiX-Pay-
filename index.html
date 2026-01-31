@@ -8,13 +8,11 @@
   <style>
     body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px; }
     .box { background:#020617; border:1px solid #1e293b; border-radius:12px; padding:20px; max-width:420px; margin:auto; }
-    input, button, select { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; font-size:15px; }
+    input, button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; font-size:15px; }
     button { background:#2563eb; color:white; font-weight:bold; cursor:pointer; }
-    button:disabled { background:#334155; cursor:not-allowed; }
     hr { border:0; border-top:1px solid #1e293b; margin:15px 0; }
     .small { font-size:12px; opacity:.7; }
     .tx { font-size:13px; margin-top:8px; padding-bottom:8px; border-bottom:1px dashed #1e293b; }
-    .warn { color:#facc15; font-size:13px; margin-top:10px; }
   </style>
 </head>
 
@@ -22,9 +20,8 @@
 <div id="app">Connecting…</div>
 
 <script type="module">
-/* ===== FIREBASE SDK ===== */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } 
+import { getAuth, signInAnonymously, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
   getFirestore, doc, setDoc, getDoc,
@@ -55,27 +52,22 @@ let unsubHistory = null;
 /* ===== AUTH ===== */
 signInAnonymously(auth);
 
-onAuthStateChanged(auth, user=>{
+onAuthStateChanged(auth, async user=>{
   if(!user) return;
   uid = user.uid;
-  listenUser();
-});
 
-/* ===== UI HELPER ===== */
-function appDiv(html){
-  document.getElementById("app").innerHTML = html;
-}
-
-/* ===== USER LISTENER ===== */
-function listenUser(){
-  onSnapshot(doc(db,"users",uid), snap=>{
-    if(!snap.exists()){
-      renderSetup();
-      return;
-    }
+  const snap = await getDoc(doc(db,"users",uid));
+  if(!snap.exists()){
+    renderSetup();
+  } else {
     renderDashboard(snap.data());
     initHistory();
-  });
+  }
+});
+
+/* ===== UI ===== */
+function appDiv(html){
+  document.getElementById("app").innerHTML = html;
 }
 
 /* ===== SETUP ===== */
@@ -92,12 +84,15 @@ function renderSetup(){
 
 window.saveProfile = async ()=>{
   if(!uname.value || !wallet.value) return alert("Fill all");
-  await setDoc(doc(db,"users",uid),{
+  const userData = {
     username: uname.value.trim(),
     walletAddress: wallet.value.trim(),
     balance: 0,
     createdAt: new Date()
-  });
+  };
+  await setDoc(doc(db,"users",uid), userData);
+  renderDashboard(userData);
+  initHistory();
 };
 
 /* ===== DASHBOARD ===== */
@@ -116,12 +111,18 @@ function renderDashboard(user){
       <input type="date" id="historyDate">
       <div id="historyBox" class="small">Loading…</div>
 
-      ${isValidator?validatorPanel():""}
+      ${isValidator?`
+        <hr>
+        <h3>Validator Panel</h3>
+        <input id="vuid" placeholder="User UID">
+        <button onclick="viewUser()">View</button>
+        <p class="small">Balance: <span id="vbal">-</span></p>
+      `:""}
     </div>
   `);
 }
 
-/* ===== USER HISTORY (DATE WISE) ===== */
+/* ===== HISTORY ===== */
 function initHistory(){
   const today = new Date().toISOString().slice(0,10);
   const dateEl = document.getElementById("historyDate");
@@ -148,9 +149,8 @@ function loadHistory(date){
     let html="";
     snap.forEach(d=>{
       const t=d.data();
-      const red=["Withdraw","Sent"].includes(t.type);
       html+=`
-        <div class="tx" style="color:${red?"#ef4444":"#22c55e"}">
+        <div class="tx">
           <b>${t.type}</b>: ${t.amount} USDC<br>
           <span class="small">${t.createdAt.toDate().toLocaleString()}</span>
         </div>
@@ -161,16 +161,6 @@ function loadHistory(date){
 }
 
 /* ===== VALIDATOR ===== */
-function validatorPanel(){
-  return `
-    <hr>
-    <h3>Validator Panel</h3>
-    <input id="vuid" placeholder="User UID">
-    <button onclick="viewUser()">View</button>
-    <p class="small">Balance: <span id="vbal">-</span></p>
-  `;
-}
-
 window.viewUser = async ()=>{
   const id=document.getElementById("vuid").value.trim();
   if(!id) return;
