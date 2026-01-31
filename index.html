@@ -131,14 +131,11 @@ window.login = async ()=>{
 window.forgotPassword = async ()=>{
   OTP_CODE = Math.floor(100000 + Math.random() * 900000).toString();
 
-  await updateDoc(userRef,{
-    otp: OTP_CODE,
-    otpAt: serverTimestamp()
-  });
+  await updateDoc(userRef,{ otp: OTP_CODE });
 
   tg.showPopup({
     title: "StabiX OTP",
-    message: "Your OTP is: " + OTP_CODE,
+    message: "Your OTP: " + OTP_CODE,
     buttons: [{type:"ok"}]
   });
 
@@ -149,39 +146,18 @@ function renderOTP(){
   appDiv(`
     <div class="box">
       <h3>Verify OTP</h3>
-      <input id="otp" placeholder="Enter OTP">
+      <input id="otp" placeholder="OTP">
       <input id="npwd" type="password" placeholder="New Password">
-      <button onclick="verifyOTP()">Verify & Reset</button>
-      <span class="link" onclick="resendOTP()">Resend OTP</span>
+      <button onclick="verifyOTP()">Reset Password</button>
+      <span class="link" onclick="forgotPassword()">Resend OTP</span>
     </div>
   `);
 }
 
-window.resendOTP = async ()=>{
-  OTP_CODE = Math.floor(100000 + Math.random() * 900000).toString();
-
-  await updateDoc(userRef,{
-    otp: OTP_CODE,
-    otpAt: serverTimestamp()
-  });
-
-  tg.showPopup({
-    title: "StabiX OTP",
-    message: "New OTP: " + OTP_CODE,
-    buttons: [{type:"ok"}]
-  });
-};
-
 window.verifyOTP = async ()=>{
   const snap = await getDoc(userRef);
-
   if(snap.data().otp !== otp.value.trim()){
     alert("Invalid OTP");
-    return;
-  }
-
-  if(!npwd.value.trim()){
-    alert("Enter new password");
     return;
   }
 
@@ -190,25 +166,7 @@ window.verifyOTP = async ()=>{
     otp: ""
   });
 
-  alert("Password updated");
   renderLogin();
-};
-
-/* ================= SET PASSWORD ================= */
-function renderSetPassword(){
-  appDiv(`
-    <div class="box">
-      <h3>Set Password</h3>
-      <input id="pwd" type="password" placeholder="New Password">
-      <button onclick="updatePassword()">Save</button>
-    </div>
-  `);
-}
-
-window.updatePassword = async ()=>{
-  if(!pwd.value.trim()) return alert("Enter password");
-  await updateDoc(userRef,{ password: pwd.value.trim() });
-  renderApp();
 };
 
 /* ================= MAIN APP ================= */
@@ -221,23 +179,20 @@ async function renderApp(){
       <h2>${user.username}</h2>
       <p class="small">${WALLET}</p>
 
-      <hr>
       <b>Balance:</b> ${user.balance.toFixed(2)} USDC
-      ${user.pendingRequest ? `<div class="warn">Pending approval</div>` : ""}
 
       <hr>
-      <h3>Deposit / Withdraw</h3>
       <select id="type">
         <option value="deposit">Deposit</option>
         <option value="withdraw">Withdraw</option>
       </select>
       <input id="amt" type="number" placeholder="Amount">
       <input id="waddr" placeholder="Wallet Address">
-      <input id="txh" placeholder="Tx Hash (deposit only)">
+      <input id="txh" placeholder="Tx Hash (deposit)">
       <button onclick="submitReq()">Submit</button>
 
       <hr>
-      <h3>Transaction History</h3>
+      <h3>History</h3>
       <div id="history">Loading…</div>
 
       ${isValidator ? validatorPanel() : ""}
@@ -246,6 +201,62 @@ async function renderApp(){
 
   loadHistory();
 }
+
+/* ================= REQUEST ================= */
+window.submitReq = async ()=>{
+  await addDoc(collection(db,"requests"),{
+    userId: WALLET,
+    amount: Number(amt.value),
+    type: type.value,
+    walletAddress: waddr.value,
+    txHash: txh.value || "",
+    status:"pending",
+    createdAt: serverTimestamp()
+  });
+
+  alert("Request sent");
+};
+
+/* ================= HISTORY ================= */
+async function loadHistory(){
+  const q = query(
+    collection(db,"transactions"),
+    where("userId","==",WALLET),
+    orderBy("createdAt","desc")
+  );
+
+  const snap = await getDocs(q);
+  let html="";
+
+  snap.forEach(d=>{
+    const t=d.data();
+    html+=`<div class="tx">${t.type} - ${t.amount}</div>`;
+  });
+
+  document.getElementById("history").innerHTML = html || "No history";
+}
+
+/* ================= VALIDATOR ================= */
+function validatorPanel(){
+  return `
+    <hr>
+    <h3>Validator Panel</h3>
+    <button onclick="loadRequests()">Load Requests</button>
+    <div id="vout"></div>
+  `;
+}
+
+window.loadRequests = async ()=>{
+  const snap = await getDocs(collection(db,"requests"));
+  let html="";
+  snap.forEach(d=>{
+    const r=d.data();
+    if(r.status==="pending"){
+      html+=`<div class="tx">${r.userId} - ${r.amount}</div>`;
+    }
+  });
+  vout.innerHTML = html || "No pending";
+};
 
 /* ================= UTIL ================= */
 function appDiv(h){
