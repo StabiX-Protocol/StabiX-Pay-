@@ -27,166 +27,181 @@
 <div id="app">Loading…</div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+(async function () {
 
-/* ===== TELEGRAM ===== */
-let tgUser = null;
-if (window.Telegram?.WebApp) {
-  Telegram.WebApp.ready();
-  tgUser = Telegram.WebApp.initDataUnsafe?.user;
-}
-if (!tgUser) tgUser = { id: "DEBUG_1001", username: "DebugUser" };
+  const app = document.getElementById("app");
 
-/* ===== FIREBASE ===== */
-firebase.initializeApp({
-  apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
-  authDomain: "stabix-backend-v1.firebaseapp.com",
-  projectId: "stabix-backend-v1",
-  storageBucket: "stabix-backend-v1.appspot.com",
-  messagingSenderId: "351361221507",
-  appId: "1:351361221507:web:ebaf0d15e86d4b184c6cb6"
-});
+  /* ===== TELEGRAM SAFE INIT ===== */
+  let tgUser = null;
+  if (window.Telegram && Telegram.WebApp) {
+    Telegram.WebApp.ready();
+    tgUser = Telegram.WebApp.initDataUnsafe?.user;
+  }
 
-const db = firebase.firestore();
+  if (!tgUser) {
+    tgUser = { id: "DEBUG_1001", username: "DebugUser" };
+  }
 
-/* ===== IDENTITY ===== */
-const WALLET = "TG_" + tgUser.id;
-const userRef = db.collection("users").doc(WALLET);
-const validatorRef = db.collection("validators").doc(String(tgUser.id));
-
-/* ===== INIT ===== */
-async function init(){
-  const snap = await userRef.get();
-  snap.exists ? renderApp() : renderSetup();
-}
-
-/* ===== SETUP ===== */
-function renderSetup(){
-  appDiv(`
-    <div class="box">
-      <h3>Create Username</h3>
-      <input id="uname" placeholder="Username">
-      <button id="saveBtn">Save</button>
-    </div>
-  `);
-
-  document.getElementById("saveBtn").onclick = saveProfile;
-}
-
-async function saveProfile(){
-  const u = document.getElementById("uname").value.trim();
-  if(!u) return alert("Enter username");
-
-  await userRef.set({
-    username: u,
-    walletAddress: WALLET,
-    balance: 0,
-    pendingRequest: false,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  /* ===== FIREBASE INIT ===== */
+  firebase.initializeApp({
+    apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
+    authDomain: "stabix-backend-v1.firebaseapp.com",
+    projectId: "stabix-backend-v1",
+    storageBucket: "stabix-backend-v1.appspot.com",
+    messagingSenderId: "351361221507",
+    appId: "1:351361221507:web:ebaf0d15e86d4b184c6cb6"
   });
 
-  renderApp();
-}
+  const db = firebase.firestore();
 
-/* ===== MAIN APP ===== */
-async function renderApp(){
-  const user = (await userRef.get()).data();
-  const isValidator = (await validatorRef.get()).exists;
+  /* ===== IDENTITY ===== */
+  const WALLET = "TG_" + tgUser.id;
+  const userRef = db.collection("users").doc(WALLET);
+  const validatorRef = db.collection("validators").doc(String(tgUser.id));
 
-  appDiv(`
-    <div class="box">
-      <h2>${user.username}</h2>
-      <p class="small">${WALLET}</p>
+  /* ===== UI RENDER ===== */
+  function render(html) {
+    app.innerHTML = html;
+  }
 
-      <hr><b>Balance:</b> ${user.balance.toFixed(2)} USDC
-      ${user.pendingRequest ? `<div class="warn">Pending approval</div>` : ""}
+  /* ===== INIT ===== */
+  async function init() {
+    try {
+      const snap = await userRef.get();
+      snap.exists ? renderApp() : renderSetup();
+    } catch (e) {
+      render("<div class='box'>Error loading app</div>");
+      console.error(e);
+    }
+  }
 
+  /* ===== SETUP ===== */
+  function renderSetup() {
+    render(`
+      <div class="box">
+        <h3>Create Username</h3>
+        <input id="uname" placeholder="Username">
+        <button id="saveBtn">Save</button>
+      </div>
+    `);
+
+    document.getElementById("saveBtn").onclick = saveProfile;
+  }
+
+  async function saveProfile() {
+    const u = document.getElementById("uname").value.trim();
+    if (!u) return alert("Enter username");
+
+    await userRef.set({
+      username: u,
+      walletAddress: WALLET,
+      balance: 0,
+      pendingRequest: false,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    renderApp();
+  }
+
+  /* ===== MAIN APP ===== */
+  async function renderApp() {
+    const user = (await userRef.get()).data();
+    const isValidator = (await validatorRef.get()).exists;
+
+    render(`
+      <div class="box">
+        <h2>${user.username}</h2>
+        <p class="small">${WALLET}</p>
+
+        <hr><b>Balance:</b> ${user.balance.toFixed(2)} USDC
+        ${user.pendingRequest ? `<div class="warn">Pending approval</div>` : ""}
+
+        <hr>
+        <h3>Deposit / Withdraw</h3>
+        <select id="type">
+          <option value="deposit">Deposit</option>
+          <option value="withdraw">Withdraw</option>
+        </select>
+        <input id="amt" type="number" placeholder="Amount">
+        <input id="waddr" placeholder="Wallet Address">
+        <input id="txh" placeholder="Tx Hash (deposit)">
+        <button id="submitBtn">Submit</button>
+
+        <hr>
+        <h3>History</h3>
+        <div id="historyBox">Loading…</div>
+
+        ${isValidator ? validatorPanel() : ""}
+      </div>
+    `);
+
+    document.getElementById("submitBtn").onclick = submitReq;
+    loadHistory();
+  }
+
+  /* ===== REQUEST ===== */
+  async function submitReq() {
+    await db.collection("requests").add({
+      userId: WALLET,
+      amount: Number(document.getElementById("amt").value),
+      type: document.getElementById("type").value,
+      walletAddress: document.getElementById("waddr").value,
+      txHash: document.getElementById("txh").value || "",
+      status: "pending",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    await userRef.update({ pendingRequest: true });
+    alert("Request submitted");
+  }
+
+  /* ===== HISTORY ===== */
+  async function loadHistory() {
+    const box = document.getElementById("historyBox");
+    try {
+      const snap = await db.collection("transactions")
+        .where("userId", "==", WALLET)
+        .get();
+
+      let html = "";
+      snap.forEach(d => {
+        const t = d.data();
+        html += `
+          <div class="tx">
+            <b>${t.type}</b> ${t.amount} USDC<br>
+            <span class="small">${t.createdAt?.toDate().toLocaleString() || ""}</span>
+          </div>`;
+      });
+
+      box.innerHTML = html || "No history";
+    } catch (e) {
+      box.innerHTML = "Failed to load history";
+    }
+  }
+
+  /* ===== VALIDATOR ===== */
+  function validatorPanel() {
+    return `
       <hr>
-      <h3>Deposit / Withdraw</h3>
-      <select id="type">
-        <option value="deposit">Deposit</option>
-        <option value="withdraw">Withdraw</option>
-      </select>
-      <input id="amt" type="number" placeholder="Amount">
-      <input id="waddr" placeholder="Wallet Address">
-      <input id="txh" placeholder="Tx Hash (deposit)">
-      <button id="submitBtn">Submit</button>
+      <h3>Validator Panel</h3>
+      <input id="vu" placeholder="User Wallet TG_xxx">
+      <button onclick="viewUser()">View User</button>
+      <div id="vout"></div>
+    `;
+  }
 
-      <hr>
-      <h3>History</h3>
-      <div id="historyBox">Loading…</div>
+  window.viewUser = async () => {
+    const u = document.getElementById("vu").value.trim();
+    const snap = await db.collection("users").doc(u).get();
+    if (!snap.exists) return alert("User not found");
+    document.getElementById("vout").innerHTML =
+      `<hr>Balance: ${snap.data().balance} USDC`;
+  };
 
-      ${isValidator ? validatorPanel() : ""}
-    </div>
-  `);
+  /* ===== START ===== */
+  init();
 
-  document.getElementById("submitBtn").onclick = submitReq;
-  loadHistory();
-}
-
-/* ===== REQUEST ===== */
-async function submitReq(){
-  await db.collection("requests").add({
-    userId: WALLET,
-    amount: Number(document.getElementById("amt").value),
-    type: document.getElementById("type").value,
-    walletAddress: document.getElementById("waddr").value,
-    txHash: document.getElementById("txh").value || "",
-    status: "pending",
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  await userRef.update({ pendingRequest: true });
-  alert("Request submitted");
-}
-
-/* ===== HISTORY ===== */
-async function loadHistory(){
-  const box = document.getElementById("historyBox");
-  const snap = await db.collection("transactions")
-    .where("userId","==",WALLET)
-    .orderBy("createdAt","desc")
-    .get();
-
-  let html = "";
-  snap.forEach(d=>{
-    const t = d.data();
-    html += `
-      <div class="tx">
-        <b>${t.type}</b> ${t.amount} USDC<br>
-        <span class="small">${t.createdAt?.toDate().toLocaleString()}</span>
-      </div>`;
-  });
-
-  box.innerHTML = html || "No history";
-}
-
-/* ===== VALIDATOR ===== */
-function validatorPanel(){
-  return `
-    <hr>
-    <h3>Validator Panel</h3>
-    <input id="vu" placeholder="User Wallet TG_xxx">
-    <button onclick="viewUser()">View User</button>
-    <div id="vout"></div>
-  `;
-}
-
-window.viewUser = async ()=>{
-  const u = document.getElementById("vu").value.trim();
-  const snap = await db.collection("users").doc(u).get();
-  if(!snap.exists) return alert("User not found");
-  document.getElementById("vout").innerHTML =
-    `<hr>Balance: ${snap.data().balance} USDC`;
-};
-
-/* ===== UTIL ===== */
-function appDiv(h){
-  document.getElementById("app").innerHTML = h;
-}
-
-init();
-});
+})();
 </script>
 </body>
 </html>
