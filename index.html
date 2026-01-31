@@ -26,7 +26,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/fireba
 import {
   getFirestore, doc, setDoc, getDoc, updateDoc,
   collection, addDoc, getDocs, serverTimestamp,
-  query, where, orderBy
+  query, where, orderBy, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 /* ================= FIREBASE ================= */
@@ -130,7 +130,6 @@ window.login = async ()=>{
 /* ================= FORGOT PASSWORD ================= */
 window.forgotPassword = async ()=>{
   OTP_CODE = Math.floor(100000 + Math.random() * 900000).toString();
-
   await updateDoc(userRef,{ otp: OTP_CODE });
 
   tg.showPopup({
@@ -182,6 +181,15 @@ async function renderApp(){
       <b>Balance:</b> ${user.balance.toFixed(2)} USDC
 
       <hr>
+
+      <!-- SEND FEATURE -->
+      <h3>Send USDC</h3>
+      <input id="sendTo" placeholder="Receiver Wallet (TG_xxx)">
+      <input id="sendAmt" type="number" placeholder="Amount">
+      <button onclick="sendUSDC()">Send</button>
+
+      <hr>
+
       <select id="type">
         <option value="deposit">Deposit</option>
         <option value="withdraw">Withdraw</option>
@@ -201,6 +209,48 @@ async function renderApp(){
 
   loadHistory();
 }
+
+/* ================= SEND FEATURE ================= */
+window.sendUSDC = async ()=>{
+  const toWallet = sendTo.value.trim();
+  const amount = Number(sendAmt.value);
+
+  if(!toWallet || amount <= 0) return alert("Invalid input");
+  if(toWallet === WALLET) return alert("Cannot send to self");
+
+  const fromRef = userRef;
+  const toRef = doc(db,"users",toWallet);
+
+  await runTransaction(db, async (tx)=>{
+    const fromSnap = await tx.get(fromRef);
+    const toSnap = await tx.get(toRef);
+
+    if(!toSnap.exists()) throw "Receiver not found";
+    if(fromSnap.data().balance < amount) throw "Insufficient balance";
+
+    tx.update(fromRef,{ balance: fromSnap.data().balance - amount });
+    tx.update(toRef,{ balance: toSnap.data().balance + amount });
+
+    tx.set(doc(collection(db,"transactions")),{
+      userId: WALLET,
+      type: "send",
+      amount,
+      to: toWallet,
+      createdAt: serverTimestamp()
+    });
+
+    tx.set(doc(collection(db,"transactions")),{
+      userId: toWallet,
+      type: "receive",
+      amount,
+      from: WALLET,
+      createdAt: serverTimestamp()
+    });
+  });
+
+  alert("Transfer successful");
+  renderApp();
+};
 
 /* ================= REQUEST ================= */
 window.submitReq = async ()=>{
