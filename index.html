@@ -8,10 +8,12 @@
   <style>
     body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px; }
     .box { background:#020617; border:1px solid #1e293b; border-radius:12px; padding:20px; max-width:420px; margin:auto; }
-    input, button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; }
+    input, button, select { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; }
     button { background:#2563eb; color:white; font-weight:bold; cursor:pointer; }
     hr { border:0; border-top:1px solid #1e293b; margin:15px 0; }
     .small { font-size:12px; opacity:.7; }
+    .tx { font-size:13px; border-bottom:1px dashed #1e293b; padding:6px 0; }
+    .warn { color:#facc15; font-size:13px; }
   </style>
 </head>
 
@@ -22,37 +24,43 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getFirestore, doc, setDoc, getDoc, updateDoc,
-  collection, addDoc, getDocs, serverTimestamp
+  collection, addDoc, getDocs, serverTimestamp,
+  query, where, orderBy, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-/* ========= FIREBASE ========= */
-const appFB = initializeApp({
+/* ================= FIREBASE ================= */
+const firebaseConfig = {
   apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
   authDomain: "stabix-backend-v1.firebaseapp.com",
-  projectId: "stabix-backend-v1"
-});
+  projectId: "stabix-backend-v1",
+  storageBucket: "stabix-backend-v1.firebasestorage.app",
+  messagingSenderId: "351361221507",
+  appId: "1:351361221507:web:ebaf0d15e86d4b184c6cb6"
+};
+const appFB = initializeApp(firebaseConfig);
 const db = getFirestore(appFB);
 
-/* ========= TELEGRAM ========= */
+/* ================= TELEGRAM ================= */
 const tg = window.Telegram.WebApp;
 tg.ready(); tg.expand();
 const tgUser = tg.initDataUnsafe?.user;
 if(!tgUser?.id){ document.getElementById("app").innerHTML="Telegram user not found"; throw ""; }
 
-/* ========= USER ========= */
+/* ================= IDENTITY ================= */
 const WALLET = "TG_" + tgUser.id;
 const userRef = doc(db,"users",WALLET);
+const validatorRef = doc(db,"validators",String(tgUser.id));
 
-/* ========= INIT ========= */
+/* ================= INIT ================= */
 async function init(){
   const snap = await getDoc(userRef);
-  if(!snap.exists() || !snap.data().password){
+  if(!snap.exists() || !snap.data()?.password){
     renderSetup(); return;
   }
   renderLogin();
 }
 
-/* ========= SETUP ========= */
+/* ================= SETUP ================= */
 function renderSetup(){
   appDiv(`
     <div class="box">
@@ -65,26 +73,28 @@ function renderSetup(){
 }
 
 window.saveProfile = async ()=>{
-  if(!uname.value || !pwd.value) return alert("Fill all");
+  if(!uname.value.trim() || !pwd.value.trim()) return alert("Fill all fields");
   await setDoc(userRef,{
-    username: uname.value,
-    password: pwd.value,
+    username: uname.value.trim(),
+    password: pwd.value.trim(),
+    walletAddress: WALLET,
     balance: 0,
+    pendingRequest:false,
+    lastUsernameChange: serverTimestamp(),
     createdAt: serverTimestamp()
   });
   renderApp();
 };
 
-/* ========= LOGIN ========= */
+/* ================= LOGIN ================= */
 function renderLogin(){
   appDiv(`
     <div class="box">
       <h3>Login</h3>
       <input id="pwd" type="password" placeholder="Password">
-      <div style="display:flex;gap:10px;align-items:center">
-        <button onclick="login()">Login</button>
-        <span style="font-size:12px;color:#60a5fa;cursor:pointer"
-              onclick="forgotPassword()">Forgot?</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+        <button style="width:70%" onclick="login()">Login</button>
+        <span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Forgot?</span>
       </div>
     </div>
   `);
@@ -92,15 +102,15 @@ function renderLogin(){
 
 window.login = async ()=>{
   const snap = await getDoc(userRef);
-  if(snap.data().password !== pwd.value) return alert("Wrong password");
+  if(snap.data().password !== pwd.value.trim()) return alert("Wrong password");
   renderApp();
 };
 
-/* ========= FORGOT PASSWORD ========= */
+/* ================= FORGOT PASSWORD ================= */
 window.forgotPassword = async ()=>{
   const otp = Math.floor(100000 + Math.random()*900000).toString();
   await updateDoc(userRef,{ otp });
-  alert("OTP: " + otp);
+  tg.showPopup({ title:"OTP", message:"Your OTP: "+otp, buttons:[{type:"ok"}] });
   renderOTP();
 };
 
@@ -111,33 +121,128 @@ function renderOTP(){
       <input id="otp" placeholder="OTP">
       <input id="npwd" type="password" placeholder="New Password">
       <button onclick="verifyOTP()">Reset</button>
+      <span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Resend</span>
     </div>
   `);
 }
 
 window.verifyOTP = async ()=>{
   const snap = await getDoc(userRef);
-  if(snap.data().otp !== otp.value) return alert("Invalid OTP");
-  await updateDoc(userRef,{ password: npwd.value, otp:"" });
+  if(snap.data().otp !== otp.value.trim()) return alert("Invalid OTP");
+  await updateDoc(userRef,{ password: npwd.value.trim(), otp:"" });
   renderLogin();
 };
 
-/* ========= MAIN APP ========= */
+/* ================= USERNAME CHANGE (30 DAYS) ================= */
+window.changeUsername = async ()=>{
+  const snap = await getDoc(userRef);
+  const last = snap.data().lastUsernameChange?.toDate();
+  if(last && ((Date.now()-last)/(1000*60*60*24)) < 30)
+    return alert("Username can be changed once every 30 days");
+
+  const name = prompt("New username");
+  if(!name?.trim()) return;
+  await updateDoc(userRef,{ username:name.trim(), lastUsernameChange:serverTimestamp() });
+  renderApp();
+};
+
+/* ================= MAIN APP ================= */
 async function renderApp(){
   const user = (await getDoc(userRef)).data();
+  const isValidator = (await getDoc(validatorRef)).exists();
+
   appDiv(`
     <div class="box">
       <h2>${user.username}</h2>
       <p class="small">${WALLET}</p>
+      <button onclick="changeUsername()">Change Username</button>
+
       <hr>
-      <b>Balance:</b> ${user.balance} USDC
+      <b>Balance:</b> ${user.balance.toFixed(2)} USDC
+
       <hr>
-      <p class="small">App opened successfully ✅</p>
+      <h3>Send USDC</h3>
+      <input id="sendTo" placeholder="Receiver Wallet (TG_xxx)">
+      <input id="sendAmt" type="number" placeholder="Amount">
+      <button onclick="sendUSDC()">Send</button>
+
+      <hr>
+      <h3>Transaction History</h3>
+      <div id="history">Loading…</div>
+
+      ${isValidator ? validatorPanel() : ""}
     </div>
   `);
+
+  loadHistory();
 }
 
-/* ========= UTILS ========= */
+/* ================= SEND USDC ================= */
+window.sendUSDC = async ()=>{
+  const toWallet = sendTo.value.trim();
+  const amount = Number(sendAmt.value);
+  if(!toWallet || amount<=0) return alert("Invalid input");
+  if(toWallet === WALLET){
+    tg.showPopup({ title:"Blocked", message:"Cannot send to yourself", buttons:[{type:"ok"}] });
+    return;
+  }
+
+  try{
+    await runTransaction(db, async(tx)=>{
+      const fromSnap = await tx.get(userRef);
+      const toRef = doc(db,"users",toWallet);
+      const toSnap = await tx.get(toRef);
+      if(!toSnap.exists()) throw "Receiver not found";
+      if(fromSnap.data().balance < amount) throw "Insufficient balance";
+
+      tx.update(userRef,{ balance: fromSnap.data().balance - amount });
+      tx.update(toRef,{ balance: toSnap.data().balance + amount });
+
+      tx.set(doc(collection(db,"transactions")),{
+        userId: WALLET, type:"sent", amount, counterparty:toWallet, createdAt:serverTimestamp()
+      });
+      tx.set(doc(collection(db,"transactions")),{
+        userId: toWallet, type:"received", amount, counterparty:WALLET, createdAt:serverTimestamp()
+      });
+    });
+    renderApp();
+  }catch(e){ alert(e); }
+};
+
+/* ================= HISTORY ================= */
+async function loadHistory(){
+  const q = query(collection(db,"transactions"), where("userId","==",WALLET), orderBy("createdAt","desc"));
+  const snap = await getDocs(q);
+  let html="";
+  snap.forEach(d=>{
+    const t=d.data();
+    html+=`<div class="tx"><b>${t.type}</b> ${t.amount} USDC<br><span class="small">${t.createdAt?.toDate?.().toLocaleString?.()||""}</span></div>`;
+  });
+  document.getElementById("history").innerHTML = html || "No history";
+}
+
+/* ================= VALIDATOR PANEL ================= */
+function validatorPanel(){
+  return `
+    <hr>
+    <h3>Validator Panel</h3>
+    <button onclick="loadRequests()">Load Pending</button>
+    <div id="vout"></div>
+  `;
+}
+
+window.loadRequests = async ()=>{
+  const q = query(collection(db,"requests"), where("status","==","pending"), orderBy("createdAt","asc"));
+  const snap = await getDocs(q);
+  let html="";
+  snap.forEach(d=>{
+    const r=d.data();
+    html+=`<div class="tx">${r.userId} • ${r.type} • ${r.amount}</div>`;
+  });
+  document.getElementById("vout").innerHTML = html || "No pending";
+};
+
+/* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
 
 init();
