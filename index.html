@@ -7,7 +7,7 @@
   <!-- Telegram -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- Firebase COMPAT (Telegram-safe) -->
+  <!-- Firebase COMPAT -->
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
@@ -27,6 +27,16 @@
 <div id="app">Loading…</div>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+
+/* ===== TELEGRAM ===== */
+let tgUser = null;
+if (window.Telegram?.WebApp) {
+  Telegram.WebApp.ready();
+  tgUser = Telegram.WebApp.initDataUnsafe?.user;
+}
+if (!tgUser) tgUser = { id: "DEBUG_1001", username: "DebugUser" };
+
 /* ===== FIREBASE ===== */
 firebase.initializeApp({
   apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
@@ -39,18 +49,6 @@ firebase.initializeApp({
 
 const db = firebase.firestore();
 
-/* ===== TELEGRAM ===== */
-let tgUser = null;
-
-if (window.Telegram && Telegram.WebApp) {
-  Telegram.WebApp.ready();
-  tgUser = Telegram.WebApp.initDataUnsafe?.user;
-}
-
-if (!tgUser) {
-  tgUser = { id: "DEBUG_1001", username: "DebugUser" };
-}
-
 /* ===== IDENTITY ===== */
 const WALLET = "TG_" + tgUser.id;
 const userRef = db.collection("users").doc(WALLET);
@@ -59,11 +57,7 @@ const validatorRef = db.collection("validators").doc(String(tgUser.id));
 /* ===== INIT ===== */
 async function init(){
   const snap = await userRef.get();
-  if(!snap.exists){
-    renderSetup();
-  } else {
-    renderApp();
-  }
+  snap.exists ? renderApp() : renderSetup();
 }
 
 /* ===== SETUP ===== */
@@ -72,13 +66,15 @@ function renderSetup(){
     <div class="box">
       <h3>Create Username</h3>
       <input id="uname" placeholder="Username">
-      <button onclick="saveProfile()">Save</button>
+      <button id="saveBtn">Save</button>
     </div>
   `);
+
+  document.getElementById("saveBtn").onclick = saveProfile;
 }
 
 async function saveProfile(){
-  const u = uname.value.trim();
+  const u = document.getElementById("uname").value.trim();
   if(!u) return alert("Enter username");
 
   await userRef.set({
@@ -114,16 +110,17 @@ async function renderApp(){
       <input id="amt" type="number" placeholder="Amount">
       <input id="waddr" placeholder="Wallet Address">
       <input id="txh" placeholder="Tx Hash (deposit)">
-      <button onclick="submitReq()">Submit</button>
+      <button id="submitBtn">Submit</button>
 
       <hr>
       <h3>History</h3>
-      <div id="history">Loading…</div>
+      <div id="historyBox">Loading…</div>
 
       ${isValidator ? validatorPanel() : ""}
     </div>
   `);
 
+  document.getElementById("submitBtn").onclick = submitReq;
   loadHistory();
 }
 
@@ -131,10 +128,10 @@ async function renderApp(){
 async function submitReq(){
   await db.collection("requests").add({
     userId: WALLET,
-    amount: Number(amt.value),
-    type: type.value,
-    walletAddress: waddr.value,
-    txHash: type.value === "deposit" ? txh.value : "",
+    amount: Number(document.getElementById("amt").value),
+    type: document.getElementById("type").value,
+    walletAddress: document.getElementById("waddr").value,
+    txHash: document.getElementById("txh").value || "",
     status: "pending",
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
@@ -145,6 +142,7 @@ async function submitReq(){
 
 /* ===== HISTORY ===== */
 async function loadHistory(){
+  const box = document.getElementById("historyBox");
   const snap = await db.collection("transactions")
     .where("userId","==",WALLET)
     .orderBy("createdAt","desc")
@@ -160,7 +158,7 @@ async function loadHistory(){
       </div>`;
   });
 
-  history.innerHTML = html || "No history";
+  box.innerHTML = html || "No history";
 }
 
 /* ===== VALIDATOR ===== */
@@ -174,12 +172,13 @@ function validatorPanel(){
   `;
 }
 
-async function viewUser(){
-  const u = vu.value.trim();
+window.viewUser = async ()=>{
+  const u = document.getElementById("vu").value.trim();
   const snap = await db.collection("users").doc(u).get();
   if(!snap.exists) return alert("User not found");
-  vout.innerHTML = `<hr>Balance: ${snap.data().balance} USDC`;
-}
+  document.getElementById("vout").innerHTML =
+    `<hr>Balance: ${snap.data().balance} USDC`;
+};
 
 /* ===== UTIL ===== */
 function appDiv(h){
@@ -187,6 +186,7 @@ function appDiv(h){
 }
 
 init();
+});
 </script>
 </body>
 </html>
