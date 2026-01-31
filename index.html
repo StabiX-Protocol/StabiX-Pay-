@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>StabiX</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <title>StabiX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <style>
-    body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px; }
-    .box { background:#020617; border:1px solid #1e293b; border-radius:12px; padding:20px; max-width:420px; margin:auto; }
-    input, button, select { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; }
-    button { background:#2563eb; color:white; font-weight:bold; cursor:pointer; }
-    hr { border:0; border-top:1px solid #1e293b; margin:15px 0; }
-    .small { font-size:12px; opacity:.7; }
-    .tx { font-size:13px; border-bottom:1px dashed #1e293b; padding:6px 0; }
-    .warn { color:#facc15; font-size:13px; }
-    .link { color:#60a5fa; font-size:13px; cursor:pointer; margin-top:10px; display:block; }
-  </style>
+  <style>
+    body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px; }
+    .box { background:#020617; border:1px solid #1e293b; border-radius:12px; padding:20px; max-width:420px; margin:auto; }
+    input, button, select { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; }
+    button { background:#2563eb; color:white; font-weight:bold; cursor:pointer; }
+    hr { border:0; border-top:1px solid #1e293b; margin:15px 0; }
+    .small { font-size:12px; opacity:.7; }
+    .tx { font-size:13px; border-bottom:1px dashed #1e293b; padding:6px 0; }
+    .warn { color:#facc15; font-size:13px; }
+    .link { color:#60a5fa; font-size:13px; cursor:pointer; margin-top:10px; display:block; }
+  </style>
 </head>
 
 <body>
@@ -24,19 +24,19 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
-  getFirestore, doc, setDoc, getDoc, updateDoc,
-  collection, addDoc, getDocs, serverTimestamp,
-  query, where, orderBy, runTransaction
+  getFirestore, doc, setDoc, getDoc, updateDoc,
+  collection, addDoc, getDocs, serverTimestamp,
+  query, where, orderBy, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 /* ================= FIREBASE ================= */
 const firebaseConfig = {
-  apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
-  authDomain: "stabix-backend-v1.firebaseapp.com",
-  projectId: "stabix-backend-v1",
-  storageBucket: "stabix-backend-v1.firebasestorage.app",
-  messagingSenderId: "351361221507",
-  appId: "1:351361221507:web:ebaf0d15e86d4b184c6cb6"
+  apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
+  authDomain: "stabix-backend-v1.firebaseapp.com",
+  projectId: "stabix-backend-v1",
+  storageBucket: "stabix-backend-v1.firebasestorage.app",
+  messagingSenderId: "351361221507",
+  appId: "1:351361221507:web:ebaf0d15e86d4b184c6cb6"
 };
 
 const appFB = initializeApp(firebaseConfig);
@@ -49,8 +49,8 @@ tg.expand();
 
 const tgUser = tg.initDataUnsafe?.user;
 if(!tgUser || !tgUser.id){
-  document.getElementById("app").innerHTML = "Telegram user not found";
-  throw "";
+  document.getElementById("app").innerHTML = "Telegram user not found";
+  throw "";
 }
 
 /* ================= IDENTITY ================= */
@@ -62,244 +62,242 @@ let OTP_CODE = null;
 
 /* ================= INIT ================= */
 async function init(){
-  const snap = await getDoc(userRef);
-  if(!snap.exists()){ renderSetup(); return; }
-  if(!snap.data().password){ renderSetPassword(); return; }
-  renderLogin();
+  const snap = await getDoc(userRef);
+  if(!snap.exists()){ renderSetup(); return; }
+  if(!snap.data().password){ renderSetPassword(); return; }
+  renderLogin();
 }
 
 /* ================= SETUP ================= */
 function renderSetup(){
-  appDiv(`
-    <div class="box">
-      <h3>Create Username</h3>
-      <input id="uname" placeholder="Username">
-      <input id="pwd" type="password" placeholder="Password">
-      <button onclick="saveProfile()">Save</button>
-    </div>
-  `);
+  appDiv(`
+    <div class="box">
+      <h3>Create Username</h3>
+      <input id="uname" placeholder="Username">
+      <input id="pwd" type="password" placeholder="Password">
+      <button onclick="saveProfile()">Save</button>
+    </div>
+  `);
 }
 
 window.saveProfile = async ()=>{
-  if(!uname.value.trim() || !pwd.value.trim()) return alert("Fill all fields");
-  await setDoc(userRef,{
-    username: uname.value.trim(),
-    password: pwd.value.trim(),
-    walletAddress: WALLET,
-    balance: 0,
-    pendingRequest:false,
-    createdAt: serverTimestamp()
-  });
-  renderApp();
+  if(!uname.value.trim() || !pwd.value.trim()) return alert("Fill all fields");
+  await setDoc(userRef,{
+    username: uname.value.trim(),
+    password: pwd.value.trim(),
+    walletAddress: WALLET,
+    balance: 0,
+    pendingRequest:false,
+    createdAt: serverTimestamp()
+  });
+  renderApp();
 };
 
 /* ================= LOGIN ================= */
 function renderLogin(){
-  appDiv(`
-    <div class="box">
-      <h3>Enter Password</h3>
-      <input id="pwd" type="password" placeholder="Password">
-      <button onclick="login()">Login</button>
-      <span class="link" onclick="forgotPassword()">Forgot Password?</span>
-    </div>
-  `);
+  appDiv(`
+    <div class="box">
+      <h3>Enter Password</h3>
+      <input id="pwd" type="password" placeholder="Password">
+      <button onclick="login()">Login</button>
+      <span class="link" onclick="forgotPassword()">Forgot Password?</span>
+    </div>
+  `);
 }
 
 window.login = async ()=>{
-  const snap = await getDoc(userRef);
-  if(snap.data().password !== pwd.value.trim()) return alert("Wrong password");
-  renderApp();
+  const snap = await getDoc(userRef);
+  if(snap.data().password !== pwd.value.trim()) return alert("Wrong password");
+  renderApp();
 };
 
 /* ================= FORGOT PASSWORD ================= */
 window.forgotPassword = async ()=>{
-  OTP_CODE = Math.floor(100000 + Math.random() * 900000).toString();
-  await updateDoc(userRef,{ otp: OTP_CODE });
-  tg.showPopup({ title:"StabiX OTP", message:"Your OTP: "+OTP_CODE, buttons:[{type:"ok"}] });
-  renderOTP();
+  OTP_CODE = Math.floor(100000 + Math.random() * 900000).toString();
+  await updateDoc(userRef,{ otp: OTP_CODE });
+  tg.showPopup({
+    title:"StabiX OTP",
+    message:"Your OTP: "+OTP_CODE,
+    buttons:[{type:"ok"}]
+  });
+  renderOTP();
 };
 
 function renderOTP(){
-  appDiv(`
-    <div class="box">
-      <h3>Verify OTP</h3>
-      <input id="otp" placeholder="OTP">
-      <input id="npwd" type="password" placeholder="New Password">
-      <button onclick="verifyOTP()">Reset Password</button>
-      <span class="link" onclick="forgotPassword()">Resend OTP</span>
-    </div>
-  `);
+  appDiv(`
+    <div class="box">
+      <h3>Verify OTP</h3>
+      <input id="otp" placeholder="OTP">
+      <input id="npwd" type="password" placeholder="New Password">
+      <button onclick="verifyOTP()">Reset Password</button>
+      <span class="link" onclick="forgotPassword()">Resend OTP</span>
+    </div>
+  `);
 }
 
 window.verifyOTP = async ()=>{
-  const snap = await getDoc(userRef);
-  if(snap.data().otp !== otp.value.trim()) return alert("Invalid OTP");
-  await updateDoc(userRef,{ password: npwd.value.trim(), otp:"" });
-  renderLogin();
+  const snap = await getDoc(userRef);
+  if(snap.data().otp !== otp.value.trim()) return alert("Invalid OTP");
+  await updateDoc(userRef,{ password: npwd.value.trim(), otp:"" });
+  renderLogin();
 };
 
 /* ================= MAIN APP ================= */
 async function renderApp(){
-  const user = (await getDoc(userRef)).data();
-  const isValidator = (await getDoc(validatorRef)).exists();
+  const user = (await getDoc(userRef)).data();
+  const isValidator = (await getDoc(validatorRef)).exists();
 
-  appDiv(`
-    <div class="box">
-      <h2>${user.username}</h2>
-      <p class="small">${WALLET}</p>
-      <b>Balance:</b> ${user.balance.toFixed(2)} USDC
+  appDiv(`
+    <div class="box">
+      <h2>${user.username}</h2>
+      <p class="small">${WALLET}</p>
+      <b>Balance:</b> ${user.balance.toFixed(2)} USDC
 
-      <hr>
+      <hr>
+      <h3>Send USDC</h3>
+      <input id="sendTo" placeholder="Receiver Wallet (TG_xxx)">
+      <input id="sendAmt" type="number" placeholder="Amount">
+      <button onclick="sendUSDC()">Send</button>
 
-      <h3>Send USDC</h3>
-      <input id="sendTo" placeholder="Receiver Wallet (TG_xxx)">
-      <input id="sendAmt" type="number" placeholder="Amount">
-      <button onclick="sendUSDC()">Send</button>
+      <hr>
+      <h3>Deposit / Withdraw</h3>
+      <select id="type" onchange="toggleReqFields()">
+        <option value="deposit">Deposit</option>
+        <option value="withdraw">Withdraw</option>
+      </select>
 
-      <hr>
+      <input id="amt" type="number" placeholder="Amount">
+      <input id="waddr" placeholder="Wallet Address">
 
-      <h3>Deposit / Withdraw</h3>
-      <select id="type" onchange="toggleReqFields()">
-        <option value="deposit">Deposit</option>
-        <option value="withdraw">Withdraw</option>
-      </select>
+      <div id="txBox">
+        <input id="txh" placeholder="Tx Hash (deposit)">
+      </div>
 
-      <input id="amt" type="number" placeholder="Amount">
-      <input id="waddr" placeholder="Wallet Address">
+      <button onclick="submitReq()">Submit</button>
 
-      <div id="txBox">
-        <input id="txh" placeholder="Tx Hash (deposit)">
-      </div>
+      <hr>
+      <h3>History</h3>
+      <div id="history">Loading…</div>
 
-      <button onclick="submitReq()">Submit</button>
+      ${isValidator ? validatorPanel() : ""}
+    </div>
+  `);
 
-      <hr>
-      <h3>History</h3>
-      <div id="history">Loading…</div>
-
-      ${isValidator ? validatorPanel() : ""}
-    </div>
-  `);
-
-  toggleReqFields();
-  loadHistory();
+  toggleReqFields();
+  loadHistory();
 }
 
 /* ================= UI TOGGLE ================= */
 window.toggleReqFields = ()=>{
-  txBox.style.display = type.value === "deposit" ? "block" : "none";
+  txBox.style.display = type.value === "deposit" ? "block" : "none";
 };
 
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
-  const toWallet = sendTo.value.trim();
-  const amount = Number(sendAmt.value);
-  if(!toWallet || amount <= 0) return alert("Invalid input");
+  const toWallet = sendTo.value.trim();
+  const amount = Number(sendAmt.value);
+  if(!toWallet || amount <= 0) return alert("Invalid input");
 
-  if(toWallet === WALLET){
-    tg.showPopup({
-      title:"Invalid Transaction",
-      message:"You cannot send USDC to your own wallet.",
-      buttons:[{type:"ok"}]
-    });
-    return;
-  }
+  if(toWallet === WALLET){
+    tg.showPopup({
+      title:"Invalid Transaction",
+      message:"You cannot send USDC to your own wallet.",
+      buttons:[{type:"ok"}]
+    });
+    return;
+  }
 
-  try{
-    await runTransaction(db, async (tx)=>{
-      const fromSnap = await tx.get(userRef);
-      const toRef = doc(db,"users",toWallet);
-      const toSnap = await tx.get(toRef);
+  try{
+    await runTransaction(db, async (tx)=>{
+      const fromSnap = await tx.get(userRef);
+      const toRef = doc(db,"users",toWallet);
+      const toSnap = await tx.get(toRef);
 
-      if(!toSnap.exists()) throw "Receiver not found";
-      if(fromSnap.data().balance < amount) throw "Insufficient balance";
+      if(!toSnap.exists()) throw "Receiver not found";
+      if(fromSnap.data().balance < amount) throw "Insufficient balance";
 
-      tx.update(userRef,{ balance: fromSnap.data().balance - amount });
-      tx.update(toRef,{ balance: toSnap.data().balance + amount });
-    });
+      tx.update(userRef,{ balance: fromSnap.data().balance - amount });
+      tx.update(toRef,{ balance: toSnap.data().balance + amount });
+    });
 
-    alert("Transfer successful");
-    renderApp();
-  }catch(e){ alert(e); }
+    alert("Transfer successful");
+    renderApp();
+  }catch(e){ alert(e); }
 };
 
 /* ================= REQUEST ================= */
 window.submitReq = async ()=>{
-  await addDoc(collection(db,"requests"),{
-    userId: WALLET,
-    amount: Number(amt.value),
-    type: type.value,
-    walletAddress: waddr.value,
-    txHash: txh.value || "",
-    status:"pending",
-    createdAt: serverTimestamp()
-  });
-  alert("Request sent");
+  await addDoc(collection(db,"requests"),{
+    userId: WALLET,
+    amount: Number(amt.value),
+    type: type.value,
+    walletAddress: waddr.value,
+    txHash: txh.value || "",
+    status:"pending",
+    createdAt: serverTimestamp()
+  });
+  alert("Request sent");
 };
 
 /* ================= HISTORY ================= */
 async function loadHistory(){
-  const q = query(collection(db,"transactions"),
-    where("userId","==",WALLET),
-    orderBy("createdAt","desc"));
-  const snap = await getDocs(q);
-  let html="";
-  snap.forEach(d=>{ html+=`<div class="tx">${d.data().type} - ${d.data().amount}</div>`; });
-  history.innerHTML = html || "No history";
+  const q = query(
+    collection(db,"transactions"),
+    where("userId","==",WALLET),
+    orderBy("createdAt","desc")
+  );
+  const snap = await getDocs(q);
+  let html="";
+  snap.forEach(d=>{
+    html += `<div class="tx">${d.data().type} - ${d.data().amount}</div>`;
+  });
+  history.innerHTML = html || "No history";
 }
 
 /* ================= VALIDATOR ================= */
 function validatorPanel(){
-  return `
-    <hr>
-    <h3>Validator Panel</h3>
-
-    <input id="vUser" placeholder="Target User ID (TG_xxx)">
-    <input id="vAmt" type="number" placeholder="Amount">
-
-    <select id="vType">
-      <option value="deposit">Deposit</option>
-      <option value="withdraw">Withdraw</option>
-    </select>
-
-    <button onclick="validatorAdjust()">Apply</button>
-
-    <hr>
-    <button onclick="loadRequests()">Load Requests</button>
-    <div id="vout"></div>
-  `;
+  return `
+    <hr>
+    <h3>Validator Panel</h3>
+    <input id="vUser" placeholder="Target User ID (TG_xxx)">
+    <input id="vAmt" type="number" placeholder="Amount">
+    <select id="vType">
+      <option value="deposit">Deposit</option>
+      <option value="withdraw">Withdraw</option>
+    </select>
+    <button onclick="validatorAdjust()">Apply</button>
+    <hr>
+    <button onclick="loadRequests()">Load Requests</button>
+    <div id="vout"></div>
+  `;
 }
 
-/* ===== VALIDATOR POWER ===== */
 window.validatorAdjust = async ()=>{
-  const uid = vUser.value.trim();
-  const amt = Number(vAmt.value);
-  if(!uid || amt <= 0) return alert("Invalid input");
+  const uid = vUser.value.trim();
+  const amt = Number(vAmt.value);
+  if(!uid || amt <= 0) return alert("Invalid input");
 
-  const targetRef = doc(db,"users",uid);
-
-  try{
-    await runTransaction(db, async (tx)=>{
-      const snap = await tx.get(targetRef);
-      if(!snap.exists()) throw "User not found";
-
-      const bal = snap.data().balance;
-      const newBal = vType.value === "deposit" ? bal + amt : bal - amt;
-      tx.update(targetRef,{ balance:newBal });
-    });
-
-    alert("Balance updated");
-  }catch(e){ alert(e); }
+  const targetRef = doc(db,"users",uid);
+  try{
+    await runTransaction(db, async (tx)=>{
+      const snap = await tx.get(targetRef);
+      if(!snap.exists()) throw "User not found";
+      const bal = snap.data().balance;
+      const newBal = vType.value === "deposit" ? bal + amt : bal - amt;
+      tx.update(targetRef,{ balance:newBal });
+    });
+    alert("Balance updated");
+  }catch(e){ alert(e); }
 };
 
 window.loadRequests = async ()=>{
-  const snap = await getDocs(collection(db,"requests"));
-  let html="";
-  snap.forEach(d=>{
-    if(d.data().status==="pending")
-      html+=`<div class="tx">${d.data().userId} - ${d.data().amount}</div>`;
-  });
-  vout.innerHTML = html || "No pending";
+  const snap = await getDocs(collection(db,"requests"));
+  let html="";
+  snap.forEach(d=>{
+    if(d.data().status==="pending")
+      html += `<div class="tx">${d.data().userId} - ${d.data().amount}</div>`;
+  });
+  vout.innerHTML = html || "No pending";
 };
 
 /* ================= UTIL ================= */
