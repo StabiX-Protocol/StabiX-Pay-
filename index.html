@@ -19,104 +19,90 @@
 </head>
 
 <body>
-<div id="app">Loading…</div>
+<div id="app">Connecting…</div>
 
 <script type="module">
-/* ===== NEW FIREBASE SDK (MODULAR) ===== */
+/* ===== FIREBASE SDK ===== */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } 
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
-  getFirestore, doc, setDoc, getDoc, updateDoc,
-  collection, addDoc, serverTimestamp
+  getFirestore, doc, setDoc, getDoc,
+  collection, query, where, orderBy,
+  onSnapshot, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ===== FIREBASE CONFIG (YOURS) ===== */
+/* ===== CONFIG ===== */
 const firebaseConfig = {
   apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
   authDomain: "stabix-backend-v1.firebaseapp.com",
   projectId: "stabix-backend-v1",
   storageBucket: "stabix-backend-v1.firebasestorage.app",
   messagingSenderId: "351361221507",
-  appId: "1:351361221507:web:ebaf0d15e86d4b184c6cb6",
-  measurementId: "G-SPGZN8ZQMS"
+  appId: "1:351361221507:web:ebaf0d15e86d4b184c6cb6"
 };
 
-/* ===== INIT ===== */
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const auth = getAuth(app);
-const db   = getFirestore(app);
+const VALIDATOR_UID = "V2pWpWhfymg1rDQfnyneQdCLU7q1";
 
-const ADMIN_UID = "V2pWpWhfymg1rDQfnyneQdCLU7q1";
+/* ===== INIT ===== */
+const appFB = initializeApp(firebaseConfig);
+const auth = getAuth(appFB);
+const db   = getFirestore(appFB);
 
 let uid = null;
-let userRef = null;
+let unsubHistory = null;
 
 /* ===== AUTH ===== */
-signInAnonymously(auth).catch(e=>{
-  document.getElementById("app").innerText = e.message;
-});
+signInAnonymously(auth);
 
-onAuthStateChanged(auth, async user=>{
+onAuthStateChanged(auth, user=>{
   if(!user) return;
   uid = user.uid;
-  userRef = doc(db,"users",uid);
-
-  const snap = await getDoc(userRef);
-  if(!snap.exists()){
-    renderSetup();
-  } else {
-    renderDashboard();
-  }
+  listenUser();
 });
 
-/* ===== UI ===== */
-function appDiv(h){ document.getElementById("app").innerHTML = h; }
+/* ===== UI HELPER ===== */
+function appDiv(html){
+  document.getElementById("app").innerHTML = html;
+}
+
+/* ===== USER LISTENER ===== */
+function listenUser(){
+  onSnapshot(doc(db,"users",uid), snap=>{
+    if(!snap.exists()){
+      renderSetup();
+      return;
+    }
+    renderDashboard(snap.data());
+    initHistory();
+  });
+}
 
 /* ===== SETUP ===== */
 function renderSetup(){
   appDiv(`
     <div class="box">
-      <h3>Create Username</h3>
-      <input id="uname" placeholder="Username" />
-      <button onclick="saveUsername()">Save</button>
+      <h3>Setup Profile</h3>
+      <input id="uname" placeholder="Username">
+      <input id="wallet" placeholder="Wallet Address">
+      <button onclick="saveProfile()">Save</button>
     </div>
   `);
 }
 
-window.saveUsername = async ()=>{
-  if(!uname.value.trim()) return alert("Enter username");
-  await setDoc(userRef,{
+window.saveProfile = async ()=>{
+  if(!uname.value || !wallet.value) return alert("Fill all");
+  await setDoc(doc(db,"users",uid),{
     username: uname.value.trim(),
+    walletAddress: wallet.value.trim(),
     balance: 0,
-    history: [],
-    pendingRequest: false,
-    createdAt: serverTimestamp()
+    createdAt: new Date()
   });
-  renderDashboard();
 };
 
 /* ===== DASHBOARD ===== */
-async function renderDashboard(){
-  const snap = await getDoc(userRef);
-  const user = snap.data();
-  const locked = user.pendingRequest === true;
-  const isAdmin = uid === ADMIN_UID;
-
-  let historyHtml = "";
-  (user.history || []).slice().reverse().forEach(tx=>{
-    const red = ["Sent","Withdraw"].includes(tx.type);
-    historyHtml += `
-      <div class="tx" style="color:${red?"#ef4444":"#22c55e"}">
-        <b>${tx.type}</b>: ${tx.amount} USDC<br>
-        <span class="small">${new Date(tx.time).toLocaleString()}</span>
-      </div>
-    `;
-  });
-
-  if(!historyHtml) historyHtml="<p class='small'>No transactions</p>";
+function renderDashboard(user){
+  const isValidator = uid === VALIDATOR_UID;
 
   appDiv(`
     <div class="box">
@@ -124,65 +110,74 @@ async function renderDashboard(){
       <p class="small">${uid}</p>
 
       <hr><h3>Balance</h3>
-      <b>${user.balance.toFixed(2)} USDC</b>
-
-      ${locked?`<div class="warn">⏳ Pending admin approval</div>`:""}
-
-      <hr><h3>Send USDC</h3>
-      <input id="to" placeholder="Receiver UID" ${locked?"disabled":""}>
-      <input id="amt" type="number" placeholder="Amount" ${locked?"disabled":""}>
-      <button onclick="send()" ${locked?"disabled":""}>Send</button>
-
-      <hr><h3>Deposit / Withdraw</h3>
-      <select id="txType" ${locked?"disabled":""}>
-        <option value="Deposit">Deposit</option>
-        <option value="Withdraw">Withdraw</option>
-      </select>
-      <input id="ra" type="number" placeholder="Amount" ${locked?"disabled":""}>
-      <button onclick="submitRequest()" ${locked?"disabled":""}>Submit Request</button>
+      <b>${(user.balance||0).toFixed(2)} USDC</b>
 
       <hr><h3>Transaction History</h3>
-      ${historyHtml}
+      <input type="date" id="historyDate">
+      <div id="historyBox" class="small">Loading…</div>
 
-      ${isAdmin?`<hr><h3>Admin Panel</h3><p class="small">Approve via Firestore</p>`:""}
+      ${isValidator?validatorPanel():""}
     </div>
   `);
 }
 
-/* ===== SEND ===== */
-window.send = async ()=>{
-  const to = document.getElementById("to").value.trim();
-  const amt = Number(document.getElementById("amt").value);
-  if(!to || amt<=0) return alert("Invalid input");
+/* ===== USER HISTORY (DATE WISE) ===== */
+function initHistory(){
+  const today = new Date().toISOString().slice(0,10);
+  const dateEl = document.getElementById("historyDate");
+  dateEl.value = today;
+  dateEl.onchange = ()=>loadHistory(dateEl.value);
+  loadHistory(today);
+}
 
-  await addDoc(collection(db,"requests"),{
-    type:"send",
-    from: uid,
-    to,
-    amount: amt,
-    createdAt: serverTimestamp()
+function loadHistory(date){
+  if(unsubHistory) unsubHistory();
+
+  const start = Timestamp.fromDate(new Date(date+"T00:00:00"));
+  const end   = Timestamp.fromDate(new Date(date+"T23:59:59"));
+
+  const q = query(
+    collection(db,"transactions"),
+    where("userId","==",uid),
+    where("createdAt",">=",start),
+    where("createdAt","<=",end),
+    orderBy("createdAt","desc")
+  );
+
+  unsubHistory = onSnapshot(q, snap=>{
+    let html="";
+    snap.forEach(d=>{
+      const t=d.data();
+      const red=["Withdraw","Sent"].includes(t.type);
+      html+=`
+        <div class="tx" style="color:${red?"#ef4444":"#22c55e"}">
+          <b>${t.type}</b>: ${t.amount} USDC<br>
+          <span class="small">${t.createdAt.toDate().toLocaleString()}</span>
+        </div>
+      `;
+    });
+    document.getElementById("historyBox").innerHTML = html || "No transactions";
   });
+}
 
-  alert("Send request submitted");
-};
+/* ===== VALIDATOR ===== */
+function validatorPanel(){
+  return `
+    <hr>
+    <h3>Validator Panel</h3>
+    <input id="vuid" placeholder="User UID">
+    <button onclick="viewUser()">View</button>
+    <p class="small">Balance: <span id="vbal">-</span></p>
+  `;
+}
 
-/* ===== REQUEST ===== */
-window.submitRequest = async ()=>{
-  const amt = Number(document.getElementById("ra").value);
-  const type = document.getElementById("txType").value;
-  if(amt<=0) return alert("Invalid amount");
-
-  await addDoc(collection(db,"requests"),{
-    type,
-    user: uid,
-    amount: amt,
-    createdAt: serverTimestamp()
-  });
-
-  await updateDoc(userRef,{ pendingRequest:true });
-  renderDashboard();
+window.viewUser = async ()=>{
+  const id=document.getElementById("vuid").value.trim();
+  if(!id) return;
+  const snap=await getDoc(doc(db,"users",id));
+  document.getElementById("vbal").innerText =
+    snap.exists()?snap.data().balance:"Not found";
 };
 </script>
-
 </body>
 </html>
