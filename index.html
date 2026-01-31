@@ -48,7 +48,109 @@ tg.expand();
 
 const tgUser = tg.initDataUnsafe?.user;
 if(!tgUser || !tgUser.id){
-  document.getElementById("app").innerHTML = "Telegram user not found";
+/* ================= SETUP ================= */
+window.saveProfile = async ()=>{
+  if(!uname.value.trim() || !pwd.value.trim())
+    return alert("Enter username & password");
+
+  await setDoc(userRef,{
+    username: uname.value.trim(),
+    password: pwd.value.trim(),
+    walletAddress: WALLET,
+    balance: 0,
+    pendingRequest:false,
+    lastUsernameChange: serverTimestamp(),
+    createdAt: serverTimestamp()
+  });
+
+  renderApp();
+};
+
+/* ================= LOGIN UI ================= */
+function renderLogin(){
+  appDiv(`
+    <div class="box">
+      <h3>Login</h3>
+      <input id="pwd" type="password" placeholder="Password">
+      <button onclick="login()">Login</button>
+      <button onclick="forgotPassword()">Forgot Password?</button>
+    </div>
+  `);
+}
+
+/* ================= INIT ================= */
+async function init(){
+  const snap = await getDoc(userRef);
+
+  if(!snap.exists()){
+    renderSetup();        // first time user
+    return;
+  }
+
+  if(!snap.data().password){
+    renderSetup();        // safety fallback
+    return;
+  }
+
+  renderLogin();          // existing user
+}
+
+/* ================= LOGIN LOGIC ================= */
+window.login = async ()=>{
+  const snap = await getDoc(userRef);
+
+  if(snap.data().password !== pwd.value.trim())
+    return alert("Wrong password");
+
+  renderApp();
+};
+
+/* ================= FORGOT PASSWORD ================= */
+window.forgotPassword = async ()=>{
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  await updateDoc(userRef,{
+    otp,
+    otpAt: serverTimestamp()
+  });
+
+  tg.showPopup({
+    title:"OTP Sent",
+    message:"Your OTP: " + otp,
+    buttons:[{type:"ok"}]
+  });
+
+  renderOTP();
+};
+
+/* ================= OTP UI ================= */
+function renderOTP(){
+  appDiv(`
+    <div class="box">
+      <h3>Reset Password</h3>
+      <input id="otp" placeholder="OTP">
+      <input id="npwd" type="password" placeholder="New Password">
+      <button onclick="verifyOTP()">Reset</button>
+      <button onclick="forgotPassword()">Resend OTP</button>
+    </div>
+  `);
+}
+
+/* ================= VERIFY OTP ================= */
+window.verifyOTP = async ()=>{
+  const snap = await getDoc(userRef);
+
+  if(snap.data().otp !== otp.value.trim())
+    return alert("Invalid OTP");
+
+  await updateDoc(userRef,{
+    password: npwd.value.trim(),
+    otp: ""
+  });
+
+  alert("Password updated");
+  renderLogin();
+};  document.getElementById("app").innerHTML = "Telegram user not found";
   throw "";
 }
 
@@ -64,39 +166,22 @@ async function init(){
 }
 
 /* ================= SETUP ================= */
-function renderSetup(){
-  appDiv(`
-    <div class="box">
-      <h3>Create Username</h3>
-      <input id="uname" placeholder="Username">
-      <button onclick="saveProfile()">Save</button>
-    </div>
-  `);
-}
+await setDoc(userRef,{
+  username: uname.value.trim(),
+  password: pwd.value.trim(),
+  walletAddress: WALLET,
+  balance: 0,
+  pendingRequest:false,
+  lastUsernameChange: serverTimestamp(),
+  createdAt: serverTimestamp()
+});
 
-window.saveProfile = async ()=>{
-  if(!uname.value.trim()) return alert("Enter username");
-
-  await setDoc(userRef,{
-    username: uname.value.trim(),
-    walletAddress: WALLET,
-    balance: 0,
-    pendingRequest:false,
-    createdAt: serverTimestamp()
-  });
-
-  renderApp();
-};
-
-/* ================= MAIN APP ================= */
-async function renderApp(){
-  const user = (await getDoc(userRef)).data();
-  const isValidator = (await getDoc(validatorRef)).exists();
-
+  
   appDiv(`
     <div class="box">
       <h2>${user.username}</h2>
       <p class="small">${WALLET}</p>
+      <button onclick="changeUsername()">Change Username</button>
 
       <hr>
       <b>Balance:</b> ${user.balance.toFixed(2)} USDC
