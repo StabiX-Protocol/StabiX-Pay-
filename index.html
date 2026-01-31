@@ -165,6 +165,23 @@ async function renderApp(){
       <input id="sendTo" placeholder="Receiver Wallet (TG_xxx)">
       <input id="sendAmt" type="number" placeholder="Amount">
       <button onclick="sendUSDC()">Send</button>
+      <hr>
+<h3>Deposit / Withdraw</h3>
+
+<select id="dwType" onchange="toggleDW()">
+  <option value="deposit">Deposit</option>
+  <option value="withdraw">Withdraw</option>
+</select>
+
+<input id="dwAmount" type="number" placeholder="Amount">
+<input id="dwWallet" placeholder="Wallet Address">
+
+<div id="txHashBox">
+  <input id="dwTxHash" placeholder="Transaction Hash (Deposit only)">
+</div>
+
+<button onclick="submitDW()">Submit</button>
+
 
       <hr>
       <h3>Transaction History</h3>
@@ -208,7 +225,40 @@ window.sendUSDC = async ()=>{
     renderApp();
   }catch(e){ alert(e); }
 };
+  /*===============Deposit & Withdraw Logic======*/
+  window.toggleDW = ()=>{
+  const type = document.getElementById("dwType").value;
+  document.getElementById("txHashBox").style.display =
+    type === "deposit" ? "block" : "none";
+};
 
+window.submitDW = async ()=>{
+  const type = dwType.value;
+  const amount = Number(dwAmount.value);
+  const wallet = dwWallet.value.trim();
+  const txHash = dwTxHash?.value || "";
+
+  if(!amount || amount<=0 || !wallet)
+    return alert("Invalid input");
+
+  if(type==="deposit" && !txHash)
+    return alert("Transaction hash required for deposit");
+
+  await addDoc(collection(db,"requests"),{
+    userId: WALLET,
+    type,
+    amount,
+    walletAddress: wallet,
+    txHash: type==="deposit" ? txHash : "",
+    status:"pending",
+    createdAt: serverTimestamp()
+  });
+
+  await updateDoc(userRef,{ pendingRequest:true });
+
+  alert(type.toUpperCase()+" request submitted");
+};
+  
 /* ================= HISTORY ================= */
 async function loadHistory(){
   const q = query(collection(db,"transactions"), where("userId","==",WALLET), orderBy("createdAt","desc"));
