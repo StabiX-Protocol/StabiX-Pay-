@@ -24,10 +24,11 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getFirestore, doc, setDoc, getDoc, updateDoc,
-  collection, addDoc, getDocs, serverTimestamp, query, where, orderBy
+  collection, addDoc, getDocs, serverTimestamp,
+  query, where, orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-/* ===== FIREBASE CONFIG (NEW SDK) ===== */
+/* ===== FIREBASE ===== */
 const firebaseConfig = {
   apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
   authDomain: "stabix-backend-v1.firebaseapp.com",
@@ -37,28 +38,35 @@ const firebaseConfig = {
   appId: "1:351361221507:web:ebaf0d15e86d4b184c6cb6"
 };
 
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+const appFB = initializeApp(firebaseConfig);
+const db = getFirestore(appFB);
 
-/* ===== TELEGRAM INIT ===== */
-const tg = window.Telegram.WebApp;
-tg.ready();
+/* ===== TELEGRAM / DEBUG FALLBACK ===== */
+let tgUser;
 
-const tgUser = tg.initDataUnsafe.user;
-if(!tgUser){
-  document.getElementById("app").innerHTML = "Telegram required";
-  throw "";
+if (window.Telegram && window.Telegram.WebApp) {
+  const tg = window.Telegram.WebApp;
+  tg.ready();
+  tgUser = tg.initDataUnsafe?.user;
+}
+
+if (!tgUser) {
+  // DEBUG MODE (browser)
+  tgUser = {
+    id: "DEBUG_1001",
+    username: "DebugUser"
+  };
 }
 
 /* ===== IDENTITY ===== */
 const WALLET = "TG_" + tgUser.id;
-const userRef = doc(db,"users",WALLET);
-const validatorRef = doc(db,"validators",String(tgUser.id));
+const userRef = doc(db, "users", WALLET);
+const validatorRef = doc(db, "validators", String(tgUser.id));
 
 /* ===== INIT ===== */
 async function init(){
-  const userSnap = await getDoc(userRef);
-  if(!userSnap.exists()){
+  const snap = await getDoc(userRef);
+  if(!snap.exists()){
     return renderSetup();
   }
   renderApp();
@@ -100,7 +108,7 @@ async function renderApp(){
       <p class="small">${WALLET}</p>
 
       <hr><b>Balance:</b> ${user.balance.toFixed(2)} USDC
-      ${user.pendingRequest?`<div class="warn">Pending approval</div>`:""}
+      ${user.pendingRequest ? `<div class="warn">Pending approval</div>` : ""}
 
       <hr>
       <h3>Deposit / Withdraw</h3>
@@ -117,7 +125,7 @@ async function renderApp(){
       <h3>History</h3>
       <div id="history"></div>
 
-      ${isValidator?validatorPanel():""}
+      ${isValidator ? validatorPanel() : ""}
     </div>
   `);
 
@@ -182,7 +190,10 @@ window.viewUser = async ()=>{
   `;
 };
 
-function appDiv(h){document.getElementById("app").innerHTML=h;}
+function appDiv(h){
+  document.getElementById("app").innerHTML = h;
+}
+
 init();
 </script>
 </body>
