@@ -182,7 +182,6 @@ async function renderApp(){
 
       <hr>
 
-      <!-- SEND USDC FEATURE -->
       <h3>Send USDC</h3>
       <input id="sendTo" placeholder="Receiver Wallet (TG_xxx)">
       <input id="sendAmt" type="number" placeholder="Amount">
@@ -216,7 +215,15 @@ window.sendUSDC = async ()=>{
   const amount = Number(sendAmt.value);
 
   if(!toWallet || amount <= 0) return alert("Invalid input");
-  if(toWallet === WALLET) return alert("Cannot send to self");
+
+  if(toWallet === WALLET){
+    tg.showPopup({
+      title: "Invalid Transaction",
+      message: "You cannot send USDC to your own wallet.",
+      buttons: [{ type: "ok" }]
+    });
+    return;
+  }
 
   const fromRef = userRef;
   const toRef = doc(db,"users",toWallet);
