@@ -14,6 +14,7 @@
     .small { font-size:12px; opacity:.7; }
     .tx { font-size:13px; border-bottom:1px dashed #1e293b; padding:6px 0; }
     .warn { color:#facc15; font-size:13px; }
+    .link { color:#60a5fa; font-size:13px; cursor:pointer; margin-top:10px; display:block; }
   </style>
 </head>
 
@@ -56,6 +57,8 @@ if(!tgUser || !tgUser.id){
 const WALLET = "TG_" + tgUser.id;
 const userRef = doc(db,"users",WALLET);
 const validatorRef = doc(db,"validators",String(tgUser.id));
+
+let OTP_CODE = null;
 
 /* ================= INIT ================= */
 async function init(){
@@ -103,7 +106,70 @@ window.saveProfile = async ()=>{
   renderApp();
 };
 
-/* ================= SET PASSWORD (RECOVERY) ================= */
+/* ================= LOGIN ================= */
+function renderLogin(){
+  appDiv(`
+    <div class="box">
+      <h3>Enter Password</h3>
+      <input id="pwd" type="password" placeholder="Password">
+      <button onclick="login()">Login</button>
+      <span class="link" onclick="forgotPassword()">Forgot Password?</span>
+    </div>
+  `);
+}
+
+window.login = async ()=>{
+  const snap = await getDoc(userRef);
+  if(snap.data().password !== pwd.value.trim()){
+    alert("Wrong password");
+    return;
+  }
+  renderApp();
+};
+
+/* ================= FORGOT PASSWORD ================= */
+window.forgotPassword = async ()=>{
+  OTP_CODE = Math.floor(100000 + Math.random() * 900000).toString();
+
+  await updateDoc(userRef,{
+    otp: OTP_CODE,
+    otpAt: serverTimestamp()
+  });
+
+  tg.showAlert("Your OTP: " + OTP_CODE);
+
+  appDiv(`
+    <div class="box">
+      <h3>Verify OTP</h3>
+      <input id="otp" placeholder="Enter OTP">
+      <input id="npwd" type="password" placeholder="New Password">
+      <button onclick="verifyOTP()">Verify & Reset</button>
+    </div>
+  `);
+};
+
+window.verifyOTP = async ()=>{
+  const snap = await getDoc(userRef);
+  if(snap.data().otp !== otp.value.trim()){
+    alert("Invalid OTP");
+    return;
+  }
+
+  if(!npwd.value.trim()){
+    alert("Enter new password");
+    return;
+  }
+
+  await updateDoc(userRef,{
+    password: npwd.value.trim(),
+    otp: "",
+  });
+
+  alert("Password updated");
+  renderLogin();
+};
+
+/* ================= SET PASSWORD ================= */
 function renderSetPassword(){
   appDiv(`
     <div class="box">
@@ -117,26 +183,6 @@ function renderSetPassword(){
 window.updatePassword = async ()=>{
   if(!pwd.value.trim()) return alert("Enter password");
   await updateDoc(userRef,{ password: pwd.value.trim() });
-  renderApp();
-};
-
-/* ================= LOGIN ================= */
-function renderLogin(){
-  appDiv(`
-    <div class="box">
-      <h3>Enter Password</h3>
-      <input id="pwd" type="password" placeholder="Password">
-      <button onclick="login()">Login</button>
-    </div>
-  `);
-}
-
-window.login = async ()=>{
-  const snap = await getDoc(userRef);
-  if(snap.data().password !== pwd.value.trim()){
-    alert("Wrong password");
-    return;
-  }
   renderApp();
 };
 
