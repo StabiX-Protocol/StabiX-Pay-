@@ -60,11 +60,7 @@ const validatorRef = doc(db,"validators",String(tgUser.id));
 /* ================= INIT ================= */
 async function init(){
   const snap = await getDoc(userRef);
-  if(!snap.exists()){
-    renderSetup();
-  } else {
-    renderApp();
-  }
+  snap.exists() ? renderApp() : renderSetup();
 }
 
 /* ================= SETUP ================= */
@@ -166,28 +162,22 @@ async function loadHistory(){
   document.getElementById("history").innerHTML = html || "No history";
 }
 
-/* ================= VALIDATOR PANEL ================= */
+/* ================= VALIDATOR ================= */
 function validatorPanel(){
   return `
     <hr>
     <h3>Validator Panel</h3>
-
-    <input id="vu" placeholder="User Wallet TG_xxx">
-    <button onclick="loadRequests()">Load Pending Requests</button>
-
+    <button onclick="loadRequests()">Load ALL Pending Requests</button>
     <div id="vout"></div>
   `;
 }
 
-/* ================= LOAD REQUESTS ================= */
+/* ================= LOAD ALL PENDING ================= */
 window.loadRequests = async ()=>{
-  const u = vu.value.trim();
-  if(!u) return alert("Enter user wallet");
-
   const q = query(
     collection(db,"requests"),
-    where("userId","==",u),
-    where("status","==","pending")
+    where("status","==","pending"),
+    orderBy("createdAt","asc")
   );
 
   const snap = await getDocs(q);
@@ -202,6 +192,7 @@ window.loadRequests = async ()=>{
     html+=`
       <div class="tx">
         <b>${r.type.toUpperCase()}</b><br>
+        User: ${r.userId}<br>
         Amount: ${r.amount}<br>
         <button onclick="approveReq('${d.id}','${r.userId}',${r.amount},'${r.type}')">Approve</button>
         <button onclick="rejectReq('${d.id}','${r.userId}')">Reject</button>
@@ -234,7 +225,6 @@ window.approveReq = async (reqId,userId,amount,type)=>{
   });
 
   await updateDoc(doc(db,"requests",reqId),{status:"approved"});
-  alert("Approved");
   loadRequests();
 };
 
@@ -242,7 +232,6 @@ window.approveReq = async (reqId,userId,amount,type)=>{
 window.rejectReq = async (reqId,userId)=>{
   await updateDoc(doc(db,"requests",reqId),{status:"rejected"});
   await updateDoc(doc(db,"users",userId),{pendingRequest:false});
-  alert("Rejected");
   loadRequests();
 };
 
