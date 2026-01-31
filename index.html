@@ -25,7 +25,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/fireba
 import {
   getFirestore, doc, setDoc, getDoc, updateDoc,
   collection, addDoc, getDocs, serverTimestamp,
-  query, where, orderBy
+  query, where, orderBy, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 /* ================= FIREBASE ================= */
@@ -103,6 +103,12 @@ async function renderApp(){
       ${user.pendingRequest ? `<div class="warn">Pending approval</div>` : ""}
 
       <hr>
+      <h3>Send USDC</h3>
+      <input id="sendTo" placeholder="Receiver Wallet (TG_xxx)">
+      <input id="sendAmt" type="number" placeholder="Amount">
+      <button onclick="sendUSDC()">Send</button>
+
+      <hr>
       <h3>Deposit / Withdraw</h3>
       <select id="type">
         <option value="deposit">Deposit</option>
@@ -123,6 +129,57 @@ async function renderApp(){
 
   loadHistory();
 }
+
+/* ================= SEND USDC ================= */
+window.sendUSDC = async ()=>{
+  const toWallet = sendTo.value.trim();
+  const amount = Number(sendAmt.value);
+
+  if(!toWallet || amount<=0) return alert("Invalid input");
+
+  if(toWallet === WALLET){
+    tg.showPopup({
+      title:"Transaction Blocked",
+      message:"You cannot send USDC to your own wallet",
+      buttons:[{type:"ok"}]
+    });
+    return;
+  }
+
+  try{
+    await runTransaction(db, async(tx)=>{
+      const fromSnap = await tx.get(userRef);
+      const toRef = doc(db,"users",toWallet);
+      const toSnap = await tx.get(toRef);
+
+      if(!toSnap.exists()) throw "Receiver not found";
+      if(fromSnap.data().balance < amount) throw "Insufficient balance";
+
+      tx.update(userRef,{balance:fromSnap.data().balance-amount});
+      tx.update(toRef,{balance:toSnap.data().balance+amount});
+
+      tx.set(doc(collection(db,"transactions")),{
+        userId: WALLET,
+        type:"sent",
+        amount,
+        counterparty: toWallet,
+        createdAt: serverTimestamp()
+      });
+
+      tx.set(doc(collection(db,"transactions")),{
+        userId: toWallet,
+        type:"received",
+        amount,
+        counterparty: WALLET,
+        createdAt: serverTimestamp()
+      });
+    });
+
+    renderApp();
+  }catch(e){
+    alert(e);
+  }
+};
 
 /* ================= USER REQUEST ================= */
 window.submitReq = async ()=>{
