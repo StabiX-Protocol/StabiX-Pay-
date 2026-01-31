@@ -136,20 +136,45 @@ window.forgotPassword = async ()=>{
     otpAt: serverTimestamp()
   });
 
-  tg.showAlert("Your OTP: " + OTP_CODE);
+  tg.showPopup({
+    title: "StabiX OTP",
+    message: "Your OTP is: " + OTP_CODE,
+    buttons: [{type:"ok"}]
+  });
 
+  renderOTP();
+};
+
+function renderOTP(){
   appDiv(`
     <div class="box">
       <h3>Verify OTP</h3>
       <input id="otp" placeholder="Enter OTP">
       <input id="npwd" type="password" placeholder="New Password">
       <button onclick="verifyOTP()">Verify & Reset</button>
+      <span class="link" onclick="resendOTP()">Resend OTP</span>
     </div>
   `);
+}
+
+window.resendOTP = async ()=>{
+  OTP_CODE = Math.floor(100000 + Math.random() * 900000).toString();
+
+  await updateDoc(userRef,{
+    otp: OTP_CODE,
+    otpAt: serverTimestamp()
+  });
+
+  tg.showPopup({
+    title: "StabiX OTP",
+    message: "New OTP: " + OTP_CODE,
+    buttons: [{type:"ok"}]
+  });
 };
 
 window.verifyOTP = async ()=>{
   const snap = await getDoc(userRef);
+
   if(snap.data().otp !== otp.value.trim()){
     alert("Invalid OTP");
     return;
@@ -162,7 +187,7 @@ window.verifyOTP = async ()=>{
 
   await updateDoc(userRef,{
     password: npwd.value.trim(),
-    otp: "",
+    otp: ""
   });
 
   alert("Password updated");
@@ -220,53 +245,6 @@ async function renderApp(){
   `);
 
   loadHistory();
-}
-
-/* ================= USER REQUEST ================= */
-window.submitReq = async ()=>{
-  await addDoc(collection(db,"requests"),{
-    userId: WALLET,
-    amount: Number(amt.value),
-    type: type.value,
-    walletAddress: waddr.value,
-    txHash: type.value==="deposit" ? txh.value : "",
-    status:"pending",
-    createdAt: serverTimestamp()
-  });
-
-  await updateDoc(userRef,{pendingRequest:true});
-};
-
-/* ================= USER HISTORY ================= */
-async function loadHistory(){
-  const q = query(
-    collection(db,"transactions"),
-    where("userId","==",WALLET),
-    orderBy("createdAt","desc")
-  );
-  const snap = await getDocs(q);
-
-  let html="";
-  snap.forEach(d=>{
-    const t=d.data();
-    html+=`
-      <div class="tx">
-        <b>${t.type}</b> ${t.amount} USDC<br>
-        <span class="small">${t.createdAt.toDate().toLocaleString()}</span>
-      </div>`;
-  });
-
-  document.getElementById("history").innerHTML = html || "No history";
-}
-
-/* ================= VALIDATOR ================= */
-function validatorPanel(){
-  return `
-    <hr>
-    <h3>Validator Panel</h3>
-    <button onclick="loadRequests()">Load Pending</button>
-    <div id="vout"></div>
-  `;
 }
 
 /* ================= UTIL ================= */
