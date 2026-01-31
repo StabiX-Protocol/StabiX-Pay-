@@ -2,18 +2,19 @@
 <html>
 <head>
   <title>StabiX</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    * { box-sizing: border-box; }
     body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px; }
     .box { background:#020617; border:1px solid #1e293b; border-radius:12px; padding:20px; max-width:420px; margin:auto; }
-    input, button, select { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; font-size:16px; }
+    input, button, select { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; }
     button { background:#2563eb; color:white; font-weight:bold; cursor:pointer; }
     hr { border:0; border-top:1px solid #1e293b; margin:15px 0; }
     .small { font-size:12px; opacity:.7; }
     .tx { font-size:13px; border-bottom:1px dashed #1e293b; padding:6px 0; }
+    .warn { color:#facc15; font-size:13px; }
+    .link { color:#60a5fa; font-size:13px; cursor:pointer; margin-top:10px; display:block; }
   </style>
 </head>
 
@@ -28,7 +29,7 @@ import {
   query, where, orderBy, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-/* ===== FIREBASE ===== */
+/* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
   authDomain: "stabix-backend-v1.firebaseapp.com",
@@ -41,30 +42,37 @@ const firebaseConfig = {
 const appFB = initializeApp(firebaseConfig);
 const db = getFirestore(appFB);
 
-/* ===== TELEGRAM ===== */
+/* ================= TELEGRAM ================= */
 const tg = window.Telegram.WebApp;
-tg.ready(); tg.expand();
-const tgUser = tg.initDataUnsafe?.user;
-if(!tgUser?.id){ document.getElementById("app").innerHTML="Telegram user not found"; throw ""; }
+tg.ready();
+tg.expand();
 
-/* ===== IDENTITY ===== */
+const tgUser = tg.initDataUnsafe?.user;
+if(!tgUser || !tgUser.id){
+  document.getElementById("app").innerHTML = "Telegram user not found";
+  throw "";
+}
+
+/* ================= IDENTITY ================= */
 const WALLET = "TG_" + tgUser.id;
 const userRef = doc(db,"users",WALLET);
 const validatorRef = doc(db,"validators",String(tgUser.id));
 
-/* ===== INIT ===== */
+let OTP_CODE = null;
+
+/* ================= INIT ================= */
 async function init(){
   const snap = await getDoc(userRef);
-  if(!snap.exists()) return renderSetup();
-  if(!snap.data().password) return renderSetPassword();
+  if(!snap.exists()){ renderSetup(); return; }
+  if(!snap.data().password){ renderSetPassword(); return; }
   renderLogin();
 }
 
-/* ===== SETUP ===== */
+/* ================= SETUP ================= */
 function renderSetup(){
   appDiv(`
     <div class="box">
-      <h3>Create Account</h3>
+      <h3>Create Username</h3>
       <input id="uname" placeholder="Username">
       <input id="pwd" type="password" placeholder="Password">
       <button onclick="saveProfile()">Save</button>
@@ -73,50 +81,64 @@ function renderSetup(){
 }
 
 window.saveProfile = async ()=>{
+  if(!uname.value.trim() || !pwd.value.trim()) return alert("Fill all fields");
   await setDoc(userRef,{
-    username: uname.value,
-    password: pwd.value,
+    username: uname.value.trim(),
+    password: pwd.value.trim(),
     walletAddress: WALLET,
     balance: 0,
+    pendingRequest:false,
     createdAt: serverTimestamp()
   });
   renderApp();
 };
 
-/* ===== SET PASSWORD (FIX) ===== */
-function renderSetPassword(){
-  appDiv(`
-    <div class="box">
-      <h3>Set Password</h3>
-      <input id="pwd" type="password">
-      <button onclick="setPassword()">Save</button>
-    </div>
-  `);
-}
-
-window.setPassword = async ()=>{
-  await updateDoc(userRef,{ password: pwd.value });
-  renderLogin();
-};
-
-/* ===== LOGIN ===== */
+/* ================= LOGIN ================= */
 function renderLogin(){
   appDiv(`
     <div class="box">
-      <h3>Login</h3>
-      <input id="pwd" type="password">
+      <h3>Enter Password</h3>
+      <input id="pwd" type="password" placeholder="Password">
       <button onclick="login()">Login</button>
+      <span class="link" onclick="forgotPassword()">Forgot Password?</span>
     </div>
   `);
 }
 
 window.login = async ()=>{
   const snap = await getDoc(userRef);
-  if(snap.data().password !== pwd.value) return alert("Wrong password");
+  if(snap.data().password !== pwd.value.trim()) return alert("Wrong password");
   renderApp();
 };
 
-/* ===== MAIN APP ===== */
+/* ================= FORGOT PASSWORD ================= */
+window.forgotPassword = async ()=>{
+  OTP_CODE = Math.floor(100000 + Math.random() * 900000).toString();
+  await updateDoc(userRef,{ otp: OTP_CODE });
+  tg.showPopup({ title:"StabiX OTP", message:"Your OTP: "+OTP_CODE, buttons:[{type:"ok"}] });
+  renderOTP();
+};
+
+function renderOTP(){
+  appDiv(`
+    <div class="box">
+      <h3>Verify OTP</h3>
+      <input id="otp" placeholder="OTP">
+      <input id="npwd" type="password" placeholder="New Password">
+      <button onclick="verifyOTP()">Reset Password</button>
+      <span class="link" onclick="forgotPassword()">Resend OTP</span>
+    </div>
+  `);
+}
+
+window.verifyOTP = async ()=>{
+  const snap = await getDoc(userRef);
+  if(snap.data().otp !== otp.value.trim()) return alert("Invalid OTP");
+  await updateDoc(userRef,{ password: npwd.value.trim(), otp:"" });
+  renderLogin();
+};
+
+/* ================= MAIN APP ================= */
 async function renderApp(){
   const user = (await getDoc(userRef)).data();
   const isValidator = (await getDoc(validatorRef)).exists();
@@ -128,9 +150,28 @@ async function renderApp(){
       <b>Balance:</b> ${user.balance.toFixed(2)} USDC
 
       <hr>
-      <input id="sendTo" placeholder="Receiver TG_xxx">
+
+      <h3>Send USDC</h3>
+      <input id="sendTo" placeholder="Receiver Wallet (TG_xxx)">
       <input id="sendAmt" type="number" placeholder="Amount">
       <button onclick="sendUSDC()">Send</button>
+
+      <hr>
+
+      <h3>Deposit / Withdraw</h3>
+      <select id="type" onchange="toggleReqFields()">
+        <option value="deposit">Deposit</option>
+        <option value="withdraw">Withdraw</option>
+      </select>
+
+      <input id="amt" type="number" placeholder="Amount">
+      <input id="waddr" placeholder="Wallet Address">
+
+      <div id="txBox">
+        <input id="txh" placeholder="Tx Hash (deposit)">
+      </div>
+
+      <button onclick="submitReq()">Submit</button>
 
       <hr>
       <h3>History</h3>
@@ -140,44 +181,128 @@ async function renderApp(){
     </div>
   `);
 
+  toggleReqFields();
   loadHistory();
 }
 
-/* ===== SEND ===== */
-window.sendUSDC = async ()=>{
-  await runTransaction(db, async(tx)=>{
-    const from = await tx.get(userRef);
-    const toRef = doc(db,"users",sendTo.value);
-    const to = await tx.get(toRef);
-
-    tx.update(userRef,{ balance: from.data().balance - Number(sendAmt.value) });
-    tx.update(toRef,{ balance: to.data().balance + Number(sendAmt.value) });
-
-    await addDoc(collection(db,"transactions"),{
-      userId: WALLET,
-      type:"send",
-      amount:Number(sendAmt.value),
-      createdAt: serverTimestamp()
-    });
-  });
-  renderApp();
+/* ================= UI TOGGLE ================= */
+window.toggleReqFields = ()=>{
+  txBox.style.display = type.value === "deposit" ? "block" : "none";
 };
 
-/* ===== HISTORY ===== */
+/* ================= SEND USDC ================= */
+window.sendUSDC = async ()=>{
+  const toWallet = sendTo.value.trim();
+  const amount = Number(sendAmt.value);
+  if(!toWallet || amount <= 0) return alert("Invalid input");
+
+  if(toWallet === WALLET){
+    tg.showPopup({
+      title:"Invalid Transaction",
+      message:"You cannot send USDC to your own wallet.",
+      buttons:[{type:"ok"}]
+    });
+    return;
+  }
+
+  try{
+    await runTransaction(db, async (tx)=>{
+      const fromSnap = await tx.get(userRef);
+      const toRef = doc(db,"users",toWallet);
+      const toSnap = await tx.get(toRef);
+
+      if(!toSnap.exists()) throw "Receiver not found";
+      if(fromSnap.data().balance < amount) throw "Insufficient balance";
+
+      tx.update(userRef,{ balance: fromSnap.data().balance - amount });
+      tx.update(toRef,{ balance: toSnap.data().balance + amount });
+    });
+
+    alert("Transfer successful");
+    renderApp();
+  }catch(e){ alert(e); }
+};
+
+/* ================= REQUEST ================= */
+window.submitReq = async ()=>{
+  await addDoc(collection(db,"requests"),{
+    userId: WALLET,
+    amount: Number(amt.value),
+    type: type.value,
+    walletAddress: waddr.value,
+    txHash: txh.value || "",
+    status:"pending",
+    createdAt: serverTimestamp()
+  });
+  alert("Request sent");
+};
+
+/* ================= HISTORY ================= */
 async function loadHistory(){
   const q = query(collection(db,"transactions"),
     where("userId","==",WALLET),
     orderBy("createdAt","desc"));
   const snap = await getDocs(q);
-  history.innerHTML = snap.docs.map(d=>`<div class="tx">${d.data().type} - ${d.data().amount}</div>`).join("") || "No history";
+  let html="";
+  snap.forEach(d=>{ html+=`<div class="tx">${d.data().type} - ${d.data().amount}</div>`; });
+  history.innerHTML = html || "No history";
 }
 
-/* ===== VALIDATOR ===== */
+/* ================= VALIDATOR ================= */
 function validatorPanel(){
-  return `<hr><h3>Validator Panel Active</h3>`;
+  return `
+    <hr>
+    <h3>Validator Panel</h3>
+
+    <input id="vUser" placeholder="Target User ID (TG_xxx)">
+    <input id="vAmt" type="number" placeholder="Amount">
+
+    <select id="vType">
+      <option value="deposit">Deposit</option>
+      <option value="withdraw">Withdraw</option>
+    </select>
+
+    <button onclick="validatorAdjust()">Apply</button>
+
+    <hr>
+    <button onclick="loadRequests()">Load Requests</button>
+    <div id="vout"></div>
+  `;
 }
 
-/* ===== UTIL ===== */
+/* ===== VALIDATOR POWER ===== */
+window.validatorAdjust = async ()=>{
+  const uid = vUser.value.trim();
+  const amt = Number(vAmt.value);
+  if(!uid || amt <= 0) return alert("Invalid input");
+
+  const targetRef = doc(db,"users",uid);
+
+  try{
+    await runTransaction(db, async (tx)=>{
+      const snap = await tx.get(targetRef);
+      if(!snap.exists()) throw "User not found";
+
+      const bal = snap.data().balance;
+      const newBal = vType.value === "deposit" ? bal + amt : bal - amt;
+      tx.update(targetRef,{ balance:newBal });
+    });
+
+    alert("Balance updated");
+  }catch(e){ alert(e); }
+};
+
+window.loadRequests = async ()=>{
+  const snap = await getDocs(collection(db,"requests"));
+  let html="";
+  snap.forEach(d=>{
+    if(d.data().status==="pending")
+      html+=`<div class="tx">${d.data().userId} - ${d.data().amount}</div>`;
+  });
+  vout.innerHTML = html || "No pending";
+};
+
+/* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
 
 init();
