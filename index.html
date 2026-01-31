@@ -74,6 +74,32 @@ function renderLogin(){
       <input id="pwd" type="password" placeholder="Password">
       <button onclick="login()">Login</button>
       <button onclick="forgotPassword()">Forgot Password?</button>
+    </div>/* ================= SETUP ================= */
+window.saveProfile = async ()=>{
+  if(!uname.value.trim() || !pwd.value.trim())
+    return alert("Enter username & password");
+
+  await setDoc(userRef,{
+    username: uname.value.trim(),
+    password: pwd.value.trim(),
+    walletAddress: WALLET,
+    balance: 0,
+    pendingRequest:false,
+    lastUsernameChange: serverTimestamp(),
+    createdAt: serverTimestamp()
+  });
+
+  renderApp();
+};
+
+/* ================= LOGIN UI ================= */
+function renderLogin(){
+  appDiv(`
+    <div class="box">
+      <h3>Login</h3>
+      <input id="pwd" type="password" placeholder="Password">
+      <button onclick="login()">Login</button>
+      <button onclick="forgotPassword()">Forgot Password?</button>
     </div>
   `);
 }
@@ -83,16 +109,16 @@ async function init(){
   const snap = await getDoc(userRef);
 
   if(!snap.exists()){
-    renderSetup();        // first time user
+    renderSetup();
     return;
   }
 
   if(!snap.data().password){
-    renderSetup();        // safety fallback
+    renderSetup();
     return;
   }
 
-  renderLogin();          // existing user
+  renderLogin();
 }
 
 /* ================= LOGIN LOGIC ================= */
@@ -150,31 +176,7 @@ window.verifyOTP = async ()=>{
 
   alert("Password updated");
   renderLogin();
-};  document.getElementById("app").innerHTML = "Telegram user not found";
-  throw "";
-}
-
-/* ================= IDENTITY ================= */
-const WALLET = "TG_" + tgUser.id;
-const userRef = doc(db,"users",WALLET);
-const validatorRef = doc(db,"validators",String(tgUser.id));
-
-/* ================= INIT ================= */
-async function init(){
-  const snap = await getDoc(userRef);
-  snap.exists() ? renderApp() : renderSetup();
-}
-
-/* ================= SETUP ================= */
-await setDoc(userRef,{
-  username: uname.value.trim(),
-  password: pwd.value.trim(),
-  walletAddress: WALLET,
-  balance: 0,
-  pendingRequest:false,
-  lastUsernameChange: serverTimestamp(),
-  createdAt: serverTimestamp()
-});
+};
 
   
   appDiv(`
