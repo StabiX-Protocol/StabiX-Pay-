@@ -194,7 +194,15 @@ async function renderApp(){
 
       <hr>
       <h3>Transaction History</h3>
-      <div id="history">Loading…</div>
+
+<input
+  id="historyDate"
+  type="date"
+  style="margin-bottom:10px"
+  onchange="loadHistoryByDate()"
+/>
+
+<div id="history">Loading...</div>
 
       ${isValidator ? validatorPanel() : ""}
     </div>
@@ -300,6 +308,53 @@ async function loadHistory(){
   document.getElementById("history").innerHTML =
     html || "<span class='small'>No transactions</span>";
 }
+  window.loadHistoryByDate = async ()=>{
+  const selected = document.getElementById("historyDate").value;
+
+  if(!selected){
+    loadHistory(); // fallback
+    return;
+  }
+
+  const start = new Date(selected);
+  start.setHours(0,0,0,0);
+
+  const end = new Date(selected);
+  end.setHours(23,59,59,999);
+
+  const q = query(
+    collection(db,"transactions"),
+    where("userId","==",WALLET),
+    where("createdAt",">=", start),
+    where("createdAt","<=", end)
+  );
+
+  const snap = await getDocs(q);
+
+  let html = "";
+  snap.forEach(d=>{
+    const t = d.data();
+
+    const isCredit =
+      t.type === "received" || t.type === "deposit";
+
+    const sign = isCredit ? "+" : "-";
+    const color = isCredit ? "#22c55e" : "#ef4444";
+
+    html += `
+      <div class="tx" style="color:${color}">
+        <b>${sign}${t.amount} USDC</b><br>
+        <span class="small">
+          ${t.type.toUpperCase()} •
+          ${t.createdAt?.toDate?.().toLocaleString?.() || ""}
+        </span>
+      </div>
+    `;
+  });
+
+  document.getElementById("history").innerHTML =
+    html || "<span class='small'>No transactions for this date</span>";
+};
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
   return `
@@ -323,7 +378,14 @@ window.loadRequests = async ()=>{
 
 /* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
+window.onload = ()=>{
+  const d = document.getElementById("historyDate");
+  if(!d) return;
 
+  const today = new Date().toISOString().split("T")[0];
+  d.value = today;   // default = today
+  d.max = today;     // future date block
+};
 init();
 </script>
 </body>
