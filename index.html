@@ -163,6 +163,10 @@ async function renderApp(){
 
       <hr>
       <b>Balance:</b> ${user.balance.toFixed(2)} USDC
+      ${user.pendingRequest
+  ? `<div class="warn"> Pending request under review</div>`
+  : ""
+      }
 
       <hr>
       <h3>Send USDC</h3>
