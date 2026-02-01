@@ -272,49 +272,34 @@ window.submitDW = async ()=>{
 async function loadHistory(){
   const q = query(
     collection(db,"transactions"),
-    where("userId","==",WALLET),
-    orderBy("createdAt","desc")
+    where("userId","==",WALLET)
   );
 
   const snap = await getDocs(q);
 
-  if(snap.empty){
-    document.getElementById("history").innerHTML =
-      "<p class='small'>No transactions yet</p>";
-    return;
-  }
-
-  let html = "";
-
+  let html="";
   snap.forEach(d=>{
     const t = d.data();
 
-    const isCredit =
-      t.type === "received" || t.type === "deposit";
-
-    const sign = isCredit ? "+" : "−";
-    const color = isCredit ? "#22c55e" : "#ef4444";
-
-    const time = t.createdAt?.toDate
-      ? t.createdAt.toDate().toLocaleString()
-      : "";
+    const sign =
+      t.type === "received" || t.type === "deposit" ? "+" : "-";
+    const color =
+      sign === "+" ? "#22c55e" : "#ef4444";
 
     html += `
-      <div class="tx" style="display:flex;justify-content:space-between">
-        <div>
-          <b>${t.type.toUpperCase()}</b><br>
-          <span class="small">${time}</span>
-        </div>
-        <div style="color:${color};font-weight:bold">
-          ${sign}${t.amount} USDC
-        </div>
+      <div class="tx" style="color:${color}">
+        <b>${sign}${t.amount} USDC</b><br>
+        <span class="small">
+          ${t.type.toUpperCase()} •
+          ${t.createdAt?.toDate?.().toLocaleString?.() || ""}
+        </span>
       </div>
     `;
   });
 
-  document.getElementById("history").innerHTML = html;
+  document.getElementById("history").innerHTML =
+    html || "<span class='small'>No transactions</span>";
 }
-
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
   return `
