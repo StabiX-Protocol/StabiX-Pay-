@@ -359,16 +359,17 @@ async function loadHistory(){
   const d = document.getElementById("historyDate");
   if(!d) return;
 
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth()+1).padStart(2,"0");
-  const dd = String(today.getDate()).padStart(2,"0");
-  const localToday = `${yyyy}-${mm}-${dd}`;
+  // ✅ IST SAFE LOCAL DATE
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  const today = `${yyyy}-${mm}-${dd}`;
 
-  d.value = localToday; // default today
-  d.max = localToday;   // future date block
+  d.value = today;   // default today
+  d.max = today;     // 🚫 block tomorrow & future
 
-  loadHistoryByDate();  // auto load today's history
+  loadHistoryByDate(); // auto-load today's history
   }
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
