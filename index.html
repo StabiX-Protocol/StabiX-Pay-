@@ -355,6 +355,21 @@ async function loadHistory(){
   document.getElementById("history").innerHTML =
     html || "<span class='small'>No transactions for this date</span>";
 };
+  function initHistoryDate(){
+  const d = document.getElementById("historyDate");
+  if(!d) return;
+
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth()+1).padStart(2,"0");
+  const dd = String(today.getDate()).padStart(2,"0");
+  const localToday = `${yyyy}-${mm}-${dd}`;
+
+  d.value = localToday; // default today
+  d.max = localToday;   // future date block
+
+  loadHistoryByDate();  // auto load today's history
+  }
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
   return `
@@ -378,23 +393,7 @@ window.loadRequests = async ()=>{
 
 /* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
-wwindow.onload = ()=>{
-  const d = document.getElementById("historyDate");
-  if(!d) return;
 
-  // LOCAL DATE (IST safe)
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth()+1).padStart(2,"0");
-  const dd = String(today.getDate()).padStart(2,"0");
-  const localToday = `${yyyy}-${mm}-${dd}`;
-
-  d.value = localToday; // default today
-  d.max = localToday;   // future block
-
-  // 🔥 MOST IMPORTANT LINE
-  loadHistoryByDate();  // auto load today's history
-};
 init();
 </script>
 </body>
