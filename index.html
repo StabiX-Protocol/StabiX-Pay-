@@ -150,7 +150,11 @@ window.changeUsername = async ()=>{
 async function renderApp(){
   const user = (await getDoc(userRef)).data();
   const isValidator = (await getDoc(validatorRef)).exists();
-
+  const now = new Date();
+const yyyy = now.getFullYear();
+const mm = String(now.getMonth() + 1).padStart(2,"0");
+const dd = String(now.getDate()).padStart(2,"0");
+const today = `${yyyy}-${mm}-${dd}`;
   appDiv(`
     <div class="box">
   <h2 style="margin:0">${user.username}</h2>
@@ -198,7 +202,8 @@ async function renderApp(){
 <input
   id="historyDate"
   type="date"
-  style="margin-bottom:10px"
+  value="${today}"
+  max="${today}"
   onchange="loadHistoryByDate()"
 />
 
@@ -355,22 +360,7 @@ async function loadHistory(){
   document.getElementById("history").innerHTML =
     html || "<span class='small'>No transactions for this date</span>";
 };
-  function initHistoryDate(){
-  const d = document.getElementById("historyDate");
-  if(!d) return;
-
-  // ✅ IST SAFE LOCAL DATE
-  const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const dd = String(now.getDate()).padStart(2, "0");
-  const today = `${yyyy}-${mm}-${dd}`;
-
-  d.value = today;   // default today
-  d.max = today;     // 🚫 block tomorrow & future
-
-  loadHistoryByDate(); // auto-load today's history
-  }
+  
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
   return `
