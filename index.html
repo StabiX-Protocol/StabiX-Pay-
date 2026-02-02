@@ -419,7 +419,8 @@ end.setHours(23,59,59,999);
   collection(db,"transactions"),
   where("userId","==",uid),
   where("createdAt",">=",start),
-  where("createdAt","<=",end)
+  where("createdAt","<=",end),
+  orderBy("createdAt","desc")
 );
 
   const txSnap = await getDocs(q);
