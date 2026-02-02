@@ -367,6 +367,12 @@ function renderHistoryFromSnap(snap, emptyText) {
     <h3>Validator Panel</h3>
 
     <input id="vUser" placeholder="Target User ID (TG_xxx)">
+    <input
+  id="vfDate"
+  type="date"
+  value="${new Date().toISOString().split('T')[0]}"
+  max="${new Date().toISOString().split('T')[0]}"
+>
     <select id="vType">
       <option value="deposit">Deposit</option>
       <option value="withdraw">Withdraw</option>
@@ -391,6 +397,14 @@ function renderHistoryFromSnap(snap, emptyText) {
 window.viewUserFullHistory = async ()=>{
   const uid = document.getElementById("vfUser")?.value.trim();
   if(!uid) return alert("User ID required");
+  const date = document.getElementById("vfDate")?.value;
+if(!date) return alert("Date required");
+
+const start = new Date(date);
+start.setHours(0,0,0,0);
+
+const end = new Date(date);
+end.setHours(23,59,59,999);
 
   // 1️⃣ Get user & balance
   const uRef = doc(db,"users",uid);
@@ -402,9 +416,11 @@ window.viewUserFullHistory = async ()=>{
 
   // 2️⃣ Get ALL transactions of user
   const q = query(
-    collection(db,"transactions"),
-    where("userId","==",uid)
-  );
+  collection(db,"transactions"),
+  where("userId","==",uid),
+  where("createdAt",">=",start),
+  where("createdAt","<=",end)
+);
 
   const txSnap = await getDocs(q);
 
