@@ -25,9 +25,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/fireba
 import {
   getFirestore, doc, setDoc, getDoc, updateDoc,
   collection, addDoc, getDocs, serverTimestamp,
-  query, where, orderBy, runTransaction
+  query, where, orderBy, runTransaction,
+  Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
 /* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
@@ -302,12 +302,14 @@ window.loadHistoryByDate = async () => {
     return;
   }
 
-  const start = new Date(selected);
-  start.setHours(0, 0, 0, 0);
+  const startDate = new Date(selected);
+startDate.setHours(0, 0, 0, 0);
 
-  const end = new Date(selected);
-  end.setHours(23, 59, 59, 999);
+const endDate = new Date(selected);
+endDate.setHours(23, 59, 59, 999);
 
+const start = Timestamp.fromDate(startDate);
+const end = Timestamp.fromDate(endDate);
   const q = query(
     collection(db, "transactions"),
     where("userId", "==", WALLET),
