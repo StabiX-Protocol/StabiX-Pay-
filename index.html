@@ -294,39 +294,35 @@ async function loadHistory(){
   snap.forEach(d=>{
   const t = d.data();
 
-  let sign = "";
-let color = "";
-let metaLine = "";
-
-if (t.type === "deposit" || t.type === "withdraw") {
-  const isCredit = t.type === "deposit";
-  sign = isCredit ? "+" : "-";
-  color = isCredit ? "#22c55e" : "#ef4444";
-  metaLine = t.type.toUpperCase(); // ONLY Deposit / Withdraw
-}
-
-else {
-  const isCredit = t.type === "received";
-  sign = isCredit ? "+" : "-";
-  color = isCredit ? "#22c55e" : "#ef4444";
-
-  metaLine = isCredit
-    ? `${t.counterparty} → ${WALLET}`
-    : `${WALLET} → ${t.counterparty}`;
-}
-
-html += `
-  <div class="tx" style="color:${color}">
-    <b>${sign}${t.amount} USDC</b><br>
-    <span class="small">
-      ${metaLine} ·
-      ${t.createdAt?.toDate?.().toLocaleString?.() || ""}
-    </span>
-  </div>
-`;
+  
 
   document.getElementById("history").innerHTML =
-    html || "<span class='small'>No transactions</span>";
+    html || "<span class='const isDepositWithdraw =
+  t.type === "deposit" || t.type === "withdraw";
+
+const isCredit =
+  isDepositWithdraw
+    ? t.type === "deposit"
+    : t.type === "received";
+
+const sign = isCredit ? "+" : "-";
+const color = isCredit ? "#22c55e" : "#ef4444";
+
+const metaLine = isDepositWithdraw
+  ? t.type.toUpperCase()
+  : (isCredit
+      ? `${t.counterparty} → ${WALLET}`
+      : `${WALLET} → ${t.counterparty}`);
+
+html += `
+<div class="tx" style="color:${color}">
+  <b>${sign}${t.amount} USDC</b><br>
+  <span class="small">
+    ${metaLine}<br>
+    ${t.createdAt?.toDate?.().toLocaleString?.() || ""}
+  </span>
+</div>
+`;small'>No transactions</span>";
 }
   window.loadHistoryByDate = async ()=>{
   const selected = document.getElementById("historyDate").value;
@@ -355,35 +351,31 @@ html += `
   snap.forEach(d=>{
   const t = d.data();
 
-  let sign = "";
-let color = "";
-let metaLine = "";
+  const isDepositWithdraw =
+  t.type === "deposit" || t.type === "withdraw";
 
-if (t.type === "deposit" || t.type === "withdraw") {
-  const isCredit = t.type === "deposit";
-  sign = isCredit ? "+" : "-";
-  color = isCredit ? "#22c55e" : "#ef4444";
-  metaLine = t.type.toUpperCase(); // ONLY Deposit / Withdraw
-}
+const isCredit =
+  isDepositWithdraw
+    ? t.type === "deposit"
+    : t.type === "received";
 
-else {
-  const isCredit = t.type === "received";
-  sign = isCredit ? "+" : "-";
-  color = isCredit ? "#22c55e" : "#ef4444";
+const sign = isCredit ? "+" : "-";
+const color = isCredit ? "#22c55e" : "#ef4444";
 
-  metaLine = isCredit
-    ? `${t.counterparty} → ${WALLET}`
-    : `${WALLET} → ${t.counterparty}`;
-}
+const metaLine = isDepositWithdraw
+  ? t.type.toUpperCase()
+  : (isCredit
+      ? `${t.counterparty} → ${WALLET}`
+      : `${WALLET} → ${t.counterparty}`);
 
 html += `
-  <div class="tx" style="color:${color}">
-    <b>${sign}${t.amount} USDC</b><br>
-    <span class="small">
-      ${metaLine} ·
-      ${t.createdAt?.toDate?.().toLocaleString?.() || ""}
-    </span>
-  </div>
+<div class="tx" style="color:${color}">
+  <b>${sign}${t.amount} USDC</b><br>
+  <span class="small">
+    ${metaLine}<br>
+    ${t.createdAt?.toDate?.().toLocaleString?.() || ""}
+  </span>
+</div>
 `;
 
   document.getElementById("history").innerHTML =
