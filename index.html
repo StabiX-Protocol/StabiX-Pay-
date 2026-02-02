@@ -381,12 +381,34 @@ function validatorPanel(){
   `;
 }
 window.loadRequests = async ()=>{
-  window.validatorAdjust = async ()=>{
-  const uid = vUser.value.trim();
-  const type = vType.value;
-  const amount = Number(vAmount.value);
+  const q = query(
+    collection(db,"requests"),
+    where("status","==","pending"),
+    orderBy("createdAt","asc")
+  );
 
-  if(!uid || amount<=0) return alert("Invalid input");
+  const snap = await getDocs(q);
+  let html = "";
+
+  snap.forEach(d=>{
+    const r = d.data();
+    html += `<div class="tx">${r.userId} • ${r.type} • ${r.amount}</div>`;
+  });
+
+  document.getElementById("vout").innerHTML =
+    html || "No pending";
+};
+
+  
+  window.validatorAdjust = async ()=>{
+  const uid = document.getElementById("vUser").value.trim();
+  const type = document.getElementById("vType").value;
+  const amount = Number(document.getElementById("vAmount").value);
+
+  if(!uid || amount <= 0){
+    alert("Invalid input");
+    return;
+  }
 
   const targetRef = doc(db,"users",uid);
 
@@ -396,15 +418,21 @@ window.loadRequests = async ()=>{
       if(!snap.exists()) throw "User not found";
 
       let bal = snap.data().balance;
-      bal = type==="deposit" ? bal + amount : bal - amount;
+
+      if(type === "deposit"){
+        bal += amount;
+      }else{
+        bal -= amount;
+      }
+
       if(bal < 0) throw "Insufficient balance";
 
       tx.update(targetRef,{ balance: bal });
 
       tx.set(doc(collection(db,"transactions")),{
         userId: uid,
-        type,                // deposit / withdraw
-        amount,
+        type: type,           // deposit / withdraw
+        amount: amount,
         counterparty: "VALIDATOR",
         createdAt: serverTimestamp()
       });
