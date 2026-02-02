@@ -25,17 +25,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/fireba
 import {
   getFirestore, doc, setDoc, getDoc, updateDoc,
   collection, addDoc, getDocs, serverTimestamp,
-  query, where, orderBy, runTransaction,
-  Timestamp
+  query, where, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
 /* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
   authDomain: "stabix-backend-v1.firebaseapp.com",
   projectId: "stabix-backend-v1",
-  storageBucket: "stabix-backend-v1.firebasestorage.app",
-  messagingSenderId: "351361221507",
-  appId: "1:351361221507:web:ebaf0d15e86d4b184c6cb6"
 };
 const appFB = initializeApp(firebaseConfig);
 const db = getFirestore(appFB);
@@ -44,7 +41,10 @@ const db = getFirestore(appFB);
 const tg = window.Telegram.WebApp;
 tg.ready(); tg.expand();
 const tgUser = tg.initDataUnsafe?.user;
-if(!tgUser?.id){ document.getElementById("app").innerHTML="Telegram user not found"; throw ""; }
+if(!tgUser?.id){
+  document.getElementById("app").innerHTML="Telegram user not found";
+  throw "";
+}
 
 /* ================= IDENTITY ================= */
 const WALLET = "TG_" + tgUser.id;
@@ -55,7 +55,8 @@ const validatorRef = doc(db,"validators",String(tgUser.id));
 async function init(){
   const snap = await getDoc(userRef);
   if(!snap.exists() || !snap.data()?.password){
-    renderSetup(); return;
+    renderSetup(); 
+    return;
   }
   renderLogin();
 }
@@ -80,22 +81,19 @@ window.saveProfile = async ()=>{
     walletAddress: WALLET,
     balance: 0,
     pendingRequest:false,
-    isFrozen:false, // 🔒🔓 ADD THIS LINE
-    lastUsernameChange: serverTimestamp(),
+    isFrozen:false,
     createdAt: serverTimestamp()
   });
   renderApp();
 };
+
 /* ================= LOGIN ================= */
 function renderLogin(){
   appDiv(`
     <div class="box">
       <h3>Login</h3>
       <input id="pwd" type="password" placeholder="Password">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-        <button style="width:70%" onclick="login()">Login</button>
-        <span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Forgot?</span>
-      </div>
+      <button onclick="login()">Login</button>
     </div>
   `);
 }
@@ -106,219 +104,95 @@ window.login = async ()=>{
   renderApp();
 };
 
-/* ================= FORGOT PASSWORD ================= */
-window.forgotPassword = async ()=>{
-  const otp = Math.floor(100000 + Math.random()*900000).toString();
-  await updateDoc(userRef,{ otp });
-  tg.showPopup({ title:"OTP", message:"Your OTP: "+otp, buttons:[{type:"ok"}] });
-  renderOTP();
-};
-
-function renderOTP(){
-  appDiv(`
-    <div class="box">
-      <h3>Reset Password</h3>
-      <input id="otp" placeholder="OTP">
-      <input id="npwd" type="password" placeholder="New Password">
-      <button onclick="verifyOTP()">Reset</button>
-      <span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Resend</span>
-    </div>
-  `);
-}
-
-window.verifyOTP = async ()=>{
-  const snap = await getDoc(userRef);
-  if(snap.data().otp !== otp.value.trim()) return alert("Invalid OTP");
-  await updateDoc(userRef,{ password: npwd.value.trim(), otp:"" });
-  renderLogin();
-};
-
-/* ================= USERNAME CHANGE (30 DAYS) ================= */
-window.changeUsername = async ()=>{
-  const snap = await getDoc(userRef);
-  const last = snap.data().lastUsernameChange?.toDate();
-  if(last && ((Date.now()-last)/(1000*60*60*24)) < 30)
-    return alert("Username can be changed once every 30 days");
-
-  const name = prompt("New username");
-  if(!name?.trim()) return;
-  await updateDoc(userRef,{ username:name.trim(), lastUsernameChange:serverTimestamp() });
-  renderApp();
-};
-
 /* ================= MAIN APP ================= */
 async function renderApp(){
-  const user = (await getDoc(userRef)).data();
+  const userSnap = await getDoc(userRef);
+  const user = userSnap.data();
   const isValidator = (await getDoc(validatorRef)).exists();
-  const now = new Date();
-const yyyy = now.getFullYear();
-const mm = String(now.getMonth() + 1).padStart(2,"0");
-const dd = String(now.getDate()).padStart(2,"0");
-const today = `${yyyy}-${mm}-${dd}`;
+
   appDiv(`
     <div class="box">
-  <h2 style="margin:0">${user.username}</h2>
-  <span 
-    onclick="changeUsername()" 
-    style="font-size:16px;cursor:pointer;opacity:0.7"
-    title="Change username" >✏️</span>
+      <h2>${user.username}</h2>
       <p class="small">${WALLET}</p>
-      
 
       <hr>
-<b>Balance:</b> ${user.balance.toFixed(2)} USDC
-
-${user.isFrozen
-  ? `<div class="warn">Account frozen until request is resolved</div>`
-  : ""
-}
-
-${user.pendingRequest && !user.isFrozen
-  ? `<div class="warn">Pending request under review</div>`
-  : ""
-}
+      <b>Balance:</b> ${user.balance} USDC
+      ${user.isFrozen ? `<div class="warn">Account frozen (request under review)</div>` : ""}
 
       <hr>
       <h3>Send USDC</h3>
-      <input id="sendTo" placeholder="Receiver Wallet (TG_xxx)">
+      <input id="sendTo" placeholder="Receiver Wallet">
       <input id="sendAmt" type="number" placeholder="Amount">
       <button onclick="sendUSDC()">Send</button>
-      <hr>
-       <hr>
-<h3>Deposit / Withdraw</h3>
-
-<select id="dwType" onchange="toggleDW()">
-  <option value="deposit">Deposit</option>
-  <option value="withdraw">Withdraw</option>
-</select>
-
-<input id="dwAmount" type="number" placeholder="Amount">
-<input id="dwWallet" placeholder="Wallet Address">
-
-<div id="txHashBox">
-  <input id="dwTxHash" placeholder="Transaction Hash (Deposit only)">
-</div>
-
-<button onclick="submitDW()">Submit</button>
-
 
       <hr>
-      <h3>Transaction History</h3>
-
-<input
-  id="historyDate"
-  type="date"
-  value="${today}"
-  max="${today}"
-  onchange="loadHistoryByDate()"
-/>
-
-<div id="history">Loading...</div>
+      <h3>Deposit / Withdraw</h3>
+      <select id="dwType">
+        <option value="deposit">Deposit</option>
+        <option value="withdraw">Withdraw</option>
+      </select>
+      <input id="dwAmount" type="number" placeholder="Amount">
+      <input id="dwWallet" placeholder="Wallet Address">
+      <input id="dwTxHash" placeholder="Tx Hash (deposit only)">
+      <button onclick="submitDW()">Submit</button>
 
       ${isValidator ? validatorPanel() : ""}
     </div>
   `);
 
-  loadHistory();
+  if(isValidator){
+    setTimeout(loadRequests,500);
+  }
 }
 
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
-  const toWallet = sendTo.value.trim();
-  const amount = Number(sendAmt.value);
-  if(!toWallet || amount<=0) return alert("Invalid input");
-  if(toWallet === WALLET){
-    tg.showPopup({ title:"Blocked", message:"Cannot send to yourself", buttons:[{type:"ok"}] });
-    return;
-  }
-
   try{
     await runTransaction(db, async(tx)=>{
       const fromSnap = await tx.get(userRef);
       if(fromSnap.data().isFrozen === true){
-  throw "Account frozen (pending request)";
+        throw "Account frozen";
       }
+
+      const toWallet = sendTo.value.trim();
+      const amount = Number(sendAmt.value);
+      if(amount <= 0) throw "Invalid amount";
+
       const toRef = doc(db,"users",toWallet);
       const toSnap = await tx.get(toRef);
       if(!toSnap.exists()) throw "Receiver not found";
+
       if(fromSnap.data().balance < amount) throw "Insufficient balance";
 
       tx.update(userRef,{ balance: fromSnap.data().balance - amount });
       tx.update(toRef,{ balance: toSnap.data().balance + amount });
-
-      tx.set(doc(collection(db,"transactions")),{
-        userId: WALLET, type:"sent", amount, counterparty:toWallet, createdAt:serverTimestamp()
-      });
-      tx.set(doc(collection(db,"transactions")),{
-        userId: toWallet, type:"received", amount, counterparty:WALLET, createdAt:serverTimestamp()
-      });
     });
     renderApp();
   }catch(e){ alert(e); }
 };
-  /*===============Deposit & Withdraw Logic======*/
-  window.toggleDW = ()=>{
-  const type = document.getElementById("dwType").value;
-  document.getElementById("txHashBox").style.display =
-    type === "deposit" ? "block" : "none";
-};
 
-
-  
-/* ================= HISTORY ================= */
-/* ================= HISTORY ================= */
-
-async function loadHistory() {
-  const q = query(
-    collection(db, "transactions"),
-    where("userId", "==", WALLET)
-  );
-
-  const snap = await getDocs(q);
-  renderHistoryFromSnap(snap, "No transactions");
-}
-
-window.loadHistoryByDate = async () => {
-  const selected = document.getElementById("historyDate")?.value;
-
-  if (!selected) {
-    loadHistory(); // fallback
-    return;
-  }
-
-  const startDate = new Date(selected);
-startDate.setHours(0, 0, 0, 0);
-
-const endDate = new Date(selected);
-endDate.setHours(23, 59, 59, 999);
-
-const start = Timestamp.fromDate(startDate);
-const end = Timestamp.fromDate(endDate);
-  const q = query(
-    collection(db, "trwindow.submitDW = async ()=>{
+/* ================= DEPOSIT / WITHDRAW REQUEST ================= */
+window.submitDW = async ()=>{
   const snap = await getDoc(userRef);
+  const user = snap.data();
 
-  if(snap.data().pendingRequest === true){
-    return alert("Request already pending");
+  if(user.pendingRequest === true){
+    return alert("Request already under review");
   }
 
   const type = dwType.value;
   const amount = Number(dwAmount.value);
   const wallet = dwWallet.value.trim();
-  const txHash = dwTxHash?.value || "";
+  const txHash = dwTxHash.value.trim();
 
-  const userBalance = snap.data().balance;
+  if(amount <= 0 || !wallet) return alert("Invalid input");
 
-  if(!amount || amount <= 0 || !wallet){
-    return alert("Invalid input");
-  }
-
-  if(type === "withdraw" && amount > userBalance){
+  if(type === "withdraw" && amount > user.balance){
     return alert("Insufficient balance");
   }
 
   if(type === "deposit" && !txHash){
-    return alert("Transaction hash required for deposit");
+    return alert("Tx hash required");
   }
 
   await addDoc(collection(db,"requests"),{
@@ -326,217 +200,35 @@ const end = Timestamp.fromDate(endDate);
     type,
     amount,
     walletAddress: wallet,
-    txHash: type === "deposit" ? txHash : "",
-    status: "pending",
+    txHash: type==="deposit" ? txHash : "",
+    status:"pending",
     createdAt: serverTimestamp()
   });
 
   await updateDoc(userRef,{
-    pendingRequest: true,
-    isFrozen: true
+    pendingRequest:true,
+    isFrozen:true
   });
 
   alert("Request submitted");
-  renderApp(); // 🔥 THIS IS IMPORTANT
-};ansactions"),
-    where("userId", "==", WALLET),
-    where("createdAt", ">=", start),
-    where("createdAt", "<=", end)
-  );
-
-  const snap = await getDocs(q);
-  renderHistoryFromSnap(snap, "No transactions for this date");
+  renderApp();
 };
 
-/* ================= HISTORY RENDER ================= */
-
-function renderHistoryFromSnap(snap, emptyText) {
-  let html = "";
-
-  snap.forEach(d => {
-    const t = d.data();
-
-    const isDepositWithdraw =
-      t.type === "deposit" || t.type === "withdraw";
-
-    const isCredit = isDepositWithdraw
-      ? t.type === "deposit"
-      : t.type === "received";
-
-    const sign = isCredit ? "+" : "-";
-    const color = isCredit ? "#22c55e" : "#ef4444";
-
-    const metaLine = isDepositWithdraw
-      ? t.type.toUpperCase()
-      : (isCredit
-          ? `${t.counterparty} → ${WALLET}`
-          : `${WALLET} → ${t.counterparty}`);
-
-    html += `
-      <div class="tx" style="color:${color}">
-        <b>${sign}${t.amount} USDC</b><br>
-        <span class="small">
-          ${metaLine}<br>
-          ${t.createdAt?.toDate()?.toLocaleString() || ""}
-        </span>
-      </div>
-    `;
-  });
-
-  document.getElementById("history").innerHTML =
-    html || `<span class="small">${emptyText}</span>`;
-}
-  
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
-  const today = new Date().toISOString().split("T")[0];
   return `
     <hr>
     <h3>Validator Panel</h3>
-
-    <input id="vUser" placeholder="Target User ID (TG_xxx)">
-    <select id="vType">
-      <option value="deposit">Deposit</option>
-      <option value="withdraw">Withdraw</option>
-    </select>
-    <input id="vAmount" type="number" placeholder="Amount">
-    <button onclick="validatorAdjust()">Apply</button>
-
-    <hr>
-    <h4>View User History</h4>
-
-    <input id="vfUser" placeholder="User ID (TG_xxx)">
-    <input id="vfDate" type="date" value="${today}" max="${today}">
-    <button onclick="viewUserFullHistory()">View</button>
-
-    <div id="vfBalance" class="small"></div>
-    <div id="vfHistory"></div>
-
-    <hr>
-    <button onclick="loadRequests()">Load Pending</button>
+    <button onclick="loadRequests()">Load Pending Requests</button>
     <div id="vout"></div>
   `;
 }
 
-/* ================= VIEW USER FULL HISTORY ================= */
-window.viewUserFullHistory = async ()=>{
-  try{
-    const uid = document.getElementById("vfUser").value.trim();
-    const date = document.getElementById("vfDate").value;
-
-    if(!uid || !date) return alert("User ID & Date required");
-
-    const startDate = new Date(date);
-    startDate.setHours(0,0,0,0);
-    const endDate = new Date(date);
-    endDate.setHours(23,59,59,999);
-
-    const start = Timestamp.fromDate(startDate);
-    const end = Timestamp.fromDate(endDate);
-
-    // ✅ USER + BALANCE
-    const uRef = doc(db,"users",uid);
-    const uSnap = await getDoc(uRef);
-    if(!uSnap.exists()) return alert("User not found");
-
-    document.getElementById("vfBalance").innerHTML =
-      `Balance: ${uSnap.data().balance.toFixed(2)} USDC`;
-
-    // ✅ TRANSACTIONS
-    const q = query(
-      collection(db,"transactions"),
-      where("userId","==",uid),
-      where("createdAt",">=",start),
-      where("createdAt","<=",end),
-      orderBy("createdAt","desc")
-    );
-
-    const snap = await getDocs(q);
-    let html = "";
-
-    snap.forEach(d=>{
-      const t = d.data();
-
-      let sign = "-";
-      let color = "#ef4444";
-      let meta = "";
-
-      if(t.type==="deposit"){
-        sign = "+";
-        color = "#22c55e";
-        meta = "DEPOSIT";
-      }
-      else if(t.type==="withdraw"){
-        meta = "WITHDRAW";
-      }
-      else if(t.type==="received"){
-        sign = "+";
-        color = "#22c55e";
-        meta = `${t.counterparty} → ${uid}`;
-      }
-      else{
-        meta = `${uid} → ${t.counterparty}`;
-      }
-
-      html += `
-        <div class="tx" style="color:${color}">
-          <b>${sign}${t.amount} USDC</b><br>
-          <span class="small">
-            ${meta}<br>
-            ${t.createdAt?.toDate()?.toLocaleString() || ""}
-          </span>
-        </div>
-      `;
-    });
-
-    document.getElementById("vfHistory").innerHTML =
-      html || "<span class='small'>No transactions for this date</span>";
-
-  }catch(e){
-    alert("History error");
-    console.error(e);
-  }
-};
-
-/* ================= VALIDATOR ADJUST ================= */
-window.validatorAdjust = async ()=>{
-  try{
-    const uid = document.getElementById("vUser").value.trim();
-    const type = document.getElementById("vType").value;
-    const amount = Number(document.getElementById("vAmount").value);
-
-    if(!uid || amount<=0) return alert("Invalid input");
-
-    const targetRef = doc(db,"users",uid);
-
-    await runTransaction(db, async(tx)=>{
-      const snap = await tx.get(targetRef);
-      if(!snap.exists()) throw "User not found";
-
-      let bal = snap.data().balance;
-      bal = type==="deposit" ? bal+amount : bal-amount;
-      if(bal<0) throw "Insufficient balance";
-
-      tx.update(targetRef,{ balance:bal });
-      tx.set(doc(collection(db,"transactions")),{
-        userId:uid,
-        type,
-        amount,
-        counterparty:"VALIDATOR",
-        createdAt:serverTimestamp()
-      });
-    });
-
-    alert("Balance updated");
-  }catch(e){
-    alert(e);
-  }
-};
-  window.loadRequests = async ()=>{
+/* ================= LOAD REQUESTS ================= */
+window.loadRequests = async ()=>{
   const q = query(
     collection(db,"requests"),
-    where("status","==","pending"),
-    orderBy("createdAt","desc")
+    where("status","==","pending")
   );
 
   const snap = await getDocs(q);
@@ -544,16 +236,13 @@ window.validatorAdjust = async ()=>{
 
   snap.forEach(d=>{
     const r = d.data();
-
     html += `
       <div class="tx">
         <b>${r.type.toUpperCase()}</b><br>
-        User: ${r.userId}<br>
-        Amount: ${r.amount} USDC<br>
+        ${r.userId}<br>
+        Amount: ${r.amount}<br>
         Wallet: ${r.walletAddress}<br>
-        ${r.txHash ? `TxHash: ${r.txHash}<br>` : ""}
-        ${r.createdAt?.toDate().toLocaleString()}<br>
-
+        ${r.txHash ? "TxHash: "+r.txHash+"<br>" : ""}
         <button onclick="approveReq('${d.id}')">Approve</button>
         <button onclick="rejectReq('${d.id}')">Reject</button>
       </div>
@@ -563,93 +252,46 @@ window.validatorAdjust = async ()=>{
   document.getElementById("vout").innerHTML =
     html || "<span class='small'>No pending requests</span>";
 };
-  window.approveReq = async (reqId)=>{
-  try{
-    const reqRef = doc(db,"requests",reqId);
 
-    await runTransaction(db, async(tx)=>{
-      const rSnap = await tx.get(reqRef);
-      if(!rSnap.exists()) throw "Request not found";
+/* ================= APPROVE ================= */
+window.approveReq = async (id)=>{
+  const reqRef = doc(db,"requests",id);
 
-      const r = rSnap.data();
+  await runTransaction(db, async(tx)=>{
+    const rSnap = await tx.get(reqRef);
+    const r = rSnap.data();
 
-      // user reference
-      const uRef = doc(db,"users",r.userId);
-      const uSnap = await tx.get(uRef);
-      if(!uSnap.exists()) throw "User not found";
+    const uRef = doc(db,"users",r.userId);
+    const uSnap = await tx.get(uRef);
 
-      let balance = uSnap.data().balance;
+    let bal = uSnap.data().balance;
+    if(r.type==="deposit") bal += r.amount;
+    else{
+      if(bal < r.amount) throw "Insufficient balance";
+      bal -= r.amount;
+    }
 
-      // APPLY LOGIC
-      if(r.type === "deposit"){
-        balance += r.amount;
-      }else{ // withdraw
-        if(balance < r.amount) throw "Insufficient balance";
-        balance -= r.amount;
-      }
+    tx.update(uRef,{ balance:bal, pendingRequest:false, isFrozen:false });
+    tx.update(reqRef,{ status:"approved" });
+  });
 
-      // UPDATE USER (UNFREEZE)
-      tx.update(uRef,{
-        balance: balance,
-        pendingRequest:false,
-        isFrozen:false
-      });
-
-      // UPDATE REQUEST
-      tx.update(reqRef,{
-        status:"approved",
-        approvedAt: serverTimestamp()
-      });
-
-      // ADD TRANSACTION ENTRY
-      tx.set(doc(collection(db,"transactions")),{
-        userId: r.userId,
-        type: r.type,
-        amount: r.amount,
-        counterparty:"SYSTEM",
-        createdAt: serverTimestamp()
-      });
-    });
-
-    alert("Request approved");
-    loadRequests();
-
-  }catch(e){
-    alert(e);
-  }
+  loadRequests();
 };
-  window.rejectReq = async (reqId)=>{
-  try{
-    const reqRef = doc(db,"requests",reqId);
 
-    await runTransaction(db, async(tx)=>{
-      const rSnap = await tx.get(reqRef);
-      if(!rSnap.exists()) throw "Request not found";
+/* ================= REJECT ================= */
+window.rejectReq = async (id)=>{
+  const reqRef = doc(db,"requests",id);
+  const rSnap = await getDoc(reqRef);
 
-      const r = rSnap.data();
+  await updateDoc(doc(db,"users",rSnap.data().userId),{
+    pendingRequest:false,
+    isFrozen:false
+  });
+  await updateDoc(reqRef,{ status:"rejected" });
 
-      const uRef = doc(db,"users",r.userId);
-
-      // REQUEST REJECT
-      tx.update(reqRef,{
-        status:"rejected",
-        rejectedAt: serverTimestamp()
-      });
-
-      // USER UNFREEZE
-      tx.update(uRef,{
-        pendingRequest:false,
-        isFrozen:false
-      });
-    });
-
-    alert("Request rejected");
-    loadRequests();
-
-  }catch(e){
-    alert(e);
-  }
+  loadRequests();
 };
+
 /* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
 
