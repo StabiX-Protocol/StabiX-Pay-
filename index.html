@@ -235,8 +235,8 @@ window.sendUSDC = async ()=>{
   try{
     await runTransaction(db, async(tx)=>{
       const fromSnap = await tx.get(userRef);
-      if(fromSnap.data().isFrozen){
-  throw "Account frozen: Pending deposit/withdraw request";
+      if(fromSnap.data().isFrozen === true){
+  throw "Account frozen (pending request)";
       }
       const toRef = doc(db,"users",toWallet);
       const toSnap = await tx.get(toRef);
@@ -263,45 +263,7 @@ window.sendUSDC = async ()=>{
     type === "deposit" ? "block" : "none";
 };
 
-window.submitDW = async ()=>{
 
-  const snap = await getDoc(userRef);
-  if(snap.data().pendingRequest){
-    return alert("Request already pending");
-  }
-  const userBalance = snap.data().balance;
-
-  const type = dwType.value;
-  const amount = Number(dwAmount.value);
-  if(type === "withdraw" && amount > userBalance){
-  return alert("Insufficient balance");
-  }
-  const wallet = dwWallet.value.trim();
-  const txHash = dwTxHash?.value || "";
-
-  if(!amount || amount<=0 || !wallet)
-    return alert("Invalid input");
-
-  if(type==="deposit" && !txHash)
-    return alert("Transaction hash required for deposit");
-
-  await addDoc(collection(db,"requests"),{
-    userId: WALLET,
-    type,
-    amount,
-    walletAddress: wallet,
-    txHash: type==="deposit" ? txHash : "",
-    status:"pending",
-    createdAt: serverTimestamp()
-  });
-
-  await updateDoc(userRef,{
-    pendingRequest:true,
-    isFrozen:true
-  });
-
-  alert(type.toUpperCase()+" request submitted");
-};
   
 /* ================= HISTORY ================= */
 /* ================= HISTORY ================= */
@@ -333,7 +295,50 @@ endDate.setHours(23, 59, 59, 999);
 const start = Timestamp.fromDate(startDate);
 const end = Timestamp.fromDate(endDate);
   const q = query(
-    collection(db, "transactions"),
+    collection(db, "trwindow.submitDW = async ()=>{
+  const snap = await getDoc(userRef);
+
+  if(snap.data().pendingRequest === true){
+    return alert("Request already pending");
+  }
+
+  const type = dwType.value;
+  const amount = Number(dwAmount.value);
+  const wallet = dwWallet.value.trim();
+  const txHash = dwTxHash?.value || "";
+
+  const userBalance = snap.data().balance;
+
+  if(!amount || amount <= 0 || !wallet){
+    return alert("Invalid input");
+  }
+
+  if(type === "withdraw" && amount > userBalance){
+    return alert("Insufficient balance");
+  }
+
+  if(type === "deposit" && !txHash){
+    return alert("Transaction hash required for deposit");
+  }
+
+  await addDoc(collection(db,"requests"),{
+    userId: WALLET,
+    type,
+    amount,
+    walletAddress: wallet,
+    txHash: type === "deposit" ? txHash : "",
+    status: "pending",
+    createdAt: serverTimestamp()
+  });
+
+  await updateDoc(userRef,{
+    pendingRequest: true,
+    isFrozen: true
+  });
+
+  alert("Request submitted");
+  renderApp(); // 🔥 THIS IS IMPORTANT
+};ansactions"),
     where("userId", "==", WALLET),
     where("createdAt", ">=", start),
     where("createdAt", "<=", end)
