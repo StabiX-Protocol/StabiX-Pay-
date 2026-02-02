@@ -282,102 +282,81 @@ window.submitDW = async ()=>{
 };
   
 /* ================= HISTORY ================= */
-async function loadHistory(){
+/* ================= HISTORY ================= */
+
+async function loadHistory() {
   const q = query(
-    collection(db,"transactions"),
-    where("userId","==",WALLET)
+    collection(db, "transactions"),
+    where("userId", "==", WALLET)
   );
 
   const snap = await getDocs(q);
+  renderHistoryFromSnap(snap, "No transactions");
+}
 
-  let html="";
-  snap.forEach(d=>{
-  const t = d.data();
+window.loadHistoryByDate = async () => {
+  const selected = document.getElementById("historyDate")?.value;
 
-   const isDepositWithdraw =
-  t.type === "deposit" || t.type === "withdraw";
-
-const isCredit = isDepositWithdraw
-  ? t.type === "deposit"
-  : t.type === "received";
-
-const sign = isCredit ? "+" : "-";
-const color = isCredit ? "#22c55e" : "#ef4444";
-
-const metaLine = isDepositWithdraw
-  ? t.type.toUpperCase()
-  : (isCredit
-      ? `${t.counterparty} → ${WALLET}`
-      : `${WALLET} → ${t.counterparty}`);
-
-html += `
-<div class="tx" style="color:${color}">
-  <b>${sign}${t.amount} USDC</b><br>
-  <span class="small">
-    ${metaLine}<br>
-    ${t.createdAt?.toDate?.().toLocaleString?.() || ""}
-  </span>
-</div>
-`;
-    document.getElementById("history").innerHTML =
-  html || "<span class='small'>No transactions</span>";
-  
-  window.loadHistoryByDate = async ()=>{
-  const selected = document.getElementById("historyDate").value;
-
-  if(!selected){
+  if (!selected) {
     loadHistory(); // fallback
     return;
   }
 
   const start = new Date(selected);
-  start.setHours(0,0,0,0);
+  start.setHours(0, 0, 0, 0);
 
   const end = new Date(selected);
-  end.setHours(23,59,59,999);
+  end.setHours(23, 59, 59, 999);
 
   const q = query(
-    collection(db,"transactions"),
-    where("userId","==",WALLET),
-    where("createdAt",">=", start),
-    where("createdAt","<=", end)
+    collection(db, "transactions"),
+    where("userId", "==", WALLET),
+    where("createdAt", ">=", start),
+    where("createdAt", "<=", end)
   );
 
   const snap = await getDocs(q);
+  renderHistoryFromSnap(snap, "No transactions for this date");
+};
 
+/* ================= HISTORY RENDER ================= */
+
+function renderHistoryFromSnap(snap, emptyText) {
   let html = "";
-  snap.forEach(d=>{
-  const t = d.data();
 
-  const isDepositWithdraw =
-  t.type === "deposit" || t.type === "withdraw";
+  snap.forEach(d => {
+    const t = d.data();
 
-const isCredit = isDepositWithdraw
-  ? t.type === "deposit"
-  : t.type === "received";
+    const isDepositWithdraw =
+      t.type === "deposit" || t.type === "withdraw";
 
-const sign = isCredit ? "+" : "-";
-const color = isCredit ? "#22c55e" : "#ef4444";
+    const isCredit = isDepositWithdraw
+      ? t.type === "deposit"
+      : t.type === "received";
 
-const metaLine = isDepositWithdraw
-  ? t.type.toUpperCase()
-  : (isCredit
-      ? `${t.counterparty} → ${WALLET}`
-      : `${WALLET} → ${t.counterparty}`);
+    const sign = isCredit ? "+" : "-";
+    const color = isCredit ? "#22c55e" : "#ef4444";
 
-html += `
-<div class="tx" style="color:${color}">
-  <b>${sign}${t.amount} USDC</b><br>
-  <span class="small">
-    ${metaLine}<br>
-    ${t.createdAt?.toDate?.().toLocaleString?.() || ""}
-  </span>
-</div>
-`;
+    const metaLine = isDepositWithdraw
+      ? t.type.toUpperCase()
+      : (isCredit
+          ? `${t.counterparty} → ${WALLET}`
+          : `${WALLET} → ${t.counterparty}`);
+
+    html += `
+      <div class="tx" style="color:${color}">
+        <b>${sign}${t.amount} USDC</b><br>
+        <span class="small">
+          ${metaLine}<br>
+          ${t.createdAt?.toDate()?.toLocaleString() || ""}
+        </span>
+      </div>
+    `;
+  });
 
   document.getElementById("history").innerHTML =
-    html || "<span class='small'>No transactions for this date</span>";
-};
+    html || `<span class="small">${emptyText}</span>`;
+}
   
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
