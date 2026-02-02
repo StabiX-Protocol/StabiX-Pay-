@@ -374,12 +374,71 @@ function renderHistoryFromSnap(snap, emptyText) {
     <input id="vAmount" type="number" placeholder="Amount">
 
     <button onclick="validatorAdjust()">Apply</button>
+    <hr>
+<h4>View User Full History</h4>
+
+<input id="vfUser" placeholder="User ID (TG_xxx)">
+<button onclick="viewUserFullHistory()">View</button>
+
+<div id="vfBalance" class="small"></div>
+<div id="vfHistory"></div>
 
     <hr>
     <button onclick="loadRequests()">Load Pending</button>
     <div id="vout"></div>
   `;
 }
+window.viewUserFullHistory = async ()=>{
+  const uid = document.getElementById("vfUser")?.value.trim();
+  if(!uid) return alert("User ID required");
+
+  // 1️⃣ Get user & balance
+  const uRef = doc(db,"users",uid);
+  const uSnap = await getDoc(uRef);
+  if(!uSnap.exists()) return alert("User not found");
+
+  document.getElementById("vfBalance").innerHTML =
+    `Balance: ${uSnap.data().balance.toFixed(2)} USDC`;
+
+  // 2️⃣ Get ALL transactions of user
+  const q = query(
+    collection(db,"transactions"),
+    where("userId","==",uid)
+  );
+
+  const txSnap = await getDocs(q);
+
+  let html = "";
+  txSnap.forEach(d=>{
+    const t = d.data();
+
+    const isDW = t.type === "deposit" || t.type === "withdraw";
+    const isCredit = isDW ? t.type === "deposit" : t.type === "received";
+
+    const sign = isCredit ? "+" : "-";
+    const color = isCredit ? "#22c55e" : "#ef4444";
+
+    const meta = isDW
+      ? t.type.toUpperCase()
+      : (isCredit
+          ? `${t.counterparty} → ${uid}`
+          : `${uid} → ${t.counterparty}`);
+
+    html += `
+      <div class="tx" style="color:${color}">
+        <b>${sign}${t.amount} USDC</b><br>
+        <span class="small">
+          ${meta}<br>
+          ${t.createdAt?.toDate()?.toLocaleString() || ""}
+        </span>
+      </div>
+    `;
+  });
+
+  document.getElementById("vfHistory").innerHTML =
+    html || "<span class='small'>No transactions</span>";
+};
+  
 window.validatorAdjust = async ()=>{
   try{
     const uid = document.getElementById("vUser").value.trim();
