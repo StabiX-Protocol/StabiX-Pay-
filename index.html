@@ -506,6 +506,71 @@ window.validatorAdjust = async ()=>{
   document.getElementById("vhHistory").innerHTML =
     html || "<span class='small'>No transactions for this date</span>";
 };
+  window.viewUserDetails = async () => {
+  const uid = document.getElementById("vhUser").value.trim();
+  const date = document.getElementById("vhDate").value;
+
+  if (!uid || !date) {
+    alert("User ID & Date required");
+    return;
+  }
+
+  const userRef = doc(db, "users", uid);
+  const snap = await getDoc(userRef);
+
+  if (!snap.exists()) {
+    alert("User not found");
+    return;
+  }
+
+  document.getElementById("vhBalance").innerHTML =
+    `Balance: ${snap.data().balance.toFixed(2)} USDC`;
+
+  const start = new Date(date);
+  start.setHours(0,0,0,0);
+
+  const end = new Date(date);
+  end.setHours(23,59,59,999);
+
+  const q = query(
+    collection(db,"transactions"),
+    where("userId","==",uid),
+    where("createdAt",">=",start),
+    where("createdAt","<=",end)
+  );
+
+  const snapTx = await getDocs(q);
+  let html = "";
+
+  snapTx.forEach(d=>{
+    const t = d.data();
+
+    const isDW = t.type==="deposit" || t.type==="withdraw";
+    const isCredit = isDW ? t.type==="deposit" : t.type==="received";
+
+    const sign = isCredit ? "+" : "-";
+    const color = isCredit ? "#22c55e" : "#ef4444";
+
+    const meta = isDW
+      ? t.type.toUpperCase()
+      : (isCredit
+          ? `${t.counterparty} → ${uid}`
+          : `${uid} → ${t.counterparty}`);
+
+    html += `
+      <div class="tx" style="color:${color}">
+        <b>${sign}${t.amount} USDC</b><br>
+        <span class="small">
+          ${meta}<br>
+          ${t.createdAt?.toDate()?.toLocaleString() || ""}
+        </span>
+      </div>
+    `;
+  });
+
+  document.getElementById("vhHistory").innerHTML =
+    html || "<span class='small'>No transactions for this date</span>";
+};
 
 /* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
