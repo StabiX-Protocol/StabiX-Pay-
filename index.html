@@ -374,6 +374,22 @@ function validatorPanel(){
     <input id="vAmount" type="number" placeholder="Amount">
 
     <button onclick="validatorAdjust()">Apply</button>
+    <hr>
+<h4>View User Details</h4>
+
+<input id="vhUser" placeholder="User ID (TG_xxx)">
+
+<input
+  id="vhDate"
+  type="date"
+  max="${new Date().toISOString().split('T')[0]}"
+  value="${new Date().toISOString().split('T')[0]}"
+>
+
+<button onclick="viewUserDetails()">View</button>
+
+<div id="vhBalance" class="small"></div>
+<div id="vhHistory"></div>
 
     <hr>
     <button onclick="loadRequests()">Load Pending</button>
@@ -422,6 +438,73 @@ window.validatorAdjust = async ()=>{
   }catch(e){
     alert("Validator error: " + e);
   }
+};
+  window.viewUserDetails = async ()=>{
+  const uid = document.getElementById("vhUser").value.trim();
+  const date = document.getElementById("vhDate").value;
+
+  if(!uid || !date){
+    alert("User ID aur Date required");
+    return;
+  }
+
+  const userRef = doc(db,"users",uid);
+  const snap = await getDoc(userRef);
+
+  if(!snap.exists()){
+    alert("User not found");
+    return;
+  }
+
+  // Balance
+  document.getElementById("vhBalance").innerHTML =
+    `Balance: ${snap.data().balance.toFixed(2)} USDC`;
+
+  // Date range
+  const start = new Date(date);
+  start.setHours(0,0,0,0);
+
+  const end = new Date(date);
+  end.setHours(23,59,59,999);
+
+  const q = query(
+    collection(db,"transactions"),
+    where("userId","==",uid),
+    where("createdAt",">=",start),
+    where("createdAt","<=",end)
+  );
+
+  const txSnap = await getDocs(q);
+
+  let html = "";
+  txSnap.forEach(d=>{
+    const t = d.data();
+
+    const isDW = t.type==="deposit" || t.type==="withdraw";
+    const isCredit = isDW ? t.type==="deposit" : t.type==="received";
+
+    const sign = isCredit ? "+" : "-";
+    const color = isCredit ? "#22c55e" : "#ef4444";
+
+    const meta = isDW
+      ? t.type.toUpperCase()
+      : (isCredit
+          ? `${t.counterparty} → ${uid}`
+          : `${uid} → ${t.counterparty}`);
+
+    html += `
+      <div class="tx" style="color:${color}">
+        <b>${sign}${t.amount} USDC</b><br>
+        <span class="small">
+          ${meta}<br>
+          ${t.createdAt?.toDate()?.toLocaleString() || ""}
+        </span>
+      </div>
+    `;
+  });
+
+  document.getElementById("vhHistory").innerHTML =
+    html || "<span class='small'>No transactions for this date</span>";
 };
 
 /* ================= UTIL ================= */
