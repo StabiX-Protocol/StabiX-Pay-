@@ -151,7 +151,7 @@ async function renderApp(){
   `);
 
   loadHistory();
-  if(isValidator) loadRequests();
+  if(isValidator) loadRequests();   // ✅ ADDED
 }
 
 /* ================= SEND USDC ================= */
@@ -160,7 +160,7 @@ window.sendUSDC = async ()=>{
     await runTransaction(db, async(tx)=>{
       const fromSnap = await tx.get(userRef);
 
-      if(fromSnap.data().isFrozen)       // ✅ ADDED
+      if(fromSnap.data().isFrozen)   // ✅ ADDED
         throw "Account frozen";
 
       const amount = Number(sendAmt.value);
@@ -183,6 +183,7 @@ window.sendUSDC = async ()=>{
         userId: sendTo.value, type:"received", amount,
         counterparty:WALLET, createdAt:serverTimestamp()
       });
+    기억
     });
     renderApp();
   }catch(e){ alert(e); }
@@ -209,61 +210,16 @@ window.submitDW = async ()=>{
 
   await updateDoc(userRef,{
     pendingRequest:true,
-    isFrozen:true          // ✅ ADDED
+    isFrozen:true                // ✅ ADDED
   });
 
   renderApp();
 };
 
-/* ================= HISTORY ================= */
-async function loadHistory(){
-  const q = query(collection(db,"transactions"), where("userId","==",WALLET));
-  const snap = await getDocs(q);
-  renderHistoryFromSnap(snap,"No transactions");
-}
-
-window.loadHistoryByDate = async ()=>{
-  const d = historyDate.value;
-  const s = Timestamp.fromDate(new Date(d+"T00:00:00"));
-  const e = Timestamp.fromDate(new Date(d+"T23:59:59"));
-
-  const q = query(
-    collection(db,"transactions"),
-    where("userId","==",WALLET),
-    where("createdAt",">=",s),
-    where("createdAt","<=",e)
-  );
-  const snap = await getDocs(q);
-  renderHistoryFromSnap(snap,"No transactions");
-};
-
-function renderHistoryFromSnap(snap,empty){
-  let h="";
-  snap.forEach(d=>{
-    const t=d.data();
-    const sign=t.type==="received"||t.type==="deposit"?"+":"-";
-    const col=sign==="+"?"#22c55e":"#ef4444";
-    h+=`<div class="tx" style="color:${col}">
-      <b>${sign}${t.amount} USDC</b><br>
-      <span class="small">${t.type} • ${t.createdAt?.toDate()?.toLocaleString()}</span>
-    </div>`;
-  });
-  history.innerHTML=h||`<span class="small">${empty}</span>`;
-}
-
-/* ================= VALIDATOR ================= */
-function validatorPanel(){
-  return `
-    <hr>
-    <h3>Validator Panel</h3>
-    <button onclick="loadRequests()">Load Pending</button>
-    <div id="vout"></div>
-  `;
-}
-
+/* ================= VALIDATOR (ADDED) ================= */
 window.loadRequests = async ()=>{
-  const q=query(collection(db,"requests"),where("status","==","pending"));
-  const snap=await getDocs(q);
+  const q = query(collection(db,"requests"), where("status","==","pending"));
+  const snap = await getDocs(q);
   let h="";
   snap.forEach(d=>{
     const r=d.data();
@@ -274,32 +230,39 @@ window.loadRequests = async ()=>{
         <button onclick="reject('${d.id}')">✖</button>
       </div>`;
   });
-  vout.innerHTML=h||"No pending";
+  vout.innerHTML = h || "No pending";
 };
 
 window.approve = async(id)=>{
-  await runTransaction(db,async(tx)=>{
-    const r=(await tx.get(doc(db,"requests",id))).data();
-    const uRef=doc(db,"users",r.userId);
-    const u=(await tx.get(uRef)).data();
-    const nb=r.type==="deposit"?u.balance+r.amount:u.balance-r.amount;
-    if(nb<0) throw "Invalid";
-    tx.update(uRef,{balance:nb,pendingRequest:false,isFrozen:false});
-    tx.update(doc(db,"requests",id),{status:"approved"});
+  await runTransaction(db, async(tx)=>{
+    const r = (await tx.get(doc(db,"requests",id))).data();
+    const uRef = doc(db,"users",r.userId);
+    const u = (await tx.get(uRef)).data();
+
+    const newBal = r.type==="deposit"
+      ? u.balance + r.amount
+      : u.balance - r.amount;
+
+    if(newBal < 0) throw "Invalid";
+
+    tx.update(uRef,{ balance:newBal, pendingRequest:false, isFrozen:false });
+    tx.update(doc(db,"requests",id),{ status:"approved" });
   });
   loadRequests();
 };
 
 window.reject = async(id)=>{
-  const r=(await getDoc(doc(db,"requests",id))).data();
-  await updateDoc(doc(db,"users",r.userId),{pendingRequest:false,isFrozen:false});
-  await updateDoc(doc(db,"requests",id),{status:"rejected"});
+  const r = (await getDoc(doc(db,"requests",id))).data();
+  await updateDoc(doc(db,"users",r.userId),{
+    pendingRequest:false,
+    isFrozen:false
+  });
+  await updateDoc(doc(db,"requests",id),{ status:"rejected" });
   loadRequests();
 };
 
 /* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML=h; }
-  
 init();
 </script>
 </body>
