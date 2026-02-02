@@ -80,12 +80,12 @@ window.saveProfile = async ()=>{
     walletAddress: WALLET,
     balance: 0,
     pendingRequest:false,
+    isFrozen:false, // 🔒🔓 ADD THIS LINE
     lastUsernameChange: serverTimestamp(),
     createdAt: serverTimestamp()
   });
   renderApp();
 };
-
 /* ================= LOGIN ================= */
 function renderLogin(){
   appDiv(`
@@ -166,11 +166,17 @@ const today = `${yyyy}-${mm}-${dd}`;
       
 
       <hr>
-      <b>Balance:</b> ${user.balance.toFixed(2)} USDC
-      ${user.pendingRequest
-  ? `<div class="warn"> Pending request under review</div>`
+<b>Balance:</b> ${user.balance.toFixed(2)} USDC
+
+${user.isFrozen
+  ? `<div class="warn">Account frozen until request is resolved</div>`
   : ""
-      }
+}
+
+${user.pendingRequest && !user.isFrozen
+  ? `<div class="warn">Pending request under review</div>`
+  : ""
+}
 
       <hr>
       <h3>Send USDC</h3>
@@ -229,6 +235,9 @@ window.sendUSDC = async ()=>{
   try{
     await runTransaction(db, async(tx)=>{
       const fromSnap = await tx.get(userRef);
+      if(fromSnap.data().isFrozen){
+  throw "Account frozen: Pending deposit/withdraw request";
+      }
       const toRef = doc(db,"users",toWallet);
       const toSnap = await tx.get(toRef);
       if(!toSnap.exists()) throw "Receiver not found";
@@ -255,8 +264,18 @@ window.sendUSDC = async ()=>{
 };
 
 window.submitDW = async ()=>{
+
+  const snap = await getDoc(userRef);
+  if(snap.data().pendingRequest){
+    return alert("Request already pending");
+  }
+  const userBalance = snap.data().balance;
+
   const type = dwType.value;
   const amount = Number(dwAmount.value);
+  if(type === "withdraw" && amount > userBalance){
+  return alert("Insufficient balance");
+  }
   const wallet = dwWallet.value.trim();
   const txHash = dwTxHash?.value || "";
 
@@ -276,7 +295,10 @@ window.submitDW = async ()=>{
     createdAt: serverTimestamp()
   });
 
-  await updateDoc(userRef,{ pendingRequest:true });
+  await updateDoc(userRef,{
+    pendingRequest:true,
+    isFrozen:true
+  });
 
   alert(type.toUpperCase()+" request submitted");
 };
@@ -501,6 +523,124 @@ window.validatorAdjust = async ()=>{
     });
 
     alert("Balance updated");
+  }catch(e){
+    alert(e);
+  }
+};
+  window.loadRequests = async ()=>{
+  const q = query(
+    collection(db,"requests"),
+    where("status","==","pending"),
+    orderBy("createdAt","desc")
+  );
+
+  const snap = await getDocs(q);
+  let html = "";
+
+  snap.forEach(d=>{
+    const r = d.data();
+
+    html += `
+      <div class="tx">
+        <b>${r.type.toUpperCase()}</b><br>
+        User: ${r.userId}<br>
+        Amount: ${r.amount} USDC<br>
+        Wallet: ${r.walletAddress}<br>
+        ${r.txHash ? `TxHash: ${r.txHash}<br>` : ""}
+        ${r.createdAt?.toDate().toLocaleString()}<br>
+
+        <button onclick="approveReq('${d.id}')">Approve</button>
+        <button onclick="rejectReq('${d.id}')">Reject</button>
+      </div>
+    `;
+  });
+
+  document.getElementById("vout").innerHTML =
+    html || "<span class='small'>No pending requests</span>";
+};
+  window.approveReq = async (reqId)=>{
+  try{
+    const reqRef = doc(db,"requests",reqId);
+
+    await runTransaction(db, async(tx)=>{
+      const rSnap = await tx.get(reqRef);
+      if(!rSnap.exists()) throw "Request not found";
+
+      const r = rSnap.data();
+
+      // user reference
+      const uRef = doc(db,"users",r.userId);
+      const uSnap = await tx.get(uRef);
+      if(!uSnap.exists()) throw "User not found";
+
+      let balance = uSnap.data().balance;
+
+      // APPLY LOGIC
+      if(r.type === "deposit"){
+        balance += r.amount;
+      }else{ // withdraw
+        if(balance < r.amount) throw "Insufficient balance";
+        balance -= r.amount;
+      }
+
+      // UPDATE USER (UNFREEZE)
+      tx.update(uRef,{
+        balance: balance,
+        pendingRequest:false,
+        isFrozen:false
+      });
+
+      // UPDATE REQUEST
+      tx.update(reqRef,{
+        status:"approved",
+        approvedAt: serverTimestamp()
+      });
+
+      // ADD TRANSACTION ENTRY
+      tx.set(doc(collection(db,"transactions")),{
+        userId: r.userId,
+        type: r.type,
+        amount: r.amount,
+        counterparty:"SYSTEM",
+        createdAt: serverTimestamp()
+      });
+    });
+
+    alert("Request approved");
+    loadRequests();
+
+  }catch(e){
+    alert(e);
+  }
+};
+  window.rejectReq = async (reqId)=>{
+  try{
+    const reqRef = doc(db,"requests",reqId);
+
+    await runTransaction(db, async(tx)=>{
+      const rSnap = await tx.get(reqRef);
+      if(!rSnap.exists()) throw "Request not found";
+
+      const r = rSnap.data();
+
+      const uRef = doc(db,"users",r.userId);
+
+      // REQUEST REJECT
+      tx.update(reqRef,{
+        status:"rejected",
+        rejectedAt: serverTimestamp()
+      });
+
+      // USER UNFREEZE
+      tx.update(uRef,{
+        pendingRequest:false,
+        isFrozen:false
+      });
+    });
+
+    alert("Request rejected");
+    loadRequests();
+
   }catch(e){
     alert(e);
   }
