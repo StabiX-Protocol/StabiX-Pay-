@@ -399,58 +399,39 @@ window.viewUserFullHistory = async ()=>{
   const uid = document.getElementById("vfUser")?.value.trim();
   if(!uid) return alert("User ID required");
 
-  const date = document.getElementById("vfDate")?.value;
+const date = document.getElementById("vfDate")?.value;
   if(!date) return alert("Date required");
 
-  // 🔒 Date range (ONLY ONCE)
-  const start = new Date(date);
+const start = new Date(date);
   start.setHours(0,0,0,0);
 
   const end = new Date(date);
-  end.setHours(23,59,59,999);
+  end.setHours(23,59,59,599);
 
-  // 1️⃣ User + balance
+  //Get User & Balance 
   const uRef = doc(db,"users",uid);
-  const uSnap = await getDoc(uRef);
-  if(!uSnap.exists()) return alert("User not found");
 
-  document.getElementById("vfBalance").innerHTML =
-    `Balance: ${uSnap.data().balance.toFixed(2)} USDC`;
-
-  // 2️⃣ Transactions (DATE FILTER HERE — RIGHT PLACE)
-  const q1 = query(
-  collection(db,"transactions"),
-  where("userId","==",uid),
-  where("createdAt",">=",start),
-  where("createdAt","<=",end)
+  //Get All Transction Of User 
+  // ✅ Get ALL Transactions of User (DATE FILTERED)
+const q = query(
+  collection(db, "transactions"),
+  where("userId", "==", uid),
+  where("createdAt", ">=", start),
+  where("createdAt", "<=", end),
+  orderBy("createdAt", "desc")
 );
 
-
-const snap1 = await getDocs(q1);
-const allTx = [];
-snap1.forEach(d => allTx.push(d.data()));
-
-// 🔥 sort by latest first
-allTx.sort((a,b)=>
-  b.createdAt.toMillis() - a.createdAt.toMillis()
-);
-  
-// 🔥 sort by time (important)
-allTx.sort((a,b)=>
-  b.createdAt.toMillis() - a.createdAt.toMillis()
-);
+const snap = await getDocs(q);
 
 let html = "";
-  allTx.forEach(t=>{
-    let html = "";
 
-allTx.forEach(t => {
+snap.forEach(d => {
+  const t = d.data();
 
   let sign = "-";
   let color = "#ef4444";
   let meta = "";
 
-  // 💰 Deposit / Withdraw
   if (t.type === "deposit") {
     sign = "+";
     color = "#22c55e";
@@ -461,16 +442,12 @@ allTx.forEach(t => {
     color = "#ef4444";
     meta = "WITHDRAW";
   }
-
-  // 🔁 Transfer (SEND / RECEIVE)
   else {
     if (t.userId === uid) {
-      // SENT
       sign = "-";
       color = "#ef4444";
       meta = `${uid} → ${t.counterparty}`;
     } else {
-      // RECEIVED
       sign = "+";
       color = "#22c55e";
       meta = `${t.counterparty} → ${uid}`;
@@ -490,7 +467,6 @@ allTx.forEach(t => {
 
 document.getElementById("vfHistory").innerHTML =
   html || "<span class='small'>No transactions for this date</span>";
-  }
   
 window.validatorAdjust = async ()=>{
   try{
