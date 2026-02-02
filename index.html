@@ -380,39 +380,19 @@ function validatorPanel(){
     <div id="vout"></div>
   `;
 }
-window.loadRequests = async ()=>{
-  const q = query(
-    collection(db,"requests"),
-    where("status","==","pending"),
-    orderBy("createdAt","asc")
-  );
-
-  const snap = await getDocs(q);
-  let html = "";
-
-  snap.forEach(d=>{
-    const r = d.data();
-    html += `<div class="tx">${r.userId} • ${r.type} • ${r.amount}</div>`;
-  });
-
-  document.getElementById("vout").innerHTML =
-    html || "No pending";
-};
-
-  
-  window.validatorAdjust = async ()=>{
-  const uid = document.getElementById("vUser").value.trim();
-  const type = document.getElementById("vType").value;
-  const amount = Number(document.getElementById("vAmount").value);
-
-  if(!uid || amount <= 0){
-    alert("Invalid input");
-    return;
-  }
-
-  const targetRef = doc(db,"users",uid);
-
+window.validatorAdjust = async ()=>{
   try{
+    const uid = document.getElementById("vUser").value.trim();
+    const type = document.getElementById("vType").value;
+    const amount = Number(document.getElementById("vAmount").value);
+
+    if(!uid || amount <= 0){
+      alert("Invalid input");
+      return;
+    }
+
+    const targetRef = doc(db,"users",uid);
+
     await runTransaction(db, async(tx)=>{
       const snap = await tx.get(targetRef);
       if(!snap.exists()) throw "User not found";
@@ -431,16 +411,16 @@ window.loadRequests = async ()=>{
 
       tx.set(doc(collection(db,"transactions")),{
         userId: uid,
-        type: type,           // deposit / withdraw
+        type: type,              // deposit / withdraw
         amount: amount,
         counterparty: "VALIDATOR",
         createdAt: serverTimestamp()
       });
     });
 
-    alert("Balance updated");
+    alert("Balance updated successfully");
   }catch(e){
-    alert(e);
+    alert("Validator error: " + e);
   }
 };
 
