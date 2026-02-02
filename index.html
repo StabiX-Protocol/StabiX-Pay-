@@ -294,16 +294,12 @@ async function loadHistory(){
   snap.forEach(d=>{
   const t = d.data();
 
-  
-
-  document.getElementById("history").innerHTML =
-    html || "<span class='const isDepositWithdraw =
+   const isDepositWithdraw =
   t.type === "deposit" || t.type === "withdraw";
 
-const isCredit =
-  isDepositWithdraw
-    ? t.type === "deposit"
-    : t.type === "received";
+const isCredit = isDepositWithdraw
+  ? t.type === "deposit"
+  : t.type === "received";
 
 const sign = isCredit ? "+" : "-";
 const color = isCredit ? "#22c55e" : "#ef4444";
@@ -322,8 +318,10 @@ html += `
     ${t.createdAt?.toDate?.().toLocaleString?.() || ""}
   </span>
 </div>
-`;small'>No transactions</span>";
-}
+`;
+    document.getElementById("history").innerHTML =
+  html || "<span class='small'>No transactions</span>";
+  
   window.loadHistoryByDate = async ()=>{
   const selected = document.getElementById("historyDate").value;
 
@@ -354,10 +352,9 @@ html += `
   const isDepositWithdraw =
   t.type === "deposit" || t.type === "withdraw";
 
-const isCredit =
-  isDepositWithdraw
-    ? t.type === "deposit"
-    : t.type === "received";
+const isCredit = isDepositWithdraw
+  ? t.type === "deposit"
+  : t.type === "received";
 
 const sign = isCredit ? "+" : "-";
 const color = isCredit ? "#22c55e" : "#ef4444";
