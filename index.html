@@ -418,28 +418,41 @@ window.viewUserFullHistory = async ()=>{
     `Balance: ${uSnap.data().balance.toFixed(2)} USDC`;
 
   // 2️⃣ Transactions (DATE FILTER HERE — RIGHT PLACE)
-  const q = query(
-    collection(db,"transactions"),
-    where("userId","==",uid),
-    where("createdAt",">=",start),
-    where("createdAt","<=",end),
-    orderBy("createdAt","desc")
-  );
-  const q2 = query(
+  const q1 = query(
   collection(db,"transactions"),
-  where("counterparty","==",uid),
+  where("userId","==",uid),
   where("createdAt",">=",start),
-  where("createdAt","<=",end),
-  orderBy("createdAt","desc")
+  where("createdAt","<=",end)
 );
 
-  const snap1 = await getDocs(q);
+const q2 = query(
+  collection(db,"transactions"),
+  where("from","==",uid),
+  where("createdAt",">=",start),
+  where("createdAt","<=",end)
+);
+
+const q3 = query(
+  collection(db,"transactions"),
+  where("to","==",uid),
+  where("createdAt",">=",start),
+  where("createdAt","<=",end)
+);
+const snap1 = await getDocs(q1);
 const snap2 = await getDocs(q2);
+const snap3 = await getDocs(q3);
 
 const allTx = [];
-snap1.forEach(d=>allTx.push(d.data()));
-snap2.forEach(d=>allTx.push(d.data()));
 
+snap1.forEach(d => allTx.push(d.data()));
+snap2.forEach(d => allTx.push(d.data()));
+snap3.forEach(d => allTx.push(d.data()));
+
+// 🔥 sort by latest first
+allTx.sort((a,b)=>
+  b.createdAt.toMillis() - a.createdAt.toMillis()
+);
+  
 // 🔥 sort by time (important)
 allTx.sort((a,b)=>
   b.createdAt.toMillis() - a.createdAt.toMillis()
@@ -454,11 +467,28 @@ let html = "";
     const sign = isCredit ? "+" : "-";
     const color = isCredit ? "#22c55e" : "#ef4444";
 
-    const meta = isDW
-  ? t.type.toUpperCase()
-  : (t.userId === uid
-      ? `${uid} → ${t.counterparty}`   // SENT
-      : `${t.userId} → ${uid}`);       // RECEIVED
+const meta = isDW
+let sign = "-";
+let color = "#ef4444";
+let meta = "";
+
+if(isDW){
+  sign = t.type === "deposit" ? "+" : "-";
+  color = t.type === "deposit" ? "#22c55e" : "#ef4444";
+  meta = t.type.toUpperCase();
+}
+else if(t.from === uid){
+  // SENT
+  sign = "-";
+  color = "#ef4444";
+  meta = `${uid} → ${t.to}`;
+}
+else if(t.to === uid){
+  // RECEIVED
+  sign = "+";
+  color = "#22c55e";
+  meta = `${t.from} → ${uid}`;
+}
 
     html += `
       <div class="tx" style="color:${color}">
