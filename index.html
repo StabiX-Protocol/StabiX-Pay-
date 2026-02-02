@@ -292,23 +292,29 @@ async function loadHistory(){
 
   let html="";
   snap.forEach(d=>{
-    const t = d.data();
+  const t = d.data();
 
-    const sign =
-      t.type === "received" || t.type === "deposit" ? "+" : "-";
-    const color =
-      sign === "+" ? "#22c55e" : "#ef4444";
+  const isCredit =
+    t.type === "received" || t.type === "deposit";
 
-    html += `
-      <div class="tx" style="color:${color}">
-        <b>${sign}${t.amount} USDC</b><br>
-        <span class="small">
-          ${t.type.toUpperCase()} •
-          ${t.createdAt?.toDate?.().toLocaleString?.() || ""}
-        </span>
-      </div>
-    `;
-  });
+  const sign = isCredit ? "+" : "-";
+  const color = isCredit ? "#22c55e" : "#ef4444";
+
+  const fromTo = isCredit
+    ? `${t.counterparty} → You`
+    : `You → ${t.counterparty}`;
+
+  html += `
+    <div class="tx" style="color:${color}">
+      <b>${sign}${t.amount} USDC</b><br>
+      <span class="small">
+        ${fromTo}<br>
+        ${t.type.toUpperCase()} ·
+        ${t.createdAt?.toDate?.().toLocaleString?.() || ""}
+      </span>
+    </div>
+  `;
+});
 
   document.getElementById("history").innerHTML =
     html || "<span class='small'>No transactions</span>";
@@ -338,24 +344,29 @@ async function loadHistory(){
 
   let html = "";
   snap.forEach(d=>{
-    const t = d.data();
+  const t = d.data();
 
-    const isCredit =
-      t.type === "received" || t.type === "deposit";
+  const isCredit =
+    t.type === "received" || t.type === "deposit";
 
-    const sign = isCredit ? "+" : "-";
-    const color = isCredit ? "#22c55e" : "#ef4444";
+  const sign = isCredit ? "+" : "-";
+  const color = isCredit ? "#22c55e" : "#ef4444";
 
-    html += `
-      <div class="tx" style="color:${color}">
-        <b>${sign}${t.amount} USDC</b><br>
-        <span class="small">
-          ${t.type.toUpperCase()} •
-          ${t.createdAt?.toDate?.().toLocaleString?.() || ""}
-        </span>
-      </div>
-    `;
-  });
+  const fromTo = isCredit
+    ? `${t.counterparty} → You`
+    : `You → ${t.counterparty}`;
+
+  html += `
+    <div class="tx" style="color:${color}">
+      <b>${sign}${t.amount} USDC</b><br>
+      <span class="small">
+        ${fromTo}<br>
+        ${t.type.toUpperCase()} ·
+        ${t.createdAt?.toDate?.().toLocaleString?.() || ""}
+      </span>
+    </div>
+  `;
+});
 
   document.getElementById("history").innerHTML =
     html || "<span class='small'>No transactions for this date</span>";
