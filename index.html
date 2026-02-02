@@ -425,12 +425,28 @@ window.viewUserFullHistory = async ()=>{
     where("createdAt","<=",end),
     orderBy("createdAt","desc")
   );
+  const q2 = query(
+  collection(db,"transactions"),
+  where("counterparty","==",uid),
+  where("createdAt",">=",start),
+  where("createdAt","<=",end),
+  orderBy("createdAt","desc")
+);
 
-  const txSnap = await getDocs(q);
-  let html = "";
+  const snap1 = await getDocs(q);
+const snap2 = await getDocs(q2);
 
-  txSnap.forEach(d=>{
-    const t = d.data();
+const allTx = [];
+snap1.forEach(d=>allTx.push(d.data()));
+snap2.forEach(d=>allTx.push(d.data()));
+
+// 🔥 sort by time (important)
+allTx.sort((a,b)=>
+  b.createdAt.toMillis() - a.createdAt.toMillis()
+);
+
+let html = "";
+  allTx.forEach(t=>{
 
     const isDW = t.type==="deposit" || t.type==="withdraw";
     const isCredit = isDW ? t.type==="deposit" : t.type==="received";
@@ -439,10 +455,10 @@ window.viewUserFullHistory = async ()=>{
     const color = isCredit ? "#22c55e" : "#ef4444";
 
     const meta = isDW
-      ? t.type.toUpperCase()
-      : (isCredit
-          ? `${t.counterparty} → ${uid}`
-          : `${uid} → ${t.counterparty}`);
+  ? t.type.toUpperCase()
+  : (t.userId === uid
+      ? `${uid} → ${t.counterparty}`   // SENT
+      : `${t.userId} → ${uid}`);       // RECEIVED
 
     html += `
       <div class="tx" style="color:${color}">
