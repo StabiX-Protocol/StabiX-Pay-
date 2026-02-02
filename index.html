@@ -4,7 +4,6 @@
   <title>StabiX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
   <style>
     body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px; }
     .box { background:#020617; border:1px solid #1e293b; border-radius:12px; padding:20px; max-width:420px; margin:auto; }
@@ -53,12 +52,17 @@ const validatorRef = doc(db,"validators",String(tgUser.id));
 
 /* ================= INIT ================= */
 async function init(){
-  const snap = await getDoc(userRef);
-  if(!snap.exists() || !snap.data()?.password){
-    renderSetup(); 
-    return;
+  try{
+    const snap = await getDoc(userRef);
+    if(!snap.exists() || !snap.data()?.password){
+      renderSetup(); 
+      return;
+    }
+    renderLogin();
+  }catch(e){
+    document.getElementById("app").innerHTML="Init error";
+    console.error(e);
   }
-  renderLogin();
 }
 
 /* ================= SETUP ================= */
@@ -141,7 +145,7 @@ async function renderApp(){
   `);
 
   if(isValidator){
-    setTimeout(loadRequests,500);
+    setTimeout(loadRequests, 300);
   }
 }
 
@@ -153,15 +157,13 @@ window.sendUSDC = async ()=>{
       if(fromSnap.data().isFrozen === true){
         throw "Account frozen";
       }
-
       const toWallet = sendTo.value.trim();
       const amount = Number(sendAmt.value);
-      if(amount <= 0) throw "Invalid amount";
+      if(!toWallet || amount<=0) throw "Invalid input";
 
       const toRef = doc(db,"users",toWallet);
       const toSnap = await tx.get(toRef);
       if(!toSnap.exists()) throw "Receiver not found";
-
       if(fromSnap.data().balance < amount) throw "Insufficient balance";
 
       tx.update(userRef,{ balance: fromSnap.data().balance - amount });
@@ -185,15 +187,9 @@ window.submitDW = async ()=>{
   const wallet = dwWallet.value.trim();
   const txHash = dwTxHash.value.trim();
 
-  if(amount <= 0 || !wallet) return alert("Invalid input");
-
-  if(type === "withdraw" && amount > user.balance){
-    return alert("Insufficient balance");
-  }
-
-  if(type === "deposit" && !txHash){
-    return alert("Tx hash required");
-  }
+  if(amount<=0 || !wallet) return alert("Invalid input");
+  if(type==="withdraw" && amount > user.balance) return alert("Insufficient balance");
+  if(type==="deposit" && !txHash) return alert("Tx hash required");
 
   await addDoc(collection(db,"requests"),{
     userId: WALLET,
@@ -205,11 +201,7 @@ window.submitDW = async ()=>{
     createdAt: serverTimestamp()
   });
 
-  await updateDoc(userRef,{
-    pendingRequest:true,
-    isFrozen:true
-  });
-
+  await updateDoc(userRef,{ pendingRequest:true, isFrozen:true });
   alert("Request submitted");
   renderApp();
 };
@@ -219,18 +211,14 @@ function validatorPanel(){
   return `
     <hr>
     <h3>Validator Panel</h3>
-    <button onclick="loadRequests()">Load Pending Requests</button>
+    <button onclick="loadRequests()">Load Pending</button>
     <div id="vout"></div>
   `;
 }
 
 /* ================= LOAD REQUESTS ================= */
 window.loadRequests = async ()=>{
-  const q = query(
-    collection(db,"requests"),
-    where("status","==","pending")
-  );
-
+  const q = query(collection(db,"requests"), where("status","==","pending"));
   const snap = await getDocs(q);
   let html = "";
 
@@ -255,10 +243,9 @@ window.loadRequests = async ()=>{
 
 /* ================= APPROVE ================= */
 window.approveReq = async (id)=>{
-  const reqRef = doc(db,"requests",id);
-
   await runTransaction(db, async(tx)=>{
-    const rSnap = await tx.get(reqRef);
+    const rRef = doc(db,"requests",id);
+    const rSnap = await tx.get(rRef);
     const r = rSnap.data();
 
     const uRef = doc(db,"users",r.userId);
@@ -272,23 +259,20 @@ window.approveReq = async (id)=>{
     }
 
     tx.update(uRef,{ balance:bal, pendingRequest:false, isFrozen:false });
-    tx.update(reqRef,{ status:"approved" });
+    tx.update(rRef,{ status:"approved" });
   });
-
   loadRequests();
 };
 
 /* ================= REJECT ================= */
 window.rejectReq = async (id)=>{
-  const reqRef = doc(db,"requests",id);
-  const rSnap = await getDoc(reqRef);
-
+  const rRef = doc(db,"requests",id);
+  const rSnap = await getDoc(rRef);
   await updateDoc(doc(db,"users",rSnap.data().userId),{
     pendingRequest:false,
     isFrozen:false
   });
-  await updateDoc(reqRef,{ status:"rejected" });
-
+  await updateDoc(rRef,{ status:"rejected" });
   loadRequests();
 };
 
