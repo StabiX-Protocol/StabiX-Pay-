@@ -425,28 +425,10 @@ window.viewUserFullHistory = async ()=>{
   where("createdAt","<=",end)
 );
 
-const q2 = query(
-  collection(db,"transactions"),
-  where("from","==",uid),
-  where("createdAt",">=",start),
-  where("createdAt","<=",end)
-);
 
-const q3 = query(
-  collection(db,"transactions"),
-  where("to","==",uid),
-  where("createdAt",">=",start),
-  where("createdAt","<=",end)
-);
 const snap1 = await getDocs(q1);
-const snap2 = await getDocs(q2);
-const snap3 = await getDocs(q3);
-
 const allTx = [];
-
 snap1.forEach(d => allTx.push(d.data()));
-snap2.forEach(d => allTx.push(d.data()));
-snap3.forEach(d => allTx.push(d.data()));
 
 // 🔥 sort by latest first
 allTx.sort((a,b)=>
@@ -460,49 +442,55 @@ allTx.sort((a,b)=>
 
 let html = "";
   allTx.forEach(t=>{
+    let html = "";
 
-    const isDW = t.type==="deposit" || t.type==="withdraw";
-    const isCredit = isDW ? t.type==="deposit" : t.type==="received";
+allTx.forEach(t => {
 
-    const sign = isCredit ? "+" : "-";
-    const color = isCredit ? "#22c55e" : "#ef4444";
+  let sign = "-";
+  let color = "#ef4444";
+  let meta = "";
 
-let sign = "-";
-let color = "#ef4444";
-let meta = "";
+  // 💰 Deposit / Withdraw
+  if (t.type === "deposit") {
+    sign = "+";
+    color = "#22c55e";
+    meta = "DEPOSIT";
+  }
+  else if (t.type === "withdraw") {
+    sign = "-";
+    color = "#ef4444";
+    meta = "WITHDRAW";
+  }
 
-if(isDW){
-  sign = t.type === "deposit" ? "+" : "-";
-  color = t.type === "deposit" ? "#22c55e" : "#ef4444";
-  meta = t.type.toUpperCase();
-}
-else if(t.from === uid){
-  // SENT
-  sign = "-";
-  color = "#ef4444";
-  meta = `${uid} → ${t.to}`;
-}
-else if(t.to === uid){
-  // RECEIVED
-  sign = "+";
-  color = "#22c55e";
-  meta = `${t.from} → ${uid}`;
-}
+  // 🔁 Transfer (SEND / RECEIVE)
+  else {
+    if (t.userId === uid) {
+      // SENT
+      sign = "-";
+      color = "#ef4444";
+      meta = `${uid} → ${t.counterparty}`;
+    } else {
+      // RECEIVED
+      sign = "+";
+      color = "#22c55e";
+      meta = `${t.counterparty} → ${uid}`;
+    }
+  }
 
-    html += `
-      <div class="tx" style="color:${color}">
-        <b>${sign}${t.amount} USDC</b><br>
-        <span class="small">
-          ${meta}<br>
-          ${t.createdAt?.toDate()?.toLocaleString() || ""}
-        </span>
-      </div>
-    `;
-  });
+  html += `
+    <div class="tx" style="color:${color}">
+      <b>${sign}${t.amount} USDC</b><br>
+      <span class="small">
+        ${meta}<br>
+        ${t.createdAt?.toDate()?.toLocaleString() || ""}
+      </span>
+    </div>
+  `;
+});
 
-  document.getElementById("vfHistory").innerHTML =
-    html || "<span class='small'>No transactions for this date</span>";
-};
+document.getElementById("vfHistory").innerHTML =
+  html || "<span class='small'>No transactions for this date</span>";
+  }
   
 window.validatorAdjust = async ()=>{
   try{
