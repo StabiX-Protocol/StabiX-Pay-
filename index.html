@@ -301,8 +301,8 @@ async function loadHistory(){
   const color = isCredit ? "#22c55e" : "#ef4444";
 
   const fromTo = isCredit
-    ? `${t.counterparty} → You`
-    : `You → ${t.counterparty}`;
+  ? `${t.counterparty} → ${WALLET}`
+  : `${WALLET} → ${t.counterparty}`;
 
   html += `
     <div class="tx" style="color:${color}">
@@ -353,8 +353,8 @@ async function loadHistory(){
   const color = isCredit ? "#22c55e" : "#ef4444";
 
   const fromTo = isCredit
-    ? `${t.counterparty} → You`
-    : `You → ${t.counterparty}`;
+  ? `${t.counterparty} → ${WALLET}`
+  : `${WALLET} → ${t.counterparty}`;
 
   html += `
     <div class="tx" style="color:${color}">
