@@ -675,11 +675,10 @@ window.approveReq = async (reqId)=>{
   pop.style.display = "flex";
   }
 
-  function closeTxPopup(){
+  window.closeTxPopup = function (){
   const pop = document.getElementById("txPopup");
-  if(pop){
-    pop.style.display = "none";
-  }
+  if(pop) pop.style.display = "none";
+};
     }
 /* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
