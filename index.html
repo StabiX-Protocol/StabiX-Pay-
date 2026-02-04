@@ -684,8 +684,11 @@ window.approveReq = async (reqId)=>{
   }, 1200);
   }
   function closeTxPopup(){
-  document.getElementById("txPopup").style.display = "none";
+  const pop = document.getElementById("txPopup");
+  if(pop){
+    pop.style.display = "none";
   }
+    }
 /* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
 
