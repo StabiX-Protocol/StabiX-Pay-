@@ -664,24 +664,15 @@ window.approveReq = async (reqId)=>{
   const time = document.getElementById("txTime");
   const doneBtn = document.getElementById("txDoneBtn");
 
-  // message
+  // message + time
   txt.innerText = msg;
-
-  // timestamp
   time.innerText = new Date().toLocaleString();
 
-  // initial state
-  doneBtn.style.display = "none";
-  check.style.display = "none";
-  spin.style.display = "block";
+  // ✅ FINAL STATE (NO TIMER)
+  spin.style.display = "none";      // ❌ spinner band
+  check.style.display = "block";    // ✅ success
+  doneBtn.style.display = "block";  // ✅ DONE button
   pop.style.display = "flex";
-  
-  // spinner → check
-  setTimeout(()=>{
-    spin.style.display = "none";
-    check.style.display = "block";
-    doneBtn.style.display = "block";
-  }, 1200);
   }
 
   function closeTxPopup(){
