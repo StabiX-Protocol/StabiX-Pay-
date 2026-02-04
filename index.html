@@ -27,13 +27,13 @@
 
 .tx-card {
   background:#020617;
-  border-radius:16px;
-  padding:25px;
+  border-radius:18px;
+  padding:30px 25px;
   text-align:center;
-  width:280px;
+  width:320px;
+  max-width:90%;
   animation: scaleIn .25s ease;
 }
-
 .spinner {
   width:60px;
   height:60px;
@@ -63,12 +63,23 @@
 
 <body>
 <div id="app">Loading…</div>
-  <!-- ===== Transaction Popup ===== -->
+<!-- ===== Transaction Popup ===== -->
 <div id="txPopup" class="tx-popup">
   <div class="tx-card">
+    <audio id="txSound" preload="auto">
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-confirmation-tone-2867.mp3" type="audio/mpeg">
+    </audio>
     <div id="txSpinner" class="spinner"></div>
     <div id="txCheck" class="check">✅</div>
-    <div id="txMsg" style="margin-top:10px"></div>
+
+    <div id="txMsg" style="margin-top:10px;font-size:16px;"></div>
+    <div id="txTime" class="small" style="margin-top:6px;"></div>
+
+    <button id="txDoneBtn"
+      style="margin-top:16px;background:#22c55e;color:#022c22;font-weight:bold;display:none"
+      onclick="closeTxPopup()">
+      DONE
+    </button>
   </div>
 </div>
 
@@ -650,9 +661,17 @@ window.approveReq = async (reqId)=>{
   const spin = document.getElementById("txSpinner");
   const check = document.getElementById("txCheck");
   const txt = document.getElementById("txMsg");
+  const time = document.getElementById("txTime");
+  const doneBtn = document.getElementById("txDoneBtn");
 
+  // message
   txt.innerText = msg;
 
+  // timestamp
+  time.innerText = new Date().toLocaleString();
+
+  // initial state
+  doneBtn.style.display = "none";
   check.style.display = "none";
   spin.style.display = "block";
   pop.style.display = "flex";
@@ -661,12 +680,11 @@ window.approveReq = async (reqId)=>{
   setTimeout(()=>{
     spin.style.display = "none";
     check.style.display = "block";
+    doneBtn.style.display = "block";
   }, 1200);
-
-  // auto close
-  setTimeout(()=>{
-    pop.style.display = "none";
-  }, 2200);
+  }
+  function closeTxPopup(){
+  document.getElementById("txPopup").style.display = "none";
   }
 /* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
