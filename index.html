@@ -455,10 +455,23 @@ window.validatorAdjust = async ()=>{
 
   snap.forEach(d=>{
     const r = d.data();
+
+    const time = r.createdAt
+      ? r.createdAt.toDate().toLocaleString()
+      : "";
+
     html += `
       <div class="tx">
-        <b>${r.type.toUpperCase()}</b> ${r.amount} USDC<br>
-        User: ${r.userId}<br>
+        <b>${r.type.toUpperCase()} ${r.amount} USDC</b><br>
+
+        <span class="small">
+          User ID: ${r.userId}<br>
+          Wallet: ${r.walletAddress}<br>
+          ${r.txHash ? `Tx Hash: ${r.txHash}<br>` : ""}
+          Time: ${time}
+        </span>
+
+        <br><br>
         <button onclick="approveReq('${d.id}')">Approve</button>
         <button onclick="rejectReq('${d.id}')">Reject</button>
       </div>
@@ -466,8 +479,9 @@ window.validatorAdjust = async ()=>{
   });
 
   document.getElementById("vout").innerHTML =
-    html || "No pending requests";
+    html || "<span class='small'>No pending requests</span>";
 };
+  
 window.approveReq = async (reqId)=>{
   const reqRef = doc(db,"requests",reqId);
 
