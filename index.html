@@ -393,6 +393,8 @@ function validatorPanel(){
       <option value="withdraw">Withdraw</option>
     </select>
     <input id="vAmount" type="number" placeholder="Amount">
+    <button onclick="checkUserBalance()">Check Balance</button>
+<div id="balanceOut" class="small" style="margin-top:8px"></div>
 
     <button onclick="validatorAdjust()">Apply</button>
 
@@ -540,6 +542,28 @@ window.approveReq = async (reqId)=>{
 
   alert("Rejected");
   loadRequests();
+};
+  window.checkUserBalance = async ()=>{
+  const uid = document.getElementById("vUser").value.trim();
+  const out = document.getElementById("balanceOut");
+
+  if(!uid){
+    out.innerText = "Enter User ID";
+    return;
+  }
+
+  try{
+    const snap = await getDoc(doc(db,"users",uid));
+    if(!snap.exists()){
+      out.innerText = "User not found";
+      return;
+    }
+
+    out.innerText =
+      `Balance: ${snap.data().balance.toFixed(2)} USDC`;
+  }catch(e){
+    out.innerText = "Error fetching balance";
+  }
 };
 /* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
