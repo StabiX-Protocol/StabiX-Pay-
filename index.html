@@ -675,6 +675,13 @@ window.approveReq = async (reqId)=>{
   check.style.display = "none";
   spin.style.display = "block";
   pop.style.display = "flex";
+  
+  // spinner → check
+  setTimeout(()=>{
+    spin.style.display = "none";
+    check.style.display = "block";
+    doneBtn.style.display = "block";
+  }, 1200);
   }
 
   function closeTxPopup(){
