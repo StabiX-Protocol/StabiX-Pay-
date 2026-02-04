@@ -679,6 +679,14 @@ window.approveReq = async (reqId)=>{
   const pop = document.getElementById("txPopup");
   if(pop) pop.style.display = "none";
 };
+  // ✅ DONE button handler (module-safe)
+const doneBtnEl = document.getElementById("txDoneBtn");
+if (doneBtnEl) {
+  doneBtnEl.addEventListener("click", () => {
+    const pop = document.getElementById("txPopup");
+    if (pop) pop.style.display = "none";
+  });
+}
     }
 /* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
