@@ -218,6 +218,11 @@ const today = `${yyyy}-${mm}-${dd}`;
 
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
+  const snap = await getDoc(userRef);
+if(snap.data().pendingRequest){
+  alert("Account frozen. Wait for validator approval.");
+  return;
+}
   const toWallet = sendTo.value.trim();
   const amount = Number(sendAmt.value);
   if(!toWallet || amount<=0) return alert("Invalid input");
@@ -263,6 +268,20 @@ window.submitDW = async ()=>{
   if(!amount || amount<=0 || !wallet)
     return alert("Invalid input");
 
+  const snap = await getDoc(userRef);
+
+  // 🔒 already frozen
+  if(snap.data().pendingRequest){
+    alert("Your account is frozen. Pending request under review.");
+    return;
+  }
+
+  // ❌ withdraw > balance
+  if(type==="withdraw" && amount > snap.data().balance){
+    alert("Insufficient balance");
+    return;
+  }
+
   if(type==="deposit" && !txHash)
     return alert("Transaction hash required for deposit");
 
@@ -276,9 +295,11 @@ window.submitDW = async ()=>{
     createdAt: serverTimestamp()
   });
 
+  // 🔒 FREEZE ACCOUNT
   await updateDoc(userRef,{ pendingRequest:true });
 
-  alert(type.toUpperCase()+" request submitted");
+  alert(type.toUpperCase()+" request submitted. Account frozen.");
+  renderApp();
 };
   
 /* ================= HISTORY ================= */
@@ -423,7 +444,89 @@ window.validatorAdjust = async ()=>{
     alert("Validator error: " + e);
   }
 };
+  window.loadRequests = async ()=>{
+  const q = query(
+    collection(db,"requests"),
+    where("status","==","pending")
+  );
 
+  const snap = await getDocs(q);
+  let html = "";
+
+  snap.forEach(d=>{
+    const r = d.data();
+    html += `
+      <div class="tx">
+        <b>${r.type.toUpperCase()}</b> ${r.amount} USDC<br>
+        User: ${r.userId}<br>
+        <button onclick="approveReq('${d.id}')">Approve</button>
+        <button onclick="rejectReq('${d.id}')">Reject</button>
+      </div>
+    `;
+  });
+
+  document.getElementById("vout").innerHTML =
+    html || "No pending requests";
+};
+window.approveReq = async (reqId)=>{
+  const reqRef = doc(db,"requests",reqId);
+
+  await runTransaction(db, async(tx)=>{
+    const reqSnap = await tx.get(reqRef);
+    if(!reqSnap.exists()) throw "Request not found";
+
+    const r = reqSnap.data();
+    const userRefX = doc(db,"users", r.userId);
+    const userSnap = await tx.get(userRefX);
+
+    let bal = userSnap.data().balance;
+
+    if(r.type === "deposit"){
+      bal += r.amount;
+    }
+
+    if(r.type === "withdraw"){
+      if(bal < r.amount) throw "Insufficient balance";
+      bal -= r.amount;
+    }
+
+    // 🔓 UNFREEZE USER + UPDATE BALANCE
+    tx.update(userRefX,{
+      balance: bal,
+      pendingRequest: false
+    });
+
+    // ✅ MARK REQUEST APPROVED
+    tx.update(reqRef,{
+      status: "approved"
+    });
+
+    // 🧾 TRANSACTION ENTRY
+    tx.set(doc(collection(db,"transactions")),{
+      userId: r.userId,
+      type: r.type,
+      amount: r.amount,
+      counterparty: "VALIDATOR",
+      createdAt: serverTimestamp()
+    });
+  });
+
+  alert("Request approved");
+  loadRequests();
+};
+  window.rejectReq = async (reqId)=>{
+  const reqRef = doc(db,"requests",reqId);
+  const snap = await getDoc(reqRef);
+
+  await updateDoc(doc(db,"users", snap.data().userId),{
+    pendingRequest:false   // 🔓 UNFREEZE
+  });
+
+  await updateDoc(reqRef,{ status:"rejected" });
+
+  alert("Rejected");
+  loadRequests();
+};
 /* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
 
