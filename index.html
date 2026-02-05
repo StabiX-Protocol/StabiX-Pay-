@@ -276,7 +276,7 @@ const today = `${yyyy}-${mm}-${dd}`;
     </div>
   `);
 
-  loadHistory();
+  loadHistoryByDate();
   // 🎉 RECEIVE POPUP (one-time)
 try{
   const q = query(
@@ -414,9 +414,7 @@ async function loadHistory() {
   const q = query(
     collection(db, "transactions"),
     where("userId", "==", WALLET),
-    orderBy("createdAt", "asc") // oldest → newest
-  );
-
+    
   const snap = await getDocs(q);
 
   let html = "";
