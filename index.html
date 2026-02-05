@@ -668,18 +668,7 @@ window.approveReq = async (reqId)=>{
 txt.innerText = msg;
 time.innerText = new Date().toLocaleString();
 
-// 🎬 INITIAL STATE
-spin.style.display = "block";   // spinner ON
-check.style.display = "none";   // check hidden
-doneBtn.style.display = "none"; // done hidden
-pop.style.display = "flex";
 
-// 🔄 spinner → success animation
-setTimeout(() => {
-  spin.style.display = "none";    // spinner OFF
-  check.style.display = "block";  // ✅ show
-  doneBtn.style.display = "block";
-}, 1200);
   
 
   window.closeTxPopup = function (){
