@@ -414,14 +414,13 @@ window.loadHistoryByDate = async () => {
     return;
   }
 
-  const startDate = new Date(selected);
-startDate.setHours(0, 0, 0, 0);
+  const start = Timestamp.fromDate(
+  new Date(selected + "T00:00:00")
+);
 
-const endDate = new Date(selected);
-endDate.setHours(23, 59, 59, 999);
-
-const start = Timestamp.fromDate(startDate);
-const end = Timestamp.fromDate(endDate);
+const end = Timestamp.fromDate(
+  new Date(selected + "T23:59:59")
+);
   const q = query(
     collection(db, "transactions"),
     where("userId", "==", WALLET),
