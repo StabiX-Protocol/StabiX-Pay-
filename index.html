@@ -664,16 +664,23 @@ window.approveReq = async (reqId)=>{
   const time = document.getElementById("txTime");
   const doneBtn = document.getElementById("txDoneBtn");
 
-  // message + time
-  txt.innerText = msg;
-  time.innerText = new Date().toLocaleString();
+// message + time
+txt.innerText = msg;
+time.innerText = new Date().toLocaleString();
 
-  // ✅ FINAL STATE (NO TIMER)
-  spin.style.display = "none";      // ❌ spinner band
-  check.style.display = "block";    // ✅ success
-  doneBtn.style.display = "block";  // ✅ DONE button
-  pop.style.display = "flex";
-  }
+// 🎬 INITIAL STATE
+spin.style.display = "block";   // spinner ON
+check.style.display = "none";   // check hidden
+doneBtn.style.display = "none"; // done hidden
+pop.style.display = "flex";
+
+// 🔄 spinner → success animation
+setTimeout(() => {
+  spin.style.display = "none";    // spinner OFF
+  check.style.display = "block";  // ✅ show
+  doneBtn.style.display = "block";
+}, 1200);
+  
 
   window.closeTxPopup = function (){
   const pop = document.getElementById("txPopup");
