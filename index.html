@@ -406,33 +406,59 @@ async function loadHistory() {
   renderHistoryFromSnap(snap, "No transactions");
 }
 
-window.loadHistoryByDate = async () => {
-  const selected = document.getElementById("historyDate")?.value;
+  window.loadHistoryByDate = async () => {
+  const selected = document.getElementById("historyDate").value;
+  if (!selected) return;
 
-  if (!selected) {
-    loadHistory(); // fallback
-    return;
-  }
-
-  const start = Timestamp.fromDate(
-  new Date(selected + "T00:00:00")
-);
-
-const end = Timestamp.fromDate(
-  new Date(selected + "T23:59:59")
-);
+  // 🔥 Firestore se sirf user ki saari history lao
   const q = query(
     collection(db, "transactions"),
     where("userId", "==", WALLET),
-    where("createdAt", ">=", start),
-    where("createdAt", "<=", end)
+    orderBy("createdAt", "asc") // oldest → newest
   );
 
   const snap = await getDocs(q);
-  // ✅ SORT IN JS (SAFE)
-const docs = snap.docs.sort((a,b)=>
-  a.data().createdAt.toMillis() - b.data().createdAt.toMillis()
-);
+
+  let html = "";
+
+  snap.forEach(d => {
+    const t = d.data();
+    if (!t.createdAt) return;
+
+    // 🔥 Firestore UTC → Local (India) date
+    const txDate = t.createdAt
+      .toDate()
+      .toLocaleDateString("en-CA"); // YYYY-MM-DD
+
+    // ❌ agar selected date match nahi hui → skip
+    if (txDate !== selected) return;
+
+    const isDW = t.type === "deposit" || t.type === "withdraw";
+    const isCredit = isDW ? t.type === "deposit" : t.type === "received";
+
+    const sign = isCredit ? "+" : "-";
+    const color = isCredit ? "#22c55e" : "#ef4444";
+
+    const meta = isDW
+      ? t.type.toUpperCase()
+      : (isCredit
+          ? `${t.counterparty} → ${WALLET}`
+          : `${WALLET} → ${t.counterparty}`);
+
+    html += `
+      <div class="tx" style="color:${color}">
+        <b>${sign}${t.amount} USDC</b><br>
+        <span class="small">
+          ${meta}<br>
+          ${t.createdAt.toDate().toLocaleString()}
+        </span>
+      </div>
+    `;
+  });
+
+  document.getElementById("history").innerHTML =
+    html || "<span class='small'>No transactions for this date</span>";
+};
   renderHistoryFromSnap(snap, "No transactions for this date");
 };
 
