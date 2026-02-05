@@ -276,7 +276,7 @@ const today = `${yyyy}-${mm}-${dd}`;
     </div>
   `);
 
-  loadHistoryByDate();
+  loadHistory();
   // 🎉 RECEIVE POPUP (one-time)
 try{
   const q = query(
@@ -406,57 +406,30 @@ async function loadHistory() {
   renderHistoryFromSnap(snap, "No transactions");
 }
 
-  window.loadHistoryByDate = async () => {
-  const selected = document.getElementById("historyDate").value;
-  if (!selected) return;
+window.loadHistoryByDate = async () => {
+  const selected = document.getElementById("historyDate")?.value;
 
-  // 🔥 Firestore se sirf user ki saari history lao
+  if (!selected) {
+    loadHistory(); // fallback
+    return;
+  }
+
+  const startDate = new Date(selected);
+startDate.setHours(0, 0, 0, 0);
+
+const endDate = new Date(selected);
+endDate.setHours(23, 59, 59, 999);
+
+const start = Timestamp.fromDate(startDate);
+const end = Timestamp.fromDate(endDate);
   const q = query(
     collection(db, "transactions"),
     where("userId", "==", WALLET),
-    
+    where("createdAt", ">=", start),
+    where("createdAt", "<=", end)
+  );
+
   const snap = await getDocs(q);
-
-  let html = "";
-
-  snap.forEach(d => {
-    const t = d.data();
-    if (!t.createdAt) return;
-
-    // 🔥 Firestore UTC → Local (India) date
-    const txDate = t.createdAt
-      .toDate()
-      .toLocaleDateString("en-CA"); // YYYY-MM-DD
-
-    // ❌ agar selected date match nahi hui → skip
-    if (txDate !== selected) return;
-
-    const isDW = t.type === "deposit" || t.type === "withdraw";
-    const isCredit = isDW ? t.type === "deposit" : t.type === "received";
-
-    const sign = isCredit ? "+" : "-";
-    const color = isCredit ? "#22c55e" : "#ef4444";
-
-    const meta = isDW
-      ? t.type.toUpperCase()
-      : (isCredit
-          ? `${t.counterparty} → ${WALLET}`
-          : `${WALLET} → ${t.counterparty}`);
-
-    html += `
-      <div class="tx" style="color:${color}">
-        <b>${sign}${t.amount} USDC</b><br>
-        <span class="small">
-          ${meta}<br>
-          ${t.createdAt.toDate().toLocaleString()}
-        </span>
-      </div>
-    `;
-  });
-
-  document.getElementById("history").innerHTML =
-    html || "<span class='small'>No transactions for this date</span>";
-};
   renderHistoryFromSnap(snap, "No transactions for this date");
 };
 
