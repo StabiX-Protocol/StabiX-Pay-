@@ -400,7 +400,6 @@ async function loadHistory() {
   const q = query(
     collection(db, "transactions"),
     where("userId", "==", WALLET)
-    orderBy("createdAt", "asc")
   );
 
   const snap = await getDocs(q);
@@ -428,10 +427,13 @@ const end = Timestamp.fromDate(endDate);
     where("userId", "==", WALLET),
     where("createdAt", ">=", start),
     where("createdAt", "<=", end)
-    orderBy("createdAt", "asc")
   );
 
   const snap = await getDocs(q);
+  // ✅ SORT IN JS (SAFE)
+const docs = snap.docs.sort((a,b)=>
+  a.data().createdAt.toMillis() - b.data().createdAt.toMillis()
+);
   renderHistoryFromSnap(snap, "No transactions for this date");
 };
 
