@@ -257,16 +257,25 @@ const today = `${yyyy}-${mm}-${dd}`;
       <p class="small">${WALLET}</p>
 
 <div class="small" style="margin-top:6px">
-  <b>EOA Wallet:</b>
-  <span id="eoaText">
-    ${user.eoaAddress ? user.eoaAddress : "Not added"}
-  </span>
-  <span
-    style="margin-left:6px;cursor:pointer;color:#60a5fa"
-    onclick="editEOA()"
-  >
-    ${user.eoaAddress ? "✏️" : "➕"}
-  </span>
+  <b>EOA Wallet:</b><br>
+
+  ${
+    user.eoaAddress
+      ? `
+        <span style="color:#22c55e">
+          ${user.eoaAddress}
+          <span style="margin-left:6px">🔒</span>
+        </span>
+      `
+      : `
+        <span
+          style="color:#60a5fa;cursor:pointer"
+          onclick="editEOA()"
+        >
+          + Add EOA Wallet
+        </span>
+      `
+  }
 </div>
       <button
   onclick="softRefresh()"
@@ -796,18 +805,24 @@ if (doneBtnEl) {
 };
   // ================= EOA WALLET =================
 window.editEOA = async ()=>{
-  const current = (await getDoc(userRef)).data()?.eoaAddress || "";
-  
+  const snap = await getDoc(userRef);
+  const current = snap.data()?.eoaAddress;
+
   const addr = prompt(
     "Enter your EOA Wallet Address",
-    current
+    current || ""
   );
 
   if(!addr) return;
 
-  // basic validation (length check)
   if(addr.length < 20){
     alert("Invalid wallet address");
+    return;
+  }
+
+  // 🔒 LOCK
+  if (current) {
+    alert("EOA wallet already locked");
     return;
   }
 
@@ -815,7 +830,8 @@ window.editEOA = async ()=>{
     eoaAddress: addr.trim()
   });
 
-  renderApp(); // soft refresh, no logout
+  alert("EOA wallet locked successfully");
+  renderApp();
 };
     
 /* ================= UTIL ================= */
