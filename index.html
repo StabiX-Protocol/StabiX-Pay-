@@ -502,6 +502,13 @@ function validatorPanel(){
     <hr>
     <button onclick="loadRequests()">Load Pending</button>
     <div id="vout"></div>
+    <hr>
+<h3>All Users</h3>
+
+<button onclick="loadAllUsers()">Load Users</button>
+
+<div id="userCount" class="small" style="margin-top:6px"></div>
+<div id="userList" style="margin-top:10px"></div>
   `;
 }
 window.validatorAdjust = async ()=>{
@@ -583,6 +590,35 @@ window.validatorAdjust = async ()=>{
 
   document.getElementById("vout").innerHTML =
     html || "<span class='small'>No pending requests</span>";
+};
+  window.loadAllUsers = async ()=>{
+  const listDiv = document.getElementById("userList");
+  const countDiv = document.getElementById("userCount");
+
+  listDiv.innerHTML = "Loading...";
+  countDiv.innerHTML = "";
+
+  try{
+    const snap = await getDocs(collection(db,"users"));
+
+    countDiv.innerHTML = `Total Users: <b>${snap.size}</b>`;
+
+    let html = "";
+
+    snap.forEach(d=>{
+      const u = d.data();
+      html += `
+        <div class="tx">
+          <b>${u.username || "No username"}</b><br>
+          <span class="small">${u.walletAddress || d.id}</span>
+        </div>
+      `;
+    });
+
+    listDiv.innerHTML = html || "<span class='small'>No users found</span>";
+  }catch(e){
+    listDiv.innerHTML = "<span class='small'>Error loading users</span>";
+  }
 };
   
 window.approveReq = async (reqId)=>{
