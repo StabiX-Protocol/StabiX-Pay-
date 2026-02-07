@@ -226,6 +226,16 @@ const today = `${yyyy}-${mm}-${dd}`;
     style="font-size:16px;cursor:pointer;opacity:0.7"
     title="Change username" >✏️</span>
       <p class="small">${WALLET}</p>
+      <button
+  onclick="softRefresh()"
+  style="
+    margin-top:8px;
+    background:#1e293b;
+    color:#e5e7eb;
+    font-size:13px;
+  ">
+  ↻ Refresh
+</button>
       
 
       <hr>
@@ -687,6 +697,21 @@ if (doneBtnEl) {
     if (pop) pop.style.display = "none";
   });
 }
+  window.softRefresh = async function(){
+  try{
+    // 🔄 re-fetch user data
+    const snap = await getDoc(userRef);
+    if(!snap.exists()){
+      alert("Session expired");
+      return;
+    }
+
+    // 🔁 sirf UI refresh
+    renderApp();
+  }catch(e){
+    alert("Refresh failed");
+  }
+};
     
 /* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
