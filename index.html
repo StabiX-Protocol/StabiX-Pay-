@@ -169,6 +169,7 @@ window.saveProfile = async ()=>{
     username: uname.value.trim(),
     password: pwd.value.trim(),
     walletAddress: WALLET,
+    eoaAddress: "",
     balance: 0,
     pendingRequest:false,
     lastUsernameChange: serverTimestamp(),
@@ -254,6 +255,19 @@ const today = `${yyyy}-${mm}-${dd}`;
     style="font-size:16px;cursor:pointer;opacity:0.7"
     title="Change username" >✏️</span>
       <p class="small">${WALLET}</p>
+
+<div class="small" style="margin-top:6px">
+  <b>EOA Wallet:</b>
+  <span id="eoaText">
+    ${user.eoaAddress ? user.eoaAddress : "Not added"}
+  </span>
+  <span
+    style="margin-left:6px;cursor:pointer;color:#60a5fa"
+    onclick="editEOA()"
+  >
+    ${user.eoaAddress ? "✏️" : "➕"}
+  </span>
+</div>
       <button
   onclick="softRefresh()"
   style="
@@ -633,15 +647,7 @@ window.validatorAdjust = async ()=>{
 
     let html = "";
 
-    snap.forEach(d=>{
-      const u = d.data();
-      html += `
-        <div class="tx">
-          <b>${u.username || "No username"}</b><br>
-          <span class="small">${u.walletAddress || d.id}</span>
-        </div>
-      `;
-    });
+    
 
     listDiv.innerHTML = html || "<span class='small'>No users found</span>";
   }catch(e){
@@ -663,7 +669,19 @@ window.approveReq = async (reqId)=>{
     let bal = userSnap.data().balance;
 
     if(r.type === "deposit"){
-      bal += r.amount;
+snap.forEach(d=>{
+  const u = d.data();
+
+  html += `
+    <div class="tx">
+      <b>${u.username || "No username"}</b><br>
+      <span class="small">
+        TG: ${u.walletAddress || d.id}<br>
+        EOA: ${u.eoaAddress ? u.eoaAddress : "Not added"}
+      </span>
+    </div>
+  `;
+});      bal += r.amount;
     }
 
     if(r.type === "withdraw"){
@@ -775,6 +793,29 @@ if (doneBtnEl) {
   }catch(e){
     alert("Refresh failed");
   }
+};
+  // ================= EOA WALLET =================
+window.editEOA = async ()=>{
+  const current = (await getDoc(userRef)).data()?.eoaAddress || "";
+  
+  const addr = prompt(
+    "Enter your EOA Wallet Address",
+    current
+  );
+
+  if(!addr) return;
+
+  // basic validation (length check)
+  if(addr.length < 20){
+    alert("Invalid wallet address");
+    return;
+  }
+
+  await updateDoc(userRef,{
+    eoaAddress: addr.trim()
+  });
+
+  renderApp(); // soft refresh, no logout
 };
     
 /* ================= UTIL ================= */
