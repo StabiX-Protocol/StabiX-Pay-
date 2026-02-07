@@ -656,11 +656,34 @@ window.validatorAdjust = async ()=>{
 
     let html = "";
 
-    
+    snap.forEach(d=>{
+      const u = d.data();
 
-    listDiv.innerHTML = html || "<span class='small'>No users found</span>";
+      const username = u.username ? u.username : "No username";
+      const tgWallet = u.walletAddress ? u.walletAddress : d.id;
+      const eoa = u.eoaAddress ? u.eoaAddress : "Not added";
+
+      html += `
+        <div class="tx">
+          <b>${username}</b><br>
+
+          <span class="small">
+            TG: ${tgWallet}
+          </span><br>
+
+          <span class="small">
+            EOA: ${eoa}
+          </span>
+        </div>
+      `;
+    });
+
+    listDiv.innerHTML =
+      html || "<span class='small'>No users found</span>";
+
   }catch(e){
-    listDiv.innerHTML = "<span class='small'>Error loading users</span>";
+    listDiv.innerHTML =
+      "<span class='small'>Error loading users</span>";
   }
 };
   
