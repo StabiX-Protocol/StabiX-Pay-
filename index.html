@@ -555,48 +555,48 @@ renderApp()
   }
 window.submitWithdraw = async ()=>{
 
-const type = "withdraw";
-const amount = Number(wdAmount.value);
-const wallet = wdWallet.value.trim();
+  const amount = Number(document.getElementById("wdAmount").value);
+  const wallet = document.getElementById("wdWallet").value.trim();
 
-if(!amount || amount<=0 || !wallet)
-return alert("Invalid input");
+  if(!amount || amount <= 0 || !wallet){
+    alert("Invalid input");
+    return;
+  }
 
-const snap = await getDoc(userRef);
+  const snap = await getDoc(userRef);
 
-// frozen check
-if(snap.data().pendingRequest){
-alert("Your account is frozen. Pending request under review.");
-return;
-}
+  // frozen account check
+  if(snap.data().pendingRequest){
+    alert("Your account is frozen. Pending request under review.");
+    return;
+  }
 
-// balance check
-if(amount > snap.data().balance){
-alert("Insufficient balance");
-return;
-}
+  // balance check
+  if(amount > snap.data().balance){
+    alert("Insufficient balance");
+    return;
+  }
 
-await addDoc(collection(db,"requests"),{
-userId: WALLET,
-type,
-amount,
-walletAddress: wallet,
-txHash:"",
-status:"pending",
-createdAt: serverTimestamp()
-});
+  await addDoc(collection(db,"requests"),{
+    userId: WALLET,
+    type: "withdraw",
+    amount: amount,
+    walletAddress: wallet,
+    txHash: "",
+    status: "pending",
+    createdAt: serverTimestamp()
+  });
 
-// freeze account
-await updateDoc(userRef,{ pendingRequest:true });
+  // freeze account until validator decision
+  await updateDoc(userRef,{ pendingRequest:true });
 
-tg.showPopup({
-title:"Request Submitted",
-message:"Wait for Validator Verification",
-buttons:[{type:"ok"}]
-})
+  tg.showPopup({
+    title:"Request Submitted",
+    message:"Wait for Validator Verification",
+    buttons:[{type:"ok"}]
+  });
 
-renderApp();
-
+  renderApp();
 };
   
 /* ================= HISTORY ================= */
