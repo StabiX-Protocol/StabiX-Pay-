@@ -14,13 +14,104 @@
     .small { font-size:12px; opacity:.7; }
     .tx { font-size:13px; border-bottom:1px dashed #1e293b; padding:6px 0; }
     .warn { color:#facc15; font-size:13px; }
+    /* ===== Transaction Popup ===== */
+.tx-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.tx-card {
+  background:#020617;
+  border-radius:18px;
+  padding:30px 25px;
+  text-align:center;
+  width:320px;
+  max-width:90%;
+  animation: scaleIn .25s ease;
+}
+.spinner {
+  width:60px;
+  height:60px;
+  border:5px solid #1e293b;
+  border-top:5px solid #22c55e;
+  border-radius:50%;
+  margin:0 auto 15px;
+  animation: spin 1s linear infinite;
+}
+
+.check {
+  font-size:42px;
+  color:#22c55e;
+  display:none;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(.8); opacity:0 }
+  to { transform: scale(1); opacity:1 }
+}
   </style>
 </head>
 
 <body>
 <div id="app">Loading…</div>
+<!-- ===== Transaction Popup ===== -->
+<div id="txPopup" class="tx-popup">
+  <div class="tx-card">
+    <audio id="txSound" preload="auto">
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-confirmation-tone-2867.mp3" type="audio/mpeg">
+    </audio>
+    <div id="txSpinner" class="spinner"></div>
+    <div id="txCheck" class="check">✅</div>
+
+    <div id="txMsg" style="margin-top:10px;font-size:16px;"></div>
+    <div id="txTime" class="small" style="margin-top:6px;"></div>
+
+    <button id="txDoneBtn"
+      style="margin-top:16px;background:#22c55e;color:#022c22;font-weight:bold;display:none"
+      onclick="closeTxPopup()">
+      DONE
+    </button>
+  </div>
+</div>
 
 <script type="module">
+  // 🚫 BLOCK NORMAL BROWSER ACCESS (ONLY TELEGRAM ALLOWED)
+if (
+  !window.Telegram ||
+  !window.Telegram.WebApp ||
+  !window.Telegram.WebApp.initDataUnsafe ||
+  !window.Telegram.WebApp.initDataUnsafe.user
+) {
+  document.body.innerHTML = `
+    <div style="
+      background:#020617;
+      color:#e5e7eb;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-family:Arial;
+      padding:20px;
+    ">
+      <div>
+        <h2>⚠️ Access Denied</h2>
+        <p>This app works only inside Telegram.</p>
+        <p class="small">Please open it from the official Telegram bot.</p>
+      </div>
+    </div>
+  `;
+  throw new Error("Not opened inside Telegram");
+}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getFirestore, doc, setDoc, getDoc, updateDoc,
@@ -78,6 +169,7 @@ window.saveProfile = async ()=>{
     username: uname.value.trim(),
     password: pwd.value.trim(),
     walletAddress: WALLET,
+    eoaAddress: "",
     balance: 0,
     pendingRequest:false,
     lastUsernameChange: serverTimestamp(),
@@ -163,6 +255,38 @@ const today = `${yyyy}-${mm}-${dd}`;
     style="font-size:16px;cursor:pointer;opacity:0.7"
     title="Change username" >✏️</span>
       <p class="small">${WALLET}</p>
+
+<div class="small" style="margin-top:6px">
+  <b>EOA Wallet:</b><br>
+
+  ${
+    user.eoaAddress
+      ? `
+        <span style="color:#22c55e">
+          ${user.eoaAddress}
+          <span style="margin-left:6px"></span>
+        </span>
+      `
+      : `
+        <span
+          style="color:#60a5fa;cursor:pointer"
+          onclick="editEOA()"
+        >
+          + Add EOA Wallet
+        </span>
+      `
+  }
+</div>
+      <button
+  onclick="softRefresh()"
+  style="
+    margin-top:8px;
+    background:#1e293b;
+    color:#e5e7eb;
+    font-size:13px;
+  ">
+  ↻ Refresh
+</button>
       
 
       <hr>
@@ -179,23 +303,103 @@ const today = `${yyyy}-${mm}-${dd}`;
       <button onclick="sendUSDC()">Send</button>
       <hr>
        <hr>
+
 <h3>Deposit / Withdraw</h3>
 
-<select id="dwType" onchange="toggleDW()">
-  <option value="deposit">Deposit</option>
-  <option value="withdraw">Withdraw</option>
-</select>
+<div style="
+display:flex;
+gap:10px;
+margin-top:10px;
+">
 
-<input id="dwAmount" type="number" placeholder="Amount">
-<input id="dwWallet" placeholder="Wallet Address">
+<button onclick="openDeposit()" style="background:#22c55e;color:#022c22;font-weight:bold">
+Deposit
+</button>
 
-<div id="txHashBox">
-  <input id="dwTxHash" placeholder="Transaction Hash (Deposit only)">
+<button onclick="openWithdraw()" style="background:#ef4444;color:white;font-weight:bold">
+Withdraw
+</button>
+
 </div>
 
-<button onclick="submitDW()">Submit</button>
+<div id="depositBox" style="
+display:none;
+margin-top:10px;
+padding:10px;
+background:#020617;
+border:1px solid #1e293b;
+border-radius:12px;
+">
 
+<select id="networkSelect" onchange="showVault()">
+  <option value="">Select Network</option>
+  <option value="sepolia">Ethereum (Sepolia)</option>
+</select>
 
+<div id="vaultSection" style="display:none;margin-top:10px">
+
+<div class="small">Vault Address:</div>
+
+<div style="display:flex;align-items:center;gap:8px;width:100%">
+
+<span style="
+color:#60a5fa;
+font-size:12px;
+word-break:break-all;
+flex:1;
+">
+0x710c5D40a97123903b7cB482dBe39EB35D52af0a
+</span>
+
+<button onclick="copyVault()" style="
+width:auto;
+padding:6px 10px;
+font-size:12px;
+flex-shrink:0;
+">
+Copy
+</button>
+
+</div>
+
+<button onclick="showDepositForm()" style="background:#22c55e;color:#022c22;font-weight:bold">
+Submit Deposit Proof 
+</button>
+
+<div id="depositForm" style="display:none;margin-top:10px">
+
+<input id="depAmount" type="number" placeholder="Amount">
+
+<input id="depHash" placeholder="Transaction Hash">
+
+<button onclick="submitDeposit()">Submit Deposit</button>
+
+</div>
+</div>
+
+</div>
+<div id="withdrawBox" style="display:none;margin-top:10px">
+
+<div class="small">Withdraw Address:</div>
+
+<div style="
+background:#020617;
+border:1px solid #1e293b;
+padding:10px;
+border-radius:8px;
+margin-top:6px;
+word-break:break-all;
+">
+
+${user.eoaAddress ? user.eoaAddress : "No EOA wallet registered"}
+
+</div>
+
+<input id="wdAmount" type="number" placeholder="Amount">
+
+<button onclick="submitWithdraw()">Request Withdraw</button>
+
+</div>
       <hr>
       <h3>Transaction History</h3>
 
@@ -213,11 +417,43 @@ const today = `${yyyy}-${mm}-${dd}`;
     </div>
   `);
 
-  loadHistory();
+  loadHistoryByDate();
+  // 🎉 RECEIVE POPUP (one-time)
+try{
+  const q = query(
+    collection(db,"transactions"),
+    where("userId","==",WALLET),
+    orderBy("createdAt","desc")
+  );
+
+  const snap = await getDocs(q);
+  if(!snap.empty){
+    const docSnap = snap.docs[0];
+    const t = docSnap.data();
+
+    // sirf received ke liye
+    if(t.type === "received"){
+      const key = "rx_" + docSnap.id;
+
+      // ek hi baar popup
+      if(!sessionStorage.getItem(key)){
+        showTxPopup(`Received ${t.amount} USDC from ${t.counterparty}`);
+        sessionStorage.setItem(key,"1");
+      }
+    }
+  }
+}catch(e){
+  console.log("Receive popup error", e);
+}
 }
 
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
+  const snap = await getDoc(userRef);
+if(snap.data().pendingRequest){
+  alert("Account frozen. Wait for validator approval.");
+  return;
+}
   const toWallet = sendTo.value.trim();
   const amount = Number(sendAmt.value);
   if(!toWallet || amount<=0) return alert("Invalid input");
@@ -244,44 +480,93 @@ window.sendUSDC = async ()=>{
         userId: toWallet, type:"received", amount, counterparty:WALLET, createdAt:serverTimestamp()
       });
     });
+    showTxPopup(`Sent ${amount} USDC to ${toWallet}`);
     renderApp();
   }catch(e){ alert(e); }
 };
   /*===============Deposit & Withdraw Logic======*/
-  window.toggleDW = ()=>{
-  const type = document.getElementById("dwType").value;
-  document.getElementById("txHashBox").style.display =
-    type === "deposit" ? "block" : "none";
-};
+window.openDeposit = ()=>{
+const box = document.getElementById("depositBox")
 
-window.submitDW = async ()=>{
-  const type = dwType.value;
-  const amount = Number(dwAmount.value);
-  const wallet = dwWallet.value.trim();
-  const txHash = dwTxHash?.value || "";
+if(box.style.display==="block"){
+box.style.display="none"
+}else{
+box.style.display="block"
+}
 
-  if(!amount || amount<=0 || !wallet)
-    return alert("Invalid input");
+document.getElementById("withdrawBox").style.display="none"
+}
+  window.openWithdraw = ()=>{
+const box = document.getElementById("withdrawBox")
 
-  if(type==="deposit" && !txHash)
-    return alert("Transaction hash required for deposit");
+if(box.style.display==="block"){
+box.style.display="none"
+}else{
+box.style.display="block"
+}
 
-  await addDoc(collection(db,"requests"),{
-    userId: WALLET,
-    type,
-    amount,
-    walletAddress: wallet,
-    txHash: type==="deposit" ? txHash : "",
-    status:"pending",
-    createdAt: serverTimestamp()
-  });
-
-  await updateDoc(userRef,{ pendingRequest:true });
-
-  alert(type.toUpperCase()+" request submitted");
-};
+document.getElementById("depositBox").style.display="none"
+  }
   
-/* ================= HISTORY ================= */
+  window.showVault = ()=>{
+const net = document.getElementById("networkSelect").value
+const vault = document.getElementById("vaultSection")
+
+if(net==="sepolia"){
+vault.style.display="block"
+}else{
+vault.style.display="none"
+}
+  }
+  window.copyVault = ()=>{
+navigator.clipboard.writeText("0x710c5D40a97123903b7cB482dBe39EB35D52af0a")
+alert("Vault address copied")
+  }
+  window.showDepositForm = ()=>{
+document.getElementById("depositForm").style.display="block"
+  }
+
+window.submitDeposit = async ()=>{
+
+const amount = depAmount.value.trim()
+const txHash = depHash.value.trim()
+
+
+if(!amount || Number(amount) <= 0){
+alert("Enter valid amount")
+return
+}
+// Ethereum tx hash validation
+if(!txHash.startsWith("0x") || txHash.length !== 66){
+alert("Invalid Transaction Hash")
+return
+}
+
+if(txHash.length !== 66){
+alert("Invalid transaction hash")
+return
+}
+
+await addDoc(collection(db,"requests"),{
+userId: WALLET,
+type:"deposit",
+amount: Number(amount),
+walletAddress:"",
+txHash: txHash,
+status:"pending",
+createdAt: serverTimestamp()
+})
+
+await updateDoc(userRef,{ pendingRequest:true })
+
+alert("Deposit request sent to validator")
+
+renderApp()
+
+  }
+  
+
+  
 /* ================= HISTORY ================= */
 
 async function loadHistory() {
@@ -319,6 +604,53 @@ const end = Timestamp.fromDate(endDate);
 
   const snap = await getDocs(q);
   renderHistoryFromSnap(snap, "No transactions for this date");
+};
+  window.submitWithdraw = async ()=>{
+
+  const amount = Number(document.getElementById("wdAmount").value);
+
+  const snap = await getDoc(userRef);
+  const user = snap.data();
+
+  if(!user.eoaAddress){
+    alert("Please register EOA wallet first");
+    return;
+  }
+
+  if(!amount || amount <= 0){
+    alert("Enter valid amount");
+    return;
+  }
+
+  if(user.pendingRequest){
+    alert("Account frozen. Pending request under review.");
+    return;
+  }
+
+  if(amount > user.balance){
+    alert("Insufficient balance");
+    return;
+  }
+
+  await addDoc(collection(db,"requests"),{
+    userId: WALLET,
+    type:"withdraw",
+    amount: amount,
+    walletAddress: user.eoaAddress,
+    txHash:"",
+    status:"pending",
+    createdAt: serverTimestamp()
+  });
+
+  await updateDoc(userRef,{ pendingRequest:true });
+
+  tg.showPopup({
+    title:"Request Submitted",
+    message:"Wait for Validator Verification",
+    buttons:[{type:"ok"}]
+  });
+
+  renderApp();
 };
 
 /* ================= HISTORY RENDER ================= */
@@ -372,12 +704,21 @@ function validatorPanel(){
       <option value="withdraw">Withdraw</option>
     </select>
     <input id="vAmount" type="number" placeholder="Amount">
+    <button onclick="checkUserBalance()">Check Balance</button>
+<div id="balanceOut" class="small" style="margin-top:8px"></div>
 
     <button onclick="validatorAdjust()">Apply</button>
 
     <hr>
     <button onclick="loadRequests()">Load Pending</button>
     <div id="vout"></div>
+    <hr>
+<h3>All Users</h3>
+
+<button onclick="loadAllUsers()">Load Users</button>
+
+<div id="userCount" class="small" style="margin-top:6px"></div>
+<div id="userList" style="margin-top:10px"></div>
   `;
 }
 window.validatorAdjust = async ()=>{
@@ -423,7 +764,255 @@ window.validatorAdjust = async ()=>{
     alert("Validator error: " + e);
   }
 };
+  window.loadRequests = async ()=>{
+  const q = query(
+    collection(db,"requests"),
+    where("status","==","pending")
+  );
 
+  const snap = await getDocs(q);
+  let html = "";
+
+  snap.forEach(d=>{
+    const r = d.data();
+
+    const time = r.createdAt
+      ? r.createdAt.toDate().toLocaleString()
+      : "";
+
+    html += `
+      <div class="tx">
+        <b>${r.type.toUpperCase()} ${r.amount} USDC</b><br>
+
+        <span class="small">
+          User ID: ${r.userId}<br>
+          Wallet: ${r.walletAddress}<br>
+          ${r.txHash ? `Tx Hash: ${r.txHash}<br>` : ""}
+          Time: ${time}
+        </span>
+
+        <br><br>
+        <button onclick="approveReq('${d.id}')">Approve</button>
+        <button onclick="rejectReq('${d.id}')">Reject</button>
+      </div>
+    `;
+  });
+
+  document.getElementById("vout").innerHTML =
+    html || "<span class='small'>No pending requests</span>";
+};
+  window.loadAllUsers = async ()=>{
+  const listDiv = document.getElementById("userList");
+  const countDiv = document.getElementById("userCount");
+
+  listDiv.innerHTML = "Loading...";
+  countDiv.innerHTML = "";
+
+  try{
+    const snap = await getDocs(collection(db,"users"));
+
+    countDiv.innerHTML = `Total Users: <b>${snap.size}</b>`;
+
+    let html = "";
+
+    snap.forEach(d=>{
+      const u = d.data();
+
+      const username = u.username ? u.username : "No username";
+      const tgWallet = u.walletAddress ? u.walletAddress : d.id;
+      const eoa = u.eoaAddress ? u.eoaAddress : "Not added";
+
+      html += `
+        <div class="tx">
+          <b>${username}</b><br>
+
+          <span class="small">
+            TG: ${tgWallet}
+          </span><br>
+
+          <span class="small">
+            EOA: ${eoa}
+          </span>
+        </div>
+      `;
+    });
+
+    listDiv.innerHTML =
+      html || "<span class='small'>No users found</span>";
+
+  }catch(e){
+    listDiv.innerHTML =
+      "<span class='small'>Error loading users</span>";
+  }
+};
+  window.approveReq = async (reqId)=>{
+
+  const reqRef = doc(db,"requests",reqId);
+
+  await runTransaction(db, async(tx)=>{
+
+    const reqSnap = await tx.get(reqRef);
+    if(!reqSnap.exists()) throw "Request not found";
+
+    const r = reqSnap.data();
+
+    const userRefX = doc(db,"users",r.userId);
+    const userSnap = await tx.get(userRefX);
+
+    if(!userSnap.exists()) throw "User not found";
+
+    let bal = userSnap.data().balance || 0;
+
+    // Deposit approve
+    if(r.type === "deposit"){
+      bal = bal + r.amount;
+    }
+
+    // Withdraw approve
+    if(r.type === "withdraw"){
+      if(bal < r.amount) throw "Insufficient balance";
+      bal = bal - r.amount;
+    }
+
+    // update user
+    tx.update(userRefX,{
+      balance: bal,
+      pendingRequest:false
+    });
+
+    // mark request approved
+    tx.update(reqRef,{
+      status:"approved"
+    });
+
+    // add transaction history
+    tx.set(doc(collection(db,"transactions")),{
+      userId: r.userId,
+      type: r.type,
+      amount: r.amount,
+      counterparty:"VALIDATOR",
+      createdAt: serverTimestamp()
+    });
+
+  });
+
+  alert("Request approved");
+  loadRequests();
+};
+
+  window.rejectReq = async (reqId)=>{
+  const reqRef = doc(db,"requests",reqId);
+  const snap = await getDoc(reqRef);
+
+  await updateDoc(doc(db,"users", snap.data().userId),{
+    pendingRequest:false   // 🔓 UNFREEZE
+  });
+
+  await updateDoc(reqRef,{ status:"rejected" });
+
+  alert("Rejected");
+  loadRequests();
+  renderApp();
+};
+  window.checkUserBalance = async ()=>{
+  const uid = document.getElementById("vUser").value.trim();
+  const out = document.getElementById("balanceOut");
+
+  if(!uid){
+    out.innerText = "Enter User ID";
+    return;
+  }
+
+  try{
+    const snap = await getDoc(doc(db,"users",uid));
+    if(!snap.exists()){
+      out.innerText = "User not found";
+      return;
+    }
+
+    out.innerText =
+      `Balance: ${snap.data().balance.toFixed(2)} USDC`;
+  }catch(e){
+    out.innerText = "Error fetching balance";
+  }
+};
+  function showTxPopup(msg){
+  const pop = document.getElementById("txPopup");
+  const spin = document.getElementById("txSpinner");
+  const check = document.getElementById("txCheck");
+  const txt = document.getElementById("txMsg");
+  const time = document.getElementById("txTime");
+  const doneBtn = document.getElementById("txDoneBtn");
+
+  // message + time
+  txt.innerText = msg;
+  time.innerText = new Date().toLocaleString();
+
+  // ✅ FINAL STATE (NO TIMER)
+  spin.style.display = "none";      // ❌ spinner band
+  check.style.display = "block";    // ✅ success
+  doneBtn.style.display = "block";  // ✅ DONE button
+  pop.style.display = "flex";
+  }
+
+  window.closeTxPopup = function (){
+  const pop = document.getElementById("txPopup");
+  if(pop) pop.style.display = "none";
+};
+  // ✅ DONE button handler (module-safe)
+const doneBtnEl = document.getElementById("txDoneBtn");
+if (doneBtnEl) {
+  doneBtnEl.addEventListener("click", () => {
+    const pop = document.getElementById("txPopup");
+    if (pop) pop.style.display = "none";
+  });
+}
+  window.softRefresh = async function(){
+  try{
+    // 🔄 re-fetch user data
+    const snap = await getDoc(userRef);
+    if(!snap.exists()){
+      alert("Session expired");
+      return;
+    }
+
+    // 🔁 sirf UI refresh
+    renderApp();
+  }catch(e){
+    alert("Refresh failed");
+  }
+};
+  // ================= EOA WALLET =================
+window.editEOA = async ()=>{
+  const snap = await getDoc(userRef);
+  const current = snap.data()?.eoaAddress;
+
+  const addr = prompt(
+    "Enter your EOA Wallet Address",
+    current || ""
+  );
+
+  if(!addr) return;
+
+  if(addr.length < 20){
+    alert("Invalid wallet address");
+    return;
+  }
+
+  // 🔒 LOCK
+  if (current) {
+    alert("EOA wallet already locked");
+    return;
+  }
+
+  await updateDoc(userRef,{
+    eoaAddress: addr.trim()
+  });
+
+  alert("EOA wallet locked successfully");
+  renderApp();
+};
+    
 /* ================= UTIL ================= */
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
 
