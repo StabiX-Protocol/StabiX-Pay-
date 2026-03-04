@@ -322,7 +322,14 @@ Withdraw
 
 </div>
 
-<div id="depositBox" style="display:none;margin-top:10px">
+<div id="depositBox" style="
+display:none;
+margin-top:10px;
+padding:10px;
+background:#020617;
+border:1px solid #1e293b;
+border-radius:12px;
+">
 
 <select id="networkSelect" onchange="showVault()">
   <option value="">Select Network</option>
@@ -468,14 +475,27 @@ if(snap.data().pendingRequest){
 };
   /*===============Deposit & Withdraw Logic======*/
 window.openDeposit = ()=>{
-document.getElementById("depositBox").style.display="block"
-document.getElementById("withdrawBox").style.display="none"
+const box = document.getElementById("depositBox")
+
+if(box.style.display==="block"){
+box.style.display="none"
+}else{
+box.style.display="block"
 }
 
-window.openWithdraw = ()=>{
-document.getElementById("withdrawBox").style.display="block"
-document.getElementById("depositBox").style.display="none"
+document.getElementById("withdrawBox").style.display="none"
 }
+  window.openWithdraw = ()=>{
+const box = document.getElementById("withdrawBox")
+
+if(box.style.display==="block"){
+box.style.display="none"
+}else{
+box.style.display="block"
+}
+
+document.getElementById("depositBox").style.display="none"
+  }
   window.showVault = ()=>{
 const net = document.getElementById("networkSelect").value
 const vault = document.getElementById("vaultSection")
