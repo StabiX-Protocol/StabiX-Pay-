@@ -859,22 +859,6 @@ window.approveReq = async (reqId)=>{
 
     let bal = userSnap.data().balance;
 
-    if(r.type === "deposit"){
-snap.forEach(d=>{
-  const u = d.data();
-
-  html += `
-    <div class="tx">
-      <b>${u.username || "No username"}</b><br>
-      <span class="small">
-        TG: ${u.walletAddress || d.id}<br>
-        EOA: ${u.eoaAddress ? u.eoaAddress : "Not added"}
-      </span>
-    </div>
-  `;
-});      bal += r.amount;
-    }
-
     if(r.type === "withdraw"){
       if(bal < r.amount) throw "Insufficient balance";
       bal -= r.amount;
