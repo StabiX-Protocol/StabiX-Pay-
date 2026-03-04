@@ -566,8 +566,14 @@ buttons:[{type:"ok"}]
 const amount = depAmount.value.trim()
 const txHash = depHash.value.trim()
 
+
 if(!amount || Number(amount) <= 0){
 alert("Enter valid amount")
+return
+}
+// Ethereum tx hash validation
+if(!txHash.startsWith("0x") || txHash.length !== 66){
+alert("Invalid Transaction Hash")
 return
 }
 
