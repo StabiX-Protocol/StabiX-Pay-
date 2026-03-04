@@ -515,7 +515,7 @@ alert("Vault address copied")
 document.getElementById("depositForm").style.display="block"
   }
 
-window.submitDW = async ()=>{
+window.submitWithdraw = async ()=>{
 const type = "withdraw";
   const amount = Number(dwAmount.value);
   const wallet = dwWallet.value.trim();
