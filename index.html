@@ -845,49 +845,61 @@ window.validatorAdjust = async ()=>{
       "<span class='small'>Error loading users</span>";
   }
 };
-  
-window.approveReq = async (reqId)=>{
+  window.approveReq = async (reqId)=>{
+
   const reqRef = doc(db,"requests",reqId);
 
   await runTransaction(db, async(tx)=>{
+
     const reqSnap = await tx.get(reqRef);
     if(!reqSnap.exists()) throw "Request not found";
 
     const r = reqSnap.data();
-    const userRefX = doc(db,"users", r.userId);
+
+    const userRefX = doc(db,"users",r.userId);
     const userSnap = await tx.get(userRefX);
 
-    let bal = userSnap.data().balance;
+    if(!userSnap.exists()) throw "User not found";
 
-    if(r.type === "withdraw"){
-      if(bal < r.amount) throw "Insufficient balance";
-      bal -= r.amount;
+    let bal = userSnap.data().balance || 0;
+
+    // Deposit approve
+    if(r.type === "deposit"){
+      bal = bal + r.amount;
     }
 
-    // 🔓 UNFREEZE USER + UPDATE BALANCE
+    // Withdraw approve
+    if(r.type === "withdraw"){
+      if(bal < r.amount) throw "Insufficient balance";
+      bal = bal - r.amount;
+    }
+
+    // update user
     tx.update(userRefX,{
       balance: bal,
-      pendingRequest: false
+      pendingRequest:false
     });
 
-    // ✅ MARK REQUEST APPROVED
+    // mark request approved
     tx.update(reqRef,{
-      status: "approved"
+      status:"approved"
     });
 
-    // 🧾 TRANSACTION ENTRY
+    // add transaction history
     tx.set(doc(collection(db,"transactions")),{
       userId: r.userId,
       type: r.type,
       amount: r.amount,
-      counterparty: "VALIDATOR",
+      counterparty:"VALIDATOR",
       createdAt: serverTimestamp()
     });
+
   });
 
   alert("Request approved");
   loadRequests();
 };
+
   window.rejectReq = async (reqId)=>{
   const reqRef = doc(db,"requests",reqId);
   const snap = await getDoc(reqRef);
