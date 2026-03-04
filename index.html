@@ -380,14 +380,26 @@ Submit Deposit Proof
 </div>
 <div id="withdrawBox" style="display:none;margin-top:10px">
 
-<input id="wdAmount" type="number" placeholder="Amount">
+<div class="small">Withdraw Address:</div>
 
-<input id="wdWallet" placeholder="Wallet Address">
+<div style="
+background:#020617;
+border:1px solid #1e293b;
+padding:10px;
+border-radius:8px;
+margin-top:6px;
+word-break:break-all;
+">
+
+${user.eoaAddress ? user.eoaAddress : "No EOA wallet registered"}
+
+</div>
+
+<input id="wdAmount" type="number" placeholder="Amount">
 
 <button onclick="submitWithdraw()">Request Withdraw</button>
 
 </div>
-
       <hr>
       <h3>Transaction History</h3>
 
@@ -552,51 +564,7 @@ alert("Deposit request sent to validator")
 renderApp()
 
   }
-  window.submitWithdraw = async ()=>{
-
-  const amount = Number(document.getElementById("wdAmount").value);
-  const wallet = document.getElementById("wdWallet").value.trim();
-
-  if(!amount || amount <= 0 || !wallet){
-    alert("Invalid input");
-    return;
-  }
-
-  const snap = await getDoc(userRef);
-
-  // frozen account check
-  if(snap.data().pendingRequest){
-    alert("Your account is frozen. Pending request under review.");
-    return;
-  }
-
-  // balance check
-  if(amount > snap.data().balance){
-    alert("Insufficient balance");
-    return;
-  }
-
-  await addDoc(collection(db,"requests"),{
-    userId: WALLET,
-    type: "withdraw",
-    amount: amount,
-    walletAddress: wallet,
-    txHash: "",
-    status: "pending",
-    createdAt: serverTimestamp()
-  });
-
-  // freeze account until validator decision
-  await updateDoc(userRef,{ pendingRequest:true });
-
-  tg.showPopup({
-    title:"Request Submitted",
-    message:"Wait for Validator Verification",
-    buttons:[{type:"ok"}]
-  });
-
-  renderApp();
-};
+  
 
   
 /* ================= HISTORY ================= */
@@ -636,6 +604,53 @@ const end = Timestamp.fromDate(endDate);
 
   const snap = await getDocs(q);
   renderHistoryFromSnap(snap, "No transactions for this date");
+};
+  window.submitWithdraw = async ()=>{
+
+  const amount = Number(document.getElementById("wdAmount").value);
+
+  const snap = await getDoc(userRef);
+  const user = snap.data();
+
+  if(!user.eoaAddress){
+    alert("Please register EOA wallet first");
+    return;
+  }
+
+  if(!amount || amount <= 0){
+    alert("Enter valid amount");
+    return;
+  }
+
+  if(user.pendingRequest){
+    alert("Account frozen. Pending request under review.");
+    return;
+  }
+
+  if(amount > user.balance){
+    alert("Insufficient balance");
+    return;
+  }
+
+  await addDoc(collection(db,"requests"),{
+    userId: WALLET,
+    type:"withdraw",
+    amount: amount,
+    walletAddress: user.eoaAddress,
+    txHash:"",
+    status:"pending",
+    createdAt: serverTimestamp()
+  });
+
+  await updateDoc(userRef,{ pendingRequest:true });
+
+  tg.showPopup({
+    title:"Request Submitted",
+    message:"Wait for Validator Verification",
+    buttons:[{type:"ok"}]
+  });
+
+  renderApp();
 };
 
 /* ================= HISTORY RENDER ================= */
