@@ -563,25 +563,33 @@ buttons:[{type:"ok"}]
 };
   window.submitDeposit = async ()=>{
 
-const amount = Number(depAmount.value)
+const amount = depAmount.value.trim()
 const txHash = depHash.value.trim()
 
-if(!amount || !txHash)
-return alert("Invalid deposit")
+if(!amount || Number(amount) <= 0){
+alert("Enter valid amount")
+return
+}
+
+if(txHash.length !== 66){
+alert("Invalid transaction hash")
+return
+}
 
 await addDoc(collection(db,"requests"),{
 userId: WALLET,
 type:"deposit",
-amount,
+amount: Number(amount),
 walletAddress:"",
-txHash,
+txHash: txHash,
 status:"pending",
 createdAt: serverTimestamp()
 })
 
 await updateDoc(userRef,{ pendingRequest:true })
 
-alert("Deposit request sent")
+alert("Deposit request sent to validator")
+
 renderApp()
 
   }
