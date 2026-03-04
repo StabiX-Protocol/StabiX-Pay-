@@ -303,22 +303,46 @@ const today = `${yyyy}-${mm}-${dd}`;
       <button onclick="sendUSDC()">Send</button>
       <hr>
        <hr>
+
 <h3>Deposit / Withdraw</h3>
 
-<select id="dwType" onchange="toggleDW()">
-  <option value="deposit">Deposit</option>
-  <option value="withdraw">Withdraw</option>
-</select>
-
-<input id="dwAmount" type="number" placeholder="Amount">
-<input id="dwWallet" placeholder="Wallet Address">
-
-<div id="txHashBox">
-  <input id="dwTxHash" placeholder="Transaction Hash (Deposit only)">
+<div style="display:flex;gap:10px">
+<button onclick="openDeposit()">Deposit</button>
+<button onclick="openWithdraw()">Withdraw</button>
 </div>
 
-<button onclick="submitDW()">Submit</button>
+<div id="depositBox" style="display:none;margin-top:10px">
 
+<div class="small">Network: Ethereum Sepolia</div>
+
+<div class="small" style="margin-top:6px">
+Vault Address:<br>
+<span style="color:#60a5fa">
+0x710c5D40a97123903b7cB482dBe39EB35D52af0a
+</span>
+</div>
+
+<button onclick="approveUSDC()">Approve USDC</button>
+
+<input id="depAmount" type="number" placeholder="Amount">
+
+<button onclick="depositVault()">Deposit to Vault</button>
+
+<input id="depHash" placeholder="Transaction Hash">
+
+<button onclick="submitDeposit()">Submit Deposit</button>
+
+</div>
+
+<div id="withdrawBox" style="display:none;margin-top:10px">
+
+<input id="wdAmount" type="number" placeholder="Amount">
+
+<input id="wdWallet" placeholder="Wallet Address">
+
+<button onclick="submitWithdraw()">Request Withdraw</button>
+
+</div>
 
       <hr>
       <h3>Transaction History</h3>
@@ -405,11 +429,15 @@ if(snap.data().pendingRequest){
   }catch(e){ alert(e); }
 };
   /*===============Deposit & Withdraw Logic======*/
-  window.toggleDW = ()=>{
-  const type = document.getElementById("dwType").value;
-  document.getElementById("txHashBox").style.display =
-    type === "deposit" ? "block" : "none";
-};
+window.openDeposit = ()=>{
+document.getElementById("depositBox").style.display="block"
+document.getElementById("withdrawBox").style.display="none"
+}
+
+window.openWithdraw = ()=>{
+document.getElementById("withdrawBox").style.display="block"
+document.getElementById("depositBox").style.display="none"
+}
 
 window.submitDW = async ()=>{
   const type = dwType.value;
@@ -454,7 +482,6 @@ window.submitDW = async ()=>{
   renderApp();
 };
   
-/* ================= HISTORY ================= */
 /* ================= HISTORY ================= */
 
 async function loadHistory() {
