@@ -384,7 +384,7 @@ I Have Deposited USDC
 
 <input id="wdWallet" placeholder="Wallet Address">
 
-<button onclick="submitWithdraw()">Request Withdraw</button>
+<button onclick="submitDW()">Request Withdraw</button>
 
 </div>
 </div>
@@ -516,7 +516,7 @@ document.getElementById("depositForm").style.display="block"
   }
 
 window.submitDW = async ()=>{
-  const type = dwType.value;
+const type = "withdraw";
   const amount = Number(dwAmount.value);
   const wallet = dwWallet.value.trim();
   const txHash = dwTxHash?.value || "";
@@ -561,6 +561,30 @@ buttons:[{type:"ok"}]
 })
   renderApp();
 };
+  window.submitDeposit = async ()=>{
+
+const amount = Number(depAmount.value)
+const txHash = depHash.value.trim()
+
+if(!amount || !txHash)
+return alert("Invalid deposit")
+
+await addDoc(collection(db,"requests"),{
+userId: WALLET,
+type:"deposit",
+amount,
+walletAddress:"",
+txHash,
+status:"pending",
+createdAt: serverTimestamp()
+})
+
+await updateDoc(userRef,{ pendingRequest:true })
+
+alert("Deposit request sent")
+renderApp()
+
+  }
   
 /* ================= HISTORY ================= */
 
