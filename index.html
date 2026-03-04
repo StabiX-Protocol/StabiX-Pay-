@@ -355,9 +355,13 @@ Copy
 
 </div>
 
-<input id="depAmount" type="number" placeholder="Amount">
+<button onclick="showDepositForm()" style="background:#22c55e;color:#022c22;font-weight:bold">
+I Have Deposited USDC
+</button>
 
-<button onclick="depositVault()">Deposit to Vault</button>
+<div id="depositForm" style="display:none;margin-top:10px">
+
+<input id="depAmount" type="number" placeholder="Amount">
 
 <input id="depHash" placeholder="Transaction Hash">
 
@@ -486,6 +490,9 @@ vault.style.display="none"
 navigator.clipboard.writeText("0x710c5D40a97123903b7cB482dBe39EB35D52af0a")
 alert("Vault address copied")
   }
+  window.showDepositForm = ()=>{
+document.getElementById("depositForm").style.display="block"
+  }
 
 window.submitDW = async ()=>{
   const type = dwType.value;
@@ -526,7 +533,11 @@ window.submitDW = async ()=>{
   // 🔒 FREEZE ACCOUNT
   await updateDoc(userRef,{ pendingRequest:true });
 
-  alert(type.toUpperCase()+" request submitted. Account frozen.");
+  tg.showPopup({
+title:"Request Submitted",
+message:"Wait for Validator Verification",
+buttons:[{type:"ok"}]
+})
   renderApp();
 };
   
