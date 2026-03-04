@@ -515,53 +515,7 @@ alert("Vault address copied")
 document.getElementById("depositForm").style.display="block"
   }
 
-window.submitWithdraw = async ()=>{
-const type = "withdraw";
-  const amount = Number(dwAmount.value);
-  const wallet = dwWallet.value.trim();
-  const txHash = dwTxHash?.value || "";
-
-  if(!amount || amount<=0 || !wallet)
-    return alert("Invalid input");
-
-  const snap = await getDoc(userRef);
-
-  // 🔒 already frozen
-  if(snap.data().pendingRequest){
-    alert("Your account is frozen. Pending request under review.");
-    return;
-  }
-
-  // ❌ withdraw > balance
-  if(type==="withdraw" && amount > snap.data().balance){
-    alert("Insufficient balance");
-    return;
-  }
-
-  if(type==="deposit" && !txHash)
-    return alert("Transaction hash required for deposit");
-
-  await addDoc(collection(db,"requests"),{
-    userId: WALLET,
-    type,
-    amount,
-    walletAddress: wallet,
-    txHash: type==="deposit" ? txHash : "",
-    status:"pending",
-    createdAt: serverTimestamp()
-  });
-
-  // 🔒 FREEZE ACCOUNT
-  await updateDoc(userRef,{ pendingRequest:true });
-
-  tg.showPopup({
-title:"Request Submitted",
-message:"Wait for Validator Verification",
-buttons:[{type:"ok"}]
-})
-  renderApp();
-};
-  window.submitDeposit = async ()=>{
+window.submitDeposit = async ()=>{
 
 const amount = depAmount.value.trim()
 const txHash = depHash.value.trim()
@@ -599,6 +553,51 @@ alert("Deposit request sent to validator")
 renderApp()
 
   }
+window.submitWithdraw = async ()=>{
+
+const type = "withdraw";
+const amount = Number(wdAmount.value);
+const wallet = wdWallet.value.trim();
+
+if(!amount || amount<=0 || !wallet)
+return alert("Invalid input");
+
+const snap = await getDoc(userRef);
+
+// frozen check
+if(snap.data().pendingRequest){
+alert("Your account is frozen. Pending request under review.");
+return;
+}
+
+// balance check
+if(amount > snap.data().balance){
+alert("Insufficient balance");
+return;
+}
+
+await addDoc(collection(db,"requests"),{
+userId: WALLET,
+type,
+amount,
+walletAddress: wallet,
+txHash:"",
+status:"pending",
+createdAt: serverTimestamp()
+});
+
+// freeze account
+await updateDoc(userRef,{ pendingRequest:true });
+
+tg.showPopup({
+title:"Request Submitted",
+message:"Wait for Validator Verification",
+buttons:[{type:"ok"}]
+})
+
+renderApp();
+
+};
   
 /* ================= HISTORY ================= */
 
