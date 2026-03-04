@@ -307,13 +307,62 @@ const today = `${yyyy}-${mm}-${dd}`;
 <h3>Deposit / Withdraw</h3>
 
 <div style="display:flex;gap:10px">
-<button onclick="openDeposit()">Deposit</button>
-<button onclick="openWithdraw()">Withdraw</button>
+
+<button 
+onclick="openDeposit()"
+style="background:#22c55e;color:#022c22;font-weight:bold">
+Deposit
+</button>
+
+<button 
+onclick="openWithdraw()"
+style="background:#ef4444;color:white;font-weight:bold">
+Withdraw
+</button>
+
 </div>
 
 <div id="depositBox" style="display:none;margin-top:10px">
 
-<div class="small">Network: Ethereum Sepolia</div>
+<select id="networkSelect" onchange="showVault()">
+  <option value="">Select Network</option>
+  <option value="sepolia">Ethereum Sepolia</option>
+</select>
+
+<div id="vaultSection" style="display:none;margin-top:10px">
+
+<div class="small">Vault Address:</div>
+
+<span style="color:#60a5fa">
+0x710c5D40a97123903b7cB482dBe39EB35D52af0a
+</span>
+
+<button onclick="copyVault()">Copy</button>
+
+<input id="depAmount" type="number" placeholder="Amount">
+
+<button onclick="depositVault()">Deposit to Vault</button>
+
+<input id="depHash" placeholder="Transaction Hash">
+
+<button onclick="submitDeposit()">Submit Deposit</button>
+
+</div>
+
+<div class="small">Vault Address:</div>
+
+<div style="display:flex;align-items:center;gap:8px">
+<span style="color:#60a5fa;font-size:12px">
+0x710c5D40a97123903b7cB482dBe39EB35D52af0a
+</span>
+
+<button onclick="navigator.clipboard.writeText('0x710c5D40a97123903b7cB482dBe39EB35D52af0a')"
+style="width:auto;padding:6px 10px;font-size:12px">
+Copy
+</button>
+</div>
+
+</div>
 
 <div class="small" style="margin-top:6px">
 Vault Address:<br>
@@ -321,8 +370,6 @@ Vault Address:<br>
 0x710c5D40a97123903b7cB482dBe39EB35D52af0a
 </span>
 </div>
-
-<button onclick="approveUSDC()">Approve USDC</button>
 
 <input id="depAmount" type="number" placeholder="Amount">
 
@@ -438,6 +485,16 @@ window.openWithdraw = ()=>{
 document.getElementById("withdrawBox").style.display="block"
 document.getElementById("depositBox").style.display="none"
 }
+  window.showVault = ()=>{
+const net = document.getElementById("networkSelect").value
+const vault = document.getElementById("vaultSection")
+
+if(net==="sepolia"){
+vault.style.display="block"
+}else{
+vault.style.display="none"
+}
+  }
 
 window.submitDW = async ()=>{
   const type = dwType.value;
