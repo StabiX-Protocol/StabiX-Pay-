@@ -333,42 +333,14 @@ Withdraw
 
 <div class="small">Vault Address:</div>
 
-<span style="color:#60a5fa">
-0x710c5D40a97123903b7cB482dBe39EB35D52af0a
-</span>
-
-<button onclick="copyVault()">Copy</button>
-
-<input id="depAmount" type="number" placeholder="Amount">
-
-<button onclick="depositVault()">Deposit to Vault</button>
-
-<input id="depHash" placeholder="Transaction Hash">
-
-<button onclick="submitDeposit()">Submit Deposit</button>
-
-</div>
-
-<div class="small">Vault Address:</div>
-
 <div style="display:flex;align-items:center;gap:8px">
 <span style="color:#60a5fa;font-size:12px">
 0x710c5D40a97123903b7cB482dBe39EB35D52af0a
 </span>
 
-<button onclick="navigator.clipboard.writeText('0x710c5D40a97123903b7cB482dBe39EB35D52af0a')"
-style="width:auto;padding:6px 10px;font-size:12px">
+<button onclick="copyVault()" style="width:auto;padding:6px 10px;font-size:12px">
 Copy
 </button>
-</div>
-
-</div>
-
-<div class="small" style="margin-top:6px">
-Vault Address:<br>
-<span style="color:#60a5fa">
-0x710c5D40a97123903b7cB482dBe39EB35D52af0a
-</span>
 </div>
 
 <input id="depAmount" type="number" placeholder="Amount">
@@ -380,6 +352,9 @@ Vault Address:<br>
 <button onclick="submitDeposit()">Submit Deposit</button>
 
 </div>
+
+</div>
+
 
 <div id="withdrawBox" style="display:none;margin-top:10px">
 
