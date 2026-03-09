@@ -344,6 +344,7 @@ const dd = String(now.getDate()).padStart(2,"0");
 const today = `${yyyy}-${mm}-${dd}`;
   appDiv(`
     <div class="box">
+    <div class="refreshIcon" onclick="softRefresh()">↻</div>
     <div class="walletHeader">
 
 <div>
@@ -370,7 +371,6 @@ ${user.eoaAddress ? user.eoaAddress : "Not added"}
 <div class="balanceBig">
 ${user.balance.toFixed(2)} USDC
 </div>
-<div class="refreshIcon" onclick="softRefresh()">↻</div>
    
 <div class="walletActions">
 <div class="walletAction" onclick="showSend()">
