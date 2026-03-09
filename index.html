@@ -490,6 +490,16 @@ try{
   console.log("Receive popup error", e);
 }
 }
+  /*=============UI Interface Of Balance Name ========*/
+  window.toggleProfile = ()=>{
+const box = document.getElementById("profileHidden")
+
+if(box.style.display === "block"){
+box.style.display = "none"
+}else{
+box.style.display = "block"
+}
+  }
 
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
