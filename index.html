@@ -557,7 +557,7 @@ box.style.display = "block"
   window.showSend = ()=>{
 
 document.body.innerHTML += `
-<div style="
+<div id="sendPopup" style="
 position:fixed;
 top:0;
 left:0;
@@ -648,6 +648,8 @@ Close
 
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
+  const popup = document.getElementById("sendPopup");
+if(popup) popup.remove();
   const snap = await getDoc(userRef);
 if(snap.data().pendingRequest){
   alert("Account frozen. Wait for validator approval.");
