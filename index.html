@@ -647,8 +647,6 @@ Close
 
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
-  const popup = document.getElementById("sendPopup");
-if(popup) popup.remove();
   const snap = await getDoc(userRef);
 if(snap.data().pendingRequest){
   alert("Account frozen. Wait for validator approval.");
