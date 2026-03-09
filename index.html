@@ -347,6 +347,20 @@ ${user.username}
 <span class="arrow">▼</span>
 </div>
 
+<div id="profileHidden" class="profileHidden">
+
+<div class="small">
+TG ID<br>
+${WALLET}
+</div>
+
+<div class="small" style="margin-top:10px">
+EOA Wallet<br>
+${user.eoaAddress ? user.eoaAddress : "Not added"}
+</div>
+
+</div>
+
 <div class="balanceBig">
 ${user.balance.toFixed(2)} USDC
 </div>
@@ -370,19 +384,7 @@ ${user.balance.toFixed(2)} USDC
 
 </div>
 
-<div id="profileHidden" class="profileHidden">
 
-<div class="small">
-TG ID<br>
-${WALLET}
-</div>
-
-<div class="small" style="margin-top:10px">
-EOA Wallet<br>
-${user.eoaAddress ? user.eoaAddress : "Not added"}
-</div>
-
-</div>
 
 <hr>
   
