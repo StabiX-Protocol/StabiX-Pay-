@@ -308,6 +308,28 @@ ${user.username}
 <div class="balanceBig">
 ${user.balance.toFixed(2)} USDC
 </div>
+<div style="
+display:flex;
+justify-content:space-around;
+margin-top:15px;
+">
+
+<div onclick="showSend()" style="text-align:center;cursor:pointer">
+<div style="font-size:24px">⬆️</div>
+<div class="small">Send</div>
+</div>
+
+<div onclick="showReceive()" style="text-align:center;cursor:pointer">
+<div style="font-size:24px">⬇️</div>
+<div class="small">Receive</div>
+</div>
+
+<div onclick="openScanner()" style="text-align:center;cursor:pointer">
+<div style="font-size:24px">📷</div>
+<div class="small">Scan</div>
+</div>
+
+</div>
 
 </div>
 
@@ -337,10 +359,7 @@ ${user.eoaAddress ? user.eoaAddress : "Not added"}
       }
 
       <hr>
-      <h3>Send USDC</h3>
-      <input id="sendTo" placeholder="Receiver Wallet (TG_xxx)">
-      <input id="sendAmt" type="number" placeholder="Amount">
-      <button onclick="sendUSDC()">Send</button>
+      
       <hr>
        <hr>
 
@@ -498,6 +517,97 @@ box.style.display = "block"
 }
 
 }
+  window.showSend = ()=>{
+
+document.body.innerHTML += `
+<div style="
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:#000000cc;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999;
+">
+
+<div style="
+background:#020617;
+padding:20px;
+border-radius:16px;
+width:300px;
+">
+
+<h3>Send USDC</h3>
+
+<input id="sendTo" placeholder="Receiver Wallet (TG_xxx)">
+
+<input id="sendAmt" type="number" placeholder="Amount">
+
+<button onclick="sendUSDC()">Send</button>
+
+<button onclick="location.reload()" style="margin-top:10px;background:#1e293b">
+Close
+</button>
+
+</div>
+</div>
+`
+
+  }
+  window.showReceive = ()=>{
+
+const wallet = WALLET
+
+const qr = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data="+wallet
+
+document.body.innerHTML += `
+<div style="
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:#000000cc;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999;
+">
+
+<div style="
+background:#020617;
+padding:20px;
+border-radius:16px;
+text-align:center;
+width:300px;
+">
+
+<h3>Receive USDC</h3>
+
+<img src="${qr}" width="180"><br><br>
+
+<div class="small">Wallet ID</div>
+
+<div style="
+font-size:13px;
+word-break:break-all;
+margin-top:5px;
+">
+${wallet}
+</div>
+
+<button onclick="location.reload()" style="margin-top:15px">
+Close
+</button>
+
+</div>
+</div>
+`
+
+  }
 
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
@@ -536,6 +646,15 @@ if(snap.data().pendingRequest){
     renderApp();
   }catch(e){ alert(e); }
 };
+  window.openScanner = ()=>{
+
+tg.showPopup({
+title:"Scanner",
+message:"QR Scanner coming soon",
+buttons:[{type:"ok"}]
+})
+
+  }
   /*===============Deposit & Withdraw Logic======*/
 window.openDeposit = ()=>{
 const box = document.getElementById("depositBox")
