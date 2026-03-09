@@ -309,10 +309,6 @@ ${user.username}
 ${user.balance.toFixed(2)} USDC
 </div>
 
-<div class="balanceLabel">
-balance
-</div>
-
 </div>
 
 <div class="refreshIcon" onclick="softRefresh()">↻</div>
@@ -491,7 +487,8 @@ try{
 }
 }
   /*=============UI Interface Of Balance Name ========*/
-  window.toggleProfile = ()=>{
+  function toggleProfile(){
+
 const box = document.getElementById("profileHidden")
 
 if(box.style.display === "block"){
@@ -499,7 +496,8 @@ box.style.display = "none"
 }else{
 box.style.display = "block"
 }
-  }
+
+}
 
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
