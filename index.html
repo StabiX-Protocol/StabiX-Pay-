@@ -339,21 +339,23 @@ ${user.username}
 <div class="balanceBig">
 ${user.balance.toFixed(2)} USDC
 </div>
+   
 <div class="walletActions">
-
-<div onclick="showSend()" style="text-align:center;cursor:pointer">
-<div style="font-size:24px">⬆️</div>
-<div class="small">Send</div>
+<div class="walletAction" onclick="showSend()">
+<div class="walletActionIcon">⬆</div>
+<div class="walletActionLabel">Send</div>
 </div>
 
-<div onclick="showReceive()" style="text-align:center;cursor:pointer">
-<div style="font-size:24px">⬇️</div>
-<div class="small">Receive</div>
+<div class="walletAction" onclick="showReceive()">
+<div class="walletActionIcon">⬇</div>
+<div class="walletActionLabel">Receive</div>
 </div>
 
-<div onclick="openScanner()" style="text-align:center;cursor:pointer">
+<div class="walletAction" onclick="openScanner()">
 <div class="walletActionIcon">▣</div>
-<div class="small">Scan</div>
+<div class="walletActionLabel">Scan</div>
+</div>
+
 </div>
 
 </div>
