@@ -1161,15 +1161,19 @@ const txt = document.getElementById("txMsg");
 const time = document.getElementById("txTime");
 const doneBtn = document.getElementById("txDoneBtn");
 
+// message + time
 txt.innerText = msg;
 time.innerText = new Date().toLocaleString();
 
+// popup open
 pop.style.display = "flex";
 
+// START STATE
 spin.style.display = "block";
 check.style.display = "none";
 doneBtn.style.display = "none";
 
+// spinner → success
 setTimeout(()=>{
 
 spin.style.display = "none";
