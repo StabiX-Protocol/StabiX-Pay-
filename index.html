@@ -296,48 +296,45 @@ const dd = String(now.getDate()).padStart(2,"0");
 const today = `${yyyy}-${mm}-${dd}`;
   appDiv(`
     <div class="box">
-  <h2 style="margin:0">${user.username}</h2>
-  <span 
-    onclick="changeUsername()" 
-    style="font-size:16px;cursor:pointer;opacity:0.7"
-    title="Change username" >✏️</span>
-      <p class="small">${WALLET}</p>
+    <div class="walletHeader">
 
-<div class="small" style="margin-top:6px">
-  <b>EOA Wallet:</b><br>
+<div>
 
-  ${
-    user.eoaAddress
-      ? `
-        <span style="color:#22c55e">
-          ${user.eoaAddress}
-          <span style="margin-left:6px"></span>
-        </span>
-      `
-      : `
-        <span
-          style="color:#60a5fa;cursor:pointer"
-          onclick="editEOA()"
-        >
-          + Add EOA Wallet
-        </span>
-      `
-  }
+<div class="userRow" onclick="toggleProfile()">
+${user.username}
+<span class="arrow">▼</span>
 </div>
-      <button
-  onclick="softRefresh()"
-  style="
-    margin-top:8px;
-    background:#1e293b;
-    color:#e5e7eb;
-    font-size:13px;
-  ">
-  ↻ Refresh
-</button>
-      
 
-      <hr>
-      <b>Balance:</b> ${user.balance.toFixed(2)} USDC
+<div class="balanceBig">
+${user.balance.toFixed(2)} USDC
+</div>
+
+<div class="balanceLabel">
+balance
+</div>
+
+</div>
+
+<div class="refreshIcon" onclick="softRefresh()">↻</div>
+
+</div>
+
+<div id="profileHidden" class="profileHidden">
+
+<div class="small">
+TG ID<br>
+${WALLET}
+</div>
+
+<div class="small" style="margin-top:10px">
+EOA Wallet<br>
+${user.eoaAddress ? user.eoaAddress : "Not added"}
+</div>
+
+</div>
+
+<hr>
+  
       ${user.pendingRequest
   ? `<div class="warn"> Pending request under review</div>`
   : ""
