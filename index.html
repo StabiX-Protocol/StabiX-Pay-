@@ -58,7 +58,7 @@
   from { transform: scale(.8); opacity:0 }
   to { transform: scale(1); opacity:1 }
 }
-    /* ===== OKX STYLE WALLET HEADER ===== */
+    /* =====  WALLET STYLE HEADER ===== */
 
 .walletHeader{
 display:flex;
@@ -103,6 +103,36 @@ border-top:1px solid #1e293b;
 .refreshIcon{
 font-size:20px;
 cursor:pointer;
+opacity:.8;
+}
+    .walletActions{
+display:flex;
+justify-content:space-around;
+align-items:center;
+margin-top:18px;
+}
+
+.walletAction{
+display:flex;
+flex-direction:column;
+align-items:center;
+cursor:pointer;
+}
+
+.walletActionIcon{
+width:48px;
+height:48px;
+background:#1e293b;
+border-radius:12px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+}
+
+.walletActionLabel{
+font-size:13px;
+margin-top:6px;
 opacity:.8;
 }
   </style>
@@ -308,11 +338,7 @@ ${user.username}
 <div class="balanceBig">
 ${user.balance.toFixed(2)} USDC
 </div>
-<div style="
-display:flex;
-justify-content:space-around;
-margin-top:15px;
-">
+<div class="walletActions">
 
 <div onclick="showSend()" style="text-align:center;cursor:pointer">
 <div style="font-size:24px">⬆️</div>
@@ -357,12 +383,8 @@ ${user.eoaAddress ? user.eoaAddress : "Not added"}
   ? `<div class="warn"> Pending request under review</div>`
   : ""
       }
-
-      <hr>
       
       <hr>
-       <hr>
-
 <h3>Deposit / Withdraw</h3>
 
 <div style="
@@ -548,7 +570,7 @@ width:300px;
 
 <button onclick="sendUSDC()">Send</button>
 
-<button onclick="location.reload()" style="margin-top:10px;background:#1e293b">
+<button onclick="this.parentElement.parentElement.remove()"style="margin-top:10px;background:#1e293b">
 Close
 </button>
 
@@ -599,7 +621,7 @@ margin-top:5px;
 ${wallet}
 </div>
 
-<button onclick="location.reload()" style="margin-top:15px">
+<button onclick="this.parentElement.parentElement.remove()" style="margin-top:15px">
 Close
 </button>
 
