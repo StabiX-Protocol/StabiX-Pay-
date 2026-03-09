@@ -64,15 +64,21 @@ animation: spin 1s linear infinite;
 font-size:72px;
 color:#22c55e;
 display:none;
+animation: popTick .4s ease forwards;
 }
 
-@keyframes spin {
-  100% { transform: rotate(360deg); }
+@keyframes popTick{
+0%{
+transform:scale(0);
+opacity:0;
 }
-
-@keyframes scaleIn {
-  from { transform: scale(.8); opacity:0 }
-  to { transform: scale(1); opacity:1 }
+60%{
+transform:scale(1.2);
+opacity:1;
+}
+100%{
+transform:scale(1);
+opacity:1;
 }
     /* =====  WALLET STYLE HEADER ===== */
 .refreshIcon{
@@ -1147,22 +1153,31 @@ window.validatorAdjust = async ()=>{
   }
 };
   function showTxPopup(msg){
-  const pop = document.getElementById("txPopup");
-  const spin = document.getElementById("txSpinner");
-  const check = document.getElementById("txCheck");
-  const txt = document.getElementById("txMsg");
-  const time = document.getElementById("txTime");
-  const doneBtn = document.getElementById("txDoneBtn");
 
-  // message + time
-  txt.innerText = msg;
-  time.innerText = new Date().toLocaleString();
+const pop = document.getElementById("txPopup");
+const spin = document.getElementById("txSpinner");
+const check = document.getElementById("txCheck");
+const txt = document.getElementById("txMsg");
+const time = document.getElementById("txTime");
+const doneBtn = document.getElementById("txDoneBtn");
 
-  // ✅ FINAL STATE (NO TIMER)
-  spin.style.display = "none";      // ❌ spinner band
-  check.style.display = "block";    // ✅ success
-  doneBtn.style.display = "block";  // ✅ DONE button
-  pop.style.display = "flex";
+txt.innerText = msg;
+time.innerText = new Date().toLocaleString();
+
+pop.style.display = "flex";
+
+spin.style.display = "block";
+check.style.display = "none";
+doneBtn.style.display = "none";
+
+setTimeout(()=>{
+
+spin.style.display = "none";
+check.style.display = "block";
+doneBtn.style.display = "block";
+
+},1500);
+
   }
 
   window.closeTxPopup = function (){
