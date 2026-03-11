@@ -73,7 +73,7 @@ stroke:#1e293b;
 stroke-width:10;
 }
 
-/* green progress ring */
+/* green ring */
 
 .circle-progress{
 fill:none;
@@ -84,14 +84,7 @@ stroke-linecap:round;
 stroke-dasharray:326;
 stroke-dashoffset:326;
 
-/* smooth animation */
-
-animation:progressFill 0.9s cubic-bezier(.4,0,.2,1) forwards;
-animation-delay:.15s;
-
-/* glow */
-
-filter:drop-shadow(0 0 6px rgba(34,197,94,0.6));
+animation:progressFill 1s ease forwards;
 }
 
 /* tick */
@@ -107,7 +100,7 @@ stroke-dasharray:60;
 stroke-dashoffset:60;
 
 animation:tickDraw .35s ease forwards;
-animation-delay:1.05s;
+animation-delay:1s;
 }
 
 /* progress animation */
@@ -228,10 +221,11 @@ opacity:.85;
 <audio id="txSound" preload="auto">
 <source src="https://assets.mixkit.co/sfx/preview/mixkit-confirmation-tone-2867.mp3" type="audio/mpeg">
 </audio>
-
-<div id="txSpinner" class="spinner">
+<div class="spinner">
 
 <svg viewBox="0 0 120 120">
+
+<!-- grey background circle -->
 
 <circle
 class="circle-bg"
@@ -240,6 +234,8 @@ cy="60"
 r="52"
 />
 
+<!-- green progress -->
+
 <circle
 class="circle-progress"
 cx="60"
@@ -247,14 +243,17 @@ cy="60"
 r="52"
 />
 
-<path
+<!-- tick -->
+
+<polyline
 id="tick"
-d="M40 65 L55 80 L82 45"
+points="40,65 55,80 80,45"
 />
 
 </svg>
 
 </div>
+
 
 <div id="txMsg" style="margin-top:10px;font-size:16px;"></div>
 <div id="txTime" class="small" style="margin-top:6px;"></div>
