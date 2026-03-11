@@ -50,21 +50,32 @@ max-width:92%;
 animation: scaleIn .25s ease;
 }
   
-.spinner {
-width:110px;
-height:110px;
-border:8px solid #1e293b;
-border-top:8px solid #22c55e;
-border-radius:50%;
+.spinner{
+width:120px;
+height:120px;
 margin:0 auto 20px;
-animation: spin 1s linear infinite;
- }
+border-radius:50%;
+border:10px solid #1e293b;
+border-top:10px solid #22c55e;
+border-right:10px solid #22c55e;
+animation:spinGlow 0.8s linear infinite;
+box-shadow:0 0 20px rgba(34,197,94,0.35);
+}
 
-.check {
+@keyframes spinGlow{
+0%{
+transform:rotate(0deg);
+}
+100%{
+transform:rotate(360deg);
+}
+}
+
+.check{
 font-size:72px;
 color:#22c55e;
 display:none;
-animation: popTick .4s ease forwards;
+animation:popTick .35s ease forwards;
 }
 
 @keyframes popTick{
@@ -73,7 +84,7 @@ transform:scale(0);
 opacity:0;
 }
 60%{
-transform:scale(1.2);
+transform:scale(1.25);
 opacity:1;
 }
 100%{
@@ -1152,33 +1163,26 @@ window.validatorAdjust = async ()=>{
 };
   function showTxPopup(msg){
 
-const pop = document.getElementById("txPopup");
-const spin = document.getElementById("txSpinner");
-const check = document.getElementById("txCheck");
-const txt = document.getElementById("txMsg");
-const time = document.getElementById("txTime");
-const doneBtn = document.getElementById("txDoneBtn");
+const pop = document.getElementById("txPopup")
+const spin = document.getElementById("txSpinner")
+const check = document.getElementById("txCheck")
+const txt = document.getElementById("txMsg")
+const doneBtn = document.getElementById("txDoneBtn")
 
-// message + time
-txt.innerText = msg;
-time.innerText = new Date().toLocaleString();
+txt.innerText = msg
 
-// popup open
-pop.style.display = "flex";
+pop.style.display = "flex"
+spin.style.display = "block"
+check.style.display = "none"
+doneBtn.style.display = "none"
 
-// START STATE
-spin.style.display = "block";
-check.style.display = "none";
-doneBtn.style.display = "none";
-
-// spinner → success
 setTimeout(()=>{
 
-spin.style.display = "none";
-check.style.display = "block";
-doneBtn.style.display = "block";
+spin.style.display = "none"
+check.style.display = "block"
+doneBtn.style.display = "block"
 
-},1500);
+},1200)
 
   }
 
