@@ -1217,17 +1217,40 @@ const txt = document.getElementById("txMsg");
 const time = document.getElementById("txTime");
 const doneBtn = document.getElementById("txDoneBtn");
 
+const circle = document.querySelector(".circle-progress");
+const tick = document.querySelector("#tick");
+
 txt.innerText = msg;
 time.innerText = new Date().toLocaleString();
 
 pop.style.display = "flex";
 
-/* animation finish */
+/* reset animation */
+
+circle.style.animation = "none";
+tick.style.animation = "none";
+
+/* force reflow */
+
+circle.offsetHeight;
+
+/* start circle animation */
+
+circle.style.animation = "progressFill .9s cubic-bezier(.4,0,.2,1) forwards";
+
+/* tick after circle */
+
+setTimeout(()=>{
+tick.style.animation = "tickDraw .35s ease forwards";
+},900);
+
+/* show DONE button */
+
 setTimeout(()=>{
 doneBtn.style.display = "block";
 },1200);
 
-  }
+     }
 
   window.closeTxPopup = function (){
   const pop = document.getElementById("txPopup");
