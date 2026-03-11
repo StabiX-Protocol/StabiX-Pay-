@@ -103,6 +103,7 @@ stroke-linejoin:round;
 stroke-dasharray:60;
 stroke-dashoffset:60;
 
+opacity:0;   /* hide initially */
 animation:none;
 }
 
@@ -1241,6 +1242,7 @@ circle.style.animation = "progressFill .9s cubic-bezier(.4,0,.2,1) forwards";
 /* tick after circle */
 
 setTimeout(()=>{
+tick.style.opacity = "1";
 tick.style.animation = "tickDraw .35s ease forwards";
 },900);
 
