@@ -1225,26 +1225,20 @@ window.validatorAdjust = async ()=>{
 };
   function showTxPopup(msg){
 
-const pop = document.getElementById("txPopup")
-const spin = document.getElementById("txSpinner")
-const check = document.getElementById("txCheck")
-const txt = document.getElementById("txMsg")
-const doneBtn = document.getElementById("txDoneBtn")
+const pop = document.getElementById("txPopup");
+const txt = document.getElementById("txMsg");
+const time = document.getElementById("txTime");
+const doneBtn = document.getElementById("txDoneBtn");
 
-txt.innerText = msg
+txt.innerText = msg;
+time.innerText = new Date().toLocaleString();
 
-pop.style.display = "flex"
-spin.style.display = "block"
-check.style.display = "none"
-doneBtn.style.display = "none"
+pop.style.display = "flex";
 
+/* animation finish */
 setTimeout(()=>{
-
-spin.style.display = "none"
-check.style.display = "block"
-doneBtn.style.display = "block"
-
-},1200)
+doneBtn.style.display = "block";
+},1200);
 
   }
 
