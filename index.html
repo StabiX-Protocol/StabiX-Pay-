@@ -50,7 +50,7 @@ max-width:92%;
 animation:scaleIn .25s ease;
 box-shadow:0 0 40px rgba(0,0,0,0.6);
 }
-  .spinner{
+.spinner{
 width:140px;
 height:140px;
 margin:0 auto 25px;
@@ -59,54 +59,74 @@ margin:0 auto 25px;
 .spinner svg{
 width:100%;
 height:100%;
-animation:spin 1.2s linear infinite;
 }
 
-.track{
+/* grey circle */
+
+.circle-bg{
 fill:none;
 stroke:#1e293b;
-stroke-width:8;
+stroke-width:10;
 }
 
-.arc{
+/* green progress */
+
+.circle-progress{
 fill:none;
 stroke:#22c55e;
-stroke-width:8;
+stroke-width:10;
 stroke-linecap:round;
-stroke-dasharray:90 260;
-filter:drop-shadow(0 0 6px rgba(34,197,94,0.6));
+
+stroke-dasharray:326;
+stroke-dashoffset:326;
+
+animation:progressFill 1s ease forwards;
 }
 
-@keyframes spin{
+/* tick */
+
+#tick{
+fill:none;
+stroke:#22c55e;
+stroke-width:10;
+stroke-linecap:round;
+stroke-linejoin:round;
+
+stroke-dasharray:60;
+stroke-dashoffset:60;
+
+animation:tickDraw .35s ease forwards;
+animation-delay:1s;
+}
+
+/* circle animation */
+
+@keyframes progressFill{
+
 0%{
-transform:rotate(0deg);
+stroke-dashoffset:326;
 }
+
 100%{
-transform:rotate(360deg);
-}
-}
-
-.check{
-font-size:80px;
-color:#22c55e;
-display:none;
-animation:tickPop .35s ease forwards;
+stroke-dashoffset:0;
 }
 
-@keyframes tickPop{
+}
+
+/* tick animation */
+
+@keyframes tickDraw{
+
 0%{
-transform:scale(0);
-opacity:0;
+stroke-dashoffset:60;
 }
-60%{
-transform:scale(1.2);
-opacity:1;
-}
+
 100%{
-transform:scale(1);
-opacity:1;
+stroke-dashoffset:0;
 }
+
 }
+
     /* =====  WALLET STYLE HEADER ===== */
 .refreshIcon{
 font-size:15px;
@@ -192,29 +212,51 @@ opacity:.85;
 <body>
 <div id="app">Loading…</div>
 <!-- ===== Transaction Popup ===== -->
-<div id="txPopup" class="tx-popup">
+  <div id="txPopup" class="tx-popup">
   <div class="tx-card">
-    <audio id="txSound" preload="auto">
-  <source src="https://assets.mixkit.co/sfx/preview/mixkit-confirmation-tone-2867.mp3" type="audio/mpeg">
-    </audio>
-    <div id="txSpinner" class="spinner">
-<svg viewBox="0 0 100 100">
-<circle class="track" cx="50" cy="50" r="42"></circle>
-<circle class="arc" cx="50" cy="50" r="42"></circle>
+
+<audio id="txSound" preload="auto">
+<source src="https://assets.mixkit.co/sfx/preview/mixkit-confirmation-tone-2867.mp3" type="audio/mpeg">
+</audio>
+
+<div id="txSpinner" class="spinner">
+
+<svg viewBox="0 0 120 120">
+
+<circle
+class="circle-bg"
+cx="60"
+cy="60"
+r="52"
+/>
+
+<circle
+class="circle-progress"
+cx="60"
+cy="60"
+r="52"
+/>
+
+<path
+id="tick"
+d="M40 65 L55 80 L82 45"
+/>
+
 </svg>
-    </div>
-    <div id="txCheck" class="check">✅</div>
 
-    <div id="txMsg" style="margin-top:10px;font-size:16px;"></div>
-    <div id="txTime" class="small" style="margin-top:6px;"></div>
-
-    <button id="txDoneBtn"
-      style="margin-top:16px;background:#22c55e;color:#022c22;font-weight:bold;display:none"
-      onclick="closeTxPopup()">
-      DONE
-    </button>
-  </div>
 </div>
+
+<div id="txMsg" style="margin-top:10px;font-size:16px;"></div>
+<div id="txTime" class="small" style="margin-top:6px;"></div>
+
+<button id="txDoneBtn"
+style="margin-top:16px;background:#22c55e;color:#022c22;font-weight:bold;display:none"
+onclick="closeTxPopup()">
+DONE
+</button>
+
+</div>
+  </div>
 
 <script type="module">
   // 🚫 BLOCK NORMAL BROWSER ACCESS (ONLY TELEGRAM ALLOWED)
