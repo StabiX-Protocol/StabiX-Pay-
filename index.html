@@ -83,19 +83,12 @@ stroke-linecap:round;
 stroke-dasharray:326;
 stroke-dashoffset:326;
 
-/* rotate circle start point */
-
 transform:rotate(-90deg);
 transform-origin:50% 50%;
 
-/* animation */
+/* IMPORTANT FIX */
 
 animation:progressFill .9s cubic-bezier(.4,0,.2,1) forwards;
-animation-delay:.05s;
-
-/* smooth render */
-
-will-change:stroke-dashoffset;
 }
 
 /* tick */
@@ -111,34 +104,32 @@ stroke-dasharray:60;
 stroke-dashoffset:60;
 
 animation:tickDraw .35s ease forwards;
-animation-delay:.95s;
-
-will-change:stroke-dashoffset;
+animation-delay:.9s;
 }
 
-/* progress animation */
+/* progress */
 
 @keyframes progressFill{
 
-0%{
+from{
 stroke-dashoffset:326;
 }
 
-100%{
+to{
 stroke-dashoffset:0;
 }
 
 }
 
-/* tick animation */
+/* tick */
 
 @keyframes tickDraw{
 
-0%{
+from{
 stroke-dashoffset:60;
 }
 
-100%{
+to{
 stroke-dashoffset:0;
 }
 
