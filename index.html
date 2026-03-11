@@ -100,11 +100,11 @@ stroke-width:10;
 stroke-linecap:round;
 stroke-linejoin:round;
 
-stroke-dasharray:60;
-stroke-dashoffset:60;
+stroke-dasharray:1;
+stroke-dashoffset:1;
 
-display:none;
-animation:none;
+animation:tickDraw .35s ease forwards;
+animation-delay:.9s;
 }
 
 /* animations */
@@ -1217,9 +1217,14 @@ const pop = document.getElementById("txPopup");
 const txt = document.getElementById("txMsg");
 const time = document.getElementById("txTime");
 const doneBtn = document.getElementById("txDoneBtn");
+    const tick = document.querySelector("#tick");
+
+const len = tick.getTotalLength();
+
+tick.style.strokeDasharray = len;
+tick.style.strokeDashoffset = len;
 
 const circle = document.querySelector(".circle-progress");
-const tick = document.querySelector("#tick");
 
 txt.innerText = msg;
 time.innerText = new Date().toLocaleString();
