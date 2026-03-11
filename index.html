@@ -50,20 +50,34 @@ max-width:92%;
 animation:scaleIn .25s ease;
 box-shadow:0 0 40px rgba(0,0,0,0.6);
 }
-  
-.spinner{
-width:120px;
-height:120px;
-margin:0 auto 20px;
-border-radius:50%;
-border:10px solid #1e293b;
-border-top:10px solid #22c55e;
-border-right:10px solid #22c55e;
-animation:spinGlow 0.8s linear infinite;
-box-shadow:0 0 20px rgba(34,197,94,0.35);
+  .spinner{
+width:140px;
+height:140px;
+margin:0 auto 25px;
 }
 
-@keyframes spinGlow{
+.spinner svg{
+width:100%;
+height:100%;
+animation:spin 1.2s linear infinite;
+}
+
+.track{
+fill:none;
+stroke:#1e293b;
+stroke-width:8;
+}
+
+.arc{
+fill:none;
+stroke:#22c55e;
+stroke-width:8;
+stroke-linecap:round;
+stroke-dasharray:90 260;
+filter:drop-shadow(0 0 6px rgba(34,197,94,0.6));
+}
+
+@keyframes spin{
 0%{
 transform:rotate(0deg);
 }
@@ -73,19 +87,19 @@ transform:rotate(360deg);
 }
 
 .check{
-font-size:72px;
+font-size:80px;
 color:#22c55e;
 display:none;
-animation:popTick .35s ease forwards;
+animation:tickPop .35s ease forwards;
 }
 
-@keyframes popTick{
+@keyframes tickPop{
 0%{
 transform:scale(0);
 opacity:0;
 }
 60%{
-transform:scale(1.25);
+transform:scale(1.2);
 opacity:1;
 }
 100%{
@@ -183,7 +197,12 @@ opacity:.85;
     <audio id="txSound" preload="auto">
   <source src="https://assets.mixkit.co/sfx/preview/mixkit-confirmation-tone-2867.mp3" type="audio/mpeg">
     </audio>
-    <div id="txSpinner" class="spinner"></div>
+    <div id="txSpinner" class="spinner">
+<svg viewBox="0 0 100 100">
+<circle class="track" cx="50" cy="50" r="42"></circle>
+<circle class="arc" cx="50" cy="50" r="42"></circle>
+</svg>
+    </div>
     <div id="txCheck" class="check">✅</div>
 
     <div id="txMsg" style="margin-top:10px;font-size:16px;"></div>
