@@ -1259,63 +1259,54 @@ window.validatorAdjust = async ()=>{
     out.innerText = "Error fetching balance";
   }
 };
-  function showTxPopup(msg,type="success"){
+  window.showTxPopup = (msg,type="success")=>{
 
-const pop = document.getElementById("txPopup");
-const txt = document.getElementById("txMsg");
-const time = document.getElementById("txTime");
-const doneBtn = document.getElementById("txDoneBtn");
-    const tick = document.querySelector("#tick");
-const len = tick.getTotalLength();
-tick.style.strokeDasharray = len;
-tick.style.strokeDashoffset = len;
-const circle = document.querySelector(".circle-progress");
-txt.innerText = msg;
-time.innerText = new Date().toLocaleString();
-pop.style.display = "flex";
-/* reset animation */
-circle.style.animation = "none";
-tick.style.animation = "none";
-tick.style.display = "none";
-    /* force reflow */
-circle.offsetHeight;
-/* start circle animation */
-circle.style.animation = "progressFill .9s cubic-bezier(.4,0,.2,1) forwards";
-/* tick after circle */
-if(type==="success"){
-setTimeout(()=>{
-tick.style.display = "block";
-tick.style.animation = "tickDraw .35s ease forwards";
-},900);
-/* show DONE button */
-setTimeout(()=>{
-doneBtn.style.display = "block";
-},1200);
+const popup = document.getElementById("txPopup")
+const title = document.getElementById("txTitle")
+const msgBox = document.getElementById("txMsg")
+const tick = document.getElementById("tick")
+const c1 = document.getElementById("crossLine1")
+const c2 = document.getElementById("crossLine2")
+const ring = document.querySelector(".circle-progress")
+
+popup.style.display="flex"
+
+msgBox.innerText = msg
+
+ring.style.animation="progressFill .9s ease forwards"
+
+if(type==="failed"){
+
+title.innerText="Transaction Failed"
+title.style.color="#ef4444"
+
+tick.style.display="none"
+c1.style.display="block"
+c2.style.display="block"
+
+}else{
+
+title.innerText="Transaction Successful"
+title.style.color="#22c55e"
+
+tick.style.display="block"
+c1.style.display="none"
+c2.style.display="none"
+
 }
-    
-  if(type==="failed"){
 
-tick.style.display = "none";
-document.getElementById("txTitle").innerText = "Transaction Failed";
-document.getElementById("txTitle").style.color = "#ef4444";
-txt.innerText = "Insufficient Balance";
-time.innerText = "";
-document.getElementById("crossLine1").style.display = "block";
-document.getElementById("crossLine2").style.display = "block";
-circle.style.stroke = "#ef4444";
-doneBtn.innerText = "OK";
-doneBtn.style.background = "#ef4444";
 setTimeout(()=>{
-doneBtn.style.display = "block";
-},1200);
+document.getElementById("txDoneBtn").style.display="block"
+},900)
 
   }
-}
+  
 
-  window.closeTxPopup = function (){
-  const pop = document.getElementById("txPopup");
-  if(pop) pop.style.display = "none";
-};
+  window.closeTxPopup = ()=>{
+document.getElementById("txPopup").style.display="none"
+document.getElementById("txDoneBtn").style.display="none"
+  }
+  
   // ✅ DONE button handler (module-safe)
 const doneBtnEl = document.getElementById("txDoneBtn");
 if (doneBtnEl) {
