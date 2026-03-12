@@ -1252,50 +1252,36 @@ window.validatorAdjust = async ()=>{
     out.innerText = "Error fetching balance";
   }
 };
-  function showTxPopup(msg){
+  function showTxPopup(msg,type="success"){
 
 const pop = document.getElementById("txPopup");
 const txt = document.getElementById("txMsg");
 const time = document.getElementById("txTime");
 const doneBtn = document.getElementById("txDoneBtn");
     const tick = document.querySelector("#tick");
-
 const len = tick.getTotalLength();
-
 tick.style.strokeDasharray = len;
 tick.style.strokeDashoffset = len;
-
 const circle = document.querySelector(".circle-progress");
-
 txt.innerText = msg;
 time.innerText = new Date().toLocaleString();
-
 pop.style.display = "flex";
-
 /* reset animation */
-
 circle.style.animation = "none";
 tick.style.animation = "none";
 tick.style.display = "none";
-    
-
-/* force reflow */
-
+    /* force reflow */
 circle.offsetHeight;
-
 /* start circle animation */
-
 circle.style.animation = "progressFill .9s cubic-bezier(.4,0,.2,1) forwards";
-
 /* tick after circle */
-
+if(type==="success"){
 setTimeout(()=>{
 tick.style.display = "block";
 tick.style.animation = "tickDraw .35s ease forwards";
 },900);
-
+}
 /* show DONE button */
-
 setTimeout(()=>{
 doneBtn.style.display = "block";
 },1200);
