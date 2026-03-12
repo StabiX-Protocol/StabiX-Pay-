@@ -1294,16 +1294,10 @@ doneBtn.style.display = "block";
   if(type==="failed"){
  document.getElementById("txTitle").innerText = "Transaction Failed";
 txt.innerText = "Reason: Insufficient Balance";
-    document.querySelector(".circle-progress").style.stroke = "#ef4444";
     document.getElementById("crossLine1").style.display = "block";
    document.getElementById("crossLine2").style.display = "block";
   tick.style.display = "none";        // tick hide
-
-  txt.innerText = "Insufficient Balance";
-  document.getElementById("txTitle").innerText = "Transaction Failed";
   document.getElementById("txTitle").style.color = "#ef4444";
-
-  const circle = document.querySelector(".circle-progress");
   circle.style.stroke = "#ef4444";    // circle red
 
   setTimeout(()=>{
