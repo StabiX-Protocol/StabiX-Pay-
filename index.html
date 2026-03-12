@@ -1289,7 +1289,7 @@ tick.style.animation = "tickDraw .35s ease forwards";
 setTimeout(()=>{
 doneBtn.style.display = "block";
 },1200);
-  }
+
   if(type==="failed"){
  document.getElementById("txTitle").innerText = "Transaction Failed";
 txt.innerText = "Reason: Insufficient Balance";
@@ -1315,6 +1315,7 @@ if (doneBtnEl) {
     const pop = document.getElementById("txPopup");
     if (pop) pop.style.display = "none";
   });
+}
 }
   window.softRefresh = async function(){
   try{
