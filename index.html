@@ -782,7 +782,7 @@ if(snap.data().pendingRequest){
       if(!toSnap.exists()) throw "Receiver not found";
       if(fromSnap.data().balance < amount){
       showTxPopup("Insufficient Balance","failed")
-      throw "stop"
+      return;
       }
       tx.update(userRef,{ balance: fromSnap.data().balance - amount });
       tx.update(toRef,{ balance: toSnap.data().balance + amount });
@@ -1259,7 +1259,7 @@ window.validatorAdjust = async ()=>{
     out.innerText = "Error fetching balance";
   }
 };
- window.showTxPopup = (msg, type="success") => {
+ window.showTxPopup = (msg,type="success")=>{
 
 const popup = document.getElementById("txPopup")
 const title = document.getElementById("txTitle")
@@ -1270,9 +1270,8 @@ const cross2 = document.getElementById("crossLine2")
 const ring = document.querySelector(".circle-progress")
 const done = document.getElementById("txDoneBtn")
 
-popup.style.display = "flex"
+popup.style.display="flex"
 msgBox.innerText = msg
-done.style.display="none"
 
 /* RESET */
 
@@ -1286,10 +1285,15 @@ ring.style.animation="progressFill .9s ease forwards"
 
 /* FAILED */
 
-if(type === "failed"){
+if(type==="failed"){
 
 title.innerText="Transaction Failed"
 title.style.color="#ef4444"
+
+ring.style.stroke="#ef4444"
+
+done.style.background="#ef4444"
+done.style.color="white"
 
 cross1.style.display="block"
 cross2.style.display="block"
@@ -1303,11 +1307,14 @@ else{
 title.innerText="Transaction Successful"
 title.style.color="#22c55e"
 
+ring.style.stroke="#22c55e"
+
+done.style.background="#22c55e"
+done.style.color="#022c22"
+
 tick.style.display="block"
 
 }
-
-/* SHOW DONE BUTTON */
 
 setTimeout(()=>{
 done.style.display="block"
