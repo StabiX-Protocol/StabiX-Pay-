@@ -1311,6 +1311,9 @@ const done = document.getElementById("txDoneBtn")
 popup.style.display="flex"
 msgBox.innerText = msg
 done.style.display="none"
+const timeBox = document.getElementById("txTime")
+const now = new Date()
+timeBox.innerText = now.toLocaleString()
 
 /* RESET */
 
