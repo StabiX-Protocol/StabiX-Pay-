@@ -759,45 +759,73 @@ Close
 
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
-  const snap = await getDoc(userRef);
-if(snap.data().pendingRequest){
-  alert("Account frozen. Wait for validator approval.");
-  return;
+
+const toWallet = sendTo.value.trim();
+const amount = Number(sendAmt.value);
+
+if(!toWallet || amount<=0) return alert("Invalid input");
+
+let failed = false;
+
+try{
+
+document.getElementById("sendPopup")?.remove();
+
+await runTransaction(db, async(tx)=>{
+
+const fromSnap = await tx.get(userRef);
+const toRef = doc(db,"users",toWallet);
+const toSnap = await tx.get(toRef);
+
+if(!toSnap.exists()) throw "Receiver not found";
+
+if(fromSnap.data().balance < amount){
+
+showTxPopup("Insufficient Balance","failed");
+
+failed = true;
+
+return;
+
 }
-  const toWallet = sendTo.value.trim();
-  const amount = Number(sendAmt.value);
-  if(!toWallet || amount<=0) return alert("Invalid input");
-  if(toWallet === WALLET){
-    tg.showPopup({ title:"Blocked", message:"Cannot send to yourself", buttons:[{type:"ok"}] });
-    return;
-  }
 
-  try{
-    document.getElementById("sendPopup")?.remove();
-    
-    await runTransaction(db, async(tx)=>{
-      const fromSnap = await tx.get(userRef);
-      const toRef = doc(db,"users",toWallet);
-      const toSnap = await tx.get(toRef);
-      if(!toSnap.exists()) throw "Receiver not found";
-      if(fromSnap.data().balance < amount){
-      showTxPopup("Insufficient Balance","failed")
-      return;
-      }
-      tx.update(userRef,{ balance: fromSnap.data().balance - amount });
-      tx.update(toRef,{ balance: toSnap.data().balance + amount });
+tx.update(userRef,{ balance: fromSnap.data().balance - amount });
+tx.update(toRef,{ balance: toSnap.data().balance + amount });
 
-      tx.set(doc(collection(db,"transactions")),{
-        userId: WALLET, type:"sent", amount, counterparty:toWallet, createdAt:serverTimestamp()
-      });
-      tx.set(doc(collection(db,"transactions")),{
-        userId: toWallet, type:"received", amount, counterparty:WALLET, createdAt:serverTimestamp()
-      });
-    });
-    showTxPopup(`Sent ${amount} USDC to ${toWallet}`);
-    renderApp();
-  }catch(e){ alert(e); }
+tx.set(doc(collection(db,"transactions")),{
+userId: WALLET,
+type:"sent",
+amount,
+counterparty:toWallet,
+createdAt:serverTimestamp()
+});
+
+tx.set(doc(collection(db,"transactions")),{
+userId: toWallet,
+type:"received",
+amount,
+counterparty:WALLET,
+createdAt:serverTimestamp()
+});
+
+});
+
+if(!failed){
+
+showTxPopup(`Sent ${amount} USDC to ${toWallet}`,"success");
+
+renderApp();
+
+}
+
+}catch(e){
+
+if(e!=="Receiver not found") console.log(e);
+
+}
+
 };
+  
   window.openScanner = ()=>{
 
 tg.showPopup({
