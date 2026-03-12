@@ -1292,21 +1292,22 @@ setTimeout(()=>{
 doneBtn.style.display = "block";
 },1200);
 }
+    
   if(type==="failed"){
 document.getElementById("txTitle").innerText = "Transaction Failed";
 document.getElementById("txTitle").style.color = "#ef4444";
-tick.style.display = "none";   // hide tick
+tick.style.display = "none";
+document.getElementById("tick").style.display = "none";
 document.getElementById("crossLine1").style.display = "block";
 document.getElementById("crossLine2").style.display = "block";
 txt.innerText = "Insufficient Balance";
 txt.style.color = "#e5e7eb";
 txt.style.fontSize = "14px";
-time.innerText = "";   // remove timestamp
-circle.style.stroke = "#ef4444";   // red circle
+time.innerText = "";
+circle.style.stroke = "#ef4444";
 doneBtn.innerText = "OK";
 doneBtn.style.background = "#ef4444";
 doneBtn.style.color = "#ffffff";
-
 setTimeout(()=>{
 doneBtn.style.display = "block";
 },1200);
