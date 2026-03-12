@@ -261,6 +261,9 @@ opacity:.85;
 
 <polyline id="tick" points="38,65 55,80 82,45"/>
 
+  <line id="crossLine1" x1="42" y1="42" x2="78" y2="78" style="display:none"/>
+<line id="crossLine2" x1="78" y1="42" x2="42" y2="78" style="display:none"/>
+
 </svg>
 
  </div>
@@ -775,8 +778,10 @@ if(snap.data().pendingRequest){
       const toRef = doc(db,"users",toWallet);
       const toSnap = await tx.get(toRef);
       if(!toSnap.exists()) throw "Receiver not found";
-      if(fromSnap.data().balance < amount) throw "Insufficient balance";
-
+      if(fromSnap.data().balance < amount){
+       showTxPopup("Insufficient Balance","failed");
+      return;
+      }
       tx.update(userRef,{ balance: fromSnap.data().balance - amount });
       tx.update(toRef,{ balance: toSnap.data().balance + amount });
 
@@ -1285,8 +1290,26 @@ tick.style.animation = "tickDraw .35s ease forwards";
 setTimeout(()=>{
 doneBtn.style.display = "block";
 },1200);
+  }
+  if(type==="failed"){
+ document.getElementById("txTitle").innerText = "Transaction Failed";
+txt.innerText = "Reason: Insufficient Balance";
+    document.querySelector(".circle-progress").style.stroke = "#ef4444";
+    document.getElementById("crossLine1").style.display = "block";
+   document.getElementById("crossLine2").style.display = "block";
+  tick.style.display = "none";        // tick hide
 
-     }
+  txt.innerText = "Insufficient Balance";
+  document.getElementById("txTitle").innerText = "Transaction Failed";
+  document.getElementById("txTitle").style.color = "#ef4444";
+
+  const circle = document.querySelector(".circle-progress");
+  circle.style.stroke = "#ef4444";    // circle red
+
+  setTimeout(()=>{
+    doneBtn.style.display = "block";
+  },1200);
+  }
 
   window.closeTxPopup = function (){
   const pop = document.getElementById("txPopup");
