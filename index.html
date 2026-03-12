@@ -261,9 +261,11 @@ opacity:.85;
 
 <polyline id="tick" points="38,65 55,80 82,45"/>
 
-  <line id="crossLine1" x1="42" y1="42" x2="78" y2="78" style="display:none"/>
-<line id="crossLine2" x1="78" y1="42" x2="42" y2="78" style="display:none"/>
+  <line id="crossLine1" x1="40" y1="40" x2="80" y2="80"
+style="display:none;stroke:#ef4444;stroke-width:10;stroke-linecap:round"/>
 
+<line id="crossLine2" x1="80" y1="40" x2="40" y2="80"
+style="display:none;stroke:#ef4444;stroke-width:10;stroke-linecap:round"/>
 </svg>
 
  </div>
@@ -1291,17 +1293,24 @@ doneBtn.style.display = "block";
 },1200);
 }
   if(type==="failed"){
- document.getElementById("txTitle").innerText = "Transaction Failed";
-txt.innerText = "Reason: Insufficient Balance";
-    document.getElementById("crossLine1").style.display = "block";
-   document.getElementById("crossLine2").style.display = "block";
-  tick.style.display = "none";        // tick hide
-  document.getElementById("txTitle").style.color = "#ef4444";
-  circle.style.stroke = "#ef4444";    // circle red
+document.getElementById("txTitle").innerText = "Transaction Failed";
+document.getElementById("txTitle").style.color = "#ef4444";
+tick.style.display = "none";   // hide tick
+document.getElementById("crossLine1").style.display = "block";
+document.getElementById("crossLine2").style.display = "block";
+txt.innerText = "Insufficient Balance";
+txt.style.color = "#e5e7eb";
+txt.style.fontSize = "14px";
+time.innerText = "";   // remove timestamp
+circle.style.stroke = "#ef4444";   // red circle
+doneBtn.innerText = "OK";
+doneBtn.style.background = "#ef4444";
+doneBtn.style.color = "#ffffff";
 
-  setTimeout(()=>{
-    doneBtn.style.display = "block";
-  },1200);
+setTimeout(()=>{
+doneBtn.style.display = "block";
+},1200);
+
   }
 }
 
