@@ -774,7 +774,7 @@ if(snap.data().pendingRequest){
 
   try{
     document.getElementById("sendPopup")?.remove();
-    showTxPopup("Sending...");
+    
     await runTransaction(db, async(tx)=>{
       const fromSnap = await tx.get(userRef);
       const toRef = doc(db,"users",toWallet);
