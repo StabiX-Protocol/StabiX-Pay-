@@ -1300,6 +1300,7 @@ const done = document.getElementById("txDoneBtn")
 
 popup.style.display="flex"
 msgBox.innerText = msg
+done.style.display="none"
 
 /* RESET */
 
@@ -1310,6 +1311,14 @@ cross2.style.display="none"
 ring.style.animation="none"
 ring.offsetHeight
 ring.style.animation="progressFill .9s ease forwards"
+
+tick.style.animation="none"
+cross1.style.animation="none"
+cross2.style.animation="none"
+
+tick.offsetHeight
+cross1.offsetHeight
+cross2.offsetHeight
 
 /* FAILED */
 
@@ -1325,6 +1334,8 @@ done.style.color="white"
 
 cross1.style.display="block"
 cross2.style.display="block"
+cross1.style.animation="tickDraw .35s ease forwards"
+cross2.style.animation="tickDraw .35s ease forwards"
 
 }
 
@@ -1341,6 +1352,7 @@ done.style.background="#22c55e"
 done.style.color="#022c22"
 
 tick.style.display="block"
+  tick.style.animation="tickDraw .35s ease forwards"
 
 }
 
