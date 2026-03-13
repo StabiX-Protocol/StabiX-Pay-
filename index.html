@@ -1312,8 +1312,12 @@ popup.style.display="flex"
 msgBox.innerText = msg
 done.style.display="none"
 const timeBox = document.getElementById("txTime")
+if(type==="success"){
 const now = new Date()
 timeBox.innerText = now.toLocaleString()
+}else{
+timeBox.innerText=""
+    }
 
 /* RESET */
 
