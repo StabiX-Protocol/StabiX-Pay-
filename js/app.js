@@ -87,3 +87,10 @@ window.verifyOTP = async ()=>{
   await updateDoc(userRef,{ password: npwd.value.trim(), otp:"" });
   renderLogin();
 };
+/* ================= UTIL ================= */
+function appDiv(h){ document.getElementById("app").innerHTML = h; }
+
+init();
+</script>
+</body>
+</html>
