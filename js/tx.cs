@@ -516,3 +516,62 @@ timeBox.innerText = now.toLocaleString()
 }else{
 timeBox.innerText=""
   }
+  /* RESET */
+
+tick.style.display="none"
+cross1.style.display="none"
+cross2.style.display="none"
+
+ring.style.animation="none"
+ring.offsetHeight
+ring.style.animation="progressFill .9s ease forwards"
+
+tick.style.animation="none"
+cross1.style.animation="none"
+cross2.style.animation="none"
+
+tick.offsetHeight
+cross1.offsetHeight
+cross2.offsetHeight
+
+/* FAILED */
+
+if(type==="failed"){
+
+title.innerText="Transaction Failed"
+title.style.color="#ef4444"
+
+ring.style.stroke="#ef4444"
+
+done.style.background="#ef4444"
+done.style.color="white"
+
+cross1.style.display="block"
+cross2.style.display="block"
+cross1.style.animation="tickDraw .35s ease forwards"
+cross2.style.animation="tickDraw .35s ease forwards"
+
+}
+
+/* SUCCESS */
+
+else{
+
+title.innerText="Transaction Successful"
+title.style.color="#22c55e"
+
+ring.style.stroke="#22c55e"
+
+done.style.background="#22c55e"
+done.style.color="#022c22"
+
+tick.style.display="block"
+  tick.style.animation="tickDraw .35s ease forwards"
+
+}
+
+setTimeout(()=>{
+done.style.display="block"
+},900)
+
+  }
