@@ -29,7 +29,21 @@ const firebaseConfig = {
 };
 
 const appFB = initializeApp(firebaseConfig);
-const db = getFirestore(appFB);
+window.db = getFirestore(appFB);
+
+window.doc = doc;
+window.setDoc = setDoc;
+window.getDoc = getDoc;
+window.updateDoc = updateDoc;
+window.collection = collection;
+window.addDoc = addDoc;
+window.getDocs = getDocs;
+window.serverTimestamp = serverTimestamp;
+window.query = query;
+window.where = where;
+window.orderBy = orderBy;
+window.runTransaction = runTransaction;
+window.Timestamp = Timestamp;
 
 // 🚫 BLOCK NORMAL BROWSER ACCESS (ONLY TELEGRAM ALLOWED)
 
