@@ -187,3 +187,32 @@ ${user.eoaAddress ? user.eoaAddress : "No EOA wallet registered"}
       ${isValidator ? validatorPanel() : ""}
     </div>
   `);
+  loadHistoryByDate();
+  // 🎉 RECEIVE POPUP (one-time)
+try{
+  const q = query(
+    collection(db,"transactions"),
+    where("userId","==",WALLET),
+    orderBy("createdAt","desc")
+  );
+
+  const snap = await getDocs(q);
+  if(!snap.empty){
+    const docSnap = snap.docs[0];
+    const t = docSnap.data();
+
+    // sirf received ke liye
+    if(t.type === "received"){
+      const key = "rx_" + docSnap.id;
+
+      // ek hi baar popup
+      if(!sessionStorage.getItem(key)){
+        showTxPopup(`Received ${t.amount} USDC from ${t.counterparty}`);
+        sessionStorage.setItem(key,"1");
+      }
+    }
+  }
+}catch(e){
+  console.log("Receive popup error", e);
+}
+}
