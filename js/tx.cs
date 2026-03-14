@@ -323,3 +323,40 @@ function renderHistoryFromSnap(snap, emptyText) {
     alert("Validator error: " + e);
   }
 };
+window.loadRequests = async ()=>{
+  const q = query(
+    collection(db,"requests"),
+    where("status","==","pending")
+  );
+
+  const snap = await getDocs(q);
+  let html = "";
+
+  snap.forEach(d=>{
+    const r = d.data();
+
+    const time = r.createdAt
+      ? r.createdAt.toDate().toLocaleString()
+      : "";
+
+    html += `
+      <div class="tx">
+        <b>${r.type.toUpperCase()} ${r.amount} USDC</b><br>
+
+        <span class="small">
+          User ID: ${r.userId}<br>
+          Wallet: ${r.walletAddress}<br>
+          ${r.txHash ? `Tx Hash: ${r.txHash}<br>` : ""}
+          Time: ${time}
+        </span>
+
+        <br><br>
+        <button onclick="approveReq('${d.id}')">Approve</button>
+        <button onclick="rejectReq('${d.id}')">Reject</button>
+      </div>
+    `;
+  });
+
+  document.getElementById("vout").innerHTML =
+    html || "<span class='small'>No pending requests</span>";
+};
