@@ -495,3 +495,24 @@ window.loadAllUsers = async ()=>{
     out.innerText = "Error fetching balance";
   }
 };
+window.showTxPopup = (msg,type="success")=>{
+
+const popup = document.getElementById("txPopup")
+const title = document.getElementById("txTitle")
+const msgBox = document.getElementById("txMsg")
+const tick = document.getElementById("tick")
+const cross1 = document.getElementById("crossLine1")
+const cross2 = document.getElementById("crossLine2")
+const ring = document.querySelector(".circle-progress")
+const done = document.getElementById("txDoneBtn")
+
+popup.style.display="flex"
+msgBox.innerText = msg
+done.style.display="none"
+const timeBox = document.getElementById("txTime")
+if(type==="success"){
+const now = new Date()
+timeBox.innerText = now.toLocaleString()
+}else{
+timeBox.innerText=""
+  }
