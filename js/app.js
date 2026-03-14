@@ -60,6 +60,7 @@ function renderLogin(){
 }
 
 window.login = async ()=>{
+  alert("login triggered")
   const snap = await getDoc(userRef);
   if(snap.data().password !== pwd.value.trim()) return alert("Wrong password");
   renderApp();
