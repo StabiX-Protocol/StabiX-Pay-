@@ -91,6 +91,3 @@ window.verifyOTP = async ()=>{
 function appDiv(h){ document.getElementById("app").innerHTML = h; }
 
 init();
-</script>
-</body>
-</html>
