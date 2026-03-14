@@ -1,1 +1,55 @@
+body{
+  background:#0f172a;
+  color:#e5e7eb;
+  font-family:Arial;
+  padding:12px;
+  margin:0;
+}
 
+.box{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:16px;
+  padding:18px;
+  width:100%;
+  max-width:380px;
+  margin:0 auto;
+  box-sizing:border-box;
+}
+
+input, button, select {
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:8px;
+  border:none;
+}
+
+button {
+  background:#2563eb;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+hr {
+  border:0;
+  border-top:1px solid #1e293b;
+  margin:15px 0;
+}
+
+.small {
+  font-size:12px;
+  opacity:.7;
+}
+
+.tx {
+  font-size:13px;
+  border-bottom:1px dashed #1e293b;
+  padding:6px 0;
+}
+
+.warn {
+  color:#facc15;
+  font-size:13px;
+}
