@@ -360,3 +360,138 @@ window.loadRequests = async ()=>{
   document.getElementById("vout").innerHTML =
     html || "<span class='small'>No pending requests</span>";
 };
+window.loadAllUsers = async ()=>{
+  const listDiv = document.getElementById("userList");
+  const countDiv = document.getElementById("userCount");
+
+  listDiv.innerHTML = "Loading...";
+  countDiv.innerHTML = "";
+
+  try{
+    const snap = await getDocs(collection(db,"users"));
+
+    countDiv.innerHTML = `Total Users: <b>${snap.size}</b>`;
+
+    let html = "";
+
+    snap.forEach(d=>{
+      const u = d.data();
+
+      const username = u.username ? u.username : "No username";
+      const tgWallet = u.walletAddress ? u.walletAddress : d.id;
+      const eoa = u.eoaAddress ? u.eoaAddress : "Not added";
+
+      html += `
+        <div class="tx">
+          <b>${username}</b><br>
+
+          <span class="small">
+            TG: ${tgWallet}
+          </span><br>
+
+          <span class="small">
+            EOA: ${eoa}
+          </span>
+        </div>
+      `;
+    });
+
+    listDiv.innerHTML =
+      html || "<span class='small'>No users found</span>";
+
+  }catch(e){
+    listDiv.innerHTML =
+      "<span class='small'>Error loading users</span>";
+  }
+};
+  window.approveReq = async (reqId)=>{
+
+  const reqRef = doc(db,"requests",reqId);
+
+  await runTransaction(db, async(tx)=>{
+
+    const reqSnap = await tx.get(reqRef);
+    if(!reqSnap.exists()) throw "Request not found";
+
+    const r = reqSnap.data();
+
+    const userRefX = doc(db,"users",r.userId);
+    const userSnap = await tx.get(userRefX);
+
+    if(!userSnap.exists()) throw "User not found";
+
+    let bal = userSnap.data().balance || 0;
+
+    // Deposit approve
+    if(r.type === "deposit"){
+      bal = bal + r.amount;
+    }
+
+    // Withdraw approve
+    if(r.type === "withdraw"){
+      if(bal < r.amount) throw "Insufficient balance";
+      bal = bal - r.amount;
+    }
+
+    // update user
+    tx.update(userRefX,{
+      balance: bal,
+      pendingRequest:false
+    });
+
+    // mark request approved
+    tx.update(reqRef,{
+      status:"approved"
+    });
+
+    // add transaction history
+    tx.set(doc(collection(db,"transactions")),{
+      userId: r.userId,
+      type: r.type,
+      amount: r.amount,
+      counterparty:"VALIDATOR",
+      createdAt: serverTimestamp()
+    });
+
+  });
+
+  alert("Request approved");
+  loadRequests();
+};
+
+  window.rejectReq = async (reqId)=>{
+  const reqRef = doc(db,"requests",reqId);
+  const snap = await getDoc(reqRef);
+
+  await updateDoc(doc(db,"users", snap.data().userId),{
+    pendingRequest:false   // 🔓 UNFREEZE
+  });
+
+  await updateDoc(reqRef,{ status:"rejected" });
+
+  alert("Rejected");
+  loadRequests();
+  renderApp();
+};
+  window.checkUserBalance = async ()=>{
+  const uid = document.getElementById("vUser").value.trim();
+  const out = document.getElementById("balanceOut");
+
+  if(!uid){
+    out.innerText = "Enter User ID";
+    return;
+  }
+
+  try{
+    const snap = await getDoc(doc(db,"users",uid));
+    if(!snap.exists()){
+      out.innerText = "User not found";
+      return;
+    }
+
+    out.innerText =
+      `Balance: ${snap.data().balance.toFixed(2)} USDC`;
+  }catch(e){
+    out.innerText = "Error fetching balance";
+  }
+};
