@@ -1,4 +1,15 @@
 import "./firebase.js"
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  serverTimestamp,
+  collection,
+  query,
+  where,
+  orderBy,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 /* ================= USERNAME CHANGE (30 DAYS) ================= */
 window.changeUsername = async ()=>{
   const snap = await getDoc(userRef);
