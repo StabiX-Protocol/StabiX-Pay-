@@ -61,4 +61,29 @@ window.login = async ()=>{
   if(snap.data().password !== pwd.value.trim()) return alert("Wrong password");
   renderApp();
 };
+/* ================= FORGOT PASSWORD ================= */
+window.forgotPassword = async ()=>{
+  const otp = Math.floor(100000 + Math.random()*900000).toString();
+  await updateDoc(userRef,{ otp });
+  tg.showPopup({ title:"OTP", message:"Your OTP: "+otp, buttons:[{type:"ok"}] });
+  renderOTP();
+};
 
+function renderOTP(){
+  appDiv(`
+    <div class="box">
+      <h3>Reset Password</h3>
+      <input id="otp" placeholder="OTP">
+      <input id="npwd" type="password" placeholder="New Password">
+      <button onclick="verifyOTP()">Reset</button>
+      <span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Resend</span>
+    </div>
+  `);
+}
+
+window.verifyOTP = async ()=>{
+  const snap = await getDoc(userRef);
+  if(snap.data().otp !== otp.value.trim()) return alert("Invalid OTP");
+  await updateDoc(userRef,{ password: npwd.value.trim(), otp:"" });
+  renderLogin();
+};
