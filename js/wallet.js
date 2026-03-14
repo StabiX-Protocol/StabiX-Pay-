@@ -347,3 +347,32 @@ function validatorPanel(){
 <div id="userList" style="margin-top:10px"></div>
   `;
 }
+window.closeTxPopup = ()=>{
+document.getElementById("txPopup").style.display="none"
+document.getElementById("txDoneBtn").style.display="none"
+  }
+  
+  // ✅ DONE button handler (module-safe)
+const doneBtnEl = document.getElementById("txDoneBtn");
+if (doneBtnEl) {
+  doneBtnEl.addEventListener("click", () => {
+    const pop = document.getElementById("txPopup");
+    if (pop) pop.style.display = "none";
+  });
+}
+
+  window.softRefresh = async function(){
+  try{
+    // 🔄 re-fetch user data
+    const snap = await getDoc(userRef);
+    if(!snap.exists()){
+      alert("Session expired");
+      return;
+    }
+
+    // 🔁 sirf UI refresh
+    renderApp();
+  }catch(e){
+    alert("Refresh failed");
+  }
+};
