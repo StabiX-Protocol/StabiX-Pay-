@@ -17,3 +17,14 @@ async function init(){
   }
   renderLogin();
 }
+/* ================= SETUP ================= */
+function renderSetup(){
+  appDiv(`
+    <div class="box">
+      <h3>Create Account</h3>
+      <input id="uname" placeholder="Username">
+      <input id="pwd" type="password" placeholder="Password">
+      <button onclick="saveProfile()">Create</button>
+    </div>
+  `);
+}
