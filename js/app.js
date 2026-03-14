@@ -52,11 +52,18 @@ function renderLogin(){
       <h3>Login</h3>
       <input id="pwd" type="password" placeholder="Password">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-        <button style="width:70%" onclick="window.login()">Login</button>
+        <button id="loginBtn" style="width:70%">Login</button>
         <span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Forgot?</span>
       </div>
     </div>
   `);
+
+  setTimeout(()=>{
+    const btn = document.getElementById("loginBtn");
+    if(btn){
+      btn.addEventListener("click", window.login);
+    }
+  },0);
 }
 
 window.login = async ()=>{
