@@ -28,3 +28,17 @@ function renderSetup(){
     </div>
   `);
 }
+window.saveProfile = async ()=>{
+  if(!uname.value.trim() || !pwd.value.trim()) return alert("Fill all fields");
+  await setDoc(userRef,{
+    username: uname.value.trim(),
+    password: pwd.value.trim(),
+    walletAddress: WALLET,
+    eoaAddress: "",
+    balance: 0,
+    pendingRequest:false,
+    lastUsernameChange: serverTimestamp(),
+    createdAt: serverTimestamp()
+  });
+  renderApp();
+};
