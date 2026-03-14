@@ -376,3 +376,34 @@ if (doneBtnEl) {
     alert("Refresh failed");
   }
 };
+  // ================= EOA WALLET =================
+window.editEOA = async ()=>{
+  const snap = await getDoc(userRef);
+  const current = snap.data()?.eoaAddress;
+
+  const addr = prompt(
+    "Enter your EOA Wallet Address",
+    current || ""
+  );
+
+  if(!addr) return;
+
+  if(addr.length < 20){
+    alert("Invalid wallet address");
+    return;
+  }
+
+  // 🔒 LOCK
+  if (current) {
+    alert("EOA wallet already locked");
+    return;
+  }
+
+  await updateDoc(userRef,{
+    eoaAddress: addr.trim()
+  });
+
+  alert("EOA wallet locked successfully");
+  renderApp();
+};
+    
