@@ -1,1 +1,35 @@
-
+// 🚫 BLOCK NORMAL BROWSER ACCESS (ONLY TELEGRAM ALLOWED)
+if (
+  !window.Telegram ||
+  !window.Telegram.WebApp ||
+  !window.Telegram.WebApp.initDataUnsafe ||
+  !window.Telegram.WebApp.initDataUnsafe.user
+) {
+  document.body.innerHTML = `
+    <div style="
+      background:#020617;
+      color:#e5e7eb;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-family:Arial;
+      padding:20px;
+    ">
+      <div>
+        <h2>⚠️ Access Denied</h2>
+        <p>This app works only inside Telegram.</p>
+        <p class="small">Please open it from the official Telegram bot.</p>
+      </div>
+    </div>
+  `;
+  throw new Error("Not opened inside Telegram");
+}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getFirestore, doc, setDoc, getDoc, updateDoc,
+  collection, addDoc, getDocs, serverTimestamp,
+  query, where, orderBy, runTransaction,
+  Timestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
