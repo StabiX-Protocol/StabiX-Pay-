@@ -1,6 +1,6 @@
 import "./firebase.js"
-import "./wallet.js"
 import "./tx.js"
+import "./wallet.js"
 /* ================= TELEGRAM ================= */
 const tg = window.Telegram.WebApp;
 tg.ready(); tg.expand();
