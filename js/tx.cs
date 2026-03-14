@@ -156,4 +156,89 @@ alert("Deposit request sent to validator")
 renderApp()
 
   }
+/* ================= HISTORY ================= */
+
+async function loadHistory() {
+  const q = query(
+    collection(db, "transactions"),
+    where("userId", "==", WALLET)
+  );
+
+  const snap = await getDocs(q);
+  renderHistoryFromSnap(snap, "No transactions");
+}
+
+window.loadHistoryByDate = async () => {
+  const selected = document.getElementById("historyDate")?.value;
+
+  if (!selected) {
+    loadHistory(); // fallback
+    return;
+  }
+
+  const startDate = new Date(selected);
+startDate.setHours(0, 0, 0, 0);
+
+const endDate = new Date(selected);
+endDate.setHours(23, 59, 59, 999);
+
+const start = Timestamp.fromDate(startDate);
+const end = Timestamp.fromDate(endDate);
+  const q = query(
+    collection(db, "transactions"),
+    where("userId", "==", WALLET),
+    where("createdAt", ">=", start),
+    where("createdAt", "<=", end)
+  );
+
+  const snap = await getDocs(q);
+  renderHistoryFromSnap(snap, "No transactions for this date");
+};
+  window.submitWithdraw = async ()=>{
+
+  const amount = Number(document.getElementById("wdAmount").value);
+
+  const snap = await getDoc(userRef);
+  const user = snap.data();
+
+  if(!user.eoaAddress){
+    alert("Please register EOA wallet first");
+    return;
+  }
+
+  if(!amount || amount <= 0){
+    alert("Enter valid amount");
+    return;
+  }
+
+  if(user.pendingRequest){
+    alert("Account frozen. Pending request under review.");
+    return;
+  }
+
+  if(amount > user.balance){
+    alert("Insufficient balance");
+    return;
+  }
+
+  await addDoc(collection(db,"requests"),{
+    userId: WALLET,
+    type:"withdraw",
+    amount: amount,
+    walletAddress: user.eoaAddress,
+    txHash:"",
+    status:"pending",
+    createdAt: serverTimestamp()
+  });
+
+  await updateDoc(userRef,{ pendingRequest:true });
+
+  tg.showPopup({
+    title:"Request Submitted",
+    message:"Wait for Validator Verification",
+    buttons:[{type:"ok"}]
+  });
+
+  renderApp();
+};
   
