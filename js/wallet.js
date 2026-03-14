@@ -10,3 +10,12 @@ window.changeUsername = async ()=>{
   await updateDoc(userRef,{ username:name.trim(), lastUsernameChange:serverTimestamp() });
   renderApp();
 };
+/* ================= MAIN APP ================= */
+async function renderApp(){
+  const user = (await getDoc(userRef)).data();
+  const isValidator = (await getDoc(validatorRef)).exists();
+  const now = new Date();
+const yyyy = now.getFullYear();
+const mm = String(now.getMonth() + 1).padStart(2,"0");
+const dd = String(now.getDate()).padStart(2,"0");
+const today = `${yyyy}-${mm}-${dd}`;
