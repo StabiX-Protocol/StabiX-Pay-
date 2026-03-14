@@ -97,6 +97,6 @@ window.verifyOTP = async ()=>{
   renderLogin();
 };
 /* ================= UTIL ================= */
-function appDiv(h){ document.getElementById("app").innerHTML = h; }
+window.appDiv = function(h){document.getElementById("app").innerHTML = h;}
 
 init();
