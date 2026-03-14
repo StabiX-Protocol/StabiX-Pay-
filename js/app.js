@@ -8,9 +8,6 @@ import {
   updateDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-window.onerror = function(msg, src, line, col, err){
-  alert("ERROR: " + msg + " | line: " + line);
-};
 /* ================= TELEGRAM ================= */
 const tg = window.Telegram.WebApp;
 tg.ready(); tg.expand();
