@@ -1,3 +1,4 @@
+import "./firebase.js"
 /* ================= USERNAME CHANGE (30 DAYS) ================= */
 window.changeUsername = async ()=>{
   const snap = await getDoc(userRef);
