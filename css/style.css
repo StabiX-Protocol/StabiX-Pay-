@@ -53,3 +53,141 @@ hr {
   color:#facc15;
   font-size:13px;
 }
+    /* ===== Transaction Popup ===== */
+
+.tx-popup{
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+
+display:none;
+
+align-items:center;
+justify-content:center;
+
+z-index:99999;
+
+/* FULL DARK OVERLAY */
+
+background:#020617;
+}
+    
+.tx-card{
+
+background:#020617;
+border-radius:28px;
+padding:40px 30px;
+text-align:center;
+width:340px;
+max-width:92%;
+animation:scaleIn .25s ease;
+box-shadow:0 0 60px rgba(0,0,0,0.9);
+}
+@keyframes scaleIn{
+
+0%{
+transform:scale(.9);
+opacity:0;
+}
+
+100%{
+transform:scale(1);
+opacity:1;
+}
+
+}
+    
+.spinner{
+width:140px;
+height:140px;
+margin:0 auto 25px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.spinner svg{
+width:100%;
+height:100%;
+}
+
+/* grey circle */
+
+.circle-bg{
+fill:none;
+stroke:#1e293b;
+stroke-width:10;
+}
+
+/* progress ring */
+
+.circle-progress{
+fill:none;
+stroke:#22c55e;
+stroke-width:10;
+stroke-linecap:round;
+
+stroke-dasharray:326;
+stroke-dashoffset:326;
+
+transform:rotate(-90deg);
+transform-origin:50% 50%;
+
+/* animation initially off */
+
+animation:none;
+}
+#txTitle{
+font-size:24px;
+font-weight:700;
+letter-spacing:.5px;
+margin-bottom:12px;
+}
+
+/* tick */
+
+#tick{
+fill:none;
+stroke:#22c55e;
+stroke-width:10;
+stroke-linecap:round;
+stroke-linejoin:round;
+
+stroke-dasharray:60;
+stroke-dashoffset:60;
+}
+/* cross */
+
+#crossLine1,
+#crossLine2{
+fill:none;
+stroke:#ef4444;
+stroke-width:10;
+stroke-linecap:round;
+stroke-linejoin:round;
+
+stroke-dasharray:60;
+stroke-dashoffset:60;
+}
+
+/* animations */
+
+@keyframes progressFill{
+from{
+stroke-dashoffset:326;
+}
+to{
+stroke-dashoffset:0;
+}
+}
+
+@keyframes tickDraw{
+from{
+stroke-dashoffset:60;
+}
+to{
+stroke-dashoffset:0;
+}
+}
