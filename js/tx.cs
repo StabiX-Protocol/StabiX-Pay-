@@ -241,4 +241,43 @@ const end = Timestamp.fromDate(endDate);
 
   renderApp();
 };
+
+/* ================= HISTORY RENDER ================= */
+
+function renderHistoryFromSnap(snap, emptyText) {
+  let html = "";
+
+  snap.forEach(d => {
+    const t = d.data();
+
+    const isDepositWithdraw =
+      t.type === "deposit" || t.type === "withdraw";
+
+    const isCredit = isDepositWithdraw
+      ? t.type === "deposit"
+      : t.type === "received";
+
+    const sign = isCredit ? "+" : "-";
+    const color = isCredit ? "#22c55e" : "#ef4444";
+
+    const metaLine = isDepositWithdraw
+      ? t.type.toUpperCase()
+      : (isCredit
+          ? `${t.counterparty} → ${WALLET}`
+          : `${WALLET} → ${t.counterparty}`);
+
+    html += `
+      <div class="tx" style="color:${color}">
+        <b>${sign}${t.amount} USDC</b><br>
+        <span class="small">
+          ${metaLine}<br>
+          ${t.createdAt?.toDate()?.toLocaleString() || ""}
+        </span>
+      </div>
+    `;
+  });
+
+  document.getElementById("history").innerHTML =
+    html || `<span class="small">${emptyText}</span>`;
+}
   
