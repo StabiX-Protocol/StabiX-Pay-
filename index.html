@@ -90,6 +90,26 @@ Next
 
 </div>
 
+<div id="amountScreen" style="display:none">
+<div class="sendHeader">
+<button onclick="backToAddress()">←</button>
+<h2>Send USDC</h2>
+</div>
+<div class="sendBody">
+<h1 class="sendTitle">Enter amount</h1>
+<input
+id="sendAmt"
+type="number"
+inputmode="decimal"
+placeholder="0"
+class="amountInput"
+/>
+<button class="nextBtn" onclick="openConfirm()">
+Next
+</button>
+</div>
+
+</div>
 
 <script type="module" src="./js/app.js"></script>
   
