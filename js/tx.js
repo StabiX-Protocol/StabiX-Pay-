@@ -506,12 +506,7 @@ const cross2 = document.getElementById("crossLine2")
 const ring = document.querySelector(".circle-progress")
 const done = document.getElementById("txDoneBtn")
 
-title.style.display="none"
-msgBox.style.display="none"
-timeBox.style.display="none"
 popup.style.display="flex"
-
-  
 msgBox.innerText = msg
 done.style.display="none"
 const timeBox = document.getElementById("txTime")
@@ -551,13 +546,10 @@ ring.style.stroke="#ef4444"
 done.style.background="#ef4444"
 done.style.color="white"
 
-
 cross1.style.display="block"
 cross2.style.display="block"
-setTimeout(()=>{
 cross1.style.animation="tickDraw .35s ease forwards"
 cross2.style.animation="tickDraw .35s ease forwards"
-},900)
 
 }
 
@@ -573,16 +565,13 @@ ring.style.stroke="#22c55e"
 done.style.background="#22c55e"
 done.style.color="#022c22"
 
-setTimeout(()=>{
 tick.style.display="block"
-tick.style.animation="tickDraw .35s ease forwards"
-},900)
+  tick.style.animation="tickDraw .35s ease forwards"
 
 }
+
 setTimeout(()=>{
-title.style.display="block"
-msgBox.style.display="block"
-timeBox.style.display="block"
 done.style.display="block"
-},1250)
+},900)
+
 }
