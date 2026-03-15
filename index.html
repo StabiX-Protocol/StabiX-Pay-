@@ -110,6 +110,31 @@ Next
 </div>
 
 </div>
+  
+<div id="confirmScreen" style="display:none">
+<div class="sendHeader">
+<button onclick="backToAmount()">←</button>
+<h2>Send</h2>
+</div>
+<div class="sendBody">
+<h1 id="confirmAmount">-0 USDC</h1>
+<hr>
+<p>Network Fee</p>
+<p>0 USDC</p>
+<p>From</p>
+<p id="confirmFrom"></p>
+<p>To</p>
+<p id="confirmTo"></p>
+<div style="margin-top:30px;display:flex;gap:10px">
+<button onclick="backToAmount()" style="flex:1;padding:14px">
+Reject
+</button>
+<button onclick="confirmSend()" style="flex:1;padding:14px;background:#22c55e;color:#022c22">
+Confirm
+</button>
+</div>
+</div>
+</div>
 
 <script type="module" src="./js/app.js"></script>
   
