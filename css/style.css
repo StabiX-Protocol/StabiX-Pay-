@@ -340,3 +340,30 @@ background:#2563eb;
 color:white;
 font-size:16px;
 }
+.sendIcon{
+font-size:60px;
+text-align:center;
+color:#22c55e;
+margin-bottom:10px;
+animation:sendGlow 1.5s infinite;
+filter:drop-shadow(0 0 10px #22c55e);
+}
+
+@keyframes sendGlow{
+
+0%{
+transform:translateY(4px);
+opacity:.6;
+}
+
+50%{
+transform:translateY(-4px);
+opacity:1;
+}
+
+100%{
+transform:translateY(4px);
+opacity:.6;
+}
+
+}
