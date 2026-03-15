@@ -505,18 +505,26 @@ const cross1 = document.getElementById("crossLine1")
 const cross2 = document.getElementById("crossLine2")
 const ring = document.querySelector(".circle-progress")
 const done = document.getElementById("txDoneBtn")
+const timeBox = document.getElementById("txTime")
 
 popup.style.display="flex"
-msgBox.innerText = msg
+
+msgBox.style.display="none"
+timeBox.style.display="none"
 done.style.display="none"
-const timeBox = document.getElementById("txTime")
+
+msgBox.innerText = msg
+
+/* TIME */
+
 if(type==="success"){
 const now = new Date()
 timeBox.innerText = now.toLocaleString()
 }else{
 timeBox.innerText=""
-  }
-  /* RESET */
+}
+
+/* RESET */
 
 tick.style.display="none"
 cross1.style.display="none"
@@ -534,7 +542,9 @@ tick.offsetHeight
 cross1.offsetHeight
 cross2.offsetHeight
 
-/* FAILED */
+/* AFTER CIRCLE COMPLETE */
+
+setTimeout(()=>{
 
 if(type==="failed"){
 
@@ -548,14 +558,11 @@ done.style.color="white"
 
 cross1.style.display="block"
 cross2.style.display="block"
+
 cross1.style.animation="tickDraw .35s ease forwards"
 cross2.style.animation="tickDraw .35s ease forwards"
 
-}
-
-/* SUCCESS */
-
-else{
+}else{
 
 title.innerText="Transaction Successful"
 title.style.color="#22c55e"
@@ -566,12 +573,20 @@ done.style.background="#22c55e"
 done.style.color="#022c22"
 
 tick.style.display="block"
-  tick.style.animation="tickDraw .35s ease forwards"
+tick.style.animation="tickDraw .35s ease forwards"
 
 }
 
-setTimeout(()=>{
-done.style.display="block"
 },900)
+
+/* AFTER TICK COMPLETE */
+
+setTimeout(()=>{
+
+msgBox.style.display="block"
+timeBox.style.display="block"
+done.style.display="block"
+
+},1250)
 
 }
