@@ -538,9 +538,6 @@ cross2.offsetHeight
 
 if(type==="failed"){
 
-title.innerText="Transaction Failed"
-title.style.color="#ef4444"
-
 ring.style.stroke="#ef4444"
 
 done.style.background="#ef4444"
@@ -548,8 +545,12 @@ done.style.color="white"
 
 setTimeout(()=>{
 
+title.innerText="Transaction Failed"
+title.style.color="#ef4444"
+
 cross1.style.display="block"
 cross2.style.display="block"
+
 cross1.style.animation="tickDraw .35s ease forwards"
 cross2.style.animation="tickDraw .35s ease forwards"
 
@@ -560,6 +561,8 @@ cross2.style.animation="tickDraw .35s ease forwards"
 
 else{
 
+setTimeout(()=>{
+
 title.innerText="Transaction Successful"
 title.style.color="#22c55e"
 
@@ -567,8 +570,6 @@ ring.style.stroke="#22c55e"
 
 done.style.background="#22c55e"
 done.style.color="#022c22"
-
-setTimeout(()=>{
 
 tick.style.display="block"
 tick.style.animation="tickDraw .35s ease forwards"
