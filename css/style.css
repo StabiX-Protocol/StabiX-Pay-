@@ -157,9 +157,6 @@ stroke-linejoin:round;
 
 stroke-dasharray:60;
 stroke-dashoffset:60;
-
-animation-delay:.9s;
-animation-fill-mode:forwards;
 }
 /* cross */
 
@@ -173,9 +170,6 @@ stroke-linejoin:round;
 
 stroke-dasharray:60;
 stroke-dashoffset:60;
-
-animation-delay:.9s;
-animation-fill-mode:forwards;
 }
 
 /* animations */
