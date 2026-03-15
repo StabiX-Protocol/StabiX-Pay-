@@ -286,6 +286,19 @@ display:none;
 flex-direction:column;
 }
 
+#amountScreen,
+#confirmScreen{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#000;
+z-index:999;
+display:none;
+flex-direction:column;
+}
+
 .sendHeader{
 display:flex;
 align-items:center;
