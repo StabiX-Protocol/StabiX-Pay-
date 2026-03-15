@@ -364,6 +364,8 @@ function validatorPanel(){
 let txLock = false
 
 function openSend(){
+const old = document.getElementById("sendPopup")
+if(old) old.remove()
 document.getElementById("sendScreen").style.display="flex"
 }
 function closeSend(){
