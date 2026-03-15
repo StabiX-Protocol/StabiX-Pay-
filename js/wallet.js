@@ -367,6 +367,22 @@ document.getElementById("sendScreen").style.display="flex"
 function closeSend(){
 document.getElementById("sendScreen").style.display="none"
 }
+function pasteAddress(){
+navigator.clipboard.readText()
+.then(text=>{
+document.getElementById("sendTo").value = text
+})
+
+}
+function goAmount(){
+const toWallet = document.getElementById("sendTo").value.trim()
+if(!toWallet){
+alert("Enter wallet ID")
+return
+}
+console.log("Receiver:",toWallet)
+
+}
 
 
 window.closeTxPopup = ()=>{
