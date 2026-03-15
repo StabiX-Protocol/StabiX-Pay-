@@ -5,7 +5,11 @@ const toWallet = sendTo.value.trim();
 const amount = Number(sendAmt.value);
 
 if(!toWallet || amount<=0) return alert("Invalid input");
-
+if(toWallet === WALLET){
+  showTxPopup("You cannot send to yourself","failed");
+  failed = true;
+  return;
+}
 let failed = false;
 
 try{
