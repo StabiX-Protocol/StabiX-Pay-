@@ -387,7 +387,23 @@ function backToAddress(){
 document.getElementById("amountScreen").style.display="none"
 document.getElementById("sendScreen").style.display="flex"
 }
-
+function openConfirm(){
+const amount = document.getElementById("sendAmt").value
+const toWallet = document.getElementById("sendTo").value.trim()
+if(!amount || amount <= 0){
+alert("Enter valid amount")
+return
+}
+document.getElementById("amountScreen").style.display="none"
+document.getElementById("confirmScreen").style.display="flex"
+document.getElementById("confirmAmount").innerText = "-" + amount + " USDC"
+document.getElementById("confirmTo").innerText = toWallet
+document.getElementById("confirmFrom").innerText = WALLET
+}
+function backToAmount(){
+document.getElementById("confirmScreen").style.display="none"
+document.getElementById("amountScreen").style.display="flex"
+}
 
 window.closeTxPopup = ()=>{
 document.getElementById("txPopup").style.display="none"
