@@ -325,22 +325,22 @@ function validatorPanel(){
   // Sending UI 
 let txLock = false
 
-function openSend(){
+window.openSend = ()=>{
 const old = document.getElementById("sendPopup")
 if(old) old.remove()
 document.getElementById("sendScreen").style.display="flex"
 }
-function closeSend(){
+window.closeSend = ()=>{
 document.getElementById("sendScreen").style.display="none"
 }
-function pasteAddress(){
+window.pasteAddress = ()=>{
 navigator.clipboard.readText()
 .then(text=>{
 document.getElementById("sendTo").value = text
 })
 
 }
-function goAmount(){
+window.goAmount = ()=>{
 const toWallet = document.getElementById("sendTo").value.trim()
 if(!toWallet){
 alert("Enter wallet ID")
@@ -349,11 +349,11 @@ return
 document.getElementById("sendScreen").style.display="none"
 document.getElementById("amountScreen").style.display="flex"
 }
-function backToAddress(){
+window.backToAddress = ()=>{
 document.getElementById("amountScreen").style.display="none"
 document.getElementById("sendScreen").style.display="flex"
 }
-function openConfirm(){
+window.openConfirm= ()=>{
 const amount = document.getElementById("sendAmt").value
 const toWallet = document.getElementById("sendTo").value.trim()
 if(!amount || amount <= 0){
@@ -366,11 +366,11 @@ document.getElementById("confirmAmount").innerText = "-" + amount + " USDC"
 document.getElementById("confirmTo").innerText = toWallet
 document.getElementById("confirmFrom").innerText = WALLET
 }
-function backToAmount(){
+window.backToAmount = ()=>{
 document.getElementById("confirmScreen").style.display="none"
 document.getElementById("amountScreen").style.display="flex"
 }
-function confirmSend(){
+window.confirmSend = ()=>{
 if(txLock) return
 txLock = true
 const input = document.getElementById("sendTo")
