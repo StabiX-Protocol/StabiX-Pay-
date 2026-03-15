@@ -6,7 +6,7 @@ const amount = Number(sendAmt.value);
 
 if(!toWallet || amount<=0) return alert("Invalid input");
 if(toWallet === WALLET){
-  showTxPopup("You cannot send to yourself","failed");
+  showTxPopup("Self Transfers Are Not Allowed","failed");
   failed = true;
   return;
 }
