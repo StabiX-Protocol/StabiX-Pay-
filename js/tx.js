@@ -505,33 +505,27 @@ const cross1 = document.getElementById("crossLine1")
 const cross2 = document.getElementById("crossLine2")
 const ring = document.querySelector(".circle-progress")
 const done = document.getElementById("txDoneBtn")
-const timeBox = document.getElementById("txTime")
-
-/* RESET */
 
 title.style.display="none"
 msgBox.style.display="none"
 timeBox.style.display="none"
+popup.style.display="flex"
+
+  
+msgBox.innerText = msg
 done.style.display="none"
+const timeBox = document.getElementById("txTime")
+if(type==="success"){
+const now = new Date()
+timeBox.innerText = now.toLocaleString()
+}else{
+timeBox.innerText=""
+  }
+  /* RESET */
 
 tick.style.display="none"
 cross1.style.display="none"
 cross2.style.display="none"
-
-popup.style.display="flex"
-
-msgBox.innerText = msg
-
-/* TIME */
-
-if(type==="success"){
-  const now = new Date()
-  timeBox.innerText = now.toLocaleString()
-}else{
-  timeBox.innerText=""
-}
-
-/* RESET ANIMATION */
 
 ring.style.animation="none"
 ring.offsetHeight
@@ -557,9 +551,10 @@ ring.style.stroke="#ef4444"
 done.style.background="#ef4444"
 done.style.color="white"
 
-setTimeout(()=>{
+
 cross1.style.display="block"
 cross2.style.display="block"
+setTimeout(()=>{
 cross1.style.animation="tickDraw .35s ease forwards"
 cross2.style.animation="tickDraw .35s ease forwards"
 },900)
@@ -584,14 +579,10 @@ tick.style.animation="tickDraw .35s ease forwards"
 },900)
 
 }
-
-/* SHOW MESSAGE + DONE */
-
 setTimeout(()=>{
 title.style.display="block"
 msgBox.style.display="block"
 timeBox.style.display="block"
 done.style.display="block"
-},1300)
-
+},1250)
 }
