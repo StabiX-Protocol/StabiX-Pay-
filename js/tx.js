@@ -4,7 +4,7 @@ window.sendUSDC = async ()=>{
 const toWallet = sendTo.value.trim();
 const amount = Number(sendAmt.value);
 
-if(!toWallet || amount<=0) return alert("Invalid input");
+if(!toWallet || amount<=0) return alert("Invalid Input");
 if(toWallet === WALLET){
   showTxPopup("Self Transfers Are Not Allowed","failed");
   failed = true;
@@ -22,7 +22,11 @@ const fromSnap = await tx.get(userRef);
 const toRef = doc(db,"users",toWallet);
 const toSnap = await tx.get(toRef);
 
-if(!toSnap.exists()) throw "Receiver not found";
+if(!toSnap.exists()){
+  showTxPopup("User Not Found","failed");
+  failed = true;
+  return;
+}
 
 if(fromSnap.data().balance < amount){
 
