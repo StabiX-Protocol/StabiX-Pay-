@@ -507,6 +507,10 @@ const ring = document.querySelector(".circle-progress")
 const done = document.getElementById("txDoneBtn")
 
 popup.style.display="flex"
+title.style.display="none"
+msgBox.style.display="none"
+timeBox.style.display="none"
+  
 msgBox.innerText = msg
 done.style.display="none"
 const timeBox = document.getElementById("txTime")
@@ -576,7 +580,9 @@ tick.style.animation="tickDraw .35s ease forwards"
 }
 
 setTimeout(()=>{
+title.style.display="block"
+msgBox.style.display="block"
+timeBox.style.display="block"
 done.style.display="block"
 },1250)
-
-  }
+}
