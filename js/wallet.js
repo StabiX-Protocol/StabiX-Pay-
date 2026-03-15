@@ -380,8 +380,12 @@ if(!toWallet){
 alert("Enter wallet ID")
 return
 }
-console.log("Receiver:",toWallet)
-
+document.getElementById("sendScreen").style.display="none"
+document.getElementById("amountScreen").style.display="flex"
+}
+function backToAddress(){
+document.getElementById("amountScreen").style.display="none"
+document.getElementById("sendScreen").style.display="flex"
 }
 
 
