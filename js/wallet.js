@@ -240,45 +240,7 @@ box.style.display = "block"
 }
 
 }
-  window.showSend = ()=>{
-document.body.innerHTML += `
-<div id="sendPopup" style="
-position:fixed;
-top:0;
-left:0;
-right:0;
-bottom:0;
-background:#000000cc;
-display:flex;
-align-items:center;
-justify-content:center;
-z-index:9999;
-">
 
-<div style="
-background:#020617;
-padding:20px;
-border-radius:16px;
-width:300px;
-">
-
-<h3>Send USDC</h3>
-
-<input id="sendTo" placeholder="Receiver Wallet (TG_xxx)">
-
-<input id="sendAmt" type="number" placeholder="Amount">
-
-<button onclick="sendUSDC()">Send</button>
-
-<button onclick="this.parentElement.parentElement.remove()"style="margin-top:10px;background:#1e293b">
-Close
-</button>
-
-</div>
-</div>
-`
-
-  }
 window.showReceive = ()=>{
 
 const wallet = WALLET
