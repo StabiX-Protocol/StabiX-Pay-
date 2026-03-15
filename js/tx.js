@@ -546,10 +546,12 @@ ring.style.stroke="#ef4444"
 done.style.background="#ef4444"
 done.style.color="white"
 
+setTimeout(()=>{
 cross1.style.display="block"
 cross2.style.display="block"
 cross1.style.animation="tickDraw .35s ease forwards"
 cross2.style.animation="tickDraw .35s ease forwards"
+},900)
 
 }
 
@@ -565,8 +567,10 @@ ring.style.stroke="#22c55e"
 done.style.background="#22c55e"
 done.style.color="#022c22"
 
+setTimeout(()=>{
 tick.style.display="block"
-  tick.style.animation="tickDraw .35s ease forwards"
+tick.style.animation="tickDraw .35s ease forwards"
+},900)
 
 }
 
