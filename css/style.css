@@ -306,12 +306,16 @@ padding:16px;
 font-size:18px;
 }
 .sendHeader button{
-width:auto;
-padding:10px 14px;
+width:40px;
+height:40px;
+padding:0;
 background:#2563eb;
 border:none;
 border-radius:10px;
 font-size:18px;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
 .sendBody{
