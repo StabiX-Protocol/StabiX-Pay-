@@ -60,7 +60,7 @@ ${user.balance.toFixed(2)} USDC
 </div>
    
 <div class="walletActions">
-<div class="walletAction" onclick="showSend()">
+<div class="walletAction" onclick="openSend()">
 <div class="walletActionIcon">⬆</div>
 <div class="walletActionLabel">Send</div>
 </div>
