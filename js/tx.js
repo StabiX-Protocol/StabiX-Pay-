@@ -1,8 +1,11 @@
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
 
-const toWallet = sendTo.value.trim();
-const amount = Number(sendAmt.value);
+const input = document.getElementById("sendTo");
+const toWallet = input ? input.value.trim() : "";
+
+const amtInput = document.getElementById("sendAmt");
+const amount = amtInput ? Number(amtInput.value) : 0;
 
 if(!toWallet || amount<=0) return alert("Invalid Input");
 if(toWallet === WALLET){
