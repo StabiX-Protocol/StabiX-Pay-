@@ -359,6 +359,16 @@ function validatorPanel(){
 <div id="userList" style="margin-top:10px"></div>
   `;
 }
+
+  // Sending UI 
+function openSend(){
+document.getElementById("sendScreen").style.display="flex"
+}
+function closeSend(){
+document.getElementById("sendScreen").style.display="none"
+}
+
+
 window.closeTxPopup = ()=>{
 document.getElementById("txPopup").style.display="none"
 document.getElementById("txDoneBtn").style.display="none"
