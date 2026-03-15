@@ -333,13 +333,6 @@ document.getElementById("sendScreen").style.display="flex"
 window.closeSend = ()=>{
 document.getElementById("sendScreen").style.display="none"
 }
-window.pasteAddress = ()=>{
-navigator.clipboard.readText()
-.then(text=>{
-document.getElementById("sendTo").value = text
-})
-
-}
 window.goAmount = ()=>{
 const toWallet = document.getElementById("sendTo").value.trim()
 if(!toWallet){
