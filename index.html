@@ -63,12 +63,29 @@ DONE
 
 </div>
 </div>
+  
+ <!-- ===== Sending UI===== -->
+<div id="sendScreen">
+<div class="sendHeader">
+<button onclick="closeSend()">←</button>
+<h2>Send USDC</h2>
+</div>
+<div class="sendBody">
+<input id="sendTo" placeholder="Enter Telegram ID">
+<input id="sendAmt" type="number" inputmode="decimal" placeholder="Amount">
+<button onclick="openConfirm()">Send</button>
+
+</div>
+
+</div>
+
 
 <script type="module" src="./js/app.js"></script>
+  
+ <!-- ===== Error Tool===== -->
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
   
 </body>
 </html>
 
-<!-- ===== Error Tool===== -->
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
