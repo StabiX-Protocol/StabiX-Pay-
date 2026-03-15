@@ -572,6 +572,6 @@ tick.style.display="block"
 
 setTimeout(()=>{
 done.style.display="block"
-},900)
+},1250)
 
   }
