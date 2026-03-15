@@ -409,7 +409,8 @@ document.getElementById("amountScreen").style.display="flex"
 function confirmSend(){
 if(txLock) return
 txLock = true
-const toWallet = document.getElementById("sendTo").value.trim()
+const input = document.getElementById("sendTo")
+const towallet = input ? input.value.trim() : ""
 const amount = document.getElementById("sendAmt").value
 if(!toWallet || !amount){
 alert("Invalid transaction")
