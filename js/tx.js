@@ -506,10 +506,11 @@ const cross2 = document.getElementById("crossLine2")
 const ring = document.querySelector(".circle-progress")
 const done = document.getElementById("txDoneBtn")
 
-popup.style.display="flex"
 title.style.display="none"
 msgBox.style.display="none"
 timeBox.style.display="none"
+popup.style.display="flex"
+
   
 msgBox.innerText = msg
 done.style.display="none"
