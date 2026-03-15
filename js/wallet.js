@@ -361,6 +361,8 @@ function validatorPanel(){
 }
 
   // Sending UI 
+let txLock = false
+
 function openSend(){
 document.getElementById("sendScreen").style.display="flex"
 }
@@ -403,6 +405,22 @@ document.getElementById("confirmFrom").innerText = WALLET
 function backToAmount(){
 document.getElementById("confirmScreen").style.display="none"
 document.getElementById("amountScreen").style.display="flex"
+}
+function confirmSend(){
+if(txLock) return
+txLock = true
+const toWallet = document.getElementById("sendTo").value.trim()
+const amount = document.getElementById("sendAmt").value
+if(!toWallet || !amount){
+alert("Invalid transaction")
+txLock = false
+return
+}
+document.getElementById("confirmScreen").style.display="none"
+sendUSDC()
+setTimeout(()=>{
+txLock = false
+},3000)
 }
 
 window.closeTxPopup = ()=>{
