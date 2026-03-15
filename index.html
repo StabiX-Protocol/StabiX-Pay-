@@ -71,10 +71,21 @@ DONE
 <h2>Send USDC</h2>
 </div>
 <div class="sendBody">
-<input id="sendTo" placeholder="Enter Telegram ID">
-<input id="sendAmt" type="number" inputmode="decimal" placeholder="Amount">
-<button onclick="openConfirm()">Send</button>
-
+<h1 class="sendTitle">Receiving address</h1>
+<p class="sendSub">
+Enter wallet address or domain name
+</p>
+<div class="addressBox">
+<input
+id="sendTo"
+placeholder="TG_123456789"
+autocomplete="off"
+/>
+<button onclick="pasteAddress()">Paste</button>
+</div>
+<button class="nextBtn" onclick="goAmount()">
+Next
+</button>
 </div>
 
 </div>
