@@ -339,6 +339,11 @@ if(!toWallet){
 alert("Enter wallet ID")
 return
 }
+ const tgPattern = /^TG_\d{6,}$/
+if(!tgPattern.test(toWallet)){
+alert("Enter valid TG ID (example: TG_123456789)")
+return
+}
 document.getElementById("sendScreen").style.display="none"
 document.getElementById("amountScreen").style.display="flex"
 }
