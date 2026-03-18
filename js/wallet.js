@@ -390,10 +390,14 @@ window.closeTxPopup = ()=>{
 document.getElementById("txPopup").style.display="none"
 document.getElementById("txDoneBtn").style.display="none"
   }
+
 window.goHome = function(){
-document.getElementById("sendScreen")?.style.display="none";
-document.getElementById("amountScreen")?.style.display="none";
-document.getElementById("confirmScreen")?.style.display="none";
+const send = document.getElementById("sendScreen");
+const amount = document.getElementById("amountScreen");
+const confirm = document.getElementById("confirmScreen");
+if(send) send.style.display = "none";
+if(amount) amount.style.display = "none";
+if(confirm) confirm.style.display = "none";
 }
   
   // ✅ DONE button handler (module-safe)
