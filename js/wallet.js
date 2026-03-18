@@ -357,7 +357,9 @@ window.handleNext = async () => {
     alert("Enter valid amount")
     return
   }
-  if(amount > window.currentUser.balance){
+  const snap = await getDoc(userRef)
+  const balance = snap.data().balance || 0
+  if(amount > balance){
     alert("Insufficient Balance")
     return
   }
