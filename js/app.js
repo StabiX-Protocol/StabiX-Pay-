@@ -96,6 +96,15 @@ window.verifyOTP = async ()=>{
   await updateDoc(userRef,{ password: npwd.value.trim(), otp:"" });
   renderLogin();
 };
+
+window.goHome = function(){
+const send = document.getElementById("sendScreen");
+const amount = document.getElementById("amountScreen");
+const confirm = document.getElementById("confirmScreen");
+if(send) send.style.display = "none";
+if(amount) amount.style.display = "none";
+if(confirm) confirm.style.display = "none";
+};
 /* ================= UTIL ================= */
 window.appDiv = function(h){document.getElementById("app").innerHTML = h;}
 
