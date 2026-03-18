@@ -143,6 +143,16 @@ Confirm
  <!-- ===== Error Tool===== -->
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
 <script>eruda.init();</script>
+
+<script>
+window.onerror = function(msg, url, line, col, error) {
+  console.log("❌ ERROR:", msg);
+  console.log("📍 File:", url);
+  console.log("📌 Line:", line, "Column:", col);
+};
+</script>
+
+
   
 </body>
 </html>
