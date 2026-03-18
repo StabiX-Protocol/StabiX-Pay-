@@ -352,7 +352,7 @@ document.getElementById("amountScreen").style.display="flex"
 
 window.handleNext = () => {
   const amount = Number(document.getElementById("sendAmt").value)
-  const balance = await window.checkUserBalance()
+  const balance = window.checkUserBalance()
   if(amount > balance){
     alert("Insufficient Balance")
     return
