@@ -358,10 +358,6 @@ if(!amount || amount <= 0){
 alert("Enter valid amount")
 return
 }
-if(amount > userBalance){
-alert("Insufficient Balance")
-return
-}
 document.getElementById("amountScreen").style.display="none"
 document.getElementById("confirmScreen").style.display="flex"
 document.getElementById("confirmAmount").innerText = "-" + amount + " USDC"
