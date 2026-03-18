@@ -347,6 +347,18 @@ return
 document.getElementById("sendScreen").style.display="none"
 document.getElementById("amountScreen").style.display="flex"
 }
+window.handleNext = () => {
+  const amount = Number(document.getElementById("sendAmt").value)
+  if(!amount || amount <= 0){
+    alert("Enter valid amount")
+    return
+  }
+  if(amount > userBalance){
+    alert("Insufficient Balance")
+    return
+  }
+  openConfirm()
+}
 window.backToAddress = ()=>{
 document.getElementById("amountScreen").style.display="none"
 document.getElementById("sendScreen").style.display="flex"
