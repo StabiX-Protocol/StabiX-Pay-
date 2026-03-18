@@ -25,7 +25,6 @@ window.changeUsername = async ()=>{
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
   const user = (await getDoc(userRef)).data();
-  window.currentUser = user;
   const isValidator = (await getDoc(validatorRef)).exists();
   const now = new Date();
 const yyyy = now.getFullYear();
