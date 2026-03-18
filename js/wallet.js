@@ -350,15 +350,21 @@ document.getElementById("sendScreen").style.display="none"
 document.getElementById("amountScreen").style.display="flex"
 }
 
-window.handleNext = () => {
+window.handleNext = async () => {
   const amount = Number(document.getElementById("sendAmt").value)
-  const balance = window.checkUserBalance()
+  if(!amount || amount <= 0){
+    alert("Enter valid amount")
+    return
+  }
+  const balance = await window.checkUserBalance() 
   if(amount > balance){
     alert("Insufficient Balance")
     return
   }
   openConfirm()
 }
+return snap.data().balance || 0;
+
 
 window.backToAddress = ()=>{
 document.getElementById("amountScreen").style.display="none"
