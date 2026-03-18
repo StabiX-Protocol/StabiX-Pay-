@@ -389,6 +389,7 @@ txLock = false
 window.closeTxPopup = ()=>{
 document.getElementById("txPopup").style.display="none"
 document.getElementById("txDoneBtn").style.display="none"
+  goHome();
   }
   
   // ✅ DONE button handler (module-safe)
