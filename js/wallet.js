@@ -330,9 +330,11 @@ const old = document.getElementById("sendPopup")
 if(old) old.remove()
 document.getElementById("sendScreen").style.display="flex"
 }
+
 window.closeSend = ()=>{
 document.getElementById("sendScreen").style.display="none"
 }
+
 window.goAmount = ()=>{
 const toWallet = document.getElementById("sendTo").value.trim()
 if(!toWallet){
@@ -347,22 +349,22 @@ return
 document.getElementById("sendScreen").style.display="none"
 document.getElementById("amountScreen").style.display="flex"
 }
+
 window.handleNext = () => {
   const amount = Number(document.getElementById("sendAmt").value)
-  if(!amount || amount <= 0){
-    alert("Enter valid amount")
-    return
-  }
-  if(amount > userBalance){
+  const balance = window.checkUserBalance()
+  if(amount > balance){
     alert("Insufficient Balance")
     return
   }
   openConfirm()
 }
+
 window.backToAddress = ()=>{
 document.getElementById("amountScreen").style.display="none"
 document.getElementById("sendScreen").style.display="flex"
 }
+
 window.openConfirm= ()=>{
 const amount = document.getElementById("sendAmt").value
 const toWallet = document.getElementById("sendTo").value.trim()
@@ -376,10 +378,12 @@ document.getElementById("confirmAmount").innerText = "-" + amount + " USDC"
 document.getElementById("confirmTo").innerText = toWallet
 document.getElementById("confirmFrom").innerText = WALLET
 }
+
 window.backToAmount = ()=>{
 document.getElementById("confirmScreen").style.display="none"
 document.getElementById("amountScreen").style.display="flex"
 }
+
 window.confirmSend = ()=>{
 if(txLock) return
 txLock = true
