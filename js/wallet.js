@@ -25,6 +25,7 @@ window.changeUsername = async ()=>{
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
   const user = (await getDoc(userRef)).data();
+  window.currentUser = user;
   const isValidator = (await getDoc(validatorRef)).exists();
   const now = new Date();
 const yyyy = now.getFullYear();
@@ -356,8 +357,7 @@ window.handleNext = async () => {
     alert("Enter valid amount")
     return
   }
-  const balance = await window.checkUserBalance() 
-  if(amount > balance){
+  if(amount > window.currentUser.balance){
     alert("Insufficient Balance")
     return
   }
