@@ -363,8 +363,6 @@ window.handleNext = async () => {
   }
   openConfirm()
 }
-return snap.data().balance || 0;
-
 
 window.backToAddress = ()=>{
 document.getElementById("amountScreen").style.display="none"
