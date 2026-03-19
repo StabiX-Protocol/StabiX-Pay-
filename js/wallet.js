@@ -335,7 +335,7 @@ window.closeSend = ()=>{
 document.getElementById("sendScreen").style.display="none"
 }
 
-window.goAmount = ()=>{
+window.goAmount = async ()=>{
 const toWallet = document.getElementById("sendTo").value.trim()
 if(!toWallet){
 alert("Enter wallet ID")
@@ -346,8 +346,22 @@ if(!tgPattern.test(toWallet)){
 alert("Enter valid TG ID (example: TG_123456789)")
 return
 }
+if(toWallet === WALLET){
+    alert("Self transfer not allowed")
+    return
+  }
+  try{
+    // 🔥 USER EXIST CHECK (FIRESTORE)
+    const snap = await getDoc(doc(db,"users",toWallet))
+    if(!snap.exists()){
+      alert("User not found")
+      return
+    }
 document.getElementById("sendScreen").style.display="none"
 document.getElementById("amountScreen").style.display="flex"
+    }catch(e){
+    alert("Error checking user")
+  }
 }
 
 window.handleNext = async () => {
