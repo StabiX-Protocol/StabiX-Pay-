@@ -240,57 +240,30 @@ box.style.display = "block"
 }
 
 }
-
 window.showReceive = ()=>{
-
-const wallet = WALLET
-
-const qr = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data="+wallet
-
-document.body.innerHTML += `
-<div style="
-position:fixed;
-top:0;
-left:0;
-right:0;
-bottom:0;
-background:#000000cc;
-display:flex;
-align-items:center;
-justify-content:center;
-z-index:9999;
-">
-
-<div style="
-background:#020617;
-padding:20px;
-border-radius:16px;
-text-align:center;
-width:300px;
-">
-
-<h3>Receive USDC</h3>
-
-<img src="${qr}" width="180"><br><br>
-
-<div class="small">Wallet ID</div>
-
-<div style="
-font-size:13px;
-word-break:break-all;
-margin-top:5px;
-">
-${wallet}
-</div>
-
-<button onclick="this.parentElement.parentElement.remove()" style="margin-top:15px">
-Close
-</button>
-
-</div>
-</div>
-`
-
+  const wallet = WALLET
+  const qr = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+wallet
+  document.getElementById("qrImg").src = qr
+  document.getElementById("walletAddr").innerText = wallet
+  document.getElementById("receiveScreen").style.display = "flex"
+}
+window.closeReceive = ()=>{
+  document.getElementById("receiveScreen").style.display = "none"
+}
+window.copyWallet = ()=>{
+  navigator.clipboard.writeText(WALLET)
+  alert("Copied")
+}
+window.shareQR = async ()=>{
+  try{
+    await navigator.share({
+      title: "My StabiX Wallet",
+      text: WALLET,
+      url: "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+WALLET
+    })
+  }catch(e){
+    alert("Sharing not supported")
+  }
 }
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
