@@ -80,11 +80,40 @@ ${user.balance.toFixed(2)} USDC
 
 
 <hr>
-  
       ${user.pendingRequest
   ? `<div class="warn"> Pending request under review</div>`
   : ""
       }
+
+     <div id="receiveScreen" style="display:none">
+  <div class="sendHeader">
+    <button onclick="closeReceive()" class="backBtn">←</button>
+    <h2>Receive USDC</h2>
+  </div>
+  <div class="sendBody" style="text-align:center">
+    <img id="qrImg" style="
+      width:240px;
+      border-radius:16px;
+      margin-top:20px;
+    ">
+    <p class="small" style="margin-top:10px">
+      Only send Sepolia assets to this address.
+    </p>
+    <div style="margin-top:20px;font-weight:bold">
+      ETH <span style="opacity:.6">Sepolia</span>
+    </div>
+    <div id="walletAddr" style="
+      font-size:13px;
+      word-break:break-all;
+      margin-top:8px;
+    "></div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:15px">
+      <button onclick="copyWallet()">Copy</button>
+      <button onclick="shareQR()">Share</button>
+    </div>
+  </div>
+  </div>
+
       
       <hr>
 <h3>Deposit / Withdraw</h3>
