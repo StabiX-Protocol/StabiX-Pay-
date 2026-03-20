@@ -97,10 +97,10 @@ ${user.balance.toFixed(2)} USDC
       margin-top:20px;
     ">
     <p class="small" style="margin-top:10px">
-      Only send Sepolia assets to this address.
+      Only Send USDC To This Address.
     </p>
     <div style="margin-top:20px;font-weight:bold">
-      ETH <span style="opacity:.6">Sepolia</span>
+      StabiX QR<span style="opacity:.6">Sepolia</span>
     </div>
     <div id="walletAddr" style="
       font-size:13px;
