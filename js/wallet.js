@@ -91,7 +91,7 @@ ${user.balance.toFixed(2)} USDC
     <h2>Receive USDC</h2>
   </div>
   <div class="sendBody" style="text-align:center">
-    <img id="qrImg" class="qrImg">
+    <div class="qrWrap"><img id="qrImg"></div>
     <p class="small" style="margin-top:10px">
       Only Send USDC To This QR Code.
     </p>
@@ -100,7 +100,12 @@ ${user.balance.toFixed(2)} USDC
     </div>
     <div class="addrBox">
   <span id="walletAddr"></span>
-  <span onclick="copyWallet()" class="copyIcon">📋</span>
+  <span onclick="copyWallet()" class="copyIcon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <rect x="9" y="9" width="13" height="13" rx="2" stroke="#fff" stroke-width="2"/>
+      <rect x="2" y="2" width="13" height="13" rx="2" stroke="#fff" stroke-width="2"/>
+    </svg>
+  </span>
 </div>
   </div>
   </div>
