@@ -100,7 +100,7 @@ ${user.balance.toFixed(2)} USDC
       Only Send USDC To This Address.
     </p>
     <div style="margin-top:20px;font-weight:bold">
-      StabiX QR<span style="opacity:.6"></span>
+      QR CODE 
     </div>
     <div id="walletAddr" style="
       font-size:13px;
@@ -290,7 +290,6 @@ window.copyWallet = ()=>{
 window.downloadQR = ()=>{
   const wallet = WALLET
   const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+wallet
-
   const a = document.createElement("a")
   a.href = qrUrl
   a.download = "stabiX_wallet_qr.png"
