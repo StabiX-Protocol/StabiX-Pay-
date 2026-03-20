@@ -110,6 +110,18 @@ ${user.balance.toFixed(2)} USDC
   </div>
   </div>
 
+  <div id="toastBox" class="toastBox">
+  <div class="toastContent">
+      <div class="toastIcon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" fill="#22c55e"/>
+        <path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div id="toastText">Copied</div>
+  </div>
+</div>
+
       
       <hr>
 <h3>Deposit / Withdraw</h3>
@@ -281,9 +293,17 @@ window.closeReceive = ()=>{
 }
 window.copyWallet = ()=>{
   navigator.clipboard.writeText(WALLET)
-  alert("Copied")
+  showToast("Receiving Wallet ID copied")
 }
-
+window.showToast = (msg)=>{
+  const box = document.getElementById("toastBox")
+  const text = document.getElementById("toastText")
+  text.innerText = msg
+  box.classList.add("show")
+ setTimeout(()=>{
+    box.classList.remove("show")
+  },2000)
+}
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
   return `
