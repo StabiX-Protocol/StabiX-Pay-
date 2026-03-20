@@ -288,14 +288,18 @@ window.copyWallet = ()=>{
   alert("Copied")
 }
 window.shareQR = async ()=>{
-  try{
-    await navigator.share({
-      title: "My StabiX Wallet",
-      text: WALLET,
-      url: "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+WALLET
-    })
-  }catch(e){
-    alert("Sharing not supported")
+  const qr = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+WALLET
+  if(navigator.share){
+    try{
+      await navigator.share({
+        title:"My StabiX Wallet",
+        text: WALLET,
+        url: qr
+      })
+    }catch(e){}
+  }else{
+    // fallback (IMPORTANT)
+    window.open(qr, "_blank")
   }
 }
 /* ================= VALIDATOR PANEL ================= */
