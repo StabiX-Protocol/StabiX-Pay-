@@ -272,9 +272,13 @@ box.style.display = "block"
 window.showReceive = ()=>{
   const wallet = WALLET
   const qr = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+wallet
+
   document.getElementById("qrImg").src = qr
   document.getElementById("walletAddr").innerText = wallet
   document.getElementById("receiveScreen").style.display = "flex"
+  document.getElementById("sendScreen").style.display = "none"
+  document.getElementById("amountScreen").style.display = "none"
+  document.getElementById("confirmScreen").style.display = "none"
 }
 window.closeReceive = ()=>{
   document.getElementById("receiveScreen").style.display = "none"
