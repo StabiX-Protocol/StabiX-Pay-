@@ -91,26 +91,17 @@ ${user.balance.toFixed(2)} USDC
     <h2>Receive USDC</h2>
   </div>
   <div class="sendBody" style="text-align:center">
-    <img id="qrImg" style="
-      width:240px;
-      border-radius:16px;
-      margin-top:20px;
-    ">
+    <img id="qrImg" class="qrImg">
     <p class="small" style="margin-top:10px">
       Only Send USDC To This QR Code.
     </p>
     <div style="margin-top:20px;font-weight:bold">
       QR CODE 
     </div>
-    <div id="walletAddr" style="
-      font-size:13px;
-      word-break:break-all;
-      margin-top:8px;
-    "></div>
-    <div style="display:flex;gap:10px;justify-content:center;margin-top:15px">
-      <button onclick="copyWallet()">Copy</button>
-      <button onclick="downloadQR()">Download</button>
-    </div>
+    <div class="addrBox">
+  <span id="walletAddr"></span>
+  <span onclick="copyWallet()" class="copyIcon">📋</span>
+</div>
   </div>
   </div>
 
@@ -286,16 +277,6 @@ window.closeReceive = ()=>{
 window.copyWallet = ()=>{
   navigator.clipboard.writeText(WALLET)
   alert("Copied")
-}
-window.downloadQR = ()=>{
-  const wallet = WALLET
-  const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+wallet
-  const a = document.createElement("a")
-  a.href = qrUrl
-  a.download = "stabiX_wallet_qr.png"
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
 }
 
 /* ================= VALIDATOR PANEL ================= */
