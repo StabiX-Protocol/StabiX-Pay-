@@ -97,7 +97,7 @@ ${user.balance.toFixed(2)} USDC
       margin-top:20px;
     ">
     <p class="small" style="margin-top:10px">
-      Only Send USDC To This Address.
+      Only Send USDC To This QR Code.
     </p>
     <div style="margin-top:20px;font-weight:bold">
       QR CODE 
