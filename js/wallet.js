@@ -109,7 +109,7 @@ ${user.balance.toFixed(2)} USDC
     "></div>
     <div style="display:flex;gap:10px;justify-content:center;margin-top:15px">
       <button onclick="copyWallet()">Copy</button>
-      <button onclick="shareQR()">Share</button>
+      <button onclick="downloadQR()">Download</button>
     </div>
   </div>
   </div>
@@ -287,21 +287,18 @@ window.copyWallet = ()=>{
   navigator.clipboard.writeText(WALLET)
   alert("Copied")
 }
-window.shareQR = async ()=>{
-  const qr = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+WALLET
-  if(navigator.share){
-    try{
-      await navigator.share({
-        title:"My StabiX Wallet",
-        text: WALLET,
-        url: qr
-      })
-    }catch(e){}
-  }else{
-    // fallback (IMPORTANT)
-    window.open(qr, "_blank")
-  }
+window.downloadQR = ()=>{
+  const wallet = WALLET
+  const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+wallet
+
+  const a = document.createElement("a")
+  a.href = qrUrl
+  a.download = "stabiX_wallet_qr.png"
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
 }
+
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
   return `
