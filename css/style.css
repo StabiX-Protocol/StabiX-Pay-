@@ -477,7 +477,7 @@ opacity:.6;
   align-items:center;
   gap:10px;
   min-width:220px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.4);
+  box-shadow:0 8px 25px rgba(0,0,0,0.5);
 }
 
 .toastIcon{
