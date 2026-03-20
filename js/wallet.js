@@ -100,7 +100,7 @@ ${user.balance.toFixed(2)} USDC
       Only Send USDC To This Address.
     </p>
     <div style="margin-top:20px;font-weight:bold">
-      StabiX QR<span style="opacity:.6">Sepolia</span>
+      StabiX QR<span style="opacity:.6"></span>
     </div>
     <div id="walletAddr" style="
       font-size:13px;
