@@ -96,7 +96,7 @@ ${user.balance.toFixed(2)} USDC
       Only Send USDC To This QR Code.
     </p>
     <div style="margin-top:20px;font-weight:bold">
-      Wallet ID
+    Wallet ID
     </div>
     <div class="addrBox">
   <span id="walletAddr"></span>
