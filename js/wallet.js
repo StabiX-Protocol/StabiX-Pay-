@@ -418,7 +418,7 @@ document.getElementById("txDoneBtn").style.display="none"
   goHome();
   }
 
-  window.openScanner = ()=>{
+window.openScanner = ()=>{
 tg.showPopup({
 title:"Scanner",
 message:"QR Scanner coming soon",
