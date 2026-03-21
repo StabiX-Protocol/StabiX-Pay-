@@ -418,14 +418,6 @@ document.getElementById("txDoneBtn").style.display="none"
   goHome();
   }
 
-window.openScanner = ()=>{
-tg.showPopup({
-title:"Scanner",
-message:"QR Scanner coming soon",
-buttons:[{type:"ok"}]
-})
-  }
-
   // ✅ DONE button handler (module-safe)
 const doneBtnEl = document.getElementById("txDoneBtn");
 if (doneBtnEl) {
