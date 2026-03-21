@@ -77,16 +77,6 @@ if(e!=="Receiver not found") console.log(e);
 }
 
 };
-  
-  window.openScanner = ()=>{
-
-tg.showPopup({
-title:"Scanner",
-message:"QR Scanner coming soon",
-buttons:[{type:"ok"}]
-})
-
-    }
   /*===============Deposit & Withdraw Logic======*/
 window.openDeposit = ()=>{
 const box = document.getElementById("depositBox")
