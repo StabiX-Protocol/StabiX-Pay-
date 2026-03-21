@@ -287,8 +287,10 @@ window.showToast = (msg)=>{
   const box = document.getElementById("toastBox")
   const text = document.getElementById("toastText")
   text.innerText = msg
+  box.classList.remove("show")
+  void box.offsetWidth
   box.classList.add("show")
- setTimeout(()=>{
+  setTimeout(()=>{
     box.classList.remove("show")
   },2000)
 }
