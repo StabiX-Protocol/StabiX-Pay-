@@ -417,11 +417,7 @@ document.getElementById("txPopup").style.display="none"
 document.getElementById("txDoneBtn").style.display="none"
   goHome();
   }
-  window.openScanner = ()=>{
-  const tg = window.Telegram.WebApp
-  tg.showScanQrPopup({
-    text:"Scan QR"
-  }
+
   // ✅ DONE button handler (module-safe)
 const doneBtnEl = document.getElementById("txDoneBtn");
 if (doneBtnEl) {
