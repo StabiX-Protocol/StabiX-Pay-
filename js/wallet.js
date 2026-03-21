@@ -281,7 +281,6 @@ window.closeReceive = ()=>{
 }
 window.copyWallet = ()=>{
   navigator.clipboard.writeText(WALLET)
-  showToast("Receiving Wallet ID copied")
 }
 
 /* ================= VALIDATOR PANEL ================= */
