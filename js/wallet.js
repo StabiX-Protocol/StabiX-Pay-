@@ -443,19 +443,28 @@ window.openScanner = async ()=>{
     }
   )
 }
-window.closeScanner = async ()=>{
-  if(qrScanner){
-    await qrScanner.stop()
+window.closeScanner = async () => {
+  try {
+    if (qrScanner && qrScanner.getState() === 2) {
+      await qrScanner.stop();
+    }
+  } catch (e) {
+    console.log("Scanner stop error:", e);
   }
-  document.getElementById("scannerOverlay").style.display = "none"
-  document.getElementById("torchBtn").style.display = "none"
-torchOn = false
-}
+  document.getElementById("scannerOverlay").style.display = "none";
+  document.getElementById("torchBtn").style.display = "none";
+  torchOn = false;
+  window.scanDone = false;
+};
 
 let torchOn = false;
 window.toggleTorch = async () => {
   if (!qrScanner) return;
   try {
+    if (qrScanner.getState() !== 2) {
+      console.log("Scanner not running");
+      return;
+    }
     torchOn = !torchOn;
     await qrScanner.applyVideoConstraints({
       advanced: [{ torch: torchOn }]
@@ -463,7 +472,6 @@ window.toggleTorch = async () => {
     console.log("Torch:", torchOn ? "ON" : "OFF");
   } catch (e) {
     console.log("Torch error:", e);
-    alert("Torch not supported");
   }
 };
 
