@@ -394,22 +394,31 @@ document.getElementById("txDoneBtn").style.display="none"
   }
 window.openScanner = ()=>{
   const tg = window.Telegram.WebApp
-
   tg.showScanQrPopup({
     text:"Scan StabiX QR"
   }, async (result)=>{
-    let raw = result.data || result.text
-    let data
+    let raw = result?.data || result?.text || ""
+    if(!raw){
+      alert("Invalid QR")
+      return
+    }
+    let data = null
     try{
-  data = JSON.parse(raw)
-  if(typeof data === "string"){
-    data = JSON.parse(data)
-  }
-}catch(e){
-  alert("Invalid QR")
-  return
-}
-    // valid QR check
+      data = JSON.parse(raw)
+      if(typeof data === "string"){
+        data = JSON.parse(data)
+      }
+    }catch(e){
+      if(/^TG_\d{6,}$/.test(raw.trim())){
+        data = {
+          type:"stabix",
+          id: raw.trim()
+        }
+      }else{
+        alert("Invalid QR")
+        return
+      }
+    }
     if((data.type || "").toLowerCase().trim() !== "stabix"){
       alert("Invalid QR")
       return
