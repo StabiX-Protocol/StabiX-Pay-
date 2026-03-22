@@ -452,24 +452,24 @@ window.closeScanner = async ()=>{
 torchOn = false
 }
 
-let torchOn = false
+let torchOn = false;
 window.toggleTorch = async () => {
-  if (!qrScanner) return
-  try {
-    const track = qrScanner.getRunningTrack()
-    if (!track) {
-      alert("Torch not supported")
-      return
-    }
-    torchOn = !torchOn
-    await track.applyConstraints({
-      advanced: [{ torch: torchOn }]
-    })
-  } catch (e) {
-    console.log("Torch error:", e)
-    alert("Torch not supported")
+  if (!qrScanner) return;
+  if (typeof qrScanner.applyVideoConstraints !== "function") {
+    alert("Torch not supported");
+    return;
   }
-}
+  try {
+    torchOn = !torchOn;
+    await qrScanner.applyVideoConstraints({
+      advanced: [{ torch: torchOn }]
+    });
+    console.log("Torch:", torchOn ? "ON" : "OFF");
+  } catch (e) {
+    console.log("Torch error:", e);
+    alert("Torch failed");
+  }
+};
 
   window.softRefresh = async function(){
   try{
