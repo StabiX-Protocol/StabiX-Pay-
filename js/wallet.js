@@ -1,3 +1,5 @@
+window.scanDone = false
+window.scanTargetId = null
 import "./firebase.js"
 import {
   doc,
@@ -226,8 +228,8 @@ ${user.eoaAddress ? user.eoaAddress : "No EOA wallet registered"}
   `);
   loadHistoryByDate();
 
-  //scan flow fix
-if(scanTargetId){
+// 🔥 SCAN FIX
+if(window.scanTargetId){
   setTimeout(()=>{
     const send = document.getElementById("sendScreen")
     const amount = document.getElementById("amountScreen")
@@ -236,12 +238,9 @@ if(scanTargetId){
     if(send && amount && input){
       send.style.display = "none"
       amount.style.display = "flex"
-      input.value = scanTargetId
+      input.value = window.scanTargetId
     }
-
-    // reset after use
-    scanTargetId = null
-
+    window.scanTargetId = null
   },150)
 }
   
@@ -413,15 +412,13 @@ document.getElementById("txDoneBtn").style.display="none"
   goHome();
   }
 
-let scanDone = false
-let scanTargetId = null
 window.openScanner = ()=>{
   const tg = window.Telegram.WebApp
-  scanDone = false
+  window.scanDone = false   // 🔥 FIX
   tg.showScanQrPopup({
     text:"Scan StabiX QR"
   }, async (result)=>{
-    if(scanDone) return true
+    if(window.scanDone) return true   // 🔥 FIX
     let raw = result?.data || result?.text || ""
     let data
     try{
@@ -446,8 +443,8 @@ window.openScanner = ()=>{
       alert("Error checking user")
       return true
     }
-    scanDone = true
-    scanTargetId = targetId
+    window.scanDone = true
+    window.scanTargetId = targetId
     return true  
   })
 }
