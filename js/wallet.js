@@ -392,8 +392,8 @@ document.getElementById("txPopup").style.display="none"
 document.getElementById("txDoneBtn").style.display="none"
   goHome();
   }
-
 let scanLock = false
+
 window.openScanner = ()=>{
   const tg = window.Telegram.WebApp
   scanLock = false
@@ -434,12 +434,21 @@ window.openScanner = ()=>{
     }
     tg.closeScanQrPopup()
     setTimeout(()=>{
-      document.getElementById("sendScreen").style.display = "none"
-      document.getElementById("amountScreen").style.display = "flex"
-      document.getElementById("sendTo").value = targetId
-    },200)
+      const send = document.getElementById("sendScreen")
+      const amount = document.getElementById("amountScreen")
+      const input = document.getElementById("sendTo")
+      if(!send || !amount || !input){
+        console.log("UI not ready")
+        scanLock = false
+        return
+      }
+      send.style.display = "none"
+      amount.style.display = "flex"
+      input.value = targetId
+    },500)
   })
 }
+
 
   // DONE button handler (module-safe)
 const doneBtnEl = document.getElementById("txDoneBtn");
