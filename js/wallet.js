@@ -449,6 +449,21 @@ window.closeScanner = async ()=>{
   document.getElementById("scannerOverlay").style.display = "none"
 }
 
+let torchOn = false
+window.toggleTorch = async ()=>{
+  if(!qrScanner) return
+  const track = qrScanner.getRunningTrack()
+  if(!track) return
+  torchOn = !torchOn
+  try{
+    await track.applyConstraints({
+      advanced: [{ torch: torchOn }]
+    })
+  }catch(e){
+    alert("Torch not supported")
+  }
+}
+
   window.softRefresh = async function(){
   try{
     // 🔄 re-fetch user data
