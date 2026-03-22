@@ -484,3 +484,13 @@ opacity:.6;
   display:flex;
   align-items:center;
 }
+
+#qr-reader{
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: black;
+  z-index: 9999;
+}
