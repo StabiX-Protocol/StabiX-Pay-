@@ -392,35 +392,31 @@ document.getElementById("txPopup").style.display="none"
 document.getElementById("txDoneBtn").style.display="none"
   goHome();
   }
+
+let scanLock = false
 window.openScanner = ()=>{
   const tg = window.Telegram.WebApp
+  scanLock = false
   tg.showScanQrPopup({
     text:"Scan StabiX QR"
   }, async (result)=>{
+    if(scanLock) return
+    scanLock = true
     let raw = result?.data || result?.text || ""
-    if(!raw){
-      alert("Invalid QR")
-      return
-    }
-    let data = null
+    let data
     try{
       data = JSON.parse(raw)
       if(typeof data === "string"){
         data = JSON.parse(data)
       }
     }catch(e){
-      if(/^TG_\d{6,}$/.test(raw.trim())){
-        data = {
-          type:"stabix",
-          id: raw.trim()
-        }
-      }else{
-        alert("Invalid QR")
-        return
-      }
+      alert("Invalid QR")
+      scanLock = false
+      return
     }
     if((data.type || "").toLowerCase().trim() !== "stabix"){
       alert("Invalid QR")
+      scanLock = false
       return
     }
     const targetId = data.id
@@ -428,16 +424,20 @@ window.openScanner = ()=>{
       const docSnap = await getDoc(doc(db,"users",targetId))
       if(!docSnap.exists()){
         alert("User not found")
+        scanLock = false
         return
       }
     }catch(e){
       alert("Error checking user")
+      scanLock = false
       return
     }
-    document.getElementById("sendScreen").style.display = "none"
-    document.getElementById("amountScreen").style.display = "flex"
-    document.getElementById("sendTo").value = targetId
     tg.closeScanQrPopup()
+    setTimeout(()=>{
+      document.getElementById("sendScreen").style.display = "none"
+      document.getElementById("amountScreen").style.display = "flex"
+      document.getElementById("sendTo").value = targetId
+    },200)
   })
 }
 
