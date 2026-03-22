@@ -393,14 +393,14 @@ document.getElementById("txDoneBtn").style.display="none"
   goHome();
   }
 
-let scanDone = false 
+let scanDone = false
 window.openScanner = ()=>{
   const tg = window.Telegram.WebApp
   scanDone = false
   tg.showScanQrPopup({
     text:"Scan StabiX QR"
   }, async (result)=>{
-    if(scanDone) return
+    if(scanDone) return true
     let raw = result?.data || result?.text || ""
     let data
     try{
@@ -409,24 +409,23 @@ window.openScanner = ()=>{
         data = JSON.parse(data)
       }
     }catch(e){
-      return // ❗ alert hata (spam hota hai)
+      return false
     }
     if((data.type || "").toLowerCase().trim() !== "stabix"){
-      return
+      return false
     }
     const targetId = data.id
     try{
       const docSnap = await getDoc(doc(db,"users",targetId))
       if(!docSnap.exists()){
         alert("User not found")
-        return
+        return true
       }
     }catch(e){
       alert("Error checking user")
-      return
+      return true
     }
-    scanDone = true
-    tg.closeScanQrPopup()
+    scanDone = true  
     setTimeout(()=>{
       const send = document.getElementById("sendScreen")
       const amount = document.getElementById("amountScreen")
@@ -436,7 +435,8 @@ window.openScanner = ()=>{
         amount.style.display = "flex"
         input.value = targetId
       }
-    },400)
+    },300)
+    return true 
   })
 }
 
