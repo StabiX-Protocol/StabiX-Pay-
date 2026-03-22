@@ -267,8 +267,13 @@ box.style.display = "block"
 }
 window.showReceive = ()=>{
   const wallet = WALLET
-  const qr = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+wallet
+  const qrData = JSON.stringify({
+  type: "stabix",
+  id: wallet
+})
 
+const qr = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(qrData)
+  
   document.getElementById("qrImg").src = qr
   document.getElementById("walletAddr").innerText = wallet
   document.getElementById("receiveScreen").style.display = "flex"
@@ -387,6 +392,42 @@ document.getElementById("txPopup").style.display="none"
 document.getElementById("txDoneBtn").style.display="none"
   goHome();
   }
+window.openScanner = ()=>{
+  const tg = window.Telegram.WebApp
+
+  tg.showScanQrPopup({
+    text:"Scan StabiX QR"
+  }, async (result)=>{
+    const raw = result.data || result.text
+    let data
+    try{
+      data = JSON.parse(raw)
+    }catch(e){
+      alert("Invalid QR")
+      return
+    }
+    // valid QR check
+    if((data.type || "").toLowerCase().trim() !== "stabix"){
+      alert("Invalid QR")
+      return
+    }
+    const targetId = data.id
+    try{
+      const docSnap = await getDoc(doc(db,"users",targetId))
+      if(!docSnap.exists()){
+        alert("User not found")
+        return
+      }
+    }catch(e){
+      alert("Error checking user")
+      return
+    }
+    document.getElementById("sendScreen").style.display = "none"
+    document.getElementById("amountScreen").style.display = "flex"
+    document.getElementById("sendTo").value = targetId
+    tg.closeScanQrPopup()
+  })
+}
 
   // DONE button handler (module-safe)
 const doneBtnEl = document.getElementById("txDoneBtn");
