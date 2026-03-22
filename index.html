@@ -175,7 +175,6 @@ z-index:99999;
   <div class="corner tr"></div>
   <div class="corner bl"></div>
   <div class="corner br"></div>
-
   </div>
 
   <button onclick="closeScanner()" style="
@@ -191,6 +190,24 @@ z-index:99999;
     border-radius:50%;
     z-index:100000;
   ">✕</button>
+  
+    <button id="torchBtn" onclick="toggleTorch()" style="
+  display:none;
+  position:absolute;
+  top:15px;
+  right:15px;
+  background:rgba(0,0,0,0.7);
+  color:#fff;
+  border:none;
+  font-size:18px;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  z-index:100000;
+">
+🔦
+  </button>
+    
  </div>
 
 
