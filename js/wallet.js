@@ -398,14 +398,17 @@ window.openScanner = ()=>{
   tg.showScanQrPopup({
     text:"Scan StabiX QR"
   }, async (result)=>{
-    const raw = result.data || result.text
+    let raw = result.data || result.text
     let data
     try{
-      data = JSON.parse(raw)
-    }catch(e){
-      alert("Invalid QR")
-      return
-    }
+  data = JSON.parse(raw)
+  if(typeof data === "string"){
+    data = JSON.parse(data)
+  }
+}catch(e){
+  alert("Invalid QR")
+  return
+}
     // valid QR check
     if((data.type || "").toLowerCase().trim() !== "stabix"){
       alert("Invalid QR")
