@@ -449,33 +449,6 @@ window.closeScanner = async ()=>{
   document.getElementById("scannerOverlay").style.display = "none"
 }
 
-let torchOn = false;
-window.toggleTorch = async () => {
-  if (!qrScanner) return;
-  const track = qrScanner.getRunningTrack();
-  if (!track) return;
-  const capabilities = track.getCapabilities();
-  if (!capabilities.torch) {
-    alert("Torch not supported");
-    return;
-  }
-  torchOn = !torchOn;
-  await track.applyConstraints({
-    advanced: [{ torch: torchOn }]
-  });
-  document.getElementById("torchBtn").style.background =
-    torchOn ? "gold" : "rgba(0,0,0,0.6)";
-};
-
-  // DONE button handler (module-safe)
-const doneBtnEl = document.getElementById("txDoneBtn");
-if (doneBtnEl) {
-  doneBtnEl.addEventListener("click", () => {
-    const pop = document.getElementById("txPopup");
-    if (pop) pop.style.display = "none";
-  });
-}
-
   window.softRefresh = async function(){
   try{
     // 🔄 re-fetch user data
