@@ -392,62 +392,74 @@ document.getElementById("txPopup").style.display="none"
 document.getElementById("txDoneBtn").style.display="none"
   goHome();
   }
-let scanLock = false
 
 window.openScanner = ()=>{
   const tg = window.Telegram.WebApp
-  scanLock = false
+
   tg.showScanQrPopup({
     text:"Scan StabiX QR"
   }, async (result)=>{
-    if(scanLock) return
-    scanLock = true
-    let raw = result?.data || result?.text || ""
+    let raw = result.data || result.text
+    
+    // Clean karo raw data
+    raw = raw.trim()
+    
     let data
     try{
       data = JSON.parse(raw)
-      if(typeof data === "string"){
-        data = JSON.parse(data)
-      }
     }catch(e){
-      alert("Invalid QR")
-      scanLock = false
+      try{
+        // Agar parse fail ho, toh fix try karo
+        raw = raw.replace(/'/g, '"')
+        raw = raw.replace(/(\w+):/g, '"$1":')
+        data = JSON.parse(raw)
+      }catch(e2){
+        alert("QR code sahi nahi hai")
+        return
+      }
+    }
+    
+    // Case-insensitive check - dono "stabix" aur "stabiX" kaam karega
+    const qrType = (data.type || "").toLowerCase().trim()
+    if(qrType !== "stabix"){
+      alert("Invalid QR - StabiX ka QR nahi hai")
       return
     }
-    if((data.type || "").toLowerCase().trim() !== "stabix"){
-      alert("Invalid QR")
-      scanLock = false
+    
+    // ID clean karo (space hatao)
+    const targetId = data.id ? data.id.toString().trim().replace(/\s/g, '') : ""
+    if(!targetId){
+      alert("QR mein ID nahi mili")
       return
     }
-    const targetId = data.id
+    
+    // Pattern check karo
+    const tgPattern = /^TG_\d+$/
+    if(!tgPattern.test(targetId)){
+      alert("ID format sahi nahi hai")
+      return
+    }
+    
     try{
       const docSnap = await getDoc(doc(db,"users",targetId))
       if(!docSnap.exists()){
-        alert("User not found")
-        scanLock = false
+        alert("User exist nahi karta")
         return
       }
+      
+      // Sab sahi hai - send screen khol do
+      document.getElementById("sendScreen").style.display = "none"
+      document.getElementById("amountScreen").style.display = "flex"
+      document.getElementById("sendTo").value = targetId
+      tg.closeScanQrPopup()
+      
     }catch(e){
-      alert("Error checking user")
-      scanLock = false
-      return
+      alert("User check karne mein error")
     }
-    tg.closeScanQrPopup()
-    setTimeout(()=>{
-      const send = document.getElementById("sendScreen")
-      const amount = document.getElementById("amountScreen")
-      const input = document.getElementById("sendTo")
-      if(!send || !amount || !input){
-        console.log("UI not ready")
-        scanLock = false
-        return
-      }
-      send.style.display = "none"
-      amount.style.display = "flex"
-      input.value = targetId
-    },500)
   })
 }
+
+
 
 
   // DONE button handler (module-safe)
