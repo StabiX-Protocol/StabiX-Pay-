@@ -455,10 +455,6 @@ torchOn = false
 let torchOn = false;
 window.toggleTorch = async () => {
   if (!qrScanner) return;
-  if (typeof qrScanner.applyVideoConstraints !== "function") {
-    alert("Torch not supported");
-    return;
-  }
   try {
     torchOn = !torchOn;
     await qrScanner.applyVideoConstraints({
@@ -467,7 +463,7 @@ window.toggleTorch = async () => {
     console.log("Torch:", torchOn ? "ON" : "OFF");
   } catch (e) {
     console.log("Torch error:", e);
-    alert("Torch failed");
+    alert("Torch not supported");
   }
 };
 
