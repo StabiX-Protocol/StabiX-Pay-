@@ -397,42 +397,46 @@ document.getElementById("txDoneBtn").style.display="none"
   }
 
 window.openScanner = ()=>{
-  const tg = window.Telegram.WebApp
-  window.scanDone = false   // 🔥 FIX
-  tg.showScanQrPopup({
-    text:"Scan StabiX QR"
-  }, async (result)=>{
-    if(window.scanDone) return true   // 🔥 FIX
-    let raw = result?.data || result?.text || ""
-    let data
-    try{
-      data = JSON.parse(raw)
-      if(typeof data === "string"){
-        data = JSON.parse(data)
+  const qr = new Html5Qrcode("qr-reader")
+  qr.start(
+    { facingMode: "environment" },
+    {
+      fps: 10,
+      qrbox: 250
+    },
+    async (decodedText)=>{
+      let data
+      try{
+        data = JSON.parse(decodedText)
+      }catch(e){
+        alert("Invalid QR")
+        return
       }
-    }catch(e){
-      return false
-    }
-    if((data.type || "").toLowerCase().trim() !== "stabix"){
-      return false
-    }
-    const targetId = data.id
-    try{
-      const docSnap = await getDoc(doc(db,"users",targetId))
-      if(!docSnap.exists()){
-        alert("User not found")
-        return true
+      if((data.type || "").toLowerCase() !== "stabix"){
+        alert("Invalid QR")
+        return
       }
-    }catch(e){
-      alert("Error checking user")
-      return true
+      const targetId = data.id
+      try{
+        const docSnap = await getDoc(doc(db,"users",targetId))
+        if(!docSnap.exists()){
+          alert("User not found")
+          return
+        }
+      }catch(e){
+        alert("Error checking user")
+        return
+      }
+      await qr.stop()
+      document.getElementById("sendScreen").style.display="none"
+      document.getElementById("amountScreen").style.display="flex"
+      document.getElementById("sendTo").value = targetId
+    },
+    (err)=>{
+      // ignore error
     }
-    window.scanDone = true
-    window.scanTargetId = targetId
-    return true  
-  })
-}
-
+  )
+  }
 
 
   // DONE button handler (module-safe)
