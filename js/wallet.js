@@ -387,19 +387,6 @@ document.getElementById("txPopup").style.display="none"
 document.getElementById("txDoneBtn").style.display="none"
   goHome();
   }
-/* ================= SCAN FUNCTION ================= */
-window.openScanner = ()=>{
-  const val = prompt("Paste Wallet ID / Scan QR");
-  if(!val) return;
-  const tgPattern = /^TG_\d{6,}$/;
-  if(!tgPattern.test(val)){
-    alert("Invalid Wallet ID (example: TG_123456789)");
-    return;
-  }
-  document.getElementById("sendScreen").style.display="flex";
-  document.getElementById("sendTo").value = val;
-  goAmount();
-}
 
   // DONE button handler (module-safe)
 const doneBtnEl = document.getElementById("txDoneBtn");
