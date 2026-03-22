@@ -283,36 +283,6 @@ window.copyWallet = ()=>{
   navigator.clipboard.writeText(WALLET)
 }
 
-/* ================= VALIDATOR PANEL ================= */
-function validatorPanel(){
-  return `
-    <hr>
-    <h3>Validator Panel</h3>
-
-    <input id="vUser" placeholder="Target User ID (TG_xxx)">
-    <select id="vType">
-      <option value="deposit">Deposit</option>
-      <option value="withdraw">Withdraw</option>
-    </select>
-    <input id="vAmount" type="number" placeholder="Amount">
-    <button onclick="checkUserBalance()">Check Balance</button>
-<div id="balanceOut" class="small" style="margin-top:8px"></div>
-
-    <button onclick="validatorAdjust()">Apply</button>
-
-    <hr>
-    <button onclick="loadRequests()">Load Pending</button>
-    <div id="vout"></div>
-    <hr>
-<h3>All Users</h3>
-
-<button onclick="loadAllUsers()">Load Users</button>
-
-<div id="userCount" class="small" style="margin-top:6px"></div>
-<div id="userList" style="margin-top:10px"></div>
-  `;
-}
-
   // Sending UI 
 let txLock = false
 
@@ -417,8 +387,21 @@ document.getElementById("txPopup").style.display="none"
 document.getElementById("txDoneBtn").style.display="none"
   goHome();
   }
+/* ================= SCAN FUNCTION ================= */
+window.openScanner = ()=>{
+  const val = prompt("Paste Wallet ID / Scan QR");
+  if(!val) return;
+  const tgPattern = /^TG_\d{6,}$/;
+  if(!tgPattern.test(val)){
+    alert("Invalid Wallet ID (example: TG_123456789)");
+    return;
+  }
+  document.getElementById("sendScreen").style.display="flex";
+  document.getElementById("sendTo").value = val;
+  goAmount();
+}
 
-  // ✅ DONE button handler (module-safe)
+  // DONE button handler (module-safe)
 const doneBtnEl = document.getElementById("txDoneBtn");
 if (doneBtnEl) {
   doneBtnEl.addEventListener("click", () => {
@@ -442,6 +425,35 @@ if (doneBtnEl) {
     alert("Refresh failed");
   }
 };
+/* ================= VALIDATOR PANEL ================= */
+function validatorPanel(){
+  return `
+    <hr>
+    <h3>Validator Panel</h3>
+
+    <input id="vUser" placeholder="Target User ID (TG_xxx)">
+    <select id="vType">
+      <option value="deposit">Deposit</option>
+      <option value="withdraw">Withdraw</option>
+    </select>
+    <input id="vAmount" type="number" placeholder="Amount">
+    <button onclick="checkUserBalance()">Check Balance</button>
+<div id="balanceOut" class="small" style="margin-top:8px"></div>
+
+    <button onclick="validatorAdjust()">Apply</button>
+
+    <hr>
+    <button onclick="loadRequests()">Load Pending</button>
+    <div id="vout"></div>
+    <hr>
+<h3>All Users</h3>
+
+<button onclick="loadAllUsers()">Load Users</button>
+
+<div id="userCount" class="small" style="margin-top:6px"></div>
+<div id="userList" style="margin-top:10px"></div>
+  `;
+}
   // ================= EOA WALLET =================
 window.editEOA = async ()=>{
   const snap = await getDoc(userRef);
