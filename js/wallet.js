@@ -399,6 +399,7 @@ document.getElementById("txDoneBtn").style.display="none"
 let qrScanner = null
 window.openScanner = async ()=>{
   document.getElementById("scannerOverlay").style.display = "block"
+  document.getElementById("torchBtn").style.display = "block"
   qrScanner = new Html5Qrcode("qr-reader")
   await qrScanner.start(
   { facingMode: "environment" },
@@ -435,7 +436,7 @@ window.openScanner = async ()=>{
       // 🔥 STOP SCANNER
       await qrScanner.stop()
       document.getElementById("scannerOverlay").style.display = "none"
-      // 🔥 NAVIGATE
+      
       document.getElementById("sendScreen").style.display="none"
       document.getElementById("amountScreen").style.display="flex"
       document.getElementById("sendTo").value = targetId
@@ -447,15 +448,16 @@ window.closeScanner = async ()=>{
     await qrScanner.stop()
   }
   document.getElementById("scannerOverlay").style.display = "none"
+  document.getElementById("torchBtn").style.display = "none"
 }
 
 let torchOn = false
 window.toggleTorch = async ()=>{
   if(!qrScanner) return
-  const track = qrScanner.getRunningTrack()
-  if(!track) return
-  torchOn = !torchOn
   try{
+    const track = qrScanner.getRunningTrack()
+    if(!track) return
+    torchOn = !torchOn
     await track.applyConstraints({
       advanced: [{ torch: torchOn }]
     })
