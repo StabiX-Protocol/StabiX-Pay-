@@ -401,6 +401,12 @@ window.openScanner = async ()=>{
   document.getElementById("scannerOverlay").style.display = "block"
   document.getElementById("torchBtn").style.display = "block"
   document.getElementById("galleryBtn").style.display = "block"
+
+  document.getElementById("galleryBtn")
+    .onclick = () => {
+      document.getElementById("galleryInput").click();
+    };
+  
   qrScanner = new Html5Qrcode("qr-reader")
   await qrScanner.start(
   { facingMode: "environment" },
@@ -477,8 +483,10 @@ window.toggleTorch = async () => {
   }
 };
 window.openGallery = () => {
+  document.getElementById("galleryBtn")
+  .addEventListener("click", () => {
   document.getElementById("galleryInput").click();
-};
+};)
 
   window.softRefresh = async function(){
   try{
