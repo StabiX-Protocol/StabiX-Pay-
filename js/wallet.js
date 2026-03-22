@@ -400,6 +400,7 @@ let qrScanner = null
 window.openScanner = async ()=>{
   document.getElementById("scannerOverlay").style.display = "block"
   document.getElementById("torchBtn").style.display = "block"
+  document.getElementById("galleryBtn").style.display = "block"
   qrScanner = new Html5Qrcode("qr-reader")
   await qrScanner.start(
   { facingMode: "environment" },
@@ -452,6 +453,7 @@ window.closeScanner = async () => {
     console.log("Scanner stop error:", e);
   }
   document.getElementById("scannerOverlay").style.display = "none";
+  document.getElementById("galleryBtn").style.display = "none"
   document.getElementById("torchBtn").style.display = "none";
   torchOn = false;
   window.scanDone = false;
@@ -473,6 +475,9 @@ window.toggleTorch = async () => {
   } catch (e) {
     console.log("Torch error:", e);
   }
+};
+window.openGallery = () => {
+  document.getElementById("galleryInput").click();
 };
 
   window.softRefresh = async function(){
