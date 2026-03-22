@@ -396,9 +396,11 @@ document.getElementById("txDoneBtn").style.display="none"
   goHome();
   }
 
-window.openScanner = ()=>{
-  const qr = new Html5Qrcode("qr-reader")
-  qr.start(
+let qrScanner = null
+window.openScanner = async ()=>{
+  document.getElementById("scannerOverlay").style.display = "block"
+  qrScanner = new Html5Qrcode("qr-reader")
+  await qrScanner.start(
     { facingMode: "environment" },
     {
       fps: 10,
@@ -427,17 +429,22 @@ window.openScanner = ()=>{
         alert("Error checking user")
         return
       }
-      await qr.stop()
+      // 🔥 STOP SCANNER
+      await qrScanner.stop()
+      document.getElementById("scannerOverlay").style.display = "none"
+      // 🔥 NAVIGATE
       document.getElementById("sendScreen").style.display="none"
       document.getElementById("amountScreen").style.display="flex"
       document.getElementById("sendTo").value = targetId
-    },
-    (err)=>{
-      // ignore error
     }
   )
+}
+window.closeScanner = async ()=>{
+  if(qrScanner){
+    await qrScanner.stop()
   }
-
+  document.getElementById("scannerOverlay").style.display = "none"
+}
 
   // DONE button handler (module-safe)
 const doneBtnEl = document.getElementById("txDoneBtn");
