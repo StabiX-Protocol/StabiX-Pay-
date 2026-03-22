@@ -153,25 +153,30 @@ z-index:99999;
 ">
 
   <div id="qr-reader" style="
-  position:absolute;
-  top:50%;
-  left:50%;
-  width:220px;
-  height:220px;
-  transform:translate(-50%,-50%);
-">
-  </div>
-
-  <div style="
-  position:absolute;
-  top:50%;
-  left:50%;
-  width:220px;
-  height:220px;
-  transform:translate(-50%,-50%);
-  border:2px solid rgba(255,255,255,0.3);
-  border-radius:12px;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  z-index:9999;
 "></div>
+
+  <div id="scanBox" style="
+  position:fixed;
+  top:50%;
+  left:50%;
+  width:240px;
+  height:240px;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+">
+  <!-- 4 corners -->
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+
+  </div>
 
   <button onclick="closeScanner()" style="
     position:absolute;
