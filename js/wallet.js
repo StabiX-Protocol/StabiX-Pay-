@@ -225,6 +225,26 @@ ${user.eoaAddress ? user.eoaAddress : "No EOA wallet registered"}
     </div>
   `);
   loadHistoryByDate();
+
+  //scan flow fix
+if(scanTargetId){
+  setTimeout(()=>{
+    const send = document.getElementById("sendScreen")
+    const amount = document.getElementById("amountScreen")
+    const input = document.getElementById("sendTo")
+
+    if(send && amount && input){
+      send.style.display = "none"
+      amount.style.display = "flex"
+      input.value = scanTargetId
+    }
+
+    // reset after use
+    scanTargetId = null
+
+  },150)
+}
+  
   // 🎉 RECEIVE POPUP (one-time)
 try{
   const q = query(
@@ -394,6 +414,7 @@ document.getElementById("txDoneBtn").style.display="none"
   }
 
 let scanDone = false
+let scanTargetId = null
 window.openScanner = ()=>{
   const tg = window.Telegram.WebApp
   scanDone = false
@@ -425,20 +446,12 @@ window.openScanner = ()=>{
       alert("Error checking user")
       return true
     }
-    scanDone = true  
-    setTimeout(()=>{
-      const send = document.getElementById("sendScreen")
-      const amount = document.getElementById("amountScreen")
-      const input = document.getElementById("sendTo")
-      if(send && amount && input){
-        send.style.display = "none"
-        amount.style.display = "flex"
-        input.value = targetId
-      }
-    },300)
-    return true 
+    scanDone = true
+    scanTargetId = targetId
+    return true  
   })
 }
+
 
 
   // DONE button handler (module-safe)
