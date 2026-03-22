@@ -227,22 +227,6 @@ ${user.eoaAddress ? user.eoaAddress : "No EOA wallet registered"}
     </div>
   `);
   loadHistoryByDate();
-
-// 🔥 SCAN FIX
-if(window.scanTargetId){
-  setTimeout(()=>{
-    const send = document.getElementById("sendScreen")
-    const amount = document.getElementById("amountScreen")
-    const input = document.getElementById("sendTo")
-
-    if(send && amount && input){
-      send.style.display = "none"
-      amount.style.display = "flex"
-      input.value = window.scanTargetId
-    }
-    window.scanTargetId = null
-  },150)
-}
   
   // 🎉 RECEIVE POPUP (one-time)
 try{
