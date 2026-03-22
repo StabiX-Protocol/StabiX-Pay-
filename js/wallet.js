@@ -401,11 +401,14 @@ window.openScanner = async ()=>{
   document.getElementById("scannerOverlay").style.display = "block"
   qrScanner = new Html5Qrcode("qr-reader")
   await qrScanner.start(
-    { facingMode: "environment" },
-    {
-      fps: 10,
-      qrbox: 250
-    },
+  { facingMode: "environment" },
+  {
+    fps: 10,
+    qrbox: {
+      width: 250,
+      height: 250
+    }
+  },
     async (decodedText)=>{
       let data
       try{
