@@ -244,7 +244,12 @@ z-index:99999;
   </svg>
   <span>Upload From Gallery</span>
 </span>
-<input type="file" id="galleryInput" accept="image/*" style="display:none">
+<input 
+  type="file" 
+  id="galleryInput" 
+  accept="image/*" 
+  style="display:none"
+  onchange="handleGallery(event)">
 
     
  </div>
