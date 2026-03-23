@@ -477,8 +477,9 @@ window.toggleTorch = async () => {
     console.log("Torch error:", e);
   }
 };
-window.openGallery = () => {
-  document.getElementById("galleryInput").click();
+window.openGallery = function () {
+  const input = document.getElementById("galleryInput");
+  if (input) input.click();
 };
 
   window.softRefresh = async function(){
