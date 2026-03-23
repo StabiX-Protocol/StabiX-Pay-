@@ -225,7 +225,17 @@ ${user.eoaAddress ? user.eoaAddress : "No EOA wallet registered"}
   ${isValidator ? validatorPanel() : ""}
     </div>
 
-  <div id="previewScreen" style="display:none">
+     <div id="previewScreen" style="
+      display:none;
+      position:fixed;
+      top:0;
+      left:0;
+      width:100vw;
+      height:100vh;
+      background:#020617;
+      z-index:9999;
+      overflow:auto;
+      ">
   <div class="sendHeader">
     <button onclick="closePreview()" class="backBtn">←</button>
     <h2>Send USDC</h2>
