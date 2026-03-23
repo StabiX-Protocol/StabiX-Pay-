@@ -225,45 +225,41 @@ ${user.eoaAddress ? user.eoaAddress : "No EOA wallet registered"}
   ${isValidator ? validatorPanel() : ""}
     </div>
 
-     <div id="previewScreen" style="
-      display:none;
-      position:fixed;
-      top:0;
-      left:0;
-      width:100vw;
-      height:100vh;
-      background:#020617;
-      z-index:9999;
-      overflow:auto;
-      ">
-  <div class="sendHeader">
-    <button onclick="closePreview()" class="backBtn">←</button>
-    <h2>Send USDC</h2>
-  </div>
-  <div class="sendBody">
-    <h1 class="sendTitle">Receiving Wallet ID</h1>
-    <p class="sendSub">Scanned Wallet ID</p>
-    <div class="addressBox">
-      <input 
-        id="previewId"
-        type="text"
-        readonly
-        style="
-          background:#1f2937;
-          color:#fff;
-          border:none;
-          width:100%;
-          padding:12px;
-          border-radius:10px;
-          font-size:16px;
-        "
-      />
+  <div id="previewScreen" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+background:#000;
+z-index:9999;
+overflow:auto;
+">
+  <div style="width:100%; max-width:380px; margin:0 auto;">
+
+    <div class="sendHeader">
+      <button onclick="closePreview()" class="backBtn">←</button>
+      <h2>Send USDC</h2>
     </div>
-    <button class="nextBtn" onclick="confirmReceiver()">
-      Confirm
-    </button>
+
+    <div class="sendBody">
+      <h1 class="sendTitle">Receiving address</h1>
+      <p class="sendSub">Scanned wallet ID</p>
+
+      <div class="addressBox">
+        <input id="previewId" readonly />
+      </div>
+
+      <button class="nextBtn" onclick="confirmReceiver()">
+        Confirm
+      </button>
+    </div>
+
   </div>
-  </div>
+
+</div>
+     
     
   `);
   loadHistoryByDate();
