@@ -293,11 +293,14 @@ window.copyWallet = ()=>{
 
   // Sending UI 
 let txLock = false
-
 window.openSend = ()=>{
-const old = document.getElementById("sendPopup")
-if(old) old.remove()
-document.getElementById("sendScreen").style.display="flex"
+  const old = document.getElementById("sendPopup")
+  if(old) old.remove()
+  const input = document.getElementById("sendTo")
+  if(input) input.value = ""
+  const amt = document.getElementById("sendAmt")
+  if(amt) amt.value = ""
+  document.getElementById("sendScreen").style.display="flex"
 }
 
 window.closeSend = ()=>{
