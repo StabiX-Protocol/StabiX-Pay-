@@ -112,6 +112,38 @@ ${user.balance.toFixed(2)} USDC
   </div>
   </div>
 
+
+  <div id="previewScreen" style="display:none">
+  <div class="sendHeader">
+    <button onclick="closePreview()" class="backBtn">←</button>
+    <h2>Send USDC</h2>
+  </div>
+  <div class="sendBody">
+    <h1 class="sendTitle">Receiving address</h1>
+    <p class="sendSub">Scanned wallet ID</p>
+    <div class="addressBox">
+      <input 
+        id="previewId"
+        type="text"
+        readonly
+        style="
+          background:#1f2937;
+          color:#fff;
+          border:none;
+          width:100%;
+          padding:12px;
+          border-radius:10px;
+          font-size:16px;
+        "
+      />
+    </div>
+    <button class="nextBtn" onclick="confirmReceiver()">
+      Confirm
+    </button>
+  </div>
+  </div>
+
+
       
       <hr>
 <h3>Deposit / Withdraw</h3>
