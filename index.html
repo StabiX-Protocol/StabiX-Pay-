@@ -228,14 +228,21 @@ z-index:99999;
   gap:8px;
   line-height:1;
 ">
-  <!-- Gallery Icon -->
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+<!-- Gallery Icon + Text -->
+<span style="
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="display:block;">
     <rect x="3" y="5" width="18" height="14" rx="2" stroke="#555" stroke-width="1.5"/>
     <circle cx="8" cy="10" r="2" fill="#555"/>
     <path d="M21 16L16 11L5 19" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
-  Upload From Gallery
-</label>
+  <span style="line-height:1;">
+    Upload From Gallery
+  </span>
+</span>
 <input type="file" id="galleryInput" accept="image/*" style="display:none">
 
     
