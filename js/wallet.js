@@ -442,9 +442,10 @@ window.openScanner = async ()=>{
       await qrScanner.stop()
       document.getElementById("scannerOverlay").style.display = "none"
       
-      document.getElementById("sendScreen").style.display="none"
-      document.getElementById("amountScreen").style.display="flex"
-      document.getElementById("sendTo").value = targetId
+      document.getElementById("previewId").value = targetId
+      document.getElementById("previewScreen").style.display = "flex"
+      document.getElementById("sendScreen").style.display = "none"
+      document.getElementById("amountScreen").style.display = "none"
     }
   )
 }
@@ -504,16 +505,22 @@ window.handleGallery = async function (e) {
       alert("User not found");
       return;
     }
-    document.getElementById("scannerOverlay").style.display = "none";
-    document.getElementById("sendScreen").style.display = "none";
-    document.getElementById("amountScreen").style.display = "flex";
-    document.getElementById("sendTo").value = targetId;
+      document.getElementById("scannerOverlay").style.display = "none";
+      document.getElementById("previewId").value = targetId
+      document.getElementById("previewScreen").style.display = "flex"
+      document.getElementById("sendScreen").style.display = "none"
+      document.getElementById("amountScreen").style.display = "none"
   } catch (err) {
     console.log("Gallery scan error:", err);
     alert("QR not detected");
   }
 };
-
+window.confirmReceiver = ()=>{
+  const id = document.getElementById("previewId").value
+  document.getElementById("previewScreen").style.display = "none"
+  document.getElementById("amountScreen").style.display = "flex"
+  document.getElementById("sendTo").value = id
+}
 
   window.softRefresh = async function(){
   try{
