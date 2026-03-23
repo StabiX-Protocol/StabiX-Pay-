@@ -481,6 +481,39 @@ window.openGallery = function () {
   const input = document.getElementById("galleryInput");
   if (input) input.click();
 };
+window.handleGallery = async function (e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const result = await Html5Qrcode.scanFile(file, true);
+    let data;
+    try {
+      data = JSON.parse(result);
+    } catch {
+      alert("Invalid QR");
+      return;
+    }
+    if ((data.type || "").toLowerCase() !== "stabix") {
+      alert("Invalid QR");
+      return;
+    }
+    const targetId = data.id;
+    const docSnap = await getDoc(doc(db, "users", targetId));
+    if (!docSnap.exists()) {
+      alert("User not found");
+      return;
+    }
+    document.getElementById("scannerOverlay").style.display = "none";
+    document.getElementById("sendScreen").style.display = "none";
+    document.getElementById("amountScreen").style.display = "flex";
+    document.getElementById("sendTo").value = targetId;
+  } catch (err) {
+    console.log("Gallery scan error:", err);
+    alert("QR not detected");
+  }
+};
+
+
 
   window.softRefresh = async function(){
   try{
