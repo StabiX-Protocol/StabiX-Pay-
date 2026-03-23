@@ -477,15 +477,13 @@ window.toggleTorch = async () => {
     console.log("Torch error:", e);
   }
 };
-window.openGallery = function () {
-  const input = document.getElementById("galleryInput");
-  if (input) input.click();
-};
 window.handleGallery = async function (e) {
   const file = e.target.files[0];
   if (!file) return;
   try {
-    const result = await Html5Qrcode.scanFile(file, true);
+    const html5Qr = new Html5Qrcode("qr-reader");
+    const result = await html5Qr.scanFile(file, false);
+    await html5Qr.clear();
     let data;
     try {
       data = JSON.parse(result);
@@ -512,7 +510,6 @@ window.handleGallery = async function (e) {
     alert("QR not detected");
   }
 };
-
 
 
   window.softRefresh = async function(){
