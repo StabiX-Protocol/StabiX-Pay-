@@ -399,17 +399,19 @@ window.backToAddress = ()=>{
   }
 };
 
-window.openConfirm= ()=>{
-const amount = document.getElementById("sendAmt").value
-const toWallet = document.getElementById("sendTo").value.trim()
-alert("Enter valid amount")
-return
-}
-document.getElementById("amountScreen").style.display="none"
-document.getElementById("confirmScreen").style.display="flex"
-document.getElementById("confirmAmount").innerText = "-" + amount + " USDC"
-document.getElementById("confirmTo").innerText = toWallet
-document.getElementById("confirmFrom").innerText = WALLET
+window.openConfirm = () => {
+  const amount = document.getElementById("sendAmt").value;
+  const towallet = document.getElementById("sendTo").value.trim();
+  if (!amount || amount <= 0) {
+    alert("Enter valid amount");
+    return;
+  }
+  document.getElementById("amountScreen").style.display = "none";
+  document.getElementById("confirmScreen").style.display = "flex";
+  document.getElementById("confirmAmount").innerText = "-" + amount + " USDC";
+  document.getElementById("confirmTo").innerText = towallet;
+  document.getElementById("confirmFrom").innerText = WALLET;
+};
 
 window.backToAmount = ()=>{
 document.getElementById("confirmScreen").style.display="none"
