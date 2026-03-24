@@ -430,16 +430,18 @@ document.getElementById("amountScreen").style.display="flex"
 window.confirmSend = () => {
   if (txLock) return;
   txLock = true;
-  let toWallet;
+  let toWallet = "";
   if (window.isScanFlow) {
     toWallet = window.scannedId;
-  } else {
+  } 
+  else {
     const input = document.getElementById("sendTo");
     toWallet = input ? input.value.trim() : "";
   }
   const amount = document.getElementById("sendAmt").value;
+  console.log("SEND DEBUG:", { toWallet, amount });
   if (!toWallet || !amount) {
-    alert("Invalid transaction");
+    alert("Invalid Input");
     txLock = false;
     return;
   }
