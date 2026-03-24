@@ -1,5 +1,5 @@
 window.scanDone = false
-window.scannedId = null
+window.scanTargetId = null
 window.isScanFlow = false;
 import "./firebase.js"
 import {
