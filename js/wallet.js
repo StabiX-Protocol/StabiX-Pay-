@@ -401,7 +401,7 @@ window.backToAddress = ()=>{
 
 window.openConfirm= ()=>{
 const amount = document.getElementById("sendAmt").value
-const toWallet = document.getElementById("sendTo").value.trim()
+let toWallet = document.getElementById("sendTo").value.trim()
 if(window.isScanFlow && !toWallet){
 toWallet = document.getElementById("previewId").value;}
 if(!amount || amount <= 0){
