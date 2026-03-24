@@ -407,7 +407,7 @@ window.openConfirm = () => {
   } else {
     toWallet = document.getElementById("sendTo").value.trim(); // normal
   }
-  if (!amount || amount <= 0) {
+  if (!toWallet || !amount || amount <= 0) {
     alert("Enter valid amount");
     return;
   }
@@ -438,7 +438,7 @@ window.confirmSend = () => {
     const input = document.getElementById("sendTo");
     toWallet = input ? input.value.trim() : "";
   }
-  const amount = document.getElementById("sendAmt").value;
+  const amount = Number(document.getElementById("sendAmt").value);
   console.log("SEND DEBUG:", { toWallet, amount });
   if (!toWallet || !amount) {
     alert("Invalid Input");
@@ -502,6 +502,7 @@ window.openScanner = async ()=>{
       document.getElementById("scannerOverlay").style.display = "none"
       
       document.getElementById("previewId").value = targetId
+      window.scannedId = targetId  
       window.isScanFlow = true;
       document.getElementById("previewScreen").style.display = "flex"
       document.getElementById("amountScreen").style.display = "none"
