@@ -432,15 +432,22 @@ window.confirmSend = () => {
   txLock = true;
   let toWallet = "";
   if (window.isScanFlow) {
-    toWallet = window.scannedId;
-  } 
-  else {
-    const input = document.getElementById("sendTo");
-    toWallet = input ? input.value.trim() : "";
+    toWallet =
+      window.scannedId ||
+      document.getElementById("previewId")?.value?.trim();
+  } else {
+    toWallet =
+      document.getElementById("sendTo")?.value?.trim();
   }
-  const amount = Number(document.getElementById("sendAmt").value);
-  console.log("SEND DEBUG:", { toWallet, amount });
-  if (!toWallet || !amount) {
+  const amount = Number(document.getElementById("sendAmt")?.value);
+  console.log("FINAL DEBUG:", {
+    isScanFlow: window.isScanFlow,
+    scannedId: window.scannedId,
+    previewId: document.getElementById("previewId")?.value,
+    toWallet,
+    amount
+  });
+  if (!toWallet || !amount || amount <= 0) {
     alert("Invalid Input");
     txLock = false;
     return;
