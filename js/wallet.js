@@ -1,5 +1,6 @@
 window.scanDone = false
 window.scanTargetId = null
+window.isScanFlow = false;
 import "./firebase.js"
 import {
   doc,
@@ -340,7 +341,8 @@ window.openSend = ()=>{
 }
 
 window.closeSend = ()=>{
-document.getElementById("sendScreen").style.display="none"
+  document.getElementById("sendScreen").style.display="none"
+  window.isScanFlow = false;
 }
 
 window.goAmount = async ()=>{
@@ -388,9 +390,13 @@ window.handleNext = async () => {
 }
 
 window.backToAddress = ()=>{
-document.getElementById("amountScreen").style.display="none"
-document.getElementById("sendScreen").style.display="flex"
-}
+  document.getElementById("amountScreen").style.display = "none";
+  if(window.isScanFlow){
+    document.getElementById("previewScreen").style.display = "flex";
+  }else{
+    document.getElementById("sendScreen").style.display = "flex";
+  }
+};
 
 window.openConfirm= ()=>{
 const amount = document.getElementById("sendAmt").value
@@ -479,6 +485,7 @@ window.openScanner = async ()=>{
       document.getElementById("scannerOverlay").style.display = "none"
       
       document.getElementById("previewId").value = targetId
+      window.isScanFlow = true;
       document.getElementById("previewScreen").style.display = "flex"
       document.getElementById("amountScreen").style.display = "none"
     }
@@ -542,6 +549,7 @@ window.handleGallery = async function (e) {
     }
       document.getElementById("scannerOverlay").style.display = "none";
       document.getElementById("previewId").value = targetId
+      window.isScanFlow = true;
       document.getElementById("previewScreen").style.display = "flex"
       document.getElementById("amountScreen").style.display = "none"
   } catch (err) {
