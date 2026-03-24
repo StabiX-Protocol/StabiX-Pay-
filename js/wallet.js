@@ -401,15 +401,24 @@ window.backToAddress = ()=>{
 
 window.openConfirm = () => {
   const amount = document.getElementById("sendAmt").value;
-  const towallet = document.getElementById("sendTo").value.trim();
+  let toWallet;
+  if (window.isScanFlow) {
+    toWallet = window.scannedId;   
+  } else {
+    toWallet = document.getElementById("sendTo").value.trim(); // normal
+  }
   if (!amount || amount <= 0) {
     alert("Enter valid amount");
+    return;
+  }
+  if (!toWallet) {
+    alert("Invalid receiver");
     return;
   }
   document.getElementById("amountScreen").style.display = "none";
   document.getElementById("confirmScreen").style.display = "flex";
   document.getElementById("confirmAmount").innerText = "-" + amount + " USDC";
-  document.getElementById("confirmTo").innerText = towallet;
+  document.getElementById("confirmTo").innerText = toWallet;
   document.getElementById("confirmFrom").innerText = WALLET;
 };
 
@@ -419,12 +428,14 @@ document.getElementById("amountScreen").style.display="flex"
 }
 
 window.confirmSend = () => {
-  if(txLock) return;
+  if (txLock) return;
   txLock = true;
-  const input = document.getElementById("sendTo");
-  let toWallet = input ? input.value.trim() : "";
-  if (window.isScanFlow && !toWallet) {
-    toWallet = document.getElementById("previewId").value;
+  let toWallet;
+  if (window.isScanFlow) {
+    toWallet = window.scannedId;
+  } else {
+    const input = document.getElementById("sendTo");
+    toWallet = input ? input.value.trim() : "";
   }
   const amount = document.getElementById("sendAmt").value;
   if (!toWallet || !amount) {
@@ -562,12 +573,13 @@ window.handleGallery = async function (e) {
   }
   e.target.value = "";
 };
-window.confirmReceiver = ()=>{
+window.confirmReceiver = () => {
+  const id = document.getElementById("previewId").value;
+  window.scannedId = id;   
   window.isScanFlow = true;
-  const id = document.getElementById("previewId").value
-  document.getElementById("previewScreen").style.display = "none"
-  document.getElementById("amountScreen").style.display = "flex"
-}
+  document.getElementById("previewScreen").style.display = "none";
+  document.getElementById("amountScreen").style.display = "flex";
+};
 window.closePreview = () => {
   document.getElementById("previewScreen").style.display = "none";
   scanDone = false;
