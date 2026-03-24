@@ -555,7 +555,13 @@ window.confirmReceiver = ()=>{
   document.getElementById("previewScreen").style.display = "none"
   document.getElementById("amountScreen").style.display = "flex"
 }
+window.closePreview = () => {
+  document.getElementById("previewScreen").style.display = "none";
+  scanDone = false;
+};
 
+
+/* ================= Refresh ================= */
   window.softRefresh = async function(){
   try{
     // 🔄 re-fetch user data
