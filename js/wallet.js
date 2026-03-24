@@ -417,26 +417,26 @@ document.getElementById("confirmScreen").style.display="none"
 document.getElementById("amountScreen").style.display="flex"
 }
 
-window.confirmSend = ()=>{
-if(txLock) return
-txLock = true
-const input = document.getElementById("sendTo")
-let toWallet = input ? input.value.trim() : "";
-if(window.isScanFlow && !toWallet){
-  toWallet = document.getElementById("previewId").value;
-}
-const amount = document.getElementById("sendAmt").value
-if(!toWallet || !amount){
-alert("Invalid transaction")
-txLock = false
-return
-}
-document.getElementById("confirmScreen").style.display="none"
-sendUSDC()
-setTimeout(()=>{
-txLock = false
-},3000)
-}
+window.confirmSend = () => {
+  if(txLock) return;
+  txLock = true;
+  const input = document.getElementById("sendTo");
+  let toWallet = input ? input.value.trim() : "";
+  if (window.isScanFlow && !toWallet) {
+    toWallet = document.getElementById("previewId").value;
+  }
+  const amount = document.getElementById("sendAmt").value;
+  if (!toWallet || !amount) {
+    alert("Invalid transaction");
+    txLock = false;
+    return;
+  }
+  document.getElementById("confirmScreen").style.display = "none";
+  sendUSDC();
+  setTimeout(() => {
+    txLock = false;
+  }, 3000);
+};
 
 window.closeTxPopup = ()=>{
 document.getElementById("txPopup").style.display="none"
