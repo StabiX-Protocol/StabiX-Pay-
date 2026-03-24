@@ -337,6 +337,7 @@ window.openSend = ()=>{
   if(input) input.value = ""
   const amt = document.getElementById("sendAmt")
   if(amt) amt.value = ""
+  window.isScanFlow = false;
   document.getElementById("sendScreen").style.display="flex"
 }
 
@@ -559,6 +560,7 @@ window.handleGallery = async function (e) {
   e.target.value = "";
 };
 window.confirmReceiver = ()=>{
+  window.isScanFlow = true;
   const id = document.getElementById("previewId").value
   document.getElementById("previewScreen").style.display = "none"
   document.getElementById("amountScreen").style.display = "flex"
