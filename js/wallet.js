@@ -410,7 +410,6 @@ document.getElementById("confirmScreen").style.display="flex"
 document.getElementById("confirmAmount").innerText = "-" + amount + " USDC"
 document.getElementById("confirmTo").innerText = toWallet
 document.getElementById("confirmFrom").innerText = WALLET
-}
 
 window.backToAmount = ()=>{
 document.getElementById("confirmScreen").style.display="none"
