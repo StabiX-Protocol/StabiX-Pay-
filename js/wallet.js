@@ -548,6 +548,7 @@ window.handleGallery = async function (e) {
     console.log("Gallery scan error:", err);
     alert("QR not detected");
   }
+  e.target.value = "";
 };
 window.confirmReceiver = ()=>{
   const id = document.getElementById("previewId").value
