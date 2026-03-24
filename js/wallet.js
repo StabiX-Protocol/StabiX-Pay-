@@ -587,6 +587,7 @@ window.confirmReceiver = () => {
   const id = document.getElementById("previewId").value;
   window.scannedId = id;   
   window.isScanFlow = true;
+  document.getElementById("sendTo").value = id;
   document.getElementById("previewScreen").style.display = "none";
   document.getElementById("amountScreen").style.display = "flex";
 };
