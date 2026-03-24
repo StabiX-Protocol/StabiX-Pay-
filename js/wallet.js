@@ -421,7 +421,10 @@ window.confirmSend = ()=>{
 if(txLock) return
 txLock = true
 const input = document.getElementById("sendTo")
-const towallet = input ? input.value.trim() : ""
+let toWallet = input ? input.value.trim() : "";
+if(window.isScanFlow && !toWallet){
+  toWallet = document.getElementById("previewId").value;
+}
 const amount = document.getElementById("sendAmt").value
 if(!toWallet || !amount){
 alert("Invalid transaction")
