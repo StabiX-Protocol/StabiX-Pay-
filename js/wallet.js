@@ -83,12 +83,16 @@ ${user.balance.toFixed(2)} USDC
 
 <div class="walletAction" onclick="openScanner()">
 <div class="walletActionIcon">
-<svg width="30" height="30" viewBox="0 0 24 24" fill="none">
-  <rect x="3" y="3" width="6" height="6" stroke="white" stroke-width="2"/>
-  <rect x="15" y="3" width="6" height="6" stroke="white" stroke-width="2"/>
-  <rect x="3" y="15" width="6" height="6" stroke="white" stroke-width="2"/>
-  <rect x="15" y="15" width="2" height="2" fill="white"/>
-  <rect x="19" y="19" width="2" height="2" fill="white"/>
+<svg viewBox="0 0 24 24" fill="none">
+  <rect x="6" y="6" width="3" height="3" fill="white"/>
+  <rect x="12" y="6" width="3" height="3" fill="white"/>
+  <rect x="6" y="12" width="3" height="3" fill="white"/>
+  <rect x="12" y="12" width="3" height="3" fill="white"/>
+  <rect x="9" y="9" width="3" height="3" fill="white"/>
+  <path d="M3 8V5C3 4.4 3.4 4 4 4H7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <path d="M17 4H20C20.6 4 21 4.4 21 5V8" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <path d="M3 16V19C3 19.6 3.4 20 4 20H7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <path d="M17 20H20C20.6 20 21 19.6 21 19V16" stroke="white" stroke-width="2" stroke-linecap="round"/>
 </svg>
 </div>
 <div class="walletActionLabel">Scan</div>
