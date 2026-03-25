@@ -84,17 +84,17 @@ ${user.balance.toFixed(2)} USDC
 <div class="walletAction" onclick="openScanner()">
 <div class="walletActionIcon">
 <svg viewBox="0 0 24 24" fill="none">
-  <path d="M4 9V6C4 5.4 4.4 5 5 5H8" stroke="white" stroke-width="2" stroke-linecap="round"/>
-  <path d="M16 5H19C19.6 5 20 5.4 20 6V9" stroke="white" stroke-width="2" stroke-linecap="round"/>
-  <path d="M4 15V18C4 18.6 4.4 19 5 19H8" stroke="white" stroke-width="2" stroke-linecap="round"/>
-  <path d="M16 19H19C19.6 19 20 18.6 20 18V15" stroke="white" stroke-width="2" stroke-linecap="round"/>
-  <rect x="7" y="7" width="2.5" height="2.5" rx="0.4" fill="white"/>
-  <rect x="12" y="7" width="2.5" height="2.5" rx="0.4" fill="white"/>
-  <rect x="7" y="12" width="2.5" height="2.5" rx="0.4" fill="white"/>
-  <rect x="12" y="12" width="1.2" height="1.2" rx="0.3" fill="white"/>
-  <rect x="13.8" y="12" width="1.2" height="1.2" rx="0.3" fill="white"/>
-  <rect x="12" y="13.8" width="1.2" height="1.2" rx="0.3" fill="white"/>
-  <rect x="13.8" y="13.8" width="1.2" height="1.2" rx="0.3" fill="white"/>
+  <path d="M5 9V6.5C5 6.2 5.2 6 5.5 6H8" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M16 6H18.5C18.8 6 19 6.2 19 6.5V9" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M5 15V17.5C5 17.8 5.2 18 5.5 18H8" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M16 18H18.5C18.8 18 19 17.8 19 17.5V15" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+  <rect x="7.2" y="7.2" width="2.2" height="2.2" rx="0.5" fill="white"/>
+  <rect x="12.6" y="7.2" width="2.2" height="2.2" rx="0.5" fill="white"/>
+  <rect x="7.2" y="12.6" width="2.2" height="2.2" rx="0.5" fill="white"/>
+  <rect x="12.8" y="12.8" width="1" height="1" rx="0.3" fill="white"/>
+  <rect x="14.2" y="12.8" width="1" height="1" rx="0.3" fill="white"/>
+  <rect x="12.8" y="14.2" width="1" height="1" rx="0.3" fill="white"/>
+  <rect x="14.2" y="14.2" width="1" height="1" rx="0.3" fill="white"/>
 </svg>
 </div>
 <div class="walletActionLabel">Scan</div>
