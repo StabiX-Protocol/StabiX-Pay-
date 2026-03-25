@@ -64,17 +64,33 @@ ${user.balance.toFixed(2)} USDC
    
 <div class="walletActions">
 <div class="walletAction" onclick="openSend()">
-<div class="walletActionIcon">⬆</div>
+<div class="walletActionIcon">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+  <path d="M12 19V5M12 5L6 11M12 5L18 11" stroke="white" stroke-width="2" stroke-linecap="round"/>
+</svg>
+</div>
 <div class="walletActionLabel">Send</div>
 </div>
 
 <div class="walletAction" onclick="showReceive()">
-<div class="walletActionIcon">⬇</div>
+<div class="walletActionIcon">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+  <path d="M12 5V19M12 19L6 13M12 19L18 13" stroke="white" stroke-width="2" stroke-linecap="round"/>
+</svg>
+</div>
 <div class="walletActionLabel">Receive</div>
 </div>
 
 <div class="walletAction" onclick="openScanner()">
-<div class="walletActionIcon">▣</div>
+<div class="walletActionIcon">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+  <rect x="3" y="3" width="6" height="6" stroke="white" stroke-width="2"/>
+  <rect x="15" y="3" width="6" height="6" stroke="white" stroke-width="2"/>
+  <rect x="3" y="15" width="6" height="6" stroke="white" stroke-width="2"/>
+  <rect x="15" y="15" width="2" height="2" fill="white"/>
+  <rect x="19" y="19" width="2" height="2" fill="white"/>
+</svg>
+</div>
 <div class="walletActionLabel">Scan</div>
 </div>
 
