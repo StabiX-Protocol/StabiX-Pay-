@@ -31,7 +31,7 @@ const firebaseConfig = {
 
 const appFB = initializeApp(firebaseConfig);
 window.db = getFirestore(appFB);
-//enableIndexedDbPersistence(db).catch(()=>{});
+enableIndexedDbPersistence(db).catch(()=>{});
 
 window.doc = doc;
 window.setDoc = setDoc;
