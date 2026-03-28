@@ -620,17 +620,26 @@ window.closePreview = () => {
 
 
 /* ================= Refresh ================= */
-  window.softRefresh = async function(){
+  let refreshCount = 0;
+window.softRefresh = async function(){
+  if(refreshCount >= 2){
+    const el = document.querySelector(".box");
+    if(el){
+      el.style.opacity = "0.5";
+      setTimeout(()=> el.style.opacity = "1", 300);
+    }
+    console.log("Fake refresh (no DB read)");
+    return;
+  }
+  refreshCount++; 
   try{
-    // 🔄 re-fetch user data
     const snap = await getDoc(userRef);
+
     if(!snap.exists()){
       alert("Session expired");
       return;
     }
-
-    // 🔁 sirf UI refresh
-    renderApp();
+    renderApp(); 
   }catch(e){
     alert("Refresh failed");
   }
