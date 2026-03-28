@@ -14,7 +14,8 @@ import {
   where,
   orderBy,
   runTransaction,
-  Timestamp
+  Timestamp,
+  enableIndexedDbPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 /* ================= FIREBASE ================= */
@@ -30,6 +31,7 @@ const firebaseConfig = {
 
 const appFB = initializeApp(firebaseConfig);
 window.db = getFirestore(appFB);
+//enableIndexedDbPersistence(db).catch(()=>{});
 
 window.doc = doc;
 window.setDoc = setDoc;
@@ -45,7 +47,7 @@ window.orderBy = orderBy;
 window.runTransaction = runTransaction;
 window.Timestamp = Timestamp;
 
-// 🚫 BLOCK NORMAL BROWSER ACCESS (ONLY TELEGRAM ALLOWED)
+// BLOCK NORMAL BROWSER ACCESS (ONLY TELEGRAM ALLOWED)
 
 if (
   !window.Telegram ||
