@@ -605,7 +605,6 @@ function updateNotif(count){
   if(count == 0){
     el.style.display = "none";   
   } else {
-    el.style.display = "flex";
-    el.innerText = count;        
+    el.style.display = "flex";        
   }
 }
