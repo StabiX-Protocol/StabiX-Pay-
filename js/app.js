@@ -32,7 +32,7 @@ function renderSetup(){
     <div class="box">
       <h3>Create Account</h3>
       <input id="uname" placeholder="Username">
-      <input id="pwd" type="password" placeholder="Password">
+      <input id="pwd" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Password">
       <button onclick="saveProfile()">Create</button>
     </div>
   `);
@@ -56,7 +56,7 @@ function renderLogin(){
   appDiv(`
     <div class="box">
       <h3>Login</h3>
-      <input id="pwd" type="password" placeholder="Password">
+      <input id="pwd" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Password">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
         <button style="width:70%" onclick="window.login()">Login</button>
         <span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Forgot?</span>
@@ -83,7 +83,7 @@ function renderOTP(){
     <div class="box">
       <h3>Reset Password</h3>
       <input id="otp" placeholder="OTP">
-      <input id="npwd" type="password" placeholder="New Password">
+      <input id="npwd" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="New Password">
       <button onclick="verifyOTP()">Reset</button>
       <span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Resend</span>
     </div>
