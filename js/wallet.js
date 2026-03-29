@@ -667,7 +667,7 @@ window.openNotifications = async () => {
   <div class="box">
     <div style="display:flex;align-items:center;gap:10px;">
       <span onclick="renderApp()" style="font-size:20px;cursor:pointer;">←</span>
-      <span style="font-size:18px;font-weight:bold;">Notifications</span>
+      <span style="font-size:18px;font-weight:bold;"></span>
     </div>
 `;
   if(snap.empty){
