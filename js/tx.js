@@ -583,25 +583,3 @@ done.style.display="block"
 },900)
 
 }
-
-window.listenNotifications = function(){
-  const q = query(
-    collection(db, "notifications"),
-    where("to", "==", WALLET),
-    where("read", "==", false)
-  );
-  onSnapshot(q, (snap) => {
-    const count = snap.size;
-    updateNotif(count);
-  });
-};
-
-function updateNotif(count){
-  const el = document.getElementById("notifCount");
-  if(!el) return;
-  if(count == 0){
-    el.style.display = "none";   
-  } else {
-    el.style.display = "flex";        
-  }
-}
