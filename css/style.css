@@ -559,7 +559,7 @@ opacity:.6;
 
 .notifBell {
   position: absolute;
-  top: 8px;
+  top: -6px;
   right: 0px;   
   width: 28px;
   height: 28px;
