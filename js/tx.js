@@ -1,3 +1,5 @@
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { query, where, onSnapshot } from "firebase/firestore";
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
 
@@ -63,6 +65,15 @@ createdAt:serverTimestamp()
 });
 
 if(!failed){
+
+await addDoc(collection(db, "notifications"), {
+  to: toWallet,
+  from: WALLET,
+  amount: Number(amount),
+  type: "receive",
+  time: serverTimestamp(),
+  read: false
+});
 
 showTxPopup(`Sent ${amount} USDC to ${toWallet}`,"success");
 
@@ -575,4 +586,30 @@ setTimeout(()=>{
 done.style.display="block"
 },900)
 
+}
+
+function listenNotifications(){
+  const q = query(
+    collection(db, "notifications"),
+    where("to", "==", WALLET),
+    where("read", "==", false)
+  );
+
+  onSnapshot(q, (snap) => {
+    const count = snap.size;
+    updateNotif(count);
+  });
+}
+
+function updateNotif(count){
+  const el = document.getElementById("notifCount");
+  if(!el) return;
+
+  el.innerText = count;
+
+  if(count == 0){
+    el.style.display = "none";
+  } else {
+    el.style.display = "flex";
+  }
 }
