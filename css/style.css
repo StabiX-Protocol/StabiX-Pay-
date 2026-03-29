@@ -565,8 +565,8 @@ opacity:.6;
   cursor: pointer;
   opacity: 0.9;
   margin-right:auto;
-  
 }
+
 .walletHeader {
   position: relative;
 }
@@ -584,6 +584,7 @@ opacity:.6;
   position: absolute;
   top: -4px;
   right: -6px;
+  margin-right:auto;
 
   min-width: 16px;
   height: 16px;
