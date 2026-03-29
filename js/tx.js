@@ -602,12 +602,10 @@ function listenNotifications(){
 function updateNotif(count){
   const el = document.getElementById("notifCount");
   if(!el) return;
-
-  el.innerText = count;
-
   if(count == 0){
-    el.style.display = "none";
+    el.style.display = "none";   
   } else {
     el.style.display = "flex";
+    el.innerText = count;        
   }
 }
