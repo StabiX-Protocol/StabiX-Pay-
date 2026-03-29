@@ -10,6 +10,7 @@ import {
   query,
   where,
   orderBy,
+  onSnapshot,
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 /* ================= USERNAME CHANGE (30 DAYS) ================= */
@@ -288,11 +289,9 @@ overflow:auto;
   </div>
 
 </div>
-     
-    
+      
   `);
   loadHistoryByDate();
-  listenNotifications();
   
   // 🎉 RECEIVE POPUP (one-time)
 try{
@@ -322,6 +321,7 @@ try{
   console.log("Receive popup error", e);
 }
 }
+listenNotifications();
  /*=============UI Interface Of Balance Name ========*/
   window.toggleProfile = ()=>{
 
