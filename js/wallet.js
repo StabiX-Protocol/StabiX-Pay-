@@ -707,7 +707,10 @@ function updateNotif(count){
     el.style.display = "flex";        
   }
 }
-
+window.closeNotifications = () => {
+  document.getElementById("notifScreen").style.display = "none";
+  renderApp();
+};
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
   return `
