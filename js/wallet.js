@@ -39,6 +39,14 @@ const today = `${yyyy}-${mm}-${dd}`;
     <div class="refreshIcon" onclick="softRefresh()">↻</div>
     <div class="walletHeader">
 
+    <div class="notifBell" onclick="openNotifications()">
+    <svg viewBox="0 0 24 24" fill="none">
+    <path d="M12 3C9.8 3 8 4.8 8 7V9.5C8 10.3 7.7 11 7.2 11.6L6 13.2C5.4 14 5.9 15 6.9 15H17.1C18.1 15 18.6 14 18 13.2L16.8 11.6C16.3 11 16 10.3 16 9.5V7C16 4.8 14.2 3 12 3Z" stroke="white" stroke-width="1.8"/>
+    <path d="M10 18C10.3 18.9 11.1 19.5 12 19.5C12.9 19.5 13.7 18.9 14 18" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <span id="notifCount" class="notifCount">0</span>
+    </div>
+
 <div class="userRow" onclick="toggleProfile()">
 ${user.username}
 <span class="arrow">▼</span>
