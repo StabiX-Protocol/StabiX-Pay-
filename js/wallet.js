@@ -293,6 +293,7 @@ overflow:auto;
     
   `);
   loadHistoryByDate();
+  listenNotifications();
   
   // 🎉 RECEIVE POPUP (one-time)
 try{
@@ -655,6 +656,38 @@ window.softRefresh = async function(){
     alert("Refresh failed");
   }
 };
+/* ================= Notifications ================= */
+window.openNotifications = async () => {
+  const q = query(
+    collection(db, "notifications"),
+    where("to", "==", WALLET)
+  );
+  const snap = await getDocs(q);
+  let html = `
+  <div class="box">
+    <h3>Notifications</h3>
+  `;
+  if(snap.empty){
+    html += `<div style="opacity:.6;margin-top:10px">No notifications</div>`;
+  }
+  snap.forEach(docSnap => {
+    const d = docSnap.data();
+    html += `
+      <div class="notifItem">
+        +${d.amount} USDC received<br>
+        <span style="opacity:.6">${d.from}</span>
+      </div>
+    `;
+  });
+  html += `</div>`;
+  appDiv(html);
+  snap.forEach(async (docSnap) => {
+    await updateDoc(doc(db, "notifications", docSnap.id), {
+      read: true
+    });
+  });
+};
+
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
   return `
