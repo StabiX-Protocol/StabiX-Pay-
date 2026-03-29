@@ -82,7 +82,7 @@ function renderOTP(){
   appDiv(`
     <div class="box">
       <h3>Reset Password</h3>
-      <input id="otp" placeholder="OTP">
+      <input id="otp" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="OTP">
       <input id="npwd" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="New Password">
       <button onclick="verifyOTP()">Reset</button>
       <span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Resend</span>
