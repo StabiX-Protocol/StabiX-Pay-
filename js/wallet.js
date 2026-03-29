@@ -667,11 +667,11 @@ window.openNotifications = async () => {
   <div class="box">
     <div style="display:flex;align-items:center;gap:10px;">
       <span onclick="renderApp()" style="font-size:20px;cursor:pointer;">←</span>
-      <span style="font-size:18px;font-weight:bold;"></span>
+      <span style="font-size:18px;font-weight:bold;">Notifications</span>
     </div>
 `;
   if(snap.empty){
-    html += `<div style="opacity:.6;margin-top:10px">No notifications</div>`;
+    html += `<div style="opacity:.6;margin-top:10px"></div>`;
   }
   snap.forEach(docSnap => {
     const d = docSnap.data();
