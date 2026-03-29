@@ -265,9 +265,7 @@ margin-top:22px;
 }
 
 .walletActionIcon svg {
-  width: 36px;
-  height: 36px;
-  opacity: 0.95; 
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.2));
 }
 
 .walletActionLabel {
