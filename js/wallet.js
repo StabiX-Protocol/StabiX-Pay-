@@ -606,6 +606,10 @@ window.handleGallery = async function (e) {
 };
 window.confirmReceiver = () => {
   const id = document.getElementById("previewId").value;
+  if (id === WALLET) {
+    alert("Self Transfer Not Allowed");
+    return;
+  }
   window.scannedId = id;   
   window.isScanFlow = true;
   document.getElementById("sendTo").value = id;
