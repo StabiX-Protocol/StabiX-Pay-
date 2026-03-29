@@ -292,6 +292,7 @@ overflow:auto;
       
   `);
   loadHistoryByDate();
+  listenNotifications();
   
   // 🎉 RECEIVE POPUP (one-time)
 try{
@@ -321,7 +322,7 @@ try{
   console.log("Receive popup error", e);
 }
 }
-listenNotifications();
+
  /*=============UI Interface Of Balance Name ========*/
   window.toggleProfile = ()=>{
 
@@ -664,19 +665,22 @@ window.openNotifications = async () => {
   const snap = await getDocs(q);
   let html = `
   <div class="box">
-    <h3>Notifications</h3>
-  `;
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span onclick="renderApp()" style="font-size:20px;cursor:pointer;">←</span>
+      <span style="font-size:18px;font-weight:bold;">Notifications</span>
+    </div>
+`;
   if(snap.empty){
     html += `<div style="opacity:.6;margin-top:10px">No notifications</div>`;
   }
   snap.forEach(docSnap => {
     const d = docSnap.data();
     html += `
-      <div class="notifItem">
-        +${d.amount} USDC received<br>
-        <span style="opacity:.6">${d.from}</span>
-      </div>
-    `;
+  <div class="notifItem">
+    +${d.amount} USDC received<br>
+    <span style="opacity:.6">${d.from}</span>
+  </div>
+`;
   });
   html += `</div>`;
   appDiv(html);
