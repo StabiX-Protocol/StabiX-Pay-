@@ -562,9 +562,7 @@ cross1.style.animation="tickDraw .35s ease forwards"
 cross2.style.animation="tickDraw .35s ease forwards"
 
 }
-
 /* SUCCESS */
-
 else{
 
 title.innerText="Transaction Successful"
@@ -586,18 +584,17 @@ done.style.display="block"
 
 }
 
-function listenNotifications(){
+window.listenNotifications = function(){
   const q = query(
     collection(db, "notifications"),
     where("to", "==", WALLET),
     where("read", "==", false)
   );
-
   onSnapshot(q, (snap) => {
     const count = snap.size;
     updateNotif(count);
   });
-}
+};
 
 function updateNotif(count){
   const el = document.getElementById("notifCount");
