@@ -1,5 +1,3 @@
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { query, where, onSnapshot } from "firebase/firestore";
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
 
