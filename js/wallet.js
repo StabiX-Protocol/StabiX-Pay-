@@ -1,7 +1,6 @@
 window.scanDone = false
 window.scanTargetId = null
 window.isScanFlow = false;
-import { getDocs, doc, updateDoc } from "firebase/firestore";
 import "./firebase.js"
 import {
   doc,
