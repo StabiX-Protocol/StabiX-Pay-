@@ -564,6 +564,9 @@ opacity:.6;
   cursor: pointer;
   opacity: 0.9;
 }
+.walletHeader {
+  position: relative;
+}
 
 .notifBell svg {
   width: 22px;
