@@ -93,6 +93,7 @@ ${user.balance.toFixed(2)} USDC
   <rect x="8" y="8" width="2.2" height="2.2" rx="0.5" fill="white"/>
   <rect x="13.8" y="8" width="2.2" height="2.2" rx="0.5" fill="white"/>
   <rect x="8" y="13.8" width="2.2" height="2.2" rx="0.5" fill="white"/>
+  <rect x="13.8" y="13.8" width="2.2" height="2.2" rx="0.5" fill="white"/>
 </svg>
 </div>
 <div class="walletActionLabel">Scan</div>
