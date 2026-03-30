@@ -685,7 +685,7 @@ const d = docSnap.data();
 const currentDate = formatDateGroup(d.time);
 if(currentDate !== lastDate){
   html += `
-  <div style="margin-top:15px;opacity:.6;font-size:12px">
+  <div style="margin-top:20px;font-size:16px;font-weight:bold;opacity:.8">
     ${currentDate}
   </div>
   `;
@@ -694,7 +694,7 @@ if(currentDate !== lastDate){
 
 html += `
 <div onclick="openNotifDetail('${docSnap.id}')"
-style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.03);cursor:pointer;">
+style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer;">
   <div style="font-weight:bold">
     +${d.amount} USDC Received
   </div>
