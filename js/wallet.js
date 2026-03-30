@@ -663,6 +663,9 @@ window.openNotifications = async () => {
     where("to", "==", WALLET)
   );
   const snap = await getDocs(q);
+  const docs = snap.docs.sort((a, b) => {
+  return b.data().time?.seconds - a.data().time?.seconds;
+  });
   let html = `
   <div class="box">
     <div style="display:flex;align-items:center;gap:10px;">
@@ -673,12 +676,28 @@ window.openNotifications = async () => {
   if(snap.empty){
     html += `<div style="opacity:.6;margin-top:10px">No notifications</div>`;
   }
-  snap.forEach(docSnap => {
-    const d = docSnap.data();
+  let lastDate = "";
+  docs.forEach(docSnap => {
+const d = docSnap.data();
+const currentDate = formatDateGroup(d.time);
+if(currentDate !== lastDate){
+  html += `
+  <div style="margin-top:15px;opacity:.6;font-size:12px">
+    ${currentDate}
+  </div>
+  `;
+  lastDate = currentDate;
+}
     html += `
-  <div class="notifItem">
-    +${d.amount} USDC received<br>
-    <span style="opacity:.6">${d.from}</span>
+  <div class="notifItem" style="
+  padding:12px 0;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+">
++${d.amount} USDC received<br>
+<span style="opacity:.6">${d.from}</span><br>
+<span style="opacity:.5;font-size:11px">
+${formatDate(d.time)} • ${formatTime(d.time)}
+</span>
   </div>
 `;
   });
@@ -716,6 +735,32 @@ window.closeNotifications = () => {
   document.getElementById("notifScreen").style.display = "none";
   renderApp();
 };
+
+function formatTime(ts){
+  if(!ts) return "";
+  const date = new Date(ts.seconds * 1000);
+  return date.toLocaleString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+function formatDate(ts){
+  if(!ts) return "";
+  const date = new Date(ts.seconds * 1000);
+  return date.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short"
+  });
+}
+function formatDateGroup(ts){
+  if(!ts) return "";
+  const date = new Date(ts.seconds * 1000);
+  return date.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  });
+}
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
   return `
