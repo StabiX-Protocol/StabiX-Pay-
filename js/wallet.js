@@ -666,13 +666,11 @@ window.openNotifications = async () => {
   const docs = snap.docs.sort((a, b) => {
   return b.data().time?.seconds - a.data().time?.seconds;
   });
-     let html = `
-     <div style="
-     background:#020617;
-     border-radius:18px;
-     padding:16px;
-     border:1px solid rgba(255,255,255,0.04);
-     ">
+    
+  let html = `
+  <div style="background:#020617;min-height:100vh;padding:16px;">
+  <div style="background:#010409;border-radius:18px;padding:16px;">
+
     <div style="display:flex;align-items:center;gap:10px;">
       <span onclick="renderApp()" style="font-size:20px;cursor:pointer;">←</span>
       <span style="font-size:18px;font-weight:bold;">Notifications</span>
@@ -693,19 +691,14 @@ if(currentDate !== lastDate){
   `;
   lastDate = currentDate;
 }
-    html += `
-  <div class="notifItem" style="
-  padding:12px 0;
-  border-bottom:1px solid rgba(255,255,255,0.03);
-">
-<div class="notifItem" onclick="openNotifDetail('${docSnap.id}')"
-  style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer">
-  <div style="font-weight:bold">
-  +${d.amount} USDC Received
-  </div>
 
-</div>
+html += `
+<div onclick="openNotifDetail('${docSnap.id}')"
+style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.03);cursor:pointer;">
+  <div style="font-weight:bold">
+    +${d.amount} USDC Received
   </div>
+</div>
 `;
   });
   html += `</div>`;
