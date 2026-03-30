@@ -73,6 +73,16 @@ await addDoc(collection(db, "notifications"), {
   read: false
 });
 
+  tx.set(doc(collection(db,"notifications")), {
+  to: toWallet,
+  from: WALLET,
+  amount: amount,
+  type: "received",
+  read: false,
+  createdAt: serverTimestamp()
+});
+  
+
 showTxPopup(`Sent ${amount} USDC to ${toWallet}`,"success");
 
 renderApp();
