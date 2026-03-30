@@ -1,5 +1,6 @@
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
+  window.isSender = true;
 
 const input = document.getElementById("sendTo");
 const toWallet = input ? input.value.trim() : "";
@@ -73,9 +74,12 @@ await addDoc(collection(db, "notifications"), {
   read: false
 });
 
-showTxPopup(`Sent ${amount} USDC to ${toWallet}`,"success");
+if(window.isSender){
+  showTxPopup(`Sent ${amount} USDC to ${toWallet}`, "success");
+}
 
 renderApp();
+window.isSender = false;
 
 }
 
