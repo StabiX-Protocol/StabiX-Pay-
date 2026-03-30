@@ -510,6 +510,7 @@ window.loadAllUsers = async ()=>{
   }
 };
 window.showTxPopup = (msg,type="success")=>{
+if(!window.isSender) return;
 
 const popup = document.getElementById("txPopup")
 const title = document.getElementById("txTitle")
