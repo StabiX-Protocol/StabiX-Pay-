@@ -668,8 +668,8 @@ window.openNotifications = async () => {
   });
     
   let html = `
-  <div style="background:#020617;min-height:100vh;padding:16px;">
-  <div style="background:#010409;border-radius:18px;padding:16px;">
+  <div style="background:#000;min-height:100vh;padding:16px;">
+  <div style="background:#000;border-radius:18px;padding:16px;">
 
     <div style="display:flex;align-items:center;gap:10px;">
       <span onclick="renderApp()" style="font-size:20px;cursor:pointer;">←</span>
