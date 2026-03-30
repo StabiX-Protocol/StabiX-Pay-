@@ -693,11 +693,13 @@ if(currentDate !== lastDate){
   padding:12px 0;
   border-bottom:1px solid rgba(255,255,255,0.05);
 ">
-+${d.amount} USDC received<br>
-<span style="opacity:.6">${d.from}</span><br>
-<span style="opacity:.5;font-size:11px">
-${formatDate(d.time)} • ${formatTime(d.time)}
-</span>
+<div class="notifItem" onclick="openNotifDetail('${docSnap.id}')"
+  style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer">
+  <div style="font-weight:bold">
+  +${d.amount} USDC Received
+  </div>
+
+</div>
   </div>
 `;
   });
@@ -761,6 +763,45 @@ function formatDateGroup(ts){
     year: "numeric"
   });
 }
+window.openNotifDetail = async (id) => {
+  const docRef = doc(db, "notifications", id);
+  const snap = await getDoc(docRef);
+  if(!snap.exists()) return;
+  const d = snap.data();
+  let html = `
+  <div class="box">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px">
+      <span onclick="openNotifications()" style="font-size:20px;cursor:pointer">←</span>
+      <span style="font-weight:bold;font-size:18px">Transaction Details</span>
+    </div>
+    <div style="margin-top:10px">
+      <b>Amount</b><br>
+      +${d.amount} USDC
+    </div>
+    <div style="margin-top:10px">
+      <b>From</b><br>
+      ${d.from}
+    </div>
+    <div style="margin-top:10px">
+      <b>To</b><br>
+      ${d.to}
+    </div>
+    <div style="margin-top:10px">
+      <b>Time</b><br>
+      ${formatDate(d.time)} • ${formatTime(d.time)}
+    </div>
+    <div style="margin-top:10px">
+      <b>Type</b><br>
+      ${d.type}
+    </div>
+    <div style="margin-top:10px">
+      <b>Status</b><br>
+      Completed
+    </div>
+  </div>
+  `;
+  appDiv(html);
+};
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
   return `
