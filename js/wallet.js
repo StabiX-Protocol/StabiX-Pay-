@@ -719,7 +719,6 @@ window.softRefresh = async function(){
 
   html += `</div>`;
   appDiv(html);
-};
   snap.forEach(async (docSnap) => {
     await updateDoc(doc(db, "notifications", docSnap.id), {
       read: true
