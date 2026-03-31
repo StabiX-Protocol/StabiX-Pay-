@@ -714,7 +714,7 @@ window.listenNotifications = function(){
   const q = query(
     collection(db, "notifications"),
     where("to", "==", WALLET),
-    where("read", "==", false)
+    where("read", "==", false),
     where("type", "==", "validator")
   );
   onSnapshot(q, (snap) => {
