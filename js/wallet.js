@@ -694,6 +694,16 @@ window.softRefresh = async function(){
     }
     html += `
     <div onclick="openNotifDetail('${docSnap.id}')"
+style="
+  padding:14px 0;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  cursor:pointer;
+  ${!d.read ? `
+    background:rgba(96,165,250,0.08);
+    border-left:3px solid #60a5fa;
+    padding-left:10px;
+  ` : ``}
+">
     style="
       padding:14px 0;
       border-bottom:1px solid rgba(255,255,255,0.06);
@@ -704,7 +714,9 @@ window.softRefresh = async function(){
         font-size:15px;
         margin-bottom:4px;
       ">
-        ${d.title}
+  <span style="${!d.read ? 'font-weight:700' : 'font-weight:600'}">
+  ${d.title || "Notification"}
+  </span>
       </div>
 
       <div style="
