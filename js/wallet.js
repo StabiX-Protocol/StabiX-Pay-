@@ -630,7 +630,6 @@ window.closePreview = () => {
   scanDone = false;
 };
 
-
 /* ================= Refresh ================= */
   let refreshCount = 0;
 window.softRefresh = async function(){
@@ -657,7 +656,7 @@ window.softRefresh = async function(){
   }
 };
 /* ================= Notifications ================= */
-window.openNotifications = async () => {
+  window.openNotifications = async () => {
   const q = query(
     collection(db, "notifications"),
     where("to", "==", WALLET)
@@ -667,42 +666,60 @@ window.openNotifications = async () => {
     return b.data().time?.seconds - a.data().time?.seconds;
   });
   let html = `
-  <div style="background:#000;min-height:100vh;padding:16px;">
-  <div style="background:#000;border-radius:18px;padding:16px;">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span onclick="renderApp()" style="font-size:20px;cursor:pointer;">←</span>
-      <span style="font-size:18px;font-weight:bold;">Notifications</span>
+  <div style="background:#000;min-height:100vh;padding:16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <span onclick="renderApp()" style="cursor:pointer;font-size:20px">←</span>
+      <span style="font-weight:bold;font-size:18px">Notifications</span>
     </div>
   `;
-  if(snap.empty){
-    html += `<div style="opacity:.6;margin-top:10px">No notifications</div>`;
+  if (snap.empty) {
+    html += `<div style="opacity:.6">No notifications</div>`;
   }
   let lastDate = "";
   docs.forEach(docSnap => {
     const d = docSnap.data();
-    if(d.type !== "validator") return;
     const currentDate = formatDateGroup(d.time);
-    if(currentDate !== lastDate){
+    if (currentDate !== lastDate) {
       html += `
-      <div style="margin-top:20px;font-size:16px;font-weight:bold;opacity:.8">
+      <div style="
+        margin-top:15px;
+        font-size:14px;
+        font-weight:600;
+        opacity:.7;
+      ">
         ${currentDate}
       </div>
       `;
       lastDate = currentDate;
     }
     html += `
-    <div style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
-      <div style="font-weight:bold">
-        ${d.title || "Notification"}
+    <div onclick="openNotifDetail('${docSnap.id}')"
+    style="
+      padding:14px 0;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      cursor:pointer;
+    ">
+      <div style="
+        font-weight:600;
+        font-size:15px;
+        margin-bottom:4px;
+      ">
+        ${d.title}
       </div>
-      <div style="font-size:12px;opacity:.7">
-        ${d.body || ""}
+
+      <div style="
+        font-size:12px;
+        opacity:.5;
+      ">
+        ${formatDate(d.time)} • ${formatTime(d.time)}
       </div>
     </div>
     `;
   });
+
   html += `</div>`;
   appDiv(html);
+};
   snap.forEach(async (docSnap) => {
     await updateDoc(doc(db, "notifications", docSnap.id), {
       read: true
