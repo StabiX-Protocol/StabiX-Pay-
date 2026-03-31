@@ -833,7 +833,6 @@ window.openNotifDetail = async (id) => {
         font-size:12px;
         opacity:.5;
       ">
-        ${formatDate(d.time)} • ${formatTime(d.time)}
         </div>
     </div>
   </div>
