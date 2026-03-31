@@ -294,7 +294,7 @@ overflow:auto;
   loadHistoryByDate();
   listenNotifications();
   
-  // 🎉 RECEIVE POPUP (one-time)
+  // RECEIVE POPUP (one-time)
 try{
   const q = query(
     collection(db,"transactions"),
@@ -307,11 +307,11 @@ try{
     const docSnap = snap.docs[0];
     const t = docSnap.data();
 
-    // sirf received ke liye
+    
     if(t.type === "received"){
       const key = "rx_" + docSnap.id;
 
-      // ek hi baar popup
+    
       if(!sessionStorage.getItem(key)){
         showTxPopup(`Received ${t.amount} USDC from ${t.counterparty}`);
         sessionStorage.setItem(key,"1");
@@ -711,7 +711,7 @@ window.softRefresh = async function(){
         font-size:12px;
         opacity:.5;
       ">
-        ${formatDate(d.time)} • ${formatTime(d.time)}
+      ${formatTime(d.time)}
       </div>
     </div>
     `;
