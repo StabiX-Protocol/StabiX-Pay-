@@ -763,35 +763,6 @@ function formatDateGroup(ts){
     year: "numeric"
   });
 }
-window.openNotifDetail = async (id) => {
-  const docRef = doc(db, "notifications", id);
-  const snap = await getDoc(docRef);
-  if(!snap.exists()) return;
-  const d = snap.data();
-  let html = `
-  <div class="box">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px">
-      <span onclick="openNotifications()" style="font-size:20px;cursor:pointer">←</span>
-      <span style="font-weight:bold;font-size:18px">
-        ${d.title || "Notification"}
-      </span>
-    </div>
-    <div style="
-  margin-top:15px;
-  font-size:14px;
-  line-height:1.6;
-  text-align:left;
-  word-break:break-word;
-">
-  ${d.body || "No details"}
-</div>
-    <div style="margin-top:15px;font-size:12px;opacity:.7">
-      ${formatDate(d.time)} • ${formatTime(d.time)}
-    </div>
-  </div>
-  `;
-  appDiv(html);
-};
 
 window.openNotifDetail = async (id) => {
   const docRef = doc(db, "notifications", id);
