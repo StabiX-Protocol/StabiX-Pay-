@@ -664,42 +664,42 @@ window.openNotifications = async () => {
   );
   const snap = await getDocs(q);
   const docs = snap.docs.sort((a, b) => {
-  return b.data().time?.seconds - a.data().time?.seconds;
+    return b.data().time?.seconds - a.data().time?.seconds;
   });
-    
   let html = `
   <div style="background:#000;min-height:100vh;padding:16px;">
   <div style="background:#000;border-radius:18px;padding:16px;">
-
     <div style="display:flex;align-items:center;gap:10px;">
       <span onclick="renderApp()" style="font-size:20px;cursor:pointer;">←</span>
       <span style="font-size:18px;font-weight:bold;">Notifications</span>
     </div>
-`;
+  `;
   if(snap.empty){
     html += `<div style="opacity:.6;margin-top:10px">No notifications</div>`;
   }
   let lastDate = "";
   docs.forEach(docSnap => {
-const d = docSnap.data();
-const currentDate = formatDateGroup(d.time);
-if(currentDate !== lastDate){
-  html += `
-  <div style="margin-top:20px;font-size:16px;font-weight:bold;opacity:.8">
-    ${currentDate}
-  </div>
-  `;
-  lastDate = currentDate;
-}
-
-html += `
-<div onclick="openNotifDetail('${docSnap.id}')"
-style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer;">
-  <div style="font-weight:bold">
-    +${d.amount} USDC Received
-  </div>
-</div>
-`;
+    const d = docSnap.data();
+    if(d.type !== "validator") return;
+    const currentDate = formatDateGroup(d.time);
+    if(currentDate !== lastDate){
+      html += `
+      <div style="margin-top:20px;font-size:16px;font-weight:bold;opacity:.8">
+        ${currentDate}
+      </div>
+      `;
+      lastDate = currentDate;
+    }
+    html += `
+    <div style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
+      <div style="font-weight:bold">
+        ${d.title || "Notification"}
+      </div>
+      <div style="font-size:12px;opacity:.7">
+        ${d.body || ""}
+      </div>
+    </div>
+    `;
   });
   html += `</div>`;
   appDiv(html);
@@ -709,11 +709,13 @@ style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08);cursor:poin
     });
   });
 };
+
 window.listenNotifications = function(){
   const q = query(
     collection(db, "notifications"),
     where("to", "==", WALLET),
     where("read", "==", false)
+    where("type", "==", "validator")
   );
   onSnapshot(q, (snap) => {
     const count = snap.size;
@@ -770,35 +772,46 @@ window.openNotifDetail = async (id) => {
   <div class="box">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px">
       <span onclick="openNotifications()" style="font-size:20px;cursor:pointer">←</span>
-      <span style="font-weight:bold;font-size:18px">Transaction Details</span>
+      <span style="font-weight:bold;font-size:18px">
+        ${d.title || "Notification"}
+      </span>
     </div>
-    <div style="margin-top:10px">
-      <b>Amount</b><br>
-      +${d.amount} USDC
+    <div style="margin-top:10px;font-size:14px;line-height:1.5">
+      ${d.body || "No details"}
     </div>
-    <div style="margin-top:10px">
-      <b>From</b><br>
-      ${d.from}
-    </div>
-    <div style="margin-top:10px">
-      <b>To</b><br>
-      ${d.to}
-    </div>
-    <div style="margin-top:10px">
-      <b>Time</b><br>
+    <div style="margin-top:15px;font-size:12px;opacity:.7">
       ${formatDate(d.time)} • ${formatTime(d.time)}
-    </div>
-    <div style="margin-top:10px">
-      <b>Type</b><br>
-      ${d.type}
-    </div>
-    <div style="margin-top:10px">
-      <b>Status</b><br>
-      Completed
     </div>
   </div>
   `;
   appDiv(html);
+};
+window.sendValidatorNotification = async () => {
+  const title = document.getElementById("vTitle").value.trim();
+  const body = document.getElementById("vBody").value.trim();
+  if(!title || !body){
+    alert("Enter title & message");
+    return;
+  }
+  try{
+    const usersSnap = await getDocs(collection(db,"users"));
+    usersSnap.forEach(async (u) => {
+      await addDoc(collection(db,"notifications"),{
+        to: u.id,
+        type: "validator",
+        title,
+        body,
+        time: serverTimestamp(),
+        read: false
+      });
+    });
+    alert("Notification sent to all users 🚀");
+    document.getElementById("vTitle").value = "";
+    document.getElementById("vBody").value = "";
+  }catch(e){
+    console.log(e);
+    alert("Error sending notification");
+  }
 };
 /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
@@ -827,7 +840,17 @@ function validatorPanel(){
 
 <div id="userCount" class="small" style="margin-top:6px"></div>
 <div id="userList" style="margin-top:10px"></div>
-  `;
+
+<hr>
+<h3>Send Notification</h3>
+<input id="vTitle" placeholder="Title (e.g. Merkle Root Updated)">
+<input id="vBody" placeholder="Message (details)">
+<button onclick="sendValidatorNotification()" 
+style="background:#60a5fa;color:#020617;font-weight:bold">
+Send Notification
+</button>
+`;
+  
 }
   // ================= EOA WALLET =================
 window.editEOA = async ()=>{
