@@ -805,7 +805,7 @@ window.sendValidatorNotification = async () => {
         read: false
       });
     });
-    alert("Notification sent to all users 🚀");
+    alert("Notification sent to all users ");
     document.getElementById("vTitle").value = "";
     document.getElementById("vBody").value = "";
   }catch(e){
