@@ -763,25 +763,62 @@ function formatDateGroup(ts){
     year: "numeric"
   });
 }
-
 window.openNotifDetail = async (id) => {
   const docRef = doc(db, "notifications", id);
   const snap = await getDoc(docRef);
   if(!snap.exists()) return;
   const d = snap.data();
   let html = `
-  <div class="box">
-    <div style="display:flex;gap:10px;margin-bottom:15px">
-      <span onclick="openNotifications()" style="cursor:pointer">←</span>
-      <span style="font-weight:bold;font-size:18px">
-        ${d.title}
+  <div style="
+    background:#000;
+    min-height:100vh;
+    padding:16px;
+  ">
+    <div style="
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:20px;
+    ">
+      <span onclick="openNotifications()" style="
+        cursor:pointer;
+        font-size:20px;
+      ">←</span>
+      <span style="
+        font-weight:bold;
+        font-size:18px;
+      ">
+        Notification
       </span>
     </div>
-    <div style="margin-top:15px">
-      ${d.body}
-    </div>
-    <div style="margin-top:15px;font-size:12px;opacity:.6">
-      ${formatDate(d.time)} • ${formatTime(d.time)}
+    <div style="
+      background:#020617;
+      border-radius:16px;
+      padding:16px;
+      border:1px solid rgba(255,255,255,0.05);
+    ">
+      <div style="
+        font-size:17px;
+        font-weight:bold;
+        margin-bottom:10px;
+      ">
+        ${d.title || "Notification"}
+      </div>
+      <div style="
+        font-size:14px;
+        line-height:1.5;
+        opacity:.85;
+        margin-bottom:15px;
+        word-break:break-word;
+      ">
+        ${d.body || ""}
+      </div>
+      <div style="
+        font-size:12px;
+        opacity:.5;
+      ">
+        ${formatDate(d.time)} • ${formatTime(d.time)}
+        </div>
     </div>
   </div>
   `;
