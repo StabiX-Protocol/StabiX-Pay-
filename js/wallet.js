@@ -771,6 +771,7 @@ function formatDateGroup(ts){
 }
 window.openNotifDetail = async (id) => {
   const docRef = doc(db, "notifications", id);
+  await updateDoc(docRef, { read: true });
   const snap = await getDoc(docRef);
   if(!snap.exists()) return;
   const d = snap.data();
