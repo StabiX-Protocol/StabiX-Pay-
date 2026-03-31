@@ -769,28 +769,18 @@ window.openNotifDetail = async (id) => {
   const snap = await getDoc(docRef);
   if(!snap.exists()) return;
   const d = snap.data();
-  let html += `
-  <div onclick='openNotifDetail("${docSnap.id}")'
-  style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer;">
-  <div style="font-weight:bold">
-  ${d.title}
-   </div>
-  </div>
-
-    <div style="
-      margin-top:15px;
-      font-size:14px;
-      line-height:1.6;
-      text-align:left;
-      word-break:break-word;
-    ">
+  let html = `
+  <div class="box">
+    <div style="display:flex;gap:10px;margin-bottom:15px">
+      <span onclick="openNotifications()" style="cursor:pointer">←</span>
+      <span style="font-weight:bold;font-size:18px">
+        ${d.title}
+      </span>
+    </div>
+    <div style="margin-top:15px">
       ${d.body}
     </div>
-    <div style="
-      margin-top:20px;
-      font-size:12px;
-      opacity:.6;
-    ">
+    <div style="margin-top:15px;font-size:12px;opacity:.6">
       ${formatDate(d.time)} • ${formatTime(d.time)}
     </div>
   </div>
