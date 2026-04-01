@@ -949,6 +949,12 @@ window.goHistory = () => {
 window.goSettings = () => {
   alert("Settings coming soon");
 };
+function selectTab(tab){
+  document.querySelectorAll(".nav-item").forEach(el=>{
+    el.classList.remove("active");
+  });
+  document.getElementById("tab-" + tab).classList.add("active");
+}
   // ================= EOA WALLET =================
 window.editEOA = async ()=>{
   const snap = await getDoc(userRef);
