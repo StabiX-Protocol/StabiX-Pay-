@@ -375,6 +375,7 @@ window.openSend = ()=>{
 
 window.closeSend = ()=>{
   document.getElementById("sendScreen").style.display="none"
+  document.getElementById("bottomNav").style.display = "flex";
   window.isScanFlow = false;
 }
 
@@ -629,6 +630,7 @@ window.confirmReceiver = () => {
 };
 window.closePreview = () => {
   document.getElementById("previewScreen").style.display = "none";
+  document.getElementById("bottomNav").style.display = "flex";
   scanDone = false;
 };
 
