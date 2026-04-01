@@ -665,6 +665,21 @@ window.softRefresh = async function(){
   const docs = snap.docs.sort((a, b) => {
     return b.data().time?.seconds - a.data().time?.seconds;
   });
+
+  const now = Date.now();
+  const docsFiltered = docs.filter(docSnap => {
+  const d = docSnap.data();
+  if(!d.time) return false;
+  const t = d.time.seconds * 1000;
+  const unreadLimit = 7 * 24 * 60 * 60 * 1000; // 7 days
+  const readLimit = 3 * 24 * 60 * 60 * 1000;   // 3 days
+  if(d.read){
+    return (now - t) < readLimit;
+  } else {
+    return (now - t) < unreadLimit;
+    }
+    });
+
   let html = `
   <div style="background:#000;min-height:100vh;padding:16px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
@@ -676,7 +691,7 @@ window.softRefresh = async function(){
     html += `<div style="opacity:.6">No notifications</div>`;
   }
   let lastDate = "";
-  docs.forEach(docSnap => {
+  docsFiltered.forEach(docSnap => {
     const d = docSnap.data();
     const currentDate = formatDateGroup(d.time);
     if (currentDate !== lastDate) {
