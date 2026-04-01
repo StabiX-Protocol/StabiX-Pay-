@@ -697,12 +697,16 @@ window.softRefresh = async function(){
     if (currentDate !== lastDate) {
       html += `
       <div style="
-        margin-top:15px;
-        font-size:14px;
-        font-weight:600;
-        opacity:.7;
+      margin-top:25px;
+      margin-bottom:10px;
+      padding-top:10px;
+      border-top:1px solid rgba(255,255,255,0.08);
+      font-size:13px;
+      font-weight:700;
+      opacity:.5;
+      letter-spacing:.5px;
       ">
-        ${currentDate}
+      ${currentDate}
       </div>
       `;
       lastDate = currentDate;
