@@ -64,6 +64,7 @@ function renderLogin(){
       </div>
     </div>
   `);
+  document.getElementById("bottomNav").style.display = "none";
 }
 
 window.login = async ()=>{
