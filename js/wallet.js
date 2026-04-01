@@ -938,20 +938,25 @@ Send Notification
 /* ================= Navigation ================= */
   window.goHome = () => {
   renderApp();
+  setTimeout(()=>selectTab("home"),50);
 };
 
 window.goDeposit = () => {
   openDeposit();
+  setTimeout(()=>selectTab("deposit"),50);
 };
 
 window.goHistory = () => {
   loadHistoryByDate();
+  setTimeout(()=>selectTab("history"),50);
 };
 
 window.goSettings = () => {
   alert("Settings coming soon");
+  setTimeout(()=>selectTab("settings"),50);
 };
-function selectTab(tab){
+
+window.selectTab = function(tab){
   ["home","deposit","history","settings"].forEach(t=>{
     const el = document.getElementById("tab-"+t);
     if(el) el.classList.remove("nav-item-active");
