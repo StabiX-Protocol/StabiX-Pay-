@@ -613,16 +613,25 @@ opacity:.6;
   opacity: 0.8;
 }
 
-/* ===== Navigation Active Colour===== */
-.nav-item{
+/* ===== Bottom Navigation Active Colour===== */
+.nav-icon{
+  font-size:20px;
+  margin-bottom:2px;
   color:#9ca3af;
-  text-align:center;
-  flex:1;
-  padding:8px 0;
 }
 
-.nav-item.active{
+.nav-text{
+  font-size:11px;
+  color:#9ca3af;
+}
+
+.nav-item-active .nav-icon,
+.nav-item-active .nav-text{
   color:#3b82f6;
+}
+
+.nav-item-active{
   background:rgba(59,130,246,0.15);
-  border-radius:12px;
+  border-radius:14px;
+  padding:6px 0;
 }
