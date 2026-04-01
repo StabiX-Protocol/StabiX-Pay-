@@ -291,6 +291,7 @@ overflow:auto;
 </div>
       
   `);
+  document.getElementById("bottomNav").style.display = "flex";
   loadHistoryByDate();
   listenNotifications();
   
@@ -657,6 +658,7 @@ window.softRefresh = async function(){
 };
 /* ================= Notifications ================= */
   window.openNotifications = async () => {
+  document.getElementById("bottomNav").style.display = "none";
   const q = query(
     collection(db, "notifications"),
     where("to", "==", WALLET)
@@ -929,8 +931,23 @@ style="background:#60a5fa;color:#020617;font-weight:bold">
 Send Notification
 </button>
 `;
-  
 }
+/* ================= Navigation ================= */
+  window.goHome = () => {
+  renderApp();
+};
+
+window.goDeposit = () => {
+  openDeposit();
+};
+
+window.goHistory = () => {
+  loadHistoryByDate();
+};
+
+window.goSettings = () => {
+  alert("Settings coming soon");
+};
   // ================= EOA WALLET =================
 window.editEOA = async ()=>{
   const snap = await getDoc(userRef);
