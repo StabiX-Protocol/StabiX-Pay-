@@ -635,7 +635,7 @@ window.closePreview = () => {
 /* ================= Refresh ================= */
   let refreshCount = 0;
 window.softRefresh = async function(){
-  if(refreshCount >= 2){
+  if(refreshCount >= 1){
     const el = document.querySelector(".box");
     if(el){
       el.style.opacity = "0.5";
