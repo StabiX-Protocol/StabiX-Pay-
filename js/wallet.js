@@ -693,7 +693,7 @@ window.softRefresh = async function(){
   let lastDate = "";
   docsFiltered.forEach(docSnap => {
     const d = docSnap.data();
-    const currentDate = formatDateGroup(d.time);
+    const currentDate = formatRelativeDate(d.time);
     if (currentDate !== lastDate) {
       html += `
       <div style="
@@ -783,6 +783,23 @@ function formatDateGroup(ts){
     year: "numeric"
   });
 }
+function formatRelativeDate(ts){
+  if(!ts) return "";
+  const now = new Date();
+  const date = new Date(ts.seconds * 1000);
+  const diffTime = now - date;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  if(diffDays === 0) return "Today";
+  if(diffDays === 1) return "Yesterday";
+  if(diffDays === 2) return "2 days ago";
+  if(diffDays === 3) return "3 days ago";
+  return date.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
+}
+
 window.openNotifDetail = async (id) => {
   const docRef = doc(db, "notifications", id);
   await updateDoc(docRef, { read: true });
