@@ -612,3 +612,17 @@ opacity:.6;
   cursor: pointer;
   opacity: 0.8;
 }
+
+/* ===== Navigation Active Colour===== */
+.nav-item{
+  color:#9ca3af;
+  text-align:center;
+  flex:1;
+  padding:8px 0;
+}
+
+.nav-item.active{
+  color:#3b82f6;
+  background:rgba(59,130,246,0.15);
+  border-radius:12px;
+}
