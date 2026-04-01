@@ -36,6 +36,7 @@ function renderSetup(){
       <button onclick="saveProfile()">Create</button>
     </div>
   `);
+  selectTab("home");
 }
 window.saveProfile = async ()=>{
   if(!uname.value.trim() || !pwd.value.trim()) return alert("Fill all fields");
