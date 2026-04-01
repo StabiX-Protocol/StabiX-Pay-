@@ -701,7 +701,7 @@ window.softRefresh = async function(){
       margin-bottom:6px;
       font-size:17px;
       font-weight:700;
-      color:#e2e8f0;
+      color:#94a3b8;
       letter-spacing:0.3px;
       ">
       ${currentDate}
