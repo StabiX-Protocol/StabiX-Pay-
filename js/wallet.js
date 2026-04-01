@@ -292,6 +292,7 @@ overflow:auto;
       
   `);
   document.getElementById("bottomNav").style.display = "flex";
+  selectTab("home");
   loadHistoryByDate();
   listenNotifications();
   
