@@ -534,7 +534,7 @@ window.openScanner = async ()=>{
         alert("Error checking user")
         return
       }
-      // 🔥 STOP SCANNER
+      // STOP SCANNER
       await qrScanner.stop()
       document.getElementById("scannerOverlay").style.display = "none"
       
@@ -701,7 +701,7 @@ window.softRefresh = async function(){
       margin-bottom:6px;
       font-size:17px;
       font-weight:700;
-      color:#94a3b8;
+      color:#60a5fa;
       letter-spacing:0.3px;
       ">
       ${currentDate}
