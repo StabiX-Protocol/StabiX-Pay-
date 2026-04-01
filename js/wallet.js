@@ -370,6 +370,7 @@ window.openSend = ()=>{
   if(amt) amt.value = ""
   window.isScanFlow = false;
   document.getElementById("sendScreen").style.display="flex"
+  document.getElementById("bottomNav").style.display = "none";
 }
 
 window.closeSend = ()=>{
