@@ -950,10 +950,12 @@ window.goSettings = () => {
   alert("Settings coming soon");
 };
 function selectTab(tab){
-  document.querySelectorAll(".nav-item").forEach(el=>{
-    el.classList.remove("active");
+  ["home","deposit","history","settings"].forEach(t=>{
+    const el = document.getElementById("tab-"+t);
+    if(el) el.classList.remove("nav-item-active");
   });
-  document.getElementById("tab-" + tab).classList.add("active");
+  const active = document.getElementById("tab-"+tab);
+  if(active) active.classList.add("nav-item-active");
 }
   // ================= EOA WALLET =================
 window.editEOA = async ()=>{
