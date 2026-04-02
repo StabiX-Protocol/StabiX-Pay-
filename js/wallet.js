@@ -940,10 +940,23 @@ Send Notification
 `;
 }
 /* ================= Navigation ================= */
-  window.goHome = async () => {
-  await renderApp();
-  selectTab("home");
-};
+  function loadHome() {
+  document.querySelector(".box").innerHTML = `
+    <h2>${user.username}</h2>
+    <h1>${user.balance.toFixed(2)} USDC</h1>
+    <!-- Send / Receive / Scan -->
+    <div style="display:flex;gap:10px;margin-top:15px;">
+      <button onclick="openSend()">Send</button>
+      <button onclick="openReceive()">Receive</button>
+      <button onclick="openScan()">Scan</button>
+    </div>
+    <hr>
+    <h3>Assets</h3>
+    <div style="margin-top:10px;">
+      USDC: ${user.balance.toFixed(2)}
+    </div>
+  `;
+  }
 
 window.goDeposit = () => {
   document.querySelector(".box").innerHTML = `
