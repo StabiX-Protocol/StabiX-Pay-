@@ -940,15 +940,16 @@ Send Notification
 `;
 }
 /* ================= Navigation ================= */
-  window.goHome = () => {
+  window.goHome = async () => {
+  const snap = await getDoc(userRef);
+  const user = snap.data();
   document.querySelector(".box").innerHTML = `
     <h2>${user.username}</h2>
     <h1>${user.balance.toFixed(2)} USDC</h1>
-    <!-- Send / Receive / Scan -->
     <div style="display:flex;gap:10px;margin-top:15px;">
       <button onclick="openSend()">Send</button>
-      <button onclick="openReceive()">Receive</button>
-      <button onclick="openScan()">Scan</button>
+      <button onclick="showReceive()">Receive</button>
+      <button onclick="openScanner()">Scan</button>
     </div>
     <hr>
     <h3>Assets</h3>
@@ -956,7 +957,8 @@ Send Notification
       USDC: ${user.balance.toFixed(2)}
     </div>
   `;
-        }
+  selectTab("home");
+};
 
 window.goDeposit = () => {
   document.querySelector(".box").innerHTML = `
