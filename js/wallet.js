@@ -297,7 +297,6 @@ overflow:auto;
   `);
   document.getElementById("bottomNav").style.display = "flex";
   selectTab("home");
-  loadHistoryByDate();
   listenNotifications();
   
   // RECEIVE POPUP (one-time)
@@ -947,13 +946,34 @@ Send Notification
 };
 
 window.goDeposit = () => {
-  openDeposit();
-  setTimeout(()=>selectTab("deposit"),50);
+  document.querySelector(".box").innerHTML = `
+    <h2>Deposit / Withdraw</h2>
+    <div style="display:flex;gap:10px;margin-top:10px;">
+      <button onclick="openDeposit()" style="background:#22c55e;color:#022c22;font-weight:bold">
+        Deposit
+      </button>
+      <button onclick="openWithdraw()" style="background:#ef4444;color:white;font-weight:bold">
+        Withdraw
+      </button>
+    </div>
+    <div id="depositBox"></div>
+    <div id="withdrawBox"></div>
+  `;
+  selectTab("deposit");
 };
 
 window.goHistory = () => {
+  document.querySelector(".box").innerHTML = `
+    <h2>Transaction History</h2>
+    <input
+      id="historyDate"
+      type="date"
+      onchange="loadHistoryByDate()"
+    />
+    <div id="history">Loading...</div>
+  `;
   loadHistoryByDate();
-  setTimeout(()=>selectTab("history"),50);
+  selectTab("history");
 };
 
 window.goSettings = () => {
