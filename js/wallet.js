@@ -257,7 +257,6 @@ onchange="loadHistoryByDate()"
 <div id="history">Loading...</div>
 
   </div>
-    </div>
   ${isValidator ? validatorPanel() : ""}
 
   <div id="previewScreen" style="
