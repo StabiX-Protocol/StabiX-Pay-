@@ -941,22 +941,7 @@ Send Notification
 }
 /* ================= Navigation ================= */
   window.goHome = async () => {
-  const snap = await getDoc(userRef);
-  const user = snap.data();
-  document.querySelector(".box").innerHTML = `
-    <h2>${user.username}</h2>
-    <h1>${user.balance.toFixed(2)} USDC</h1>
-    <div style="display:flex;gap:10px;margin-top:15px;">
-      <button onclick="openSend()">Send</button>
-      <button onclick="showReceive()">Receive</button>
-      <button onclick="openScanner()">Scan</button>
-    </div>
-    <hr>
-    <h3>Assets</h3>
-    <div style="margin-top:10px;">
-      USDC: ${user.balance.toFixed(2)}
-    </div>
-  `;
+  await renderApp();   
   selectTab("home");
 };
 
