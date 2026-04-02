@@ -253,9 +253,9 @@ ${user.eoaAddress ? user.eoaAddress : "No EOA wallet registered"}
 
 <div id="history">Loading...</div>
 
-  ${isValidator ? validatorPanel() : ""}
   </div>
     </div>
+  ${isValidator ? validatorPanel() : ""}
 
   <div id="previewScreen" style="
 display:none;
