@@ -940,7 +940,7 @@ Send Notification
 `;
 }
 /* ================= Navigation ================= */
-  function loadHome() {
+  window.goHome = () => {
   document.querySelector(".box").innerHTML = `
     <h2>${user.username}</h2>
     <h1>${user.balance.toFixed(2)} USDC</h1>
@@ -956,7 +956,7 @@ Send Notification
       USDC: ${user.balance.toFixed(2)}
     </div>
   `;
-  }
+        }
 
 window.goDeposit = () => {
   document.querySelector(".box").innerHTML = `
