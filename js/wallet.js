@@ -141,27 +141,51 @@ ${user.balance.toFixed(2)} USDC
 </div>
   </div>
   </div>
-      
+
+<hr>
+<h3>Assets</h3>
+<div style="
+display:flex;
+flex-direction:column;
+gap:10px;
+margin-top:10px;
+">
+<div style="
+background:#020617;
+border:1px solid #1e293b;
+border-radius:12px;
+padding:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+">
+<div>
+<div style="font-size:14px">USDC</div>
+<div style="font-size:11px;opacity:.6">Stablecoin</div>
+</div>
+<div style="font-weight:bold">
+${user.balance.toFixed(2)}
+</div>
+</div>
+</div>
+    
+
+
 <div id="dwSection" style="display:none;">
 <hr>
 <h3>Deposit / Withdraw</h3>
-
 <div style="
 display:flex;
 gap:10px;
 margin-top:10px;
 ">
-
 <button onclick="openDeposit()" style="background:#22c55e;color:#022c22;font-weight:bold">
 Deposit
 </button>
-
 <button onclick="openWithdraw()" style="background:#ef4444;color:white;font-weight:bold">
 Withdraw
 </button>
-
 </div>
-
 <div id="depositBox" style="
 display:none;
 margin-top:10px;
@@ -170,18 +194,13 @@ background:#020617;
 border:1px solid #1e293b;
 border-radius:12px;
 ">
-
 <select id="networkSelect" onchange="showVault()">
   <option value="">Select Network</option>
   <option value="sepolia">Ethereum (Sepolia)</option>
 </select>
-
 <div id="vaultSection" style="display:none;margin-top:10px">
-
 <div class="small">Vault Address:</div>
-
 <div style="display:flex;align-items:center;gap:8px;width:100%">
-
 <span style="
 color:#60a5fa;
 font-size:12px;
@@ -190,7 +209,6 @@ flex:1;
 ">
 0x710c5D40a97123903b7cB482dBe39EB35D52af0a
 </span>
-
 <button onclick="copyVault()" style="
 width:auto;
 padding:6px 10px;
@@ -199,29 +217,19 @@ flex-shrink:0;
 ">
 Copy
 </button>
-
 </div>
-
 <button onclick="showDepositForm()" style="background:#22c55e;color:#022c22;font-weight:bold">
 Submit Deposit Proof 
 </button>
-
 <div id="depositForm" style="display:none;margin-top:10px">
-
 <input id="depAmount" type="number" placeholder="Amount">
-
 <input id="depHash" placeholder="Transaction Hash">
-
 <button onclick="submitDeposit()">Submit Deposit</button>
-
 </div>
 </div>
-
 </div>
 <div id="withdrawBox" style="display:none;margin-top:10px">
-
 <div class="small">Withdraw Address:</div>
-
 <div style="
 background:#020617;
 border:1px solid #1e293b;
@@ -230,25 +238,20 @@ border-radius:8px;
 margin-top:6px;
 word-break:break-all;
 ">
-
 ${user.eoaAddress ? user.eoaAddress : "No EOA wallet registered"}
-
 </div>
-
 <input id="wdAmount" type="number" placeholder="Amount">
-
 <button onclick="submitWithdraw()">Request Withdraw</button>
-
 </div>
-      <hr>
-      <h3>Transaction History</h3>
 
+<hr>
+<h3>Transaction History</h3>
 <input
-  id="historyDate"
-  type="date"
-  value="${today}"
-  max="${today}"
-  onchange="loadHistoryByDate()"
+id="historyDate"
+type="date"
+value="${today}"
+max="${today}"
+onchange="loadHistoryByDate()"
 />
 
 <div id="history">Loading...</div>
