@@ -270,44 +270,26 @@ z-index:99999;
   z-index:999;
   box-shadow:0 8px 30px rgba(0,0,0,0.6);
 ">
-  <div id="tab-home" onclick="goHome();selectTab('home')" style="flex:1;text-align:center;cursor:pointer">
-
+  <div id="tab-home" onclick="navigateHome()" style="flex:1;text-align:center;cursor:pointer">
      <div class="nav-icon">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
   <path d="M3 10L12 3L21 10" stroke="white" stroke-width="2" stroke-linecap="round"/>
   <path d="M5 10V20H19V10" stroke="white" stroke-width="2" stroke-linecap="round"/>
     </svg>
      </div>
-    
     <div class="nav-text">Home</div>
   </div>
+  
   <div id="tab-deposit" onclick="goDeposit();selectTab('deposit')" style="flex:1;text-align:center;cursor:pointer">
-   
-
-
-    
-
-    
     <div class="nav-icon">
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-    
-    <!-- Down Arrow (LEFT) -->
     <path d="M7 8V14" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round"/>
     <path d="M4 11L7 14L10 11" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-
-    <!-- Up Arrow (RIGHT) -->
     <path d="M17 14V8" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round"/>
     <path d="M14 11L17 8L20 11" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-
   </svg>
     </div>
 
-
-
-
-
-
-    
     <div class="nav-text">D/W</div>
   </div>
   <div id="tab-history" onclick="goHistory();selectTab('history')" style="flex:1;text-align:center;cursor:pointer">
@@ -319,8 +301,8 @@ z-index:99999;
     </div>
     <div class="nav-text">History</div>
   </div>
+  
   <div id="tab-settings" onclick="goSettings();selectTab('settings')" style="flex:1;text-align:center;cursor:pointer">
-
     <div class="nav-icon">
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
     <line x1="5" y1="7" x2="19" y2="7" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
