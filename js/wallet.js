@@ -940,9 +940,9 @@ Send Notification
 `;
 }
 /* ================= Navigation ================= */
-  window.goHome = () => {
-  renderApp();
-  setTimeout(()=>selectTab("home"),50);
+  window.goHome = async () => {
+  await renderApp();
+  selectTab("home");
 };
 
 window.goDeposit = () => {
@@ -978,7 +978,6 @@ window.goHistory = () => {
 
 window.goSettings = () => {
   alert("Settings coming soon");
-  setTimeout(()=>selectTab("settings"),50);
 };
 
 window.selectTab = function(tab){
