@@ -142,7 +142,8 @@ ${user.balance.toFixed(2)} USDC
   </div>
   </div>
       
-      <hr>
+<div id="dwSection" style="display:none;">
+<hr>
 <h3>Deposit / Withdraw</h3>
 
 <div style="
@@ -253,6 +254,7 @@ ${user.eoaAddress ? user.eoaAddress : "No EOA wallet registered"}
 <div id="history">Loading...</div>
 
   ${isValidator ? validatorPanel() : ""}
+  </div>
     </div>
 
   <div id="previewScreen" style="
