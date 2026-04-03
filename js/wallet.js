@@ -159,13 +159,16 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 ">
+<div style="display:flex;align-items:center;gap:10px;">   
+<img 
+src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
+style="width:32px;height:32px;border-radius:50%;">
 <div>
 <div style="font-size:14px">USDC</div>
-<div style="font-size:11px;opacity:.6">Stablecoin</div>
+</div>
 </div>
 <div style="font-weight:bold">
 ${user.balance.toFixed(2)}
-</div>
 </div>
 </div>
     
