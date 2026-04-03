@@ -1,50 +1,35 @@
 /* ================= SEND USDC ================= */
 window.sendUSDC = async ()=>{
-  window.isSender = true;
-
+window.isSender = true;
 const input = document.getElementById("sendTo");
 const toWallet = input ? input.value.trim() : "";
-
 const amtInput = document.getElementById("sendAmt");
 const amount = amtInput ? Number(amtInput.value) : 0;
-
 if(!toWallet || amount<=0) return alert("Invalid Input");
 if(toWallet === WALLET){
-  showTxPopup("Self Transfers Are Not Allowed","failed");
-  failed = true;
-  return;
+showTxPopup("Self Transfers Are Not Allowed","failed");
+failed = true;
+return;
 }
 let failed = false;
-
 try{
-
 document.getElementById("sendPopup")?.remove();
-
 await runTransaction(db, async(tx)=>{
-
 const fromSnap = await tx.get(userRef);
 const toRef = doc(db,"users",toWallet);
 const toSnap = await tx.get(toRef);
-
 if(!toSnap.exists()){
-  showTxPopup("User Not Found","failed");
-  failed = true;
-  return;
-}
-
-if(fromSnap.data().balance < amount){
-
-showTxPopup("Insufficient Balance","failed");
-
+showTxPopup("User Not Found","failed");
 failed = true;
-
 return;
-
 }
-
+if(fromSnap.data().balance < amount){
+showTxPopup("Insufficient Balance","failed");
+failed = true;
+return;
+}
 tx.update(userRef,{ balance: fromSnap.data().balance - amount });
 tx.update(toRef,{ balance: toSnap.data().balance + amount });
-
 tx.set(doc(collection(db,"transactions")),{
 userId: WALLET,
 type:"sent",
@@ -52,7 +37,6 @@ amount,
 counterparty:toWallet,
 createdAt:serverTimestamp()
 });
-
 tx.set(doc(collection(db,"transactions")),{
 userId: toWallet,
 type:"received",
@@ -60,11 +44,9 @@ amount,
 counterparty:WALLET,
 createdAt:serverTimestamp()
 });
-
 });
 
 if(!failed){
-
 await addDoc(collection(db, "notifications"), {
   to: toWallet,
   from: WALLET,
@@ -73,86 +55,70 @@ await addDoc(collection(db, "notifications"), {
   time: serverTimestamp(),
   read: false
 });
-
 if(window.isSender){
   showTxPopup(`Sent ${amount} USDC to ${toWallet}`, "success");
 }
-
 renderApp();
 window.isSender = false;
-
 }
-
 }catch(e){
-
 if(e!=="Receiver not found") console.log(e);
-
 }
-
 };
   /*===============Deposit & Withdraw Logic======*/
 window.openDeposit = ()=>{
 const box = document.getElementById("depositBox")
-
 if(box.style.display==="block"){
 box.style.display="none"
 }else{
 box.style.display="block"
 }
-
 document.getElementById("withdrawBox").style.display="none"
 }
-  window.openWithdraw = ()=>{
+window.openWithdraw = ()=>{
 const box = document.getElementById("withdrawBox")
-
 if(box.style.display==="block"){
 box.style.display="none"
 }else{
 box.style.display="block"
 }
-
 document.getElementById("depositBox").style.display="none"
-  }
-  
-  window.showVault = ()=>{
+}
+
+window.showVault = ()=>{
 const net = document.getElementById("networkSelect").value
 const vault = document.getElementById("vaultSection")
-
 if(net==="sepolia"){
 vault.style.display="block"
 }else{
 vault.style.display="none"
 }
-  }
-  window.copyVault = ()=>{
+}
+
+window.copyVault = ()=>{
 navigator.clipboard.writeText("0x710c5D40a97123903b7cB482dBe39EB35D52af0a")
 alert("Vault address copied")
-  }
-  window.showDepositForm = ()=>{
+}
+
+window.showDepositForm = ()=>{
 document.getElementById("depositForm").style.display="block"
-  }
+}
 
 window.submitDeposit = async ()=>{
-
 const amount = depAmount.value.trim()
 const txHash = depHash.value.trim()
-
-
 if(!amount || Number(amount) <= 0){
 alert("Enter valid amount")
 return
 }
-// Ethereum tx hash validation
 if(!txHash.startsWith("0x") || txHash.length !== 66){
 alert("Invalid Transaction Hash")
 return
 }
-
 if(txHash.length !== 66){
 alert("Invalid transaction hash")
 return
 }
-
 await addDoc(collection(db,"requests"),{
 userId: WALLET,
 type:"deposit",
@@ -162,218 +128,176 @@ txHash: txHash,
 status:"pending",
 createdAt: serverTimestamp()
 })
-
 await updateDoc(userRef,{ pendingRequest:true })
-
 alert("Deposit request sent to validator")
-
 renderApp()
-
-  }
+}
 /* ================= HISTORY ================= */
-
 async function loadHistory() {
-  const q = query(
-    collection(db, "transactions"),
-    where("userId", "==", WALLET)
-  );
-
-  const snap = await getDocs(q);
-  renderHistoryFromSnap(snap, "No transactions");
+const q = query(
+collection(db, "transactions"),
+where("userId", "==", WALLET)
+);
+const snap = await getDocs(q);
+renderHistoryFromSnap(snap, "No transactions");
 }
 
 window.loadHistoryByDate = async () => {
-  const selected = document.getElementById("historyDate")?.value;
-
-  if (!selected) {
-    loadHistory(); // fallback
-    return;
-  }
-
-  const startDate = new Date(selected);
+const selected = document.getElementById("historyDate")?.value;
+if (!selected) {
+loadHistory(); 
+return;
+}
+const startDate = new Date(selected);
 startDate.setHours(0, 0, 0, 0);
-
 const endDate = new Date(selected);
 endDate.setHours(23, 59, 59, 999);
-
 const start = Timestamp.fromDate(startDate);
 const end = Timestamp.fromDate(endDate);
-  const q = query(
-    collection(db, "transactions"),
-    where("userId", "==", WALLET),
-    where("createdAt", ">=", start),
-    where("createdAt", "<=", end)
-  );
-
-  const snap = await getDocs(q);
-  renderHistoryFromSnap(snap, "No transactions for this date");
+const q = query(
+collection(db, "transactions"),
+where("userId", "==", WALLET),
+where("createdAt", ">=", start),
+where("createdAt", "<=", end)
+);
+const snap = await getDocs(q);
+renderHistoryFromSnap(snap, "No transactions for this date");
 };
-  window.submitWithdraw = async ()=>{
-
-  const amount = Number(document.getElementById("wdAmount").value);
-
-  const snap = await getDoc(userRef);
-  const user = snap.data();
-
-  if(!user.eoaAddress){
-    alert("Please register EOA wallet first");
-    return;
-  }
-
-  if(!amount || amount <= 0){
-    alert("Enter valid amount");
-    return;
-  }
-
-  if(user.pendingRequest){
-    alert("Account frozen. Pending request under review.");
-    return;
-  }
-
-  if(amount > user.balance){
-    alert("Insufficient balance");
-    return;
-  }
-
-  await addDoc(collection(db,"requests"),{
-    userId: WALLET,
-    type:"withdraw",
-    amount: amount,
-    walletAddress: user.eoaAddress,
-    txHash:"",
-    status:"pending",
-    createdAt: serverTimestamp()
-  });
-
-  await updateDoc(userRef,{ pendingRequest:true });
-
-  tg.showPopup({
-    title:"Request Submitted",
-    message:"Wait for Validator Verification",
-    buttons:[{type:"ok"}]
-  });
-
-  renderApp();
-};
-
-/* ================= HISTORY RENDER ================= */
-
-function renderHistoryFromSnap(snap, emptyText) {
-  let html = "";
-
-  snap.forEach(d => {
-    const t = d.data();
-
-    const isDepositWithdraw =
-      t.type === "deposit" || t.type === "withdraw";
-
-    const isCredit = isDepositWithdraw
-      ? t.type === "deposit"
-      : t.type === "received";
-
-    const sign = isCredit ? "+" : "-";
-    const color = isCredit ? "#22c55e" : "#ef4444";
-
-    const metaLine = isDepositWithdraw
-      ? t.type.toUpperCase()
-      : (isCredit
-          ? `${t.counterparty} → ${WALLET}`
-          : `${WALLET} → ${t.counterparty}`);
-
-    html += `
-      <div class="tx" style="color:${color}">
-        <b>${sign}${t.amount} USDC</b><br>
-        <span class="small">
-          ${metaLine}<br>
-          ${t.createdAt?.toDate()?.toLocaleString() || ""}
-        </span>
-      </div>
-    `;
-  });
-
-  document.getElementById("history").innerHTML =
-    html || `<span class="small">${emptyText}</span>`;
+  
+window.submitWithdraw = async ()=>{
+const amount = Number(document.getElementById("wdAmount").value);
+const snap = await getDoc(userRef);
+const user = snap.data();
+if(!user.eoaAddress){
+alert("Please register EOA wallet first");
+return;
 }
-  window.validatorAdjust = async ()=>{
-  try{
-    const uid = document.getElementById("vUser").value.trim();
-    const type = document.getElementById("vType").value;
-    const amount = Number(document.getElementById("vAmount").value);
-
-    if(!uid || amount <= 0){
-      alert("Invalid input");
-      return;
-    }
-
-    const targetRef = doc(db,"users",uid);
-
-    await runTransaction(db, async(tx)=>{
-      const snap = await tx.get(targetRef);
-      if(!snap.exists()) throw "User not found";
-
-      let bal = snap.data().balance;
-
-      if(type === "deposit"){
-        bal += amount;
-      }else{
-        bal -= amount;
-      }
-
-      if(bal < 0) throw "Insufficient balance";
-
-      tx.update(targetRef,{ balance: bal });
-
-      tx.set(doc(collection(db,"transactions")),{
-        userId: uid,
-        type: type,              // deposit / withdraw
-        amount: amount,
-        counterparty: "VALIDATOR",
-        createdAt: serverTimestamp()
-      });
-    });
-
-    alert("Balance updated successfully");
-  }catch(e){
-    alert("Validator error: " + e);
-  }
+if(!amount || amount <= 0){
+alert("Enter valid amount");
+return;
+}
+if(user.pendingRequest){
+alert("Account frozen. Pending request under review.");
+return;
+}
+if(amount > user.balance){
+alert("Insufficient balance");
+return;
+}
+await addDoc(collection(db,"requests"),{
+userId: WALLET,
+type:"withdraw",
+amount: amount,
+walletAddress: user.eoaAddress,
+txHash:"",
+status:"pending",
+createdAt: serverTimestamp()
+});
+await updateDoc(userRef,{ pendingRequest:true });
+tg.showPopup({
+title:"Request Submitted",
+message:"Wait for Validator Verification",
+buttons:[{type:"ok"}]
+});
+renderApp();
 };
+/* ================= HISTORY RENDER ================= */
+function renderHistoryFromSnap(snap, emptyText) {
+let html = "";
+snap.forEach(d => {
+const t = d.data();
+const isDepositWithdraw =
+t.type === "deposit" || t.type === "withdraw";
+const isCredit = isDepositWithdraw
+? t.type === "deposit"
+: t.type === "received";
+const sign = isCredit ? "+" : "-";
+const color = isCredit ? "#22c55e" : "#ef4444";
+const metaLine = isDepositWithdraw
+? t.type.toUpperCase()
+: (isCredit? `${t.counterparty} → ${WALLET}`: `${WALLET} → ${t.counterparty}`);
+
+html += `
+<div class="tx" style="color:${color}">
+<b>${sign}${t.amount} USDC</b><br>
+<span class="small">
+${metaLine}<br>
+${t.createdAt?.toDate()?.toLocaleString() || ""}
+</span>
+</div>
+`;
+});
+document.getElementById("history").innerHTML =
+html || `<span class="small">${emptyText}</span>`;
+}
+
+window.validatorAdjust = async ()=>{
+try{
+const uid = document.getElementById("vUser").value.trim();
+const type = document.getElementById("vType").value;
+const amount = Number(document.getElementById("vAmount").value);
+if(!uid || amount <= 0){
+alert("Invalid input");
+return;
+}
+const targetRef = doc(db,"users",uid);
+await runTransaction(db, async(tx)=>{
+const snap = await tx.get(targetRef);
+if(!snap.exists()) throw "User not found";
+let bal = snap.data().balance;
+if(type === "deposit"){
+bal += amount;
+}else{
+bal -= amount;
+}
+if(bal < 0) throw "Insufficient balance";
+tx.update(targetRef,{ balance: bal });
+tx.set(doc(collection(db,"transactions")),{
+userId: uid,
+type: type,           
+amount: amount,
+counterparty: "VALIDATOR",
+createdAt: serverTimestamp()
+});
+});
+
+alert("Balance updated successfully");
+}catch(e){
+alert("Validator error: " + e);
+}
+};
+
 window.loadRequests = async ()=>{
-  const q = query(
-    collection(db,"requests"),
-    where("status","==","pending")
-  );
+const q = query(
+collection(db,"requests"),
+where("status","==","pending")
+);
+const snap = await getDocs(q);
+let html = "";
+snap.forEach(d=>{
+const r = d.data();
+const time = r.createdAt? r.createdAt.toDate().toLocaleString(): "";
 
-  const snap = await getDocs(q);
-  let html = "";
-
-  snap.forEach(d=>{
-    const r = d.data();
-
-    const time = r.createdAt
-      ? r.createdAt.toDate().toLocaleString()
-      : "";
-
-    html += `
-      <div class="tx">
-        <b>${r.type.toUpperCase()} ${r.amount} USDC</b><br>
-
-        <span class="small">
-          User ID: ${r.userId}<br>
-          Wallet: ${r.walletAddress}<br>
-          ${r.txHash ? `Tx Hash: ${r.txHash}<br>` : ""}
-          Time: ${time}
-        </span>
-
-        <br><br>
-        <button onclick="approveReq('${d.id}')">Approve</button>
-        <button onclick="rejectReq('${d.id}')">Reject</button>
-      </div>
-    `;
-  });
-
-  document.getElementById("vout").innerHTML =
-    html || "<span class='small'>No pending requests</span>";
+html += `
+<div class="tx">
+<b>${r.type.toUpperCase()} ${r.amount} USDC</b><br>
+<span class="small">
+User ID: ${r.userId}<br>
+Wallet: ${r.walletAddress}<br>
+${r.txHash ? `Tx Hash: ${r.txHash}<br>` : ""}
+Time: ${time}
+</span>
+<br><br>
+<button onclick="approveReq('${d.id}')">Approve</button>
+<button onclick="rejectReq('${d.id}')">Reject</button>
+</div>
+`;
+});
+document.getElementById("vout").innerHTML =
+html || "<span class='small'>No pending requests</span>";
 };
+
+
 window.loadAllUsers = async ()=>{
   const listDiv = document.getElementById("userList");
   const countDiv = document.getElementById("userCount");
