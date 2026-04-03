@@ -161,8 +161,8 @@ align-items:center;
 ">
 <div style="display:flex;align-items:center;gap:10px;">   
 <img 
-src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
-style="width:32px;height:32px;border-radius:50%;">
+src="./media/usd-coin-usdc-logo.png"
+style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
 <div>
 <div style="font-size:14px">USDC</div>
 </div>
