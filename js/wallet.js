@@ -29,6 +29,7 @@ window.changeUsername = async ()=>{
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
   const user = (await getDoc(userRef)).data();
+  window.userData = user;
   const isValidator = (await getDoc(validatorRef)).exists();
   const now = new Date();
 const yyyy = now.getFullYear();
@@ -375,7 +376,7 @@ try{
  /*=============Primary Balance ========*/
 window.getPrimaryBalance = function(){
   if(window.primaryAsset === "USDC"){
-    return user.balance.toFixed(2);
+    return window.userData.balance.toFixed(2);
   }
   if(window.primaryAsset === "USDT"){
     return "0.00";
