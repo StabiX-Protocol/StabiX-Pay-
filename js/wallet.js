@@ -1,3 +1,4 @@
+window.primaryAsset = "USDC";
 window.scanDone = false
 window.scanTargetId = null
 window.isScanFlow = false;
@@ -67,7 +68,7 @@ ${user.eoaAddress ? user.eoaAddress : "Not added"}
 </div>
 
 <div class="balanceBig">
-${user.balance.toFixed(2)} USDC
+${window.getPrimaryBalance()} ${window.primaryAsset}
 </div>
    
 <div class="walletActions">
@@ -152,51 +153,65 @@ margin-top:10px;
 ">
 
 <!-- USDC -->
-<div style="
+<div onclick="setPrimary('USDC')" style="
 background:#020617;
-border:1px solid #1e293b;
+border:1px solid ${window.primaryAsset === 'USDC' ? '#3b82f6' : '#1e293b'};
 border-radius:12px;
 padding:12px;
 display:flex;
 justify-content:space-between;
 align-items:center;
+cursor:pointer;
 ">
-<div style="display:flex;align-items:center;gap:10px;">   
-<img 
-src="./media/usd-coin-usdc-logo.png"
-style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
-<div>
-<div style="font-size:14px">USDC</div>
-</div>
-</div>
-<div style="font-weight:bold">
-${user.balance.toFixed(2)}
-</div>
+  <div style="display:flex;align-items:center;gap:10px;">   
+    <img 
+      src="./media/usd-coin-usdc-logo.png"
+      style="width:32px;height:32px;border-radius:50%;object-fit:cover;"
+    >
+
+    <div>
+      <div style="font-size:14px">USDC</div>
+      ${window.primaryAsset === "USDC" ? '<div style="font-size:10px;color:#22c55e;">PRIMARY</div>' : ''}
+    </div>
+
+  </div>
+
+  <div style="font-weight:bold">
+    ${user.balance.toFixed(2)}
+  </div>
 </div>
 
  <!-- USDT -->
-<div style="
-  background:#020617;
-  border:1px solid #1e293b;
-  border-radius:12px;
-  padding:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  ">
- <div style="display:flex;align-items:center;gap:10px;">   
- <img 
-  src="./media/tether-usdt-logo.png"
-  style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
-  <div>
-  <div style="font-size:14px">USDT</div>
+<div onclick="setPrimary('USDT')" style="
+background:#020617;
+border:1px solid ${window.primaryAsset === 'USDT' ? '#3b82f6' : '#1e293b'};
+border-radius:12px;
+padding:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+cursor:pointer;
+">
+
+  <div style="display:flex;align-items:center;gap:10px;">   
+    
+    <img 
+      src="./media/tether-usdt-logo.png"
+      style="width:32px;height:32px;border-radius:50%;object-fit:cover;"
+    >
+
+    <div>
+      <div style="font-size:14px">USDT</div>
+      ${window.primaryAsset === "USDT" ? '<div style="font-size:10px;color:#22c55e;">PRIMARY</div>' : ''}
+    </div>
+
   </div>
-  </div>
+
   <div style="font-weight:bold">
-  0.00
+    0.00
   </div>
-  </div>
-  </div>
+
+</div>
     
 
 
@@ -357,6 +372,23 @@ try{
 }
 }
 
+ /*=============Primary Balance ========*/
+window.getPrimaryBalance = function(){
+  if(window.primaryAsset === "USDC"){
+    return user.balance.toFixed(2);
+  }
+  if(window.primaryAsset === "USDT"){
+    return "0.00";
+  }
+};
+window.setPrimary = function(asset){
+  if(asset === "USDT"){
+    alert("USDT coming soon");
+    return;
+  }
+  window.primaryAsset = asset;
+  renderApp();
+};
  /*=============UI Interface Of Balance Name ========*/
   window.toggleProfile = ()=>{
 
