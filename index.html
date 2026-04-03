@@ -2,42 +2,27 @@
 <html>
 <head>
 <title>StabiX</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <link rel="stylesheet" href="css/style.css">
-
 </head>
-
 <body>
-
 <div id="app">Loading…</div>
-
 <!-- ===== Transaction Popup ===== -->
 <div id="txPopup" class="tx-popup">
 <div class="tx-card">
-
 <audio id="txSound" preload="auto">
 <source src="https://assets.mixkit.co/sfx/preview/mixkit-confirmation-tone-2867.mp3" type="audio/mpeg">
 </audio>
-
 <div class="spinner">
 <svg viewBox="0 0 120 120">
-
 <circle class="circle-bg" cx="60" cy="60" r="52"/>
-
 <circle class="circle-progress" cx="60" cy="60" r="52"/>
-
 <polyline id="tick" points="38,65 55,80 82,45"/>
-
 <line id="crossLine1" x1="40" y1="40" x2="80" y2="80"
 style="display:none;stroke:#ef4444;stroke-width:10;stroke-linecap:round"/>
-
 <line id="crossLine2" x1="80" y1="40" x2="40" y2="80"
 style="display:none;stroke:#ef4444;stroke-width:10;stroke-linecap:round"/>
-
 </svg>
 </div>
 
@@ -52,15 +37,12 @@ Transaction Successful
 </div>
 
 <div id="txMsg" style="font-size:16px;"></div>
-
 <div id="txTime" class="small" style="margin-top:6px;"></div>
-
 <button id="txDoneBtn"
 style="margin-top:16px;background:#22c55e;color:#022c22;"
 onclick="closeTxPopup(); window.goHome();">
 DONE
 </button>
-
 </div>
 </div>
   
@@ -68,7 +50,7 @@ DONE
 <div id="sendScreen">
 <div class="sendHeader">
 <button onclick="closeSend()" class="backBtn">
-  ←
+←
 </button>
 <h2>Send USDC</h2>
 </div>
@@ -88,9 +70,8 @@ autocomplete="off"
 Next
 </button>
 </div>
-
 </div>
-
+    <!-- ===== Amount Screen===== -->
 <div id="amountScreen" style="display:none">
 <div class="sendHeader">
 <button onclick="backToAddress()" class="backBtn">←</button>
@@ -110,9 +91,8 @@ class="amountInput"
 Next
 </button>
 </div>
-
 </div>
-  
+         <!-- =====Confirm Screen===== -->
 <div id="confirmScreen" style="display:none">
 <div class="sendHeader">
 <button onclick="backToAmount()" class="backBtn">←</button>
@@ -141,7 +121,7 @@ Confirm
  <!-- ===== QR Code===== -->
  <script src="https://unpkg.com/html5-qrcode"></script> 
 
-  <div id="scannerOverlay" style="
+<div id="scannerOverlay" style="
 display:none;
 position:fixed;
 top:0;
@@ -152,166 +132,165 @@ background:black;
 z-index:99999;
 ">
 
-  <div id="qr-reader" style="
-  position:fixed;
-  top:0;
-  left:0;
-  width:100vw;
-  height:100vh;
-  z-index:9999;
+<div id="qr-reader" style="
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+z-index:9999;
 "></div>
 
-  <div id="scanBox" style="
-  position:fixed;
-  top:40%;
-  left:50%;
-  width:240px;
-  height:240px;
-  transform:translate(-50%, -50%);
-  pointer-events:none;
+<div id="scanBox" style="
+position:fixed;
+top:40%;
+left:50%;
+width:240px;
+height:240px;
+transform:translate(-50%, -50%);
+pointer-events:none;
 ">
-  <!-- 4 corners -->
-  <div class="corner tl"></div>
-  <div class="corner tr"></div>
-  <div class="corner bl"></div>
-  <div class="corner br"></div>
-  </div>
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+</div>
 
-  <button onclick="closeScanner()" style="
-    position:absolute;
-    top:15px;
-    left:15px;
-    background:rgba(0,0,0,0.7);
-    color:#fff;
-    border:none;
-    font-size:18px;
-    width:40px;
-    height:40px;
-    border-radius:50%;
-    z-index:100000;
-  ">✕</button>
+<button onclick="closeScanner()" style="
+position:absolute;
+top:15px;
+left:15px;
+background:rgba(0,0,0,0.7);
+color:#fff;
+border:none;
+font-size:18px;
+width:40px;
+height:40px;
+border-radius:50%;
+z-index:100000;
+">✕</button>
   
- <button id="torchBtn" onclick="toggleTorch()" style="
-  position:absolute;
-  top:15px;
-  right:15px;
-  background:rgba(0,0,0,0.7);
-  color:#fff;
-  border:none;
-  font-size:18px;
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  z-index:100000;
+<button id="torchBtn" onclick="toggleTorch()" style="
+position:absolute;
+top:15px;
+right:15px;
+background:rgba(0,0,0,0.7);
+color:#fff;
+border:none;
+font-size:18px;
+width:40px;
+height:40px;
+border-radius:50%;
+z-index:100000;
 ">
 <svg width="26" height="26" viewBox="0 0 24 24" fill="white"
-     style="transform:translate(-5px, -5px);">
-    <path d="M6 2h12v3H6V2zm3 5h6c1.1 0 2 .9 2 2v11c0 1.1-.9 2-2 2H9c-1.1 0-2-.9-2-2V9c0-1.1.9-2 2-2zm3 3a1.5 1.5 0 100 3 1.5 1.5 0 000-3z"/>
+style="transform:translate(-5px, -5px);">
+<path d="M6 2h12v3H6V2zm3 5h6c1.1 0 2 .9 2 2v11c0 1.1-.9 2-2 2H9c-1.1 0-2-.9-2-2V9c0-1.1.9-2 2-2zm3 3a1.5 1.5 0 100 3 1.5 1.5 0 000-3z"/>
 </svg>
-  </button>
+</button>
 
-  <label for="galleryInput" id="galleryBtn" style="
-  position:fixed;
-  bottom:100px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#e5e7eb;
-  color:#111;
-  border:none;
-  height:48px;
-  padding:0 20px;
-  border-radius:999px;
-  font-size:15px;
-  font-weight:500;
-  z-index:100000;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  line-height:1;
+<label for="galleryInput" id="galleryBtn" style="
+position:fixed;
+bottom:100px;
+left:50%;
+transform:translateX(-50%);
+background:#e5e7eb;
+color:#111;
+border:none;
+height:48px;
+padding:0 20px;
+border-radius:999px;
+font-size:15px;
+font-weight:500;
+z-index:100000;
+display:inline-flex;
+align-items:center;
+gap:8px;
+line-height:1;
 ">
 <!-- Gallery Icon + Text -->
 <span style="
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  white-space:nowrap;
-  transform:translateY(15px);  
+display:inline-flex;
+align-items:center;
+gap:8px;
+white-space:nowrap;
+transform:translateY(15px);  
 ">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="display:block;">
-    <rect x="3" y="5" width="18" height="14" rx="2" stroke="#555" stroke-width="1.5"/>
-    <circle cx="8" cy="10" r="2" fill="#555"/>
-    <path d="M21 16L16 11L5 19" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-  <span>Upload From Gallery</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="display:block;">
+<rect x="3" y="5" width="18" height="14" rx="2" stroke="#555" stroke-width="1.5"/>
+<circle cx="8" cy="10" r="2" fill="#555"/>
+<path d="M21 16L16 11L5 19" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span>Upload From Gallery</span>
 </span>
 <input 
-  type="file" 
-  id="galleryInput" 
-  accept="image/*" 
-  style="display:none"
-  onchange="handleGallery(event)">
- </div>
-
-  <!-- Bottom Navigation -->
+type="file" 
+id="galleryInput" 
+accept="image/*" 
+style="display:none"
+onchange="handleGallery(event)">
+</div>
+  
+ <!-- Bottom Navigation -->
 <div id="bottomNav" style="
-  position:fixed;
-  bottom:10px;
-  left:50%;
-  transform:translateX(-50%);
-  width:92%;
-  max-width:420px;
-  height:70px;
-  background:rgba(2,6,23,0.9);
-  backdrop-filter:blur(12px);
-  border-radius:22px;
-  display:none;
-  justify-content:space-around;
-  align-items:center;
-  z-index:999;
-  box-shadow:0 8px 30px rgba(0,0,0,0.6);
+position:fixed;
+bottom:10px;
+left:50%;
+transform:translateX(-50%);
+width:92%;
+max-width:420px;
+height:70px;
+background:rgba(2,6,23,0.9);
+backdrop-filter:blur(12px);
+border-radius:22px;
+display:none;
+justify-content:space-around;
+align-items:center;
+z-index:999;
+box-shadow:0 8px 30px rgba(0,0,0,0.6);
 ">
-  <div id="tab-home" onclick="navigateHome()" style="flex:1;text-align:center;cursor:pointer">
-     <div class="nav-icon">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-  <path d="M3 10L12 3L21 10" stroke="white" stroke-width="2" stroke-linecap="round"/>
-  <path d="M5 10V20H19V10" stroke="white" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-     </div>
-    <div class="nav-text">Home</div>
-  </div>
+<div id="tab-home" onclick="navigateHome()" style="flex:1;text-align:center;cursor:pointer">
+<div class="nav-icon">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+<path d="M3 10L12 3L21 10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+<path d="M5 10V20H19V10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+</svg>
+</div>
+<div class="nav-text">Home</div>
+</div>
   
-  <div id="tab-deposit" onclick="goDeposit();selectTab('deposit')" style="flex:1;text-align:center;cursor:pointer">
-    <div class="nav-icon">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-    <path d="M7 8V14" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round"/>
-    <path d="M4 11L7 14L10 11" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M17 14V8" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round"/>
-    <path d="M14 11L17 8L20 11" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-    </div>
+<div id="tab-deposit" onclick="goDeposit();selectTab('deposit')" style="flex:1;text-align:center;cursor:pointer">
+<div class="nav-icon">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+<path d="M7 8V14" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round"/>
+<path d="M4 11L7 14L10 11" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17 14V8" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round"/>
+<path d="M14 11L17 8L20 11" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div>
 
-    <div class="nav-text">D/W</div>
-  </div>
-  <div id="tab-history" onclick="goHistory();selectTab('history')" style="flex:1;text-align:center;cursor:pointer">
-    <div class="nav-icon">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2"/>
-    <path d="M12 7V12L15 14" stroke="white" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-    </div>
-    <div class="nav-text">History</div>
-  </div>
+<div class="nav-text">D/W</div>
+</div>
+<div id="tab-history" onclick="goHistory();selectTab('history')" style="flex:1;text-align:center;cursor:pointer">
+<div class="nav-icon">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+<circle cx="12" cy="12" r="10" stroke="white" stroke-width="2"/>
+<path d="M12 7V12L15 14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+</svg>
+</div>
+<div class="nav-text">History</div>
+</div>
   
-  <div id="tab-settings" onclick="goSettings();selectTab('settings')" style="flex:1;text-align:center;cursor:pointer">
-    <div class="nav-icon">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-    <line x1="5" y1="7" x2="19" y2="7" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
-    <line x1="5" y1="12" x2="19" y2="12" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
-    <line x1="5" y1="17" x2="19" y2="17" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
-    </svg>
-    </div>
-    <div class="nav-text">Settings</div>
-  </div>
+<div id="tab-settings" onclick="goSettings();selectTab('settings')" style="flex:1;text-align:center;cursor:pointer">
+<div class="nav-icon">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+<line x1="5" y1="7" x2="19" y2="7" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="5" y1="12" x2="19" y2="12" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="5" y1="17" x2="19" y2="17" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
+</svg>
+</div>
+<div class="nav-text">Settings</div>
+</div>
 </div>
 
 
