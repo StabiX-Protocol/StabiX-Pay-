@@ -150,6 +150,8 @@ flex-direction:column;
 gap:10px;
 margin-top:10px;
 ">
+
+<!-- USDC -->
 <div style="
 background:#020617;
 border:1px solid #1e293b;
@@ -171,6 +173,30 @@ style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
 ${user.balance.toFixed(2)}
 </div>
 </div>
+
+ <!-- USDT -->
+<div style="
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:12px;
+  padding:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  ">
+ <div style="display:flex;align-items:center;gap:10px;">   
+ <img 
+  src="./media/tether-usdt-logo.png"
+  style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+  <div>
+  <div style="font-size:14px">USDT</div>
+  </div>
+  </div>
+  <div style="font-weight:bold">
+  0.00
+  </div>
+  </div>
+  </div>
     
 
 
