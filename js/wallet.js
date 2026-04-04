@@ -139,7 +139,6 @@ appDiv(`
     flex-direction:column;
     gap:10px;
     margin-top:10px;">
-
                 <!-- USDC -->
     <div onclick="setPrimary('USDC')" style="
     background:#020617;
@@ -187,9 +186,67 @@ appDiv(`
     0.00
     </div>
     </div>
+
+           <!-- Asset Selector -->
+    <div id="assetSelector" style="
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#020617;
+    z-index:999;
+    padding:20px;
+    box-sizing:border-box;
+    ">
+   <h2 style="margin-bottom:20px;">Select Primary Asset</h2>
+
+               <!-- USDC -->
+   <div onclick="setPrimary('USDC'); closeAssetSelector()" style="
+    background:#020617;
+    border:1px solid #1e293b;
+    border-radius:12px;
+    padding:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+    cursor:pointer;">
+    <div style="display:flex;align-items:center;gap:10px;">
+    <img src="./media/usd-coin-usdc-logo.png" style="width:32px;height:32px;border-radius:50%;">
+    <div>USDC</div>
+    </div>
+    <div>${window.userData?.balance?.toFixed(2) || "0.00"}</div>
+    </div>
+
+              <!-- USDT -->
+    <div onclick="setPrimary('USDT'); closeAssetSelector()" style="
+    background:#020617;
+    border:1px solid #1e293b;
+    border-radius:12px;
+    padding:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    cursor:pointer;">
+    <div style="display:flex;align-items:center;gap:10px;">
+    <img src="./media/tether-usdt-logo.png" style="width:32px;height:32px;border-radius:50%;">
+    <div>USDT</div>
+    </div>
+    <div>0.00</div>
+    </div>
+    <div onclick="closeAssetSelector()" style="
+    margin-top:20px;
+    text-align:center;
+    padding:10px;
+    background:#1e293b;
+    border-radius:10px;
+    cursor:pointer;">
+    Close
+    </div>
+    </div>
     
-
-
     <div id="dwSection" style="display:none;">
     <hr>
     <h3>Deposit / Withdraw</h3>
@@ -325,6 +382,11 @@ sessionStorage.setItem(key,"1");
 console.log("Receive popup error", e);
 }
 }
+ /*=============Open Selector ========*/
+window.openAssetSelector = function(){
+document.getElementById("assetSelector").style.display = "block";}
+window.closeAssetSelector = function(){
+document.getElementById("assetSelector").style.display = "none";}
  /*=============Primary Balance ========*/
 window.getPrimaryBalance = function(){
 if(window.primaryAsset === "USDC"){
