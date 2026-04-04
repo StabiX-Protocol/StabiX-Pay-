@@ -229,68 +229,62 @@ appDiv(`
 
               <!-- USDT -->
     <div onclick="confirmPrimary('USDT')" style="
-background:#020617;
-border:1px solid #1e293b;
-border-radius:12px;
-padding:12px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-cursor:pointer;
-margin-bottom:10px;
-">
-<div style="display:flex;align-items:center;gap:10px;">
-<img src="./media/tether-usdt-logo.png" style="width:32px;height:32px;border-radius:50%;">
-<div>
-<div style="font-size:14px">USDT</div>
-
-${window.primaryAsset === "USDT" ? `
-<div style="
-font-size:12px;
-color:#22c55e;
-font-weight:600;
-margin-top:2px;
-">Primary</div>
-` : ``}
-
-</div>
-</div>
-
-<div style="font-weight:bold">0.00</div>
-</div>
+    background:#020617;
+    border:1px solid #1e293b;
+    border-radius:12px;
+    padding:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    cursor:pointer;
+    margin-bottom:10px;
+    ">
+    <div style="display:flex;align-items:center;gap:10px;">
+    <img src="./media/tether-usdt-logo.png" style="width:32px;height:32px;border-radius:50%;">
+    <div>
+    <div style="font-size:14px">USDT</div>
+    ${window.primaryAsset === "USDT" ? `
+    <div style="
+    font-size:12px;
+    color:#22c55e;
+    font-weight:600;
+    margin-top:2px;
+    ">Primary</div>
+    ` : ``}
+    </div>
+    </div>
+    <div style="font-weight:bold">0.00</div>
+    </div>
     
             <!-- USDC -->
     <div onclick="confirmPrimary('USDC')" style="
-background:#020617;
-border:1px solid #1e293b;
-border-radius:12px;
-padding:12px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-cursor:pointer;
-">
-<div style="display:flex;align-items:center;gap:10px;">
-<img src="./media/usd-coin-usdc-logo.png" style="width:32px;height:32px;border-radius:50%;">
-<div>
-<div style="font-size:14px">USDC</div>
-
-${window.primaryAsset === "USDC" ? `
-<div style="
-font-size:12px;
-color:#22c55e;
-font-weight:600;
-margin-top:2px;
-">Primary</div>
-` : ``}
-
-</div>
-</div>
-
-<div style="font-weight:bold">
-${window.userData?.balance?.toFixed(2) || "0.00"}
-</div>
-</div>
+    background:#020617;
+    border:1px solid #1e293b;
+    border-radius:12px;
+    padding:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    cursor:pointer;
+    ">
+    <div style="display:flex;align-items:center;gap:10px;">
+    <img src="./media/usd-coin-usdc-logo.png" style="width:32px;height:32px;border-radius:50%;">
+    <div>
+    <div style="font-size:14px">USDC</div>
+    ${window.primaryAsset === "USDC" ? `
+    <div style="
+    font-size:12px;
+    color:#22c55e;
+    font-weight:600;
+    margin-top:2px;
+    ">Primary</div>
+    ` : ``}
+    </div>
+    </div>
+    <div style="font-weight:bold">
+    ${window.userData?.balance?.toFixed(2) || "0.00"}
+    </div>
+    </div>
 
 
     <div id="confirmBox" style="
@@ -505,7 +499,6 @@ window.applyPrimary = function(){
 window.primaryAsset = window.selectedAsset;
 localStorage.setItem("primaryAsset", window.primaryAsset);
 document.getElementById("confirmBox").style.display = "none";
-renderApp();
 }
 
  /*=============Primary Balance ========*/
