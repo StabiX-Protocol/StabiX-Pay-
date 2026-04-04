@@ -216,10 +216,27 @@ appDiv(`
     padding:20px;
     box-sizing:border-box;
     ">
-    <h2 style="margin-bottom:20px;">Select Primary Asset</h2>
+    <h2 style="margin-bottom:20px;">Select Primary Asset</h2>          
 
-               <!-- USDC -->
-    <div onclick="setPrimary('USDC'); closeAssetSelector()" style="
+              <!-- USDT -->
+    onclick="confirmPrimary('USDT')" 
+    background:#020617;
+    border:1px solid #1e293b;
+    border-radius:12px;
+    padding:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    cursor:pointer;">
+    <div style="display:flex;align-items:center;gap:10px;">
+    <img src="./media/tether-usdt-logo.png" style="width:32px;height:32px;border-radius:50%;">
+    <div>USDT</div>
+    </div>
+    <div>0.00</div>
+    </div>
+    
+            <!-- USDC -->
+    onclick="confirmPrimary('USDC')"
     background:#020617;
     border:1px solid #1e293b;
     border-radius:12px;
@@ -236,32 +253,52 @@ appDiv(`
     <div>${window.userData?.balance?.toFixed(2) || "0.00"}</div>
     </div>
 
-              <!-- USDT -->
-    <div onclick="setPrimary('USDT'); closeAssetSelector()" style="
+    <div id="confirmBox" style="
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.7);
+    z-index:1000;
+    align-items:center;
+    justify-content:center;">
+
+    <div style="
     background:#020617;
     border:1px solid #1e293b;
     border-radius:12px;
-    padding:12px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    cursor:pointer;">
-    <div style="display:flex;align-items:center;gap:10px;">
-    <img src="./media/tether-usdt-logo.png" style="width:32px;height:32px;border-radius:50%;">
-    <div>USDT</div>
+    padding:20px;
+    width:80%;
+    text-align:center;">
+    <div id="confirmText" style="margin-bottom:20px;">
+    Set as primary?
     </div>
-    <div>0.00</div>
-    </div>
-    <div onclick="closeAssetSelector()" style="
-    margin-top:20px;
-    text-align:center;
+
+    <div style="display:flex;gap:10px;">
+    <button onclick="applyPrimary()" style="
+    flex:1;
     padding:10px;
-    background:#1e293b;
-    border-radius:10px;
-    cursor:pointer;">
-    Close
+    background:#22c55e;
+    border:none;
+    border-radius:8px;
+    color:white;
+    ">Yes</button>
+
+    <button onclick="closeConfirm()" style="
+    flex:1;
+    padding:10px;
+    background:#ef4444;
+    border:none;
+    border-radius:8px;
+    color:white;
+    ">No</button>
     </div>
     </div>
+    </div>
+     
+    
     
     <div id="dwSection" style="display:none;">
     <hr>
