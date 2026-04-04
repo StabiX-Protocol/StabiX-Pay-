@@ -499,12 +499,8 @@ window.applyPrimary = function(){
 window.primaryAsset = window.selectedAsset;
 localStorage.setItem("primaryAsset", window.primaryAsset);
 document.getElementById("confirmBox").style.display = "none";
-renderApp();
-setTimeout(()=>{
 openAssetSelector();
-},50);
 }
-
 
  /*=============Primary Balance ========*/
 window.getPrimaryBalance = function(){
