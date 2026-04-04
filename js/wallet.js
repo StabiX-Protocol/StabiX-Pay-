@@ -212,9 +212,9 @@ appDiv(`
     width:100%;
     height:100%;
     background:#020617;
-    z-index:999;
+    z-index:9999;
+    overflow:auto;
     padding:20px;
-    box-sizing:border-box;
     ">
     <h2 style="margin-bottom:20px;">Select Primary Asset</h2>
 
