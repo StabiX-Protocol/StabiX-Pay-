@@ -216,10 +216,19 @@ appDiv(`
     padding:20px;
     box-sizing:border-box;
     ">
-    <h2 style="margin-bottom:20px;">Select Primary Asset</h2>          
+    <h2 style="margin-bottom:20px;">Select Primary Asset</h2>
+
+    <div onclick="closeAssetSelector()" style="
+    position:absolute;
+    top:15px;
+    right:15px;
+    font-size:22px;
+    cursor:pointer;">
+    ✕
+    </div>
 
               <!-- USDT -->
-    onclick="confirmPrimary('USDT')" 
+    <div onclick="confirmPrimary('USDT')" style="
     background:#020617;
     border:1px solid #1e293b;
     border-radius:12px;
@@ -227,7 +236,9 @@ appDiv(`
     display:flex;
     justify-content:space-between;
     align-items:center;
-    cursor:pointer;">
+    cursor:pointer;
+    margin-bottom:10px;
+    ">
     <div style="display:flex;align-items:center;gap:10px;">
     <img src="./media/tether-usdt-logo.png" style="width:32px;height:32px;border-radius:50%;">
     <div>USDT</div>
@@ -236,7 +247,7 @@ appDiv(`
     </div>
     
             <!-- USDC -->
-    onclick="confirmPrimary('USDC')"
+    <div onclick="confirmPrimary('USDC')" style="
     background:#020617;
     border:1px solid #1e293b;
     border-radius:12px;
@@ -244,8 +255,8 @@ appDiv(`
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:10px;
-    cursor:pointer;">
+    cursor:pointer;
+    ">
     <div style="display:flex;align-items:center;gap:10px;">
     <img src="./media/usd-coin-usdc-logo.png" style="width:32px;height:32px;border-radius:50%;">
     <div>USDC</div>
@@ -298,14 +309,7 @@ appDiv(`
     </div>
     </div>
 
-    <div onclick="closeAssetSelector()" style="
-    position:absolute;
-    top:15px;
-    right:15px;
-    font-size:22px;
-    cursor:pointer;">
-    ✕
-    </div>
+    
      
     
     
