@@ -334,16 +334,6 @@ appDiv(`
     </div>
     </div>
 
-        <div style="
-font-size:11px;
-color:#64748b;
-margin-top:24px;
-text-align:center;
-line-height:1.4;
-">
-* Primary asset sets the default currency for your transactions. You can change it anytime.
-</div>
-
     
      
     
