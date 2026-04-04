@@ -502,7 +502,7 @@ document.getElementById("confirmBox").style.display = "none";
 renderApp();
 setTimeout(()=>{
 openAssetSelector();
-},0);
+},50);
 }
 
 
