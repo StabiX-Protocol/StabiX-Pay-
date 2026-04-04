@@ -228,16 +228,6 @@ appDiv(`
     ✕
     </div>
 
-    <div style="
-font-size:11px;
-color:#64748b;
-margin-top:24px;
-text-align:center;
-line-height:1.4;
-">
-* Primary asset sets the default currency for your transactions. You can change it anytime.
-</div>
-
               <!-- USDT -->
     <div onclick="confirmPrimary('USDT')" style="
     background:#020617;
@@ -343,7 +333,16 @@ line-height:1.4;
     </div>
     </div>
     </div>
-  
+
+        <div style="
+font-size:11px;
+color:#64748b;
+margin-top:24px;
+text-align:center;
+line-height:1.4;
+">
+* Primary asset sets the default currency for your transactions. You can change it anytime.
+</div>
 
     
      
