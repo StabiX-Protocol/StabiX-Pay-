@@ -1,4 +1,5 @@
 window.primaryAsset = localStorage.getItem("primaryAsset") || "USDC";
+window.keepAssetOpen = false;
 window.scanDone = false
 window.scanTargetId = null
 window.isScanFlow = false;
@@ -450,7 +451,12 @@ document.getElementById("bottomNav").style.display = "flex";
 selectTab("home");
 listenNotifications();
   
-       // RECEIVE POPUP (one-time)
+if(window.keepAssetOpen){
+  window.keepAssetOpen = false;
+  openAssetSelector();
+}
+  
+       // RECEIVE POPUP
 try{
 const q = query(
 collection(db,"transactions"),
@@ -499,6 +505,7 @@ window.applyPrimary = function(){
 window.primaryAsset = window.selectedAsset;
 localStorage.setItem("primaryAsset", window.primaryAsset);
 document.getElementById("confirmBox").style.display = "none";
+window.keepAssetOpen = true;
 renderApp();
 openAssetSelector();
 }
