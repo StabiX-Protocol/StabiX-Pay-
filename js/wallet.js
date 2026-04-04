@@ -132,66 +132,15 @@ appDiv(`
     </div>
     </div>
 
+              <!-- Assets -->
     <hr>
-    <h3>Assets</h3>
     <div style="
     display:flex;
-    flex-direction:column;
-    gap:10px;
+    justify-content:space-between;
+    align-items:center;
     margin-top:10px;">
-                <!-- USDC -->
-    <div onclick="setPrimary('USDC')" style="
-    background:#020617;
-    border:1px solid ${window.primaryAsset === 'USDC' ? '#3b82f6' : '#1e293b'};
-    border-radius:12px;
-    padding:12px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    cursor:pointer;">
-    <div style="display:flex;align-items:center;gap:10px;">   
-    <img 
-    src="./media/usd-coin-usdc-logo.png"
-    style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
-    <div>
-    <div style="font-size:14px">USDC</div>
-    ${window.primaryAsset === "USDC" ? '<div style="font-size:10px;color:#22c55e;">PRIMARY</div>' : ''}
-    </div>
-    </div>
-    <div style="font-weight:bold">
-    ${user.balance.toFixed(2)}
-    </div>
-    </div>
-
-                 <!-- USDT -->
-    <div onclick="setPrimary('USDT')" style="
-    background:#020617;
-    border:1px solid ${window.primaryAsset === 'USDT' ? '#3b82f6' : '#1e293b'};
-    border-radius:12px;
-    padding:12px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    cursor:pointer;">
-    <div style="display:flex;align-items:center;gap:10px;">   
-    <img 
-    src="./media/tether-usdt-logo.png"
-    style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
-    <div>
-    <div style="font-size:14px">USDT</div>
-    ${window.primaryAsset === "USDT" ? '<div style="font-size:10px;color:#22c55e;">PRIMARY</div>' : ''}
-    </div>
-    </div>
-    <div style="font-weight:bold">
-    0.00
-    </div>
-    </div>
-
-          <!--  Open Asset Selector -->
+    <h3 style="margin:0;">Assets</h3>
     <div onclick="openAssetSelector()" style="
-    position:absolute;
-    right:10px;
-    top:10px;
     width:28px;
     height:28px;
     border-radius:50%;
@@ -200,9 +149,59 @@ appDiv(`
     align-items:center;
     justify-content:center;
     cursor:pointer;
-    z-index:20;">
+    font-size:18px;">
     +
     </div>
+    </div>
+    <div style="
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:10px;">
+                <!-- USDT -->
+    <div onclick="setPrimary('USDT')" style="
+    background:#020617;
+    border:1px solid #1e293b;
+    border-radius:12px;
+    padding:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    cursor:pointer;">
+    <div style="display:flex;align-items:center;gap:10px;">
+    <img 
+    src="./media/tether-usdt-logo.png"
+    style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+    <div>
+    <div style="font-size:14px">USDT</div>
+    </div>
+    </div>
+    <div style="font-weight:bold">
+    0.00
+    </div>
+    </div>
+                 <!-- USDC -->
+    <div onclick="setPrimary('USDC')" style="
+    background:#020617;
+    border:1px solid #1e293b;
+    border-radius:12px;
+    padding:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    cursor:pointer;">
+    <div style="display:flex;align-items:center;gap:10px;">
+    <img 
+    src="./media/usd-coin-usdc-logo.png"
+    style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+    <div>
+    <div style="font-size:14px">USDC</div>
+    </div>
+    </div>
+    <div style="font-weight:bold">
+    ${user.balance.toFixed(2)}
+    </div>
+    </div>   
 
            <!-- Asset Selector -->
     <div id="assetSelector" style="
@@ -217,10 +216,10 @@ appDiv(`
     padding:20px;
     box-sizing:border-box;
     ">
-   <h2 style="margin-bottom:20px;">Select Primary Asset</h2>
+    <h2 style="margin-bottom:20px;">Select Primary Asset</h2>
 
                <!-- USDC -->
-   <div onclick="setPrimary('USDC'); closeAssetSelector()" style="
+    <div onclick="setPrimary('USDC'); closeAssetSelector()" style="
     background:#020617;
     border:1px solid #1e293b;
     border-radius:12px;
