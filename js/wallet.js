@@ -297,6 +297,15 @@ appDiv(`
     </div>
     </div>
     </div>
+
+    <div onclick="closeAssetSelector()" style="
+    position:absolute;
+    top:15px;
+    right:15px;
+    font-size:22px;
+    cursor:pointer;">
+    ✕
+    </div>
      
     
     
@@ -437,9 +446,34 @@ console.log("Receive popup error", e);
 }
  /*=============Open Selector ========*/
 window.openAssetSelector = function(){
-document.getElementById("assetSelector").style.display = "block";}
+document.getElementById("assetSelector").style.display = "block";
+document.getElementById("bottomNav").style.display = "none";
+}
 window.closeAssetSelector = function(){
-document.getElementById("assetSelector").style.display = "none";}
+document.getElementById("assetSelector").style.display = "none";
+document.getElementById("bottomNav").style.display = "flex";
+}
+
+window.selectedAsset = null;
+window.confirmPrimary = function(asset){
+window.selectedAsset = asset;
+document.getElementById("confirmText").innerText =
+"Set " + asset + " as primary?";
+document.getElementById("confirmBox").style.display = "flex";
+}
+
+window.closeConfirm = function(){
+document.getElementById("confirmBox").style.display = "none";
+}
+
+window.applyPrimary = function(){
+window.primaryAsset = window.selectedAsset;
+localStorage.setItem("primaryAsset", window.primaryAsset);
+document.getElementById("confirmBox").style.display = "none";
+closeAssetSelector();
+renderApp();
+}
+
  /*=============Primary Balance ========*/
 window.getPrimaryBalance = function(){
 if(window.primaryAsset === "USDC"){
