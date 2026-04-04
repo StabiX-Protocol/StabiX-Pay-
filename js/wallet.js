@@ -187,6 +187,23 @@ appDiv(`
     </div>
     </div>
 
+          <!--  Open Asset Selector -->
+    <div onclick="openAssetSelector()" style="
+    position:absolute;
+    right:10px;
+    top:10px;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    background:#1e293b;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:20;">
+    +
+    </div>
+
            <!-- Asset Selector -->
     <div id="assetSelector" style="
     display:none;
