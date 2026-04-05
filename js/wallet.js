@@ -1174,6 +1174,12 @@ return `
 <hr>
 <h3>Validator Panel</h3>
 <input id="vUser" placeholder="Target User ID (TG_xxx)">
+
+<select id="vAsset">
+  <option value="USDC">USDC</option>
+  <option value="USDT">USDT</option>
+</select>
+
 <select id="vType">
 <option value="deposit">Deposit</option>
 <option value="withdraw">Withdraw</option>
