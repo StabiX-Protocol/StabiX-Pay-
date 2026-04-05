@@ -657,6 +657,7 @@ document.getElementById("confirmScreen").style.display = "flex";
 document.getElementById("confirmAmount").innerText = "-" + amount + " " + window.primaryAsset;
 document.getElementById("confirmTo").innerText = toWallet;
 document.getElementById("confirmFrom").innerText = WALLET;
+document.getElementById("feeText").innerText ="0 " + window.primaryAsset;
 };
 
 window.backToAmount = ()=>{
@@ -689,7 +690,11 @@ txLock = false;
 return;
 }
 document.getElementById("confirmScreen").style.display = "none";
-sendUSDC();
+if(window.primaryAsset === "USDC"){
+sendUSDC()
+}else{
+sendUSDT()
+}
 setTimeout(() => {
 txLock = false;
 }, 3000);
