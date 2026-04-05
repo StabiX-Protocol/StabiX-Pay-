@@ -160,7 +160,7 @@ appDiv(`
     gap:10px;
     margin-top:10px;">
                 <!-- USDT -->
-    <div onclick="setPrimary('USDT')" style="
+    style="
     background:#020617;
     border:1px solid #1e293b;
     border-radius:12px;
@@ -177,12 +177,12 @@ appDiv(`
     <div style="font-size:14px">USDT</div>
     </div>
     </div>
-    <div id="usdtBal" style="font-weight:bold">
-    0.00
+    <div style="font-weight:bold">
+    ${(user.usdtBalance || 0).toFixed(2)}
     </div>
     </div>
                  <!-- USDC -->
-    <div onclick="setPrimary('USDC')" style="
+    style="
     background:#020617;
     border:1px solid #1e293b;
     border-radius:12px;
@@ -200,7 +200,7 @@ appDiv(`
     </div>
     </div>
     <div id="usdcBal" style="font-weight:bold">
-    0.00
+    ${(user.balance || 0).toFixed(2)}
     </div>
     </div>   
 
