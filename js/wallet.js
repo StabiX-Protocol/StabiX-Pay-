@@ -571,6 +571,7 @@ if(amt) amt.value = ""
 window.isScanFlow = false;
 document.getElementById("sendScreen").style.display="flex"
 document.getElementById("bottomNav").style.display = "none";
+document.getElementById("sendTitle").innerText ="Send " + window.primaryAsset;
 }
 
 window.closeSend = ()=>{
@@ -600,6 +601,7 @@ if(!snap.exists()){
 alert("User not found")
 return
 }
+document.getElementById("amountTitle").innerText ="Send " + window.primaryAsset;
 document.getElementById("sendScreen").style.display="none"
 document.getElementById("amountScreen").style.display="flex"
 }catch(e){
