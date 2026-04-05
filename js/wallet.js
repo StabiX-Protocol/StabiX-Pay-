@@ -160,7 +160,7 @@ appDiv(`
     gap:10px;
     margin-top:10px;">
                 <!-- USDT -->
-    style="
+    <div style="
     background:#020617;
     border:1px solid #1e293b;
     border-radius:12px;
@@ -182,7 +182,7 @@ appDiv(`
     </div>
     </div>
                  <!-- USDC -->
-    style="
+    <div style="
     background:#020617;
     border:1px solid #1e293b;
     border-radius:12px;
