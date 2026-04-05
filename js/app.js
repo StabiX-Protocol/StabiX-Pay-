@@ -46,6 +46,7 @@ password: pwd.value.trim(),
 walletAddress: WALLET,
 eoaAddress: "",
 balance: 0,
+usdtBalance: 0,
 pendingRequest:false,
 lastUsernameChange: serverTimestamp(),
 createdAt: serverTimestamp()
