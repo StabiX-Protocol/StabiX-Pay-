@@ -1,5 +1,6 @@
-/* ================= SEND USDC ================= */
+/* ================= SEND USDC/USDT ================= */
 window.sendUSDC = async ()=>{
+const asset = window.primaryAsset;
 window.isSender = true;
 const input = document.getElementById("sendTo");
 const toWallet = input ? input.value.trim() : "";
@@ -23,17 +24,26 @@ showTxPopup("User Not Found","failed");
 failed = true;
 return;
 }
-if(fromSnap.data().balance < amount){
+const fromBalance = asset === "USDC"
+? fromSnap.data().balance: fromSnap.data().usdtBalance || 0;
+if(fromBalance < amount)
+{
 showTxPopup("Insufficient Balance","failed");
 failed = true;
 return;
 }
-tx.update(userRef,{ balance: fromSnap.data().balance - amount });
-tx.update(toRef,{ balance: toSnap.data().balance + amount });
+if(asset === "USDC"){
+tx.update(userRef,{ balance: fromBalance - amount });
+tx.update(toRef,{ balance: (toSnap.data().balance || 0) + amount });
+}else{
+tx.update(userRef,{ usdtBalance: fromBalance - amount });
+tx.update(toRef,{ usdtBalance: (toSnap.data().usdtBalance || 0) + amount });
+}
 tx.set(doc(collection(db,"transactions")),{
 userId: WALLET,
 type:"sent",
 amount,
+asset,
 counterparty:toWallet,
 createdAt:serverTimestamp()
 });
@@ -41,6 +51,7 @@ tx.set(doc(collection(db,"transactions")),{
 userId: toWallet,
 type:"received",
 amount,
+asset,
 counterparty:WALLET,
 createdAt:serverTimestamp()
 });
