@@ -134,6 +134,7 @@ await addDoc(collection(db,"requests"),{
 userId: WALLET,
 type:"deposit",
 amount: Number(amount),
+asset: window.primaryAsset,
 walletAddress:"",
 txHash: txHash,
 status:"pending",
@@ -230,7 +231,7 @@ const metaLine = isDepositWithdraw
 
 html += `
 <div class="tx" style="color:${color}">
-<b>${sign}${t.amount} USDC</b><br>
+<b>${sign}${t.amount} ${t.asset || "USDC"}</b><br>
 <span class="small">
 ${metaLine}<br>
 ${t.createdAt?.toDate()?.toLocaleString() || ""}
@@ -243,55 +244,46 @@ html || `<span class="small">${emptyText}</span>`;
 }
 
 window.validatorAdjust = async ()=>{
-  const userId = document.getElementById("vUser").value.trim()
-  const type = document.getElementById("vType").value
-  const amount = Number(document.getElementById("vAmount").value)
-  const asset = document.getElementById("vAsset").value
-
-  if(!userId || !amount){
-    alert("Invalid input")
-    return
-  }
-
-  const ref = doc(db,"users",userId)
-  const snap = await getDoc(ref)
-
-  if(!snap.exists()){
-    alert("User not found")
-    return
-  }
-
-  const data = snap.data()
-
-  let balance = 0
-
-  if(asset === "USDC"){
-    balance = data.balance || 0
-  }else{
-    balance = data.usdtBalance || 0
-  }
-
-  if(type === "deposit"){
-    balance += amount
-  }else{
-    if(balance < amount){
-      alert("Insufficient balance")
-      return
-    }
-    balance -= amount
-  }
-
-  if(asset === "USDC"){
-    await updateDoc(ref,{
-      balance: balance
-    })
-  }else{
-    await updateDoc(ref,{
-      usdtBalance: balance
-    })
-  }
-
-  alert(asset + " updated")
+const userId = document.getElementById("vUser").value.trim()
+const type = document.getElementById("vType").value
+const amount = Number(document.getElementById("vAmount").value)
+const asset = document.getElementById("vAsset").value
+if(!userId || !amount){
+alert("Invalid input")
+return
+}
+const ref = doc(db,"users",userId)
+const snap = await getDoc(ref)
+if(!snap.exists()){
+alert("User not found")
+return
+}
+const data = snap.data()
+let balance = 0
+if(asset === "USDC"){
+balance = data.balance || 0
+}else{
+balance = data.usdtBalance || 0
+}
+if(type === "deposit"){
+balance += amount
+}else{
+if(balance < amount){
+alert("Insufficient balance")
+return
+}
+balance -= amount
+}
+if(asset === "USDC"){
+await updateDoc(ref,{
+balance: balance
+})
+}else{
+await updateDoc(ref,{
+usdtBalance: balance
+})
+}
+alert(asset + " updated")
 }
 
 window.loadRequests = async ()=>{
@@ -370,7 +362,13 @@ const r = reqSnap.data();
 const userRefX = doc(db,"users",r.userId);
 const userSnap = await tx.get(userRefX);
 if(!userSnap.exists()) throw "User not found";
-let bal = userSnap.data().balance || 0;
+const asset = r.asset || "USDC";
+let bal = 0;
+if(asset === "USDC"){
+bal = userSnap.data().balance || 0;
+}else{
+bal = userSnap.data().usdtBalance || 0;
+}
 if(r.type === "deposit"){
 bal = bal + r.amount;
 }
@@ -378,10 +376,17 @@ if(r.type === "withdraw"){
 if(bal < r.amount) throw "Insufficient balance";
 bal = bal - r.amount;
 }
+if(asset === "USDC"){
 tx.update(userRefX,{
 balance: bal,
 pendingRequest:false
 });
+}else{
+tx.update(userRefX,{
+usdtBalance: bal,
+pendingRequest:false
+});
+}
 tx.update(reqRef,{
 status:"approved"
 });
@@ -389,6 +394,7 @@ tx.set(doc(collection(db,"transactions")),{
 userId: r.userId,
 type: r.type,
 amount: r.amount,
+asset: asset,
 counterparty:"VALIDATOR",
 createdAt: serverTimestamp()
 });
@@ -410,33 +416,26 @@ renderApp();
 };
 
 window.checkUserBalance = async ()=>{
-  const userId = document.getElementById("vUser").value.trim()
-  const asset = document.getElementById("vAsset").value
-
-  if(!userId){
-    alert("Enter user ID")
-    return
-  }
-
-  const snap = await getDoc(doc(db,"users",userId))
-
-  if(!snap.exists()){
-    alert("User not found")
-    return
-  }
-
-  const data = snap.data()
-
-  let balance = 0
-
-  if(asset === "USDC"){
-    balance = data.balance || 0
-  }else{
-    balance = data.usdtBalance || 0
-  }
-
-  document.getElementById("balanceOut").innerText =
-    asset + " Balance: " + balance
+const userId = document.getElementById("vUser").value.trim()
+const asset = document.getElementById("vAsset").value
+if(!userId){
+alert("Enter user ID")
+return
+}
+const snap = await getDoc(doc(db,"users",userId))
+if(!snap.exists()){
+alert("User not found")
+return
+}
+const data = snap.data()
+let balance = 0
+if(asset === "USDC"){
+balance = data.balance || 0
+}else{
+balance = data.usdtBalance || 0
+}
+document.getElementById("balanceOut").innerText =
+asset + " Balance: " + balance
 }
 
 
