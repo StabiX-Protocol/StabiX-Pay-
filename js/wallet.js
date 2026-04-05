@@ -522,7 +522,6 @@ return "0.00";
 };
 window.setPrimary = function(asset){
 if(asset === "USDT"){
-alert("USDT coming soon");
 return;
 }
 window.primaryAsset = asset;
