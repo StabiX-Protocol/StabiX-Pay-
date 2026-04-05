@@ -1168,47 +1168,6 @@ const active = document.getElementById("tab-"+tab);
 if(active) active.classList.add("nav-item-active");
 }
 
- /* ================= VALIDATOR PANEL ================= */
-function validatorPanel(){
-return `
-<hr>
-<h3>Validator Panel</h3>
-<input id="vUser" placeholder="Target User ID (TG_xxx)">
-
-<select id="vAsset">
-  <option value="USDC">USDC</option>
-  <option value="USDT">USDT</option>
-</select>
-
-<select id="vType">
-<option value="deposit">Deposit</option>
-<option value="withdraw">Withdraw</option>
-</select>
-<input id="vAmount" type="number" placeholder="Amount">
-<button onclick="checkUserBalance()">Check Balance</button>
-<div id="balanceOut" class="small" style="margin-top:8px"></div>
-<button onclick="validatorAdjust()">Apply</button>
-
-<hr>
-<button onclick="loadRequests()">Load Pending</button>
-<div id="vout"></div>
-
-<hr>
-<h3>All Users</h3>
-<button onclick="loadAllUsers()">Load Users</button>
-<div id="userCount" class="small" style="margin-top:6px"></div>
-<div id="userList" style="margin-top:10px"></div>
-
-<hr>
-<h3>Send Notification</h3>
-<input id="vTitle" placeholder="Title (e.g. Merkle Root Updated)">
-<input id="vBody" placeholder="Message (details)">
-<button onclick="sendValidatorNotification()" 
-style="background:#60a5fa;color:#020617;font-weight:bold">
-Send Notification
-</button>
-`;
-}
   // ================= EOA WALLET =================
 window.editEOA = async ()=>{
 const snap = await getDoc(userRef);
