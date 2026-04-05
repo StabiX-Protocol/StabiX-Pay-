@@ -541,7 +541,7 @@ window.showReceive = ()=>{
 const wallet = WALLET
 const qrData = JSON.stringify({
 type: "stabix",
-id: wallet
+id: wallet,
 asset: window.primaryAsset
 })
 const qr = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(qrData)
