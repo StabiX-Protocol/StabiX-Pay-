@@ -254,7 +254,8 @@ appDiv(`
     ` : ``}
     </div>
     </div>
-    <div style="font-weight:bold">0.00</div>
+    <div style="font-weight:bold">
+    ${window.userData?.usdtBalance?.toFixed(2) || "0.00"}</div>
     </div>
     
             <!-- USDC -->
@@ -541,6 +542,7 @@ const wallet = WALLET
 const qrData = JSON.stringify({
 type: "stabix",
 id: wallet
+asset: window.primaryAsset
 })
 const qr = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(qrData)
 document.getElementById("qrImg").src = qr
@@ -716,6 +718,12 @@ async (decodedText)=>{
 let data
 try{
 data = JSON.parse(decodedText)
+const assetFromQR = data.asset;
+const targetId = data.id
+if(assetFromQR && assetFromQR !== window.primaryAsset){
+alert("Switch to " + assetFromQR + " to continue");
+return;
+}
 }catch(e){
 alert("Invalid QR")
 return
