@@ -178,7 +178,7 @@ appDiv(`
     </div>
     </div>
     <div style="font-weight:bold">
-    ${(user.usdtBalance || 0).toFixed(2)}
+    ${window.userData?.usdtBalance?.toFixed(2) || "0.00"}
     </div>
     </div>
                  <!-- USDC -->
@@ -199,8 +199,8 @@ appDiv(`
     <div style="font-size:14px">USDC</div>
     </div>
     </div>
-    <div id="usdcBal" style="font-weight:bold">
-    ${(user.balance || 0).toFixed(2)}
+    <div style="font-weight:bold">
+    ${window.userData?.balance?.toFixed(2) || "0.00"}
     </div>
     </div>   
 
