@@ -243,40 +243,56 @@ html || `<span class="small">${emptyText}</span>`;
 }
 
 window.validatorAdjust = async ()=>{
-try{
-const uid = document.getElementById("vUser").value.trim();
-const type = document.getElementById("vType").value;
-const amount = Number(document.getElementById("vAmount").value);
-if(!uid || amount <= 0){
-alert("Invalid input");
-return;
-}
-const targetRef = doc(db,"users",uid);
-await runTransaction(db, async(tx)=>{
-const snap = await tx.get(targetRef);
-if(!snap.exists()) throw "User not found";
-let bal = snap.data().balance;
-if(type === "deposit"){
-bal += amount;
-}else{
-bal -= amount;
-}
-if(bal < 0) throw "Insufficient balance";
-tx.update(targetRef,{ balance: bal });
-tx.set(doc(collection(db,"transactions")),{
-userId: uid,
-type: type,           
-amount: amount,
-counterparty: "VALIDATOR",
-createdAt: serverTimestamp()
-});
-});
+  const userId = document.getElementById("vUser").value.trim()
+  const type = document.getElementById("vType").value
+  const amount = Number(document.getElementById("vAmount").value)
+  const asset = document.getElementById("vAsset").value
 
-alert("Balance updated successfully");
-}catch(e){
-alert("Validator error: " + e);
+  if(!userId || !amount){
+    alert("Invalid input")
+    return
+  }
+
+  const ref = doc(db,"users",userId)
+  const snap = await getDoc(ref)
+
+  if(!snap.exists()){
+    alert("User not found")
+    return
+  }
+
+  const data = snap.data()
+
+  let balance = 0
+
+  if(asset === "USDC"){
+    balance = data.balance || 0
+  }else{
+    balance = data.usdtBalance || 0
+  }
+
+  if(type === "deposit"){
+    balance += amount
+  }else{
+    if(balance < amount){
+      alert("Insufficient balance")
+      return
+    }
+    balance -= amount
+  }
+
+  if(asset === "USDC"){
+    await updateDoc(ref,{
+      balance: balance
+    })
+  }else{
+    await updateDoc(ref,{
+      usdtBalance: balance
+    })
+  }
+
+  alert(asset + " updated")
 }
-};
 
 window.loadRequests = async ()=>{
 const q = query(
@@ -392,25 +408,37 @@ alert("Rejected");
 loadRequests();
 renderApp();
 };
-  
+
 window.checkUserBalance = async ()=>{
-const uid = document.getElementById("vUser").value.trim();
-const out = document.getElementById("balanceOut");
-if(!uid){out.innerText = "Enter User ID";
-return;
+  const userId = document.getElementById("vUser").value.trim()
+  const asset = document.getElementById("vAsset").value
+
+  if(!userId){
+    alert("Enter user ID")
+    return
+  }
+
+  const snap = await getDoc(doc(db,"users",userId))
+
+  if(!snap.exists()){
+    alert("User not found")
+    return
+  }
+
+  const data = snap.data()
+
+  let balance = 0
+
+  if(asset === "USDC"){
+    balance = data.balance || 0
+  }else{
+    balance = data.usdtBalance || 0
+  }
+
+  document.getElementById("balanceOut").innerText =
+    asset + " Balance: " + balance
 }
-try{
-const snap = await getDoc(doc(db,"users",uid));
-if(!snap.exists()){
-out.innerText = "User not found";
-return;
-}
-out.innerText =
-`Balance: ${snap.data().balance.toFixed(2)} USDC`;
-}catch(e){
-out.innerText = "Error fetching balance";
-}
-};
+
 
 window.showTxPopup = (msg,type="success")=>{
 if(!window.isSender) return;
