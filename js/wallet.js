@@ -111,12 +111,12 @@ appDiv(`
     <div id="receiveScreen" style="display:none">
     <div class="sendHeader">
     <button onclick="closeReceive()" class="backBtn">←</button>
-    <h2>Receive USDC</h2>
+    <h2>Receive ${window.primaryAsset}</h2>
     </div>
     <div class="sendBody" style="text-align:center">
     <div class="qrWrap"><img id="qrImg"></div>
     <p class="small" style="margin-top:10px">
-    Only Send USDC To This QR Code.
+    Only Send ${window.primaryAsset} To This QR Code.
     </p>
     <div style="margin-top:20px;font-weight:bold">
     Wallet ID
@@ -469,7 +469,7 @@ const t = docSnap.data();
 if(t.type === "received"){
 const key = "rx_" + docSnap.id;
 if(!sessionStorage.getItem(key)){
-showTxPopup(`Received ${t.amount} USDC from ${t.counterparty}`);
+showTxPopup(`Received ${t.amount} ${t.asset || "USDC"} from ${t.counterparty}`);
 sessionStorage.setItem(key,"1");
 }
 }
@@ -514,10 +514,10 @@ openAssetSelector();
  /*=============Primary Balance ========*/
 window.getPrimaryBalance = function(){
 if(window.primaryAsset === "USDC"){
-return window.userData.balance.toFixed(2);
+return (window.userData.balance || 0).toFixed(2);
 }
 if(window.primaryAsset === "USDT"){
-return "0.00";
+return (window.userData.usdtBalance || 0).toFixed(2);
 }
 };
 window.setPrimary = function(asset){
@@ -612,7 +612,9 @@ alert("Enter valid amount")
 return
 }
 const snap = await getDoc(userRef)
-const balance = snap.data().balance || 0
+const asset = window.primaryAsset;
+const balance = asset === "USDC"
+? snap.data().balance || 0: snap.data().usdtBalance || 0;
 if(amount > balance){
 alert("Insufficient Balance")
 return
@@ -647,7 +649,7 @@ return;
 }
 document.getElementById("amountScreen").style.display = "none";
 document.getElementById("confirmScreen").style.display = "flex";
-document.getElementById("confirmAmount").innerText = "-" + amount + " USDC";
+document.getElementById("confirmAmount").innerText = "-" + amount + " " + window.primaryAsset;
 document.getElementById("confirmTo").innerText = toWallet;
 document.getElementById("confirmFrom").innerText = WALLET;
 };
