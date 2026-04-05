@@ -571,7 +571,8 @@ if(amt) amt.value = ""
 window.isScanFlow = false;
 document.getElementById("sendScreen").style.display="flex"
 document.getElementById("bottomNav").style.display = "none";
-document.getElementById("sendTitle").innerText ="Send " + window.primaryAsset;
+document.getElementById("sendTitle").innerText =
+"Send " + window.primaryAsset;
 }
 
 window.closeSend = ()=>{
