@@ -67,7 +67,7 @@ time: serverTimestamp(),
 read: false
 });
 if(window.isSender){
-showTxPopup(`Sent ${amount} USDC to ${toWallet}`, "success");
+showTxPopup(`Sent ${amount} ${asset} to ${toWallet}`, "success");
 }
 renderApp();
 window.isSender = false;
