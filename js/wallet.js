@@ -177,7 +177,7 @@ appDiv(`
     <div style="font-size:14px">USDT</div>
     </div>
     </div>
-    <div style="font-weight:bold">
+    <div id="usdtBal" style="font-weight:bold">
     0.00
     </div>
     </div>
@@ -199,8 +199,8 @@ appDiv(`
     <div style="font-size:14px">USDC</div>
     </div>
     </div>
-    <div style="font-weight:bold">
-    ${user.balance.toFixed(2)}
+    <div id="usdcBal" style="font-weight:bold">
+    0.00
     </div>
     </div>   
 
@@ -522,10 +522,8 @@ return (window.userData.usdtBalance || 0).toFixed(2);
 }
 };
 window.setPrimary = function(asset){
-if(asset === "USDT"){
-return;
-}
 window.primaryAsset = asset;
+localStorage.setItem("primaryAsset", asset);
 renderApp();
 };
  /*=============UI Interface Of Balance Name ========*/
