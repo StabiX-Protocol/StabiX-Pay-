@@ -499,7 +499,9 @@ document.getElementById("bottomNav").style.display = "flex";
 window.selectedAsset = null;
 window.confirmPrimary = function(asset){
 if(asset === window.primaryAsset){
-return;}
+return;
+}
+  
 window.selectedAsset = asset;
 document.getElementById("confirmText").innerText =
 "Set " + asset + " as primary?";
