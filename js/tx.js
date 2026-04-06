@@ -62,7 +62,7 @@ showTxPopup(`Sent ${amount} ${asset} to ${toWallet}`, "success");
 }
 renderApp();
 window.isSender = false;
-}
+
 }catch(e){
 if(e!=="Receiver not found") console.log(e);
 }
