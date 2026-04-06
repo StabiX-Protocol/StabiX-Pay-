@@ -548,7 +548,6 @@ const qrData = JSON.stringify({
 type: "stabix",
 id: wallet,
 })
-}
 const qr = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(qrData)
 document.getElementById("qrImg").src = qr
 document.getElementById("walletAddr").innerText = wallet
