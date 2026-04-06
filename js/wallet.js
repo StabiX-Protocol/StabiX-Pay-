@@ -433,7 +433,7 @@ appDiv(`
     <div class="sendHeader">
     <button onclick="closePreview()" class="backBtn">←</button>
     <h2 id="previewTitle">
-    Send <span id="previewAsset"></span>
+    Send ${window.primaryAsset}
     </h2>
     </div>
     <div class="sendBody">
