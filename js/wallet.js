@@ -748,7 +748,7 @@ return
 await qrScanner.stop()
 document.getElementById("scannerOverlay").style.display = "none"    
 document.getElementById("previewId").value = targetId
-document.getElementById("previewTitle").innerText ="Send " + (window.primaryAsset || "USDC");
+document.getElementById("previewAsset").innerText = window.primaryAsset;
 window.scannedId = targetId  
 window.isScanFlow = true;
 document.getElementById("previewScreen").style.display = "flex"
@@ -829,7 +829,7 @@ e.target.value = "";
 
 window.confirmReceiver = () => {
 const id = document.getElementById("previewId").value;
-document.getElementById("previewTitle").innerText ="Send " + (window.primaryAsset || "USDC");
+document.getElementById("previewAsset").innerText = window.primaryAsset;
 if (id === WALLET) {
 alert("Self Transfer Not Allowed");
 return;
