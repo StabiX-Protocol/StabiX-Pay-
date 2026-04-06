@@ -745,8 +745,6 @@ if((data.type || "").toLowerCase() !== "stabix"){
   return;
 }
   
-
-const targetId = data.id
 try{
 const docSnap = await getDoc(doc(db,"users",targetId))
 if(!docSnap.exists()){
