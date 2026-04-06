@@ -57,9 +57,7 @@ createdAt:serverTimestamp()
 });
 });
 
-try {
 if(!failed){
-/*
 await addDoc(collection(db, "notifications"), {
 to: toWallet,
 from: WALLET,
@@ -68,16 +66,16 @@ type: "receive",
 time: serverTimestamp(),
 read: false
 });
-*/
 if(window.isSender){
 showTxPopup(`Sent ${amount} ${asset} to ${toWallet}`, "success");
 }
 renderApp();
 window.isSender = false;
 }
-} catch(e){
-if(e !== "Receiver not found") console.log(e);
+}catch(e){
+if(e!=="Receiver not found") console.log(e);
 }
+};
   /*===============Deposit & Withdraw Logic======*/
 window.openDeposit = ()=>{
 const box = document.getElementById("depositBox")
@@ -499,4 +497,4 @@ tick.style.animation="tickDraw .35s ease forwards"
 setTimeout(()=>{
 done.style.display="block"
 },900)
-};
+}
