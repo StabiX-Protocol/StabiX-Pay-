@@ -852,7 +852,7 @@ return;
 document.getElementById("scannerOverlay").style.display = "none";
 document.getElementById("previewId").value = targetId
 window.isScanFlow = true;
-document.getElementById("previewScreen").style.display = "flex"
+
 document.getElementById("amountScreen").style.display = "none"
 } catch (err) {
 console.log("Gallery scan error:", err);
@@ -876,9 +876,9 @@ document.getElementById("amountScreen").style.display = "flex";
 const asset = window.primaryAsset;
 document.getElementById("amountText").innerText = "Send " + asset;
 document.getElementById("amountAssetImg").src =
-  asset === "USDT"
-    ? "./media/tether-usdt-logo.png"
-    : "./media/usd-coin-usdc-logo.png";
+asset === "USDT"
+? "./media/tether-usdt-logo.png"
+: "./media/usd-coin-usdc-logo.png";
 };
 
 window.closePreview = () => {
