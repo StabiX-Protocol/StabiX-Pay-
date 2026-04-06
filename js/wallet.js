@@ -720,24 +720,32 @@ width: 250,
 height: 250
 }
 },
+
 async (decodedText)=>{
-let data
+let data;
 try{
-data = JSON.parse(decodedText)
-const assetFromQR = data.asset;
-const targetId = data.id
-if(assetFromQR && assetFromQR !== window.primaryAsset){
-alert("Switch to " + assetFromQR + " to continue");
-return;
-}
+  data = JSON.parse(decodedText);
 }catch(e){
-alert("Invalid QR")
-return
+  alert("Invalid QR");
+  return;
 }
+
+const assetFromQR = data.asset;
+const targetId = data.id;
+
+window.scannedAsset = assetFromQR || "USDC";
+
+if(assetFromQR && assetFromQR !== window.primaryAsset){
+  alert("Switch to " + assetFromQR + " to continue");
+  return;
+}
+
 if((data.type || "").toLowerCase() !== "stabix"){
-alert("Invalid QR")
-return
+  alert("Invalid QR");
+  return;
 }
+  
+
 const targetId = data.id
 try{
 const docSnap = await getDoc(doc(db,"users",targetId))
