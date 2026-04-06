@@ -116,7 +116,7 @@ appDiv(`
     <div class="sendBody" style="text-align:center">
     <div class="qrWrap"><img id="qrImg"></div>
     <p class="small" style="margin-top:10px">
-    Only Send ${window.primaryAsset} To This QR Code.
+    Only Send Your Assets To This QR Code.
     </p>
     <div style="margin-top:20px;font-weight:bold">
     Wallet ID
