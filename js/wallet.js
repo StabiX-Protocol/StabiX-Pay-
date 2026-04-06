@@ -432,7 +432,7 @@ appDiv(`
     <div style="width:100%; max-width:380px; margin:0 auto;">
     <div class="sendHeader">
     <button onclick="closePreview()" class="backBtn">←</button>
-    <h2>Send USDC</h2>
+    <h2 id="previewTitle">Send</h2>
     </div>
     <div class="sendBody">
     <h1 class="sendTitle">Receiving address</h1>
@@ -755,6 +755,7 @@ document.getElementById("previewId").value = targetId
 window.scannedId = targetId  
 window.isScanFlow = true;
 document.getElementById("previewScreen").style.display = "flex"
+document.getElementById("previewTitle").innerText ="Send " + window.primaryAsset;
 document.getElementById("amountScreen").style.display = "none"
 }
 )
