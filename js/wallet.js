@@ -432,7 +432,9 @@ appDiv(`
     <div style="width:100%; max-width:380px; margin:0 auto;">
     <div class="sendHeader">
     <button onclick="closePreview()" class="backBtn">←</button>
-    <h2 id="previewTitle"></h2>
+    <h2 id="previewTitle">
+    Send <span id="previewAsset"></span>
+    </h2>
     </div>
     <div class="sendBody">
     <h1 class="sendTitle">Receiving address</h1>
