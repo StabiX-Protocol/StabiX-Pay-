@@ -735,10 +735,7 @@ if(!assetFromQR){
 alert("Invalid QR (asset missing)");
 return;
 }
-if(assetFromQR && assetFromQR !== window.primaryAsset){
-alert("Switch to " + assetFromQR + " to continue");
-return;
-}
+window.scannedAsset = window.primaryAsset;
 if((data.type || "").toLowerCase() !== "stabix"){
 alert("Invalid QR");
 return;
