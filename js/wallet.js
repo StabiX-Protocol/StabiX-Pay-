@@ -827,6 +827,7 @@ e.target.value = "";
 
 window.confirmReceiver = () => {
 const id = document.getElementById("previewId").value;
+document.getElementById("previewTitle").innerText ="Send " + (window.primaryAsset || "USDC");
 if (id === WALLET) {
 alert("Self Transfer Not Allowed");
 return;
@@ -835,7 +836,6 @@ window.scannedId = id;
 window.isScanFlow = true;
 document.getElementById("sendTo").value = id;
 document.getElementById("previewScreen").style.display = "none";
-document.getElementById("previewTitle").innerText ="Send " + window.primaryAsset;
 document.getElementById("amountScreen").style.display = "flex";
 };
 
