@@ -432,8 +432,13 @@ appDiv(`
     <div style="width:100%; max-width:380px; margin:0 auto;">
     <div class="sendHeader">
     <button onclick="closePreview()" class="backBtn">←</button>
-    <h2 id="previewTitle">
-    Send ${window.primaryAsset}
+    <h2 id="previewTitle" style="display:flex;align-items:center;gap:8px;justify-content:center;">
+    <span id="previewText">Send ${window.primaryAsset}</span>
+    <img id="previewAssetImg"
+    src="${window.primaryAsset === 'USDT' 
+    ? './media/tether-usdt-logo.png' 
+    : './media/usd-coin-usdc-logo.png'}"
+    style="width:20px;height:20px;border-radius:50%;">
     </h2>
     </div>
     <div class="sendBody">
@@ -752,6 +757,12 @@ window.scannedId = targetId
 window.isScanFlow = true;
 document.getElementById("previewScreen").style.display = "flex"
 document.getElementById("amountScreen").style.display = "none"
+const asset = window.primaryAsset;
+document.getElementById("previewText").innerText = "Send " + asset;
+document.getElementById("previewAssetImg").src =
+asset === "USDT"
+? "./media/tether-usdt-logo.png"
+: "./media/usd-coin-usdc-logo.png";
 }
 )
 }
