@@ -829,6 +829,7 @@ e.target.value = "";
 
 window.confirmReceiver = () => {
 const id = document.getElementById("previewId").value;
+setTimeout(() => {document.getElementById("previewAsset").innerText = window.primaryAsset;}, 0);
 
 if (id === WALLET) {
 alert("Self Transfer Not Allowed");
