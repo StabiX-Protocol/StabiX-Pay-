@@ -299,7 +299,7 @@ const time = r.createdAt? r.createdAt.toDate().toLocaleString(): "";
 
 html += `
 <div class="tx">
-<b>${r.type.toUpperCase()} ${r.amount} USDC</b><br>
+<b>${r.type.toUpperCase()} ${r.amount} ${r.asset || "USDC"}</b>
 <span class="small">
 User ID: ${r.userId}<br>
 Wallet: ${r.walletAddress}<br>
