@@ -500,7 +500,6 @@ window.selectedAsset = null;
 window.confirmPrimary = function(asset){
 if(asset === window.primaryAsset){
 return;}
-window.selectedAsset = asset;
 document.getElementById("confirmText").innerText =
 "Set " + asset + " as primary?";
 document.getElementById("confirmBox").style.display = "flex";
