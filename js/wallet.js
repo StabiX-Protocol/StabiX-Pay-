@@ -847,9 +847,14 @@ window.scannedId = id;
 window.isScanFlow = true;
 document.getElementById("sendTo").value = id;
 document.getElementById("previewScreen").style.display = "none";
-document.getElementById("amountTitle").innerText ="Send " + window.primaryAsset;
 document.getElementById("bottomNav").style.display = "none";
 document.getElementById("amountScreen").style.display = "flex";
+const asset = window.primaryAsset;
+document.getElementById("amountText").innerText = "Send " + asset;
+document.getElementById("amountAssetImg").src =
+  asset === "USDT"
+    ? "./media/tether-usdt-logo.png"
+    : "./media/usd-coin-usdc-logo.png";
 };
 
 window.closePreview = () => {
