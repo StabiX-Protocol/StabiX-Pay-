@@ -847,8 +847,7 @@ window.scannedId = id;
 window.isScanFlow = true;
 document.getElementById("sendTo").value = id;
 document.getElementById("previewScreen").style.display = "none";
-document.getElementById("amountTitle").innerText =
-"Send " + window.primaryAsset;
+
 document.getElementById("bottomNav").style.display = "none";
 document.getElementById("amountScreen").style.display = "flex";
 };
