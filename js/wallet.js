@@ -852,7 +852,7 @@ return;
 document.getElementById("scannerOverlay").style.display = "none";
 document.getElementById("previewId").value = targetId
 window.isScanFlow = true;
-
+document.getElementById("previewScreen").style.display = "flex"
 document.getElementById("amountScreen").style.display = "none"
 } catch (err) {
 console.log("Gallery scan error:", err);
@@ -881,7 +881,7 @@ asset === "USDT"
 : "./media/usd-coin-usdc-logo.png";
 };
 
-window.closePreview = () => {
+window.closePreview = async () => {
 await stopCamera();
 document.getElementById("previewScreen").style.display = "none";
 document.getElementById("bottomNav").style.display = "flex";
