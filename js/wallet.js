@@ -778,8 +778,7 @@ asset === "USDT"
 )
 }
 
-window.closeScanner = async () => {
-await stopCamera();
+window.closeScanner = () => {
 try {
 if (qrScanner && qrScanner.getState() === 2) {
 await qrScanner.stop();
@@ -792,20 +791,6 @@ document.getElementById("galleryBtn").style.display = "none"
 document.getElementById("torchBtn").style.display = "none";
 torchOn = false;
 window.scanDone = false;
-};
-
-window.stopCamera = async () => {
-try {
-if (window.qrScanner) {
-await window.qrScanner.stop();
-}
-const video = document.querySelector("video");
-if (video && video.srcObject) {
-video.srcObject.getTracks().forEach(track => track.stop());
-}
-} catch (e) {
-console.log("Camera stop error:", e);
-}
 };
 
 let torchOn = false;
@@ -831,7 +816,7 @@ const file = e.target.files[0];
 if (!file) return;
 try {
 const html5Qr = new Html5Qrcode("qr-reader");
-const result = await html5Qr.scanFile(file, false);
+const result = await html5Qr.scanFile(file, flse);
 await html5Qr.clear();
 let data;
 try {
@@ -884,7 +869,6 @@ asset === "USDT"
 };
 
 window.closePreview = async () => {
-await stopCamera();
 document.getElementById("previewScreen").style.display = "none";
 document.getElementById("bottomNav").style.display = "flex";
 scanDone = false;
@@ -1151,7 +1135,6 @@ alert("Error sending notification");
 
 /* ================= Navigation ================= */
 window.navigateHome = async () => {
-await stopCamera();
 try {
 await renderApp();
 const send = document.getElementById("sendScreen");
