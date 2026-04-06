@@ -610,7 +610,12 @@ if(!snap.exists()){
 alert("User not found")
 return
 }
-document.getElementById("amountTitle").innerText ="Send " + window.primaryAsset;
+const asset = window.primaryAsset;
+document.getElementById("amountText").innerText = "Send " + asset;
+document.getElementById("amountAssetImg").src =
+asset === "USDT"
+? "./media/tether-usdt-logo.png"
+: "./media/usd-coin-usdc-logo.png";
 document.getElementById("sendScreen").style.display="none"
 document.getElementById("amountScreen").style.display="flex"
 }catch(e){
@@ -650,7 +655,7 @@ let toWallet;
 if (window.isScanFlow) {
 toWallet = window.scannedId;   
 } else {
-toWallet = document.getElementById("sendTo").value.trim(); // normal
+toWallet = document.getElementById("sendTo").value.trim(); 
 }
 if (!toWallet || !amount || amount <= 0) {
 alert("Enter valid amount");
