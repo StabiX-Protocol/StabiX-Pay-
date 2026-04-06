@@ -748,7 +748,7 @@ return
 await qrScanner.stop()
 document.getElementById("scannerOverlay").style.display = "none"    
 document.getElementById("previewId").value = targetId
-document.getElementById("previewAsset").innerText = window.primaryAsset;
+setTimeout(() => {document.getElementById("previewAsset").innerText = window.primaryAsset;}, 0);
 window.scannedId = targetId  
 window.isScanFlow = true;
 document.getElementById("previewScreen").style.display = "flex"
