@@ -746,6 +746,7 @@ return
 await qrScanner.stop()
 document.getElementById("scannerOverlay").style.display = "none"    
 document.getElementById("previewId").value = targetId
+document.getElementById("previewTitle").innerText ="Send " + (window.primaryAsset || "USDC");
 window.scannedId = targetId  
 window.isScanFlow = true;
 document.getElementById("previewScreen").style.display = "flex"
