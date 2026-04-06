@@ -575,8 +575,12 @@ if(amt) amt.value = ""
 window.isScanFlow = false;
 document.getElementById("sendScreen").style.display="flex"
 document.getElementById("bottomNav").style.display = "none";
-document.getElementById("sendTitle").innerText =
-"Send " + window.primaryAsset;
+const asset = window.primaryAsset;
+document.getElementById("sendText").innerText = "Send " + asset;
+document.getElementById("sendAssetImg").src =
+asset === "USDT"
+? "./media/tether-usdt-logo.png"
+: "./media/usd-coin-usdc-logo.png";
 }
 
 window.closeSend = ()=>{
