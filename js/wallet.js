@@ -720,31 +720,29 @@ width: 250,
 height: 250
 }
 },
-
 async (decodedText)=>{
 let data;
 try{
-  data = JSON.parse(decodedText);
+data = JSON.parse(decodedText);
 }catch(e){
-  alert("Invalid QR");
-  return;
+alert("Invalid QR");
+return;
 }
-
 const assetFromQR = data.asset;
 const targetId = data.id;
-
-window.scannedAsset = assetFromQR || "USDC";
-
+window.scannedAsset = assetFromQR;
+if(!assetFromQR){
+alert("Invalid QR (asset missing)");
+return;
+}
 if(assetFromQR && assetFromQR !== window.primaryAsset){
-  alert("Switch to " + assetFromQR + " to continue");
-  return;
+alert("Switch to " + assetFromQR + " to continue");
+return;
 }
-
 if((data.type || "").toLowerCase() !== "stabix"){
-  alert("Invalid QR");
-  return;
-}
-  
+alert("Invalid QR");
+return;
+} 
 try{
 const docSnap = await getDoc(doc(db,"users",targetId))
 if(!docSnap.exists()){
