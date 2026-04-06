@@ -777,6 +777,7 @@ asset === "USDT"
 }
 
 window.closeScanner = async () => {
+await stopCamera();
 try {
 if (qrScanner && qrScanner.getState() === 2) {
 await qrScanner.stop();
@@ -789,6 +790,20 @@ document.getElementById("galleryBtn").style.display = "none"
 document.getElementById("torchBtn").style.display = "none";
 torchOn = false;
 window.scanDone = false;
+};
+
+window.stopCamera = async () => {
+try {
+if (window.qrScanner) {
+await window.qrScanner.stop();
+}
+const video = document.querySelector("video");
+if (video && video.srcObject) {
+video.srcObject.getTracks().forEach(track => track.stop());
+}
+} catch (e) {
+console.log("Camera stop error:", e);
+}
 };
 
 let torchOn = false;
@@ -867,6 +882,7 @@ document.getElementById("amountAssetImg").src =
 };
 
 window.closePreview = () => {
+await stopCamera();
 document.getElementById("previewScreen").style.display = "none";
 document.getElementById("bottomNav").style.display = "flex";
 scanDone = false;
@@ -1133,6 +1149,7 @@ alert("Error sending notification");
 
 /* ================= Navigation ================= */
 window.navigateHome = async () => {
+await stopCamera();
 try {
 await renderApp();
 const send = document.getElementById("sendScreen");
