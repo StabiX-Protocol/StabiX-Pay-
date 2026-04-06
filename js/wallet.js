@@ -832,6 +832,14 @@ e.target.value = "";
 
 window.confirmReceiver = () => {
 const id = document.getElementById("previewId").value;
+if(window.scannedAsset && window.scannedAsset !== window.primaryAsset){
+alert(
+"Your primary asset is " + window.primaryAsset + ".\n" +
+"You are trying to send to a " + window.scannedAsset + " address.\n" +
+"Please switch to the correct asset before proceeding."
+);
+return;
+}
 if (id === WALLET) {
 alert("Self Transfer Not Allowed");
 return;
