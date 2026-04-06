@@ -499,4 +499,4 @@ tick.style.animation="tickDraw .35s ease forwards"
 setTimeout(()=>{
 done.style.display="block"
 },900)
-}
+};
