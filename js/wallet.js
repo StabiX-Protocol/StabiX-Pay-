@@ -540,7 +540,6 @@ const wallet = WALLET
 const qrData = JSON.stringify({
 type: "stabix",
 id: wallet,
-asset: window.primaryAsset
 })
 const qr = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(qrData)
 document.getElementById("qrImg").src = qr
@@ -728,14 +727,7 @@ data = JSON.parse(decodedText);
 alert("Invalid QR");
 return;
 }
-const assetFromQR = data.asset;
 const targetId = data.id;
-window.scannedAsset = assetFromQR;
-if(!assetFromQR){
-alert("Invalid QR (asset missing)");
-return;
-}
-window.scannedAsset = window.primaryAsset;
 if((data.type || "").toLowerCase() !== "stabix"){
 alert("Invalid QR");
 return;
@@ -746,6 +738,7 @@ if(!docSnap.exists()){
 alert("User not found")
 return
 }
+window.scannedAsset = window.primaryAsset;
 }catch(e){
 alert("Error checking user")
 return
@@ -815,6 +808,7 @@ return;
 }
 const targetId = data.id;
 const docSnap = await getDoc(doc(db, "users", targetId));
+window.scannedAsset = window.primaryAsset;
 if (!docSnap.exists()) {
 alert("User not found");
 return;
@@ -833,14 +827,6 @@ e.target.value = "";
 
 window.confirmReceiver = () => {
 const id = document.getElementById("previewId").value;
-if(window.scannedAsset && window.scannedAsset !== window.primaryAsset){
-alert(
-"Your primary asset is " + window.primaryAsset + ".\n" +
-"You are trying to send to a " + window.scannedAsset + " address.\n" +
-"Please switch to the correct asset before proceeding."
-);
-return;
-}
 if (id === WALLET) {
 alert("Self Transfer Not Allowed");
 return;
