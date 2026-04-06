@@ -1,1022 +1,324 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>StabiX</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <style>
-    body { background:#0f172a; color:#e5e7eb; font-family:Arial; padding:20px; }
-    .box { background:#020617; border:1px solid #1e293b; border-radius:12px; padding:20px; max-width:420px; margin:auto; }
-    input, button, select { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; }
-    button { background:#2563eb; color:white; font-weight:bold; cursor:pointer; }
-    hr { border:0; border-top:1px solid #1e293b; margin:15px 0; }
-    .small { font-size:12px; opacity:.7; }
-    .tx { font-size:13px; border-bottom:1px dashed #1e293b; padding:6px 0; }
-    .warn { color:#facc15; font-size:13px; }
-    /* ===== Transaction Popup ===== */
-.tx-popup {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.6);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.tx-card {
-  background:#020617;
-  border-radius:18px;
-  padding:30px 25px;
-  text-align:center;
-  width:320px;
-  max-width:90%;
-  animation: scaleIn .25s ease;
-}
-.spinner {
-  width:60px;
-  height:60px;
-  border:5px solid #1e293b;
-  border-top:5px solid #22c55e;
-  border-radius:50%;
-  margin:0 auto 15px;
-  animation: spin 1s linear infinite;
-}
-
-.check {
-  font-size:42px;
-  color:#22c55e;
-  display:none;
-}
-
-@keyframes spin {
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes scaleIn {
-  from { transform: scale(.8); opacity:0 }
-  to { transform: scale(1); opacity:1 }
-}
-  </style>
+<title>StabiX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 <div id="app">Loading…</div>
 <!-- ===== Transaction Popup ===== -->
 <div id="txPopup" class="tx-popup">
-  <div class="tx-card">
-    <audio id="txSound" preload="auto">
-  <source src="https://assets.mixkit.co/sfx/preview/mixkit-confirmation-tone-2867.mp3" type="audio/mpeg">
-    </audio>
-    <div id="txSpinner" class="spinner"></div>
-    <div id="txCheck" class="check">✅</div>
-
-    <div id="txMsg" style="margin-top:10px;font-size:16px;"></div>
-    <div id="txTime" class="small" style="margin-top:6px;"></div>
-
-    <button id="txDoneBtn"
-      style="margin-top:16px;background:#22c55e;color:#022c22;font-weight:bold;display:none"
-      onclick="closeTxPopup()">
-      DONE
-    </button>
-  </div>
+<div class="tx-card">
+<audio id="txSound" preload="auto">
+<source src="https://assets.mixkit.co/sfx/preview/mixkit-confirmation-tone-2867.mp3" type="audio/mpeg">
+</audio>
+<div class="spinner">
+<svg viewBox="0 0 120 120">
+<circle class="circle-bg" cx="60" cy="60" r="52"/>
+<circle class="circle-progress" cx="60" cy="60" r="52"/>
+<polyline id="tick" points="38,65 55,80 82,45"/>
+<line id="crossLine1" x1="40" y1="40" x2="80" y2="80"
+style="display:none;stroke:#ef4444;stroke-width:10;stroke-linecap:round"/>
+<line id="crossLine2" x1="80" y1="40" x2="40" y2="80"
+style="display:none;stroke:#ef4444;stroke-width:10;stroke-linecap:round"/>
+</svg>
 </div>
 
-<script type="module">
-  // 🚫 BLOCK NORMAL BROWSER ACCESS (ONLY TELEGRAM ALLOWED)
-if (
-  !window.Telegram ||
-  !window.Telegram.WebApp ||
-  !window.Telegram.WebApp.initDataUnsafe ||
-  !window.Telegram.WebApp.initDataUnsafe.user
-) {
-  document.body.innerHTML = `
-    <div style="
-      background:#020617;
-      color:#e5e7eb;
-      height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      font-family:Arial;
-      padding:20px;
-    ">
-      <div>
-        <h2>⚠️ Access Denied</h2>
-        <p>This app works only inside Telegram.</p>
-        <p class="small">Please open it from the official Telegram bot.</p>
-      </div>
-    </div>
-  `;
-  throw new Error("Not opened inside Telegram");
-}
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import {
-  getFirestore, doc, setDoc, getDoc, updateDoc,
-  collection, addDoc, getDocs, serverTimestamp,
-  query, where, orderBy, runTransaction,
-  Timestamp
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-/* ================= FIREBASE ================= */
-const firebaseConfig = {
-  apiKey: "AIzaSyBNs4efcfPoHYk13cU8xuCdnTHOXL1yzT4",
-  authDomain: "stabix-backend-v1.firebaseapp.com",
-  projectId: "stabix-backend-v1",
-  storageBucket: "stabix-backend-v1.firebasestorage.app",
-  messagingSenderId: "351361221507",
-  appId: "1:351361221507:web:ebaf0d15e86d4b184c6cb6"
-};
-const appFB = initializeApp(firebaseConfig);
-const db = getFirestore(appFB);
-
-/* ================= TELEGRAM ================= */
-const tg = window.Telegram.WebApp;
-tg.ready(); tg.expand();
-const tgUser = tg.initDataUnsafe?.user;
-if(!tgUser?.id){ document.getElementById("app").innerHTML="Telegram user not found"; throw ""; }
-
-/* ================= IDENTITY ================= */
-const WALLET = "TG_" + tgUser.id;
-const userRef = doc(db,"users",WALLET);
-const validatorRef = doc(db,"validators",String(tgUser.id));
-
-/* ================= INIT ================= */
-async function init(){
-  const snap = await getDoc(userRef);
-  if(!snap.exists() || !snap.data()?.password){
-    renderSetup(); return;
-  }
-  renderLogin();
-}
-
-/* ================= SETUP ================= */
-function renderSetup(){
-  appDiv(`
-    <div class="box">
-      <h3>Create Account</h3>
-      <input id="uname" placeholder="Username">
-      <input id="pwd" type="password" placeholder="Password">
-      <button onclick="saveProfile()">Create</button>
-    </div>
-  `);
-}
-
-window.saveProfile = async ()=>{
-  if(!uname.value.trim() || !pwd.value.trim()) return alert("Fill all fields");
-  await setDoc(userRef,{
-    username: uname.value.trim(),
-    password: pwd.value.trim(),
-    walletAddress: WALLET,
-    eoaAddress: "",
-    balance: 0,
-    pendingRequest:false,
-    lastUsernameChange: serverTimestamp(),
-    createdAt: serverTimestamp()
-  });
-  renderApp();
-};
-
-/* ================= LOGIN ================= */
-function renderLogin(){
-  appDiv(`
-    <div class="box">
-      <h3>Login</h3>
-      <input id="pwd" type="password" placeholder="Password">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-        <button style="width:70%" onclick="login()">Login</button>
-        <span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Forgot?</span>
-      </div>
-    </div>
-  `);
-}
-
-window.login = async ()=>{
-  const snap = await getDoc(userRef);
-  if(snap.data().password !== pwd.value.trim()) return alert("Wrong password");
-  renderApp();
-};
-
-/* ================= FORGOT PASSWORD ================= */
-window.forgotPassword = async ()=>{
-  const otp = Math.floor(100000 + Math.random()*900000).toString();
-  await updateDoc(userRef,{ otp });
-  tg.showPopup({ title:"OTP", message:"Your OTP: "+otp, buttons:[{type:"ok"}] });
-  renderOTP();
-};
-
-function renderOTP(){
-  appDiv(`
-    <div class="box">
-      <h3>Reset Password</h3>
-      <input id="otp" placeholder="OTP">
-      <input id="npwd" type="password" placeholder="New Password">
-      <button onclick="verifyOTP()">Reset</button>
-      <span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Resend</span>
-    </div>
-  `);
-}
-
-window.verifyOTP = async ()=>{
-  const snap = await getDoc(userRef);
-  if(snap.data().otp !== otp.value.trim()) return alert("Invalid OTP");
-  await updateDoc(userRef,{ password: npwd.value.trim(), otp:"" });
-  renderLogin();
-};
-
-/* ================= USERNAME CHANGE (30 DAYS) ================= */
-window.changeUsername = async ()=>{
-  const snap = await getDoc(userRef);
-  const last = snap.data().lastUsernameChange?.toDate();
-  if(last && ((Date.now()-last)/(1000*60*60*24)) < 30)
-    return alert("Username can be changed once every 30 days");
-
-  const name = prompt("New username");
-  if(!name?.trim()) return;
-  await updateDoc(userRef,{ username:name.trim(), lastUsernameChange:serverTimestamp() });
-  renderApp();
-};
-
-/* ================= MAIN APP ================= */
-async function renderApp(){
-  const user = (await getDoc(userRef)).data();
-  const isValidator = (await getDoc(validatorRef)).exists();
-  const now = new Date();
-const yyyy = now.getFullYear();
-const mm = String(now.getMonth() + 1).padStart(2,"0");
-const dd = String(now.getDate()).padStart(2,"0");
-const today = `${yyyy}-${mm}-${dd}`;
-  appDiv(`
-    <div class="box">
-  <h2 style="margin:0">${user.username}</h2>
-  <span 
-    onclick="changeUsername()" 
-    style="font-size:16px;cursor:pointer;opacity:0.7"
-    title="Change username" >✏️</span>
-      <p class="small">${WALLET}</p>
-
-<div class="small" style="margin-top:6px">
-  <b>EOA Wallet:</b><br>
-
-  ${
-    user.eoaAddress
-      ? `
-        <span style="color:#22c55e">
-          ${user.eoaAddress}
-          <span style="margin-left:6px"></span>
-        </span>
-      `
-      : `
-        <span
-          style="color:#60a5fa;cursor:pointer"
-          onclick="editEOA()"
-        >
-          + Add EOA Wallet
-        </span>
-      `
-  }
-</div>
-      <button
-  onclick="softRefresh()"
-  style="
-    margin-top:8px;
-    background:#1e293b;
-    color:#e5e7eb;
-    font-size:13px;
-  ">
-  ↻ Refresh
-</button>
-      
-
-      <hr>
-      <b>Balance:</b> ${user.balance.toFixed(2)} USDC
-      ${user.pendingRequest
-  ? `<div class="warn"> Pending request under review</div>`
-  : ""
-      }
-
-      <hr>
-      <h3>Send USDC</h3>
-      <input id="sendTo" placeholder="Receiver Wallet (TG_xxx)">
-      <input id="sendAmt" type="number" placeholder="Amount">
-      <button onclick="sendUSDC()">Send</button>
-      <hr>
-       <hr>
-
-<h3>Deposit / Withdraw</h3>
-
-<div style="
-display:flex;
-gap:10px;
-margin-top:10px;
+<div id="txTitle"
+style="
+font-size:22px;
+font-weight:bold;
+color:#22c55e;
+margin-bottom:10px;
 ">
+Transaction Successful
+</div>
 
-<button onclick="openDeposit()" style="background:#22c55e;color:#022c22;font-weight:bold">
-Deposit
+<div id="txMsg" style="font-size:16px;"></div>
+<div id="txTime" class="small" style="margin-top:6px;"></div>
+<button id="txDoneBtn"
+style="margin-top:16px;background:#22c55e;color:#022c22;"
+onclick="closeTxPopup(); window.goHome();">
+DONE
 </button>
-
-<button onclick="openWithdraw()" style="background:#ef4444;color:white;font-weight:bold">
-Withdraw
+</div>
+</div>
+  
+ <!-- ===== Sending UI===== -->
+<div id="sendScreen">
+<div class="sendHeader">
+<button onclick="closeSend()" class="backBtn">
+←
 </button>
-
+<h2 id="sendTitle" style="display:flex;align-items:center;gap:8px;justify-content:center;">
+<span id="sendText">Send</span>
+<img id="sendAssetImg"
+src="./media/usd-coin-usdc-logo.png"
+style="width:20px;height:20px;border-radius:50%;">  
+</h2>
 </div>
-
-<div id="depositBox" style="
-display:none;
-margin-top:10px;
-padding:10px;
-background:#020617;
-border:1px solid #1e293b;
-border-radius:12px;
-">
-
-<select id="networkSelect" onchange="showVault()">
-  <option value="">Select Network</option>
-  <option value="sepolia">Ethereum (Sepolia)</option>
-</select>
-
-<div id="vaultSection" style="display:none;margin-top:10px">
-
-<div class="small">Vault Address:</div>
-
-<div style="display:flex;align-items:center;gap:8px;width:100%">
-
-<span style="
-color:#60a5fa;
-font-size:12px;
-word-break:break-all;
-flex:1;
-">
-0x710c5D40a97123903b7cB482dBe39EB35D52af0a
-</span>
-
-<button onclick="copyVault()" style="
-width:auto;
-padding:6px 10px;
-font-size:12px;
-flex-shrink:0;
-">
-Copy
-</button>
-
-</div>
-
-<button onclick="showDepositForm()" style="background:#22c55e;color:#022c22;font-weight:bold">
-Submit Deposit Proof 
-</button>
-
-<div id="depositForm" style="display:none;margin-top:10px">
-
-<input id="depAmount" type="number" placeholder="Amount">
-
-<input id="depHash" placeholder="Transaction Hash">
-
-<button onclick="submitDeposit()">Submit Deposit</button>
-
-</div>
-</div>
-
-</div>
-<div id="withdrawBox" style="display:none;margin-top:10px">
-
-<div class="small">Withdraw Address:</div>
-
-<div style="
-background:#020617;
-border:1px solid #1e293b;
-padding:10px;
-border-radius:8px;
-margin-top:6px;
-word-break:break-all;
-">
-
-${user.eoaAddress ? user.eoaAddress : "No EOA wallet registered"}
-
-</div>
-
-<input id="wdAmount" type="number" placeholder="Amount">
-
-<button onclick="submitWithdraw()">Request Withdraw</button>
-
-</div>
-      <hr>
-      <h3>Transaction History</h3>
-
+<div class="sendBody">
+<h1 class="sendTitle">Receiving Wallet ID</h1>
+<div class="addressBox">
 <input
-  id="historyDate"
-  type="date"
-  value="${today}"
-  max="${today}"
-  onchange="loadHistoryByDate()"
+id="sendTo"
+placeholder="Enter Wallet ID (TG_xxx)"
+autocomplete="off"
 />
+</div>
+<button class="nextBtn" onclick="goAmount()">
+Next
+</button>
+</div>
+</div>
+    <!-- ===== Amount Screen===== -->
+<div id="amountScreen" style="display:none">
+<div class="sendHeader">
+<button onclick="backToAddress()" class="backBtn">←</button>
+<h2 id="amountTitle" style="display:flex;align-items:center;gap:8px;justify-content:center;">
+<span id="amountText">Send</span>
+<img id="amountAssetImg"
+src="./media/usd-coin-usdc-logo.png"
+style="width:20px;height:20px;border-radius:50%;">
+</h2>
+</div>
+<div class="sendBody">
+<div class="sendIcon">⬆</div>
+<h1 class="sendTitle">Enter Amount</h1>
+<input
+id="sendAmt"
+type="number"
+inputmode="decimal"
+placeholder="0"
+class="amountInput"
+/>
+<button class="nextBtn" onclick="handleNext()">
+Next
+</button>
+</div>
+</div>
+         <!-- =====Confirm Screen===== -->
+<div id="confirmScreen" style="display:none">
+<div class="sendHeader">
+<button onclick="backToAmount()" class="backBtn">←</button>
+</div>
+<div class="sendBody">
+<h1 id="confirmAmount" style="font-size:56px;text-align:center;">
+-0 USDC
+</h1>
+<hr>
+<p>Transaction Fee</p>
+<p id="feeText">0</p>
+<p>From</p>
+<p id="confirmFrom"></p>
+<p>To</p>
+<p id="confirmTo"></p>
+<div style="margin-top:30px;display:flex;gap:10px">
+<button onclick="sendUSDC()" 
+style="width:80%;margin:20px auto;padding:14px;background:#22c55e;color:#fff;border:none;border-radius:12px;display:block;">
+Confirm
+</button>
+</button>
+</div>
+</div>
+</div>
+             
+ <!-- ===== QR Code===== -->
+ <script src="https://unpkg.com/html5-qrcode"></script> 
 
-<div id="history">Loading...</div>
+<div id="scannerOverlay" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+background:black;
+z-index:99999;
+">
 
-      ${isValidator ? validatorPanel() : ""}
-    </div>
-  `);
+<div id="qr-reader" style="
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+z-index:9999;
+"></div>
 
-  loadHistoryByDate();
-  // 🎉 RECEIVE POPUP (one-time)
-try{
-  const q = query(
-    collection(db,"transactions"),
-    where("userId","==",WALLET),
-    orderBy("createdAt","desc")
-  );
+<div id="scanBox" style="
+position:fixed;
+top:40%;
+left:50%;
+width:240px;
+height:240px;
+transform:translate(-50%, -50%);
+pointer-events:none;
+">
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+</div>
 
-  const snap = await getDocs(q);
-  if(!snap.empty){
-    const docSnap = snap.docs[0];
-    const t = docSnap.data();
-
-    // sirf received ke liye
-    if(t.type === "received"){
-      const key = "rx_" + docSnap.id;
-
-      // ek hi baar popup
-      if(!sessionStorage.getItem(key)){
-        showTxPopup(`Received ${t.amount} USDC from ${t.counterparty}`);
-        sessionStorage.setItem(key,"1");
-      }
-    }
-  }
-}catch(e){
-  console.log("Receive popup error", e);
-}
-}
-
-/* ================= SEND USDC ================= */
-window.sendUSDC = async ()=>{
-  const snap = await getDoc(userRef);
-if(snap.data().pendingRequest){
-  alert("Account frozen. Wait for validator approval.");
-  return;
-}
-  const toWallet = sendTo.value.trim();
-  const amount = Number(sendAmt.value);
-  if(!toWallet || amount<=0) return alert("Invalid input");
-  if(toWallet === WALLET){
-    tg.showPopup({ title:"Blocked", message:"Cannot send to yourself", buttons:[{type:"ok"}] });
-    return;
-  }
-
-  try{
-    await runTransaction(db, async(tx)=>{
-      const fromSnap = await tx.get(userRef);
-      const toRef = doc(db,"users",toWallet);
-      const toSnap = await tx.get(toRef);
-      if(!toSnap.exists()) throw "Receiver not found";
-      if(fromSnap.data().balance < amount) throw "Insufficient balance";
-
-      tx.update(userRef,{ balance: fromSnap.data().balance - amount });
-      tx.update(toRef,{ balance: toSnap.data().balance + amount });
-
-      tx.set(doc(collection(db,"transactions")),{
-        userId: WALLET, type:"sent", amount, counterparty:toWallet, createdAt:serverTimestamp()
-      });
-      tx.set(doc(collection(db,"transactions")),{
-        userId: toWallet, type:"received", amount, counterparty:WALLET, createdAt:serverTimestamp()
-      });
-    });
-    showTxPopup(`Sent ${amount} USDC to ${toWallet}`);
-    renderApp();
-  }catch(e){ alert(e); }
-};
-  /*===============Deposit & Withdraw Logic======*/
-window.openDeposit = ()=>{
-const box = document.getElementById("depositBox")
-
-if(box.style.display==="block"){
-box.style.display="none"
-}else{
-box.style.display="block"
-}
-
-document.getElementById("withdrawBox").style.display="none"
-}
-  window.openWithdraw = ()=>{
-const box = document.getElementById("withdrawBox")
-
-if(box.style.display==="block"){
-box.style.display="none"
-}else{
-box.style.display="block"
-}
-
-document.getElementById("depositBox").style.display="none"
-  }
+<button onclick="closeScanner()" style="
+position:absolute;
+top:15px;
+left:15px;
+background:rgba(0,0,0,0.7);
+color:#fff;
+border:none;
+font-size:18px;
+width:40px;
+height:40px;
+border-radius:50%;
+z-index:100000;
+">✕</button>
   
-  window.showVault = ()=>{
-const net = document.getElementById("networkSelect").value
-const vault = document.getElementById("vaultSection")
+<button id="torchBtn" onclick="toggleTorch()" style="
+position:absolute;
+top:15px;
+right:15px;
+background:rgba(0,0,0,0.7);
+color:#fff;
+border:none;
+font-size:18px;
+width:40px;
+height:40px;
+border-radius:50%;
+z-index:100000;
+">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="white"
+style="transform:translate(-5px, -5px);">
+<path d="M6 2h12v3H6V2zm3 5h6c1.1 0 2 .9 2 2v11c0 1.1-.9 2-2 2H9c-1.1 0-2-.9-2-2V9c0-1.1.9-2 2-2zm3 3a1.5 1.5 0 100 3 1.5 1.5 0 000-3z"/>
+</svg>
+</button>
 
-if(net==="sepolia"){
-vault.style.display="block"
-}else{
-vault.style.display="none"
-}
-  }
-  window.copyVault = ()=>{
-navigator.clipboard.writeText("0x710c5D40a97123903b7cB482dBe39EB35D52af0a")
-alert("Vault address copied")
-  }
-  window.showDepositForm = ()=>{
-document.getElementById("depositForm").style.display="block"
-  }
-
-window.submitDeposit = async ()=>{
-
-const amount = depAmount.value.trim()
-const txHash = depHash.value.trim()
-
-
-if(!amount || Number(amount) <= 0){
-alert("Enter valid amount")
-return
-}
-// Ethereum tx hash validation
-if(!txHash.startsWith("0x") || txHash.length !== 66){
-alert("Invalid Transaction Hash")
-return
-}
-
-if(txHash.length !== 66){
-alert("Invalid transaction hash")
-return
-}
-
-await addDoc(collection(db,"requests"),{
-userId: WALLET,
-type:"deposit",
-amount: Number(amount),
-walletAddress:"",
-txHash: txHash,
-status:"pending",
-createdAt: serverTimestamp()
-})
-
-await updateDoc(userRef,{ pendingRequest:true })
-
-alert("Deposit request sent to validator")
-
-renderApp()
-
-  }
+<label for="galleryInput" id="galleryBtn" style="
+position:fixed;
+bottom:100px;
+left:50%;
+transform:translateX(-50%);
+background:#e5e7eb;
+color:#111;
+border:none;
+height:48px;
+padding:0 20px;
+border-radius:999px;
+font-size:15px;
+font-weight:500;
+z-index:100000;
+display:inline-flex;
+align-items:center;
+gap:8px;
+line-height:1;
+">
+<!-- Gallery Icon + Text -->
+<span style="
+display:inline-flex;
+align-items:center;
+gap:8px;
+white-space:nowrap;
+transform:translateY(15px);  
+">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="display:block;">
+<rect x="3" y="5" width="18" height="14" rx="2" stroke="#555" stroke-width="1.5"/>
+<circle cx="8" cy="10" r="2" fill="#555"/>
+<path d="M21 16L16 11L5 19" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span>Upload From Gallery</span>
+</span>
+<input 
+type="file" 
+id="galleryInput" 
+accept="image/*" 
+style="display:none"
+onchange="handleGallery(event)">
+</div>
   
+ <!-- Bottom Navigation -->
+<div id="bottomNav" style="
+position:fixed;
+bottom:10px;
+left:50%;
+transform:translateX(-50%);
+width:92%;
+max-width:420px;
+height:70px;
+background:rgba(2,6,23,0.9);
+backdrop-filter:blur(12px);
+border-radius:22px;
+display:none;
+justify-content:space-around;
+align-items:center;
+z-index:999;
+box-shadow:0 8px 30px rgba(0,0,0,0.6);
+">
+<div id="tab-home" onclick="navigateHome()" style="flex:1;text-align:center;cursor:pointer">
+<div class="nav-icon">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+<path d="M3 10L12 3L21 10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+<path d="M5 10V20H19V10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+</svg>
+</div>
+<div class="nav-text">Home</div>
+</div>
+  
+<div id="tab-deposit" onclick="goDeposit();selectTab('deposit')" style="flex:1;text-align:center;cursor:pointer">
+<div class="nav-icon">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+<path d="M7 8V14" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round"/>
+<path d="M4 11L7 14L10 11" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17 14V8" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round"/>
+<path d="M14 11L17 8L20 11" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div>
+
+<div class="nav-text">D/W</div>
+</div>
+<div id="tab-history" onclick="goHistory();selectTab('history')" style="flex:1;text-align:center;cursor:pointer">
+<div class="nav-icon">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+<circle cx="12" cy="12" r="10" stroke="white" stroke-width="2"/>
+<path d="M12 7V12L15 14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+</svg>
+</div>
+<div class="nav-text">History</div>
+</div>
+  
+<div id="tab-settings" onclick="goSettings();selectTab('settings')" style="flex:1;text-align:center;cursor:pointer">
+<div class="nav-icon">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+<line x1="5" y1="7" x2="19" y2="7" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="5" y1="12" x2="19" y2="12" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="5" y1="17" x2="19" y2="17" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
+</svg>
+</div>
+<div class="nav-text">Settings</div>
+</div>
+</div>
+
+
 
   
-/* ================= HISTORY ================= */
-
-async function loadHistory() {
-  const q = query(
-    collection(db, "transactions"),
-    where("userId", "==", WALLET)
-  );
-
-  const snap = await getDocs(q);
-  renderHistoryFromSnap(snap, "No transactions");
-}
-
-window.loadHistoryByDate = async () => {
-  const selected = document.getElementById("historyDate")?.value;
-
-  if (!selected) {
-    loadHistory(); // fallback
-    return;
-  }
-
-  const startDate = new Date(selected);
-startDate.setHours(0, 0, 0, 0);
-
-const endDate = new Date(selected);
-endDate.setHours(23, 59, 59, 999);
-
-const start = Timestamp.fromDate(startDate);
-const end = Timestamp.fromDate(endDate);
-  const q = query(
-    collection(db, "transactions"),
-    where("userId", "==", WALLET),
-    where("createdAt", ">=", start),
-    where("createdAt", "<=", end)
-  );
-
-  const snap = await getDocs(q);
-  renderHistoryFromSnap(snap, "No transactions for this date");
-};
-  window.submitWithdraw = async ()=>{
-
-  const amount = Number(document.getElementById("wdAmount").value);
-
-  const snap = await getDoc(userRef);
-  const user = snap.data();
-
-  if(!user.eoaAddress){
-    alert("Please register EOA wallet first");
-    return;
-  }
-
-  if(!amount || amount <= 0){
-    alert("Enter valid amount");
-    return;
-  }
-
-  if(user.pendingRequest){
-    alert("Account frozen. Pending request under review.");
-    return;
-  }
-
-  if(amount > user.balance){
-    alert("Insufficient balance");
-    return;
-  }
-
-  await addDoc(collection(db,"requests"),{
-    userId: WALLET,
-    type:"withdraw",
-    amount: amount,
-    walletAddress: user.eoaAddress,
-    txHash:"",
-    status:"pending",
-    createdAt: serverTimestamp()
-  });
-
-  await updateDoc(userRef,{ pendingRequest:true });
-
-  tg.showPopup({
-    title:"Request Submitted",
-    message:"Wait for Validator Verification",
-    buttons:[{type:"ok"}]
-  });
-
-  renderApp();
-};
-
-/* ================= HISTORY RENDER ================= */
-
-function renderHistoryFromSnap(snap, emptyText) {
-  let html = "";
-
-  snap.forEach(d => {
-    const t = d.data();
-
-    const isDepositWithdraw =
-      t.type === "deposit" || t.type === "withdraw";
-
-    const isCredit = isDepositWithdraw
-      ? t.type === "deposit"
-      : t.type === "received";
-
-    const sign = isCredit ? "+" : "-";
-    const color = isCredit ? "#22c55e" : "#ef4444";
-
-    const metaLine = isDepositWithdraw
-      ? t.type.toUpperCase()
-      : (isCredit
-          ? `${t.counterparty} → ${WALLET}`
-          : `${WALLET} → ${t.counterparty}`);
-
-    html += `
-      <div class="tx" style="color:${color}">
-        <b>${sign}${t.amount} USDC</b><br>
-        <span class="small">
-          ${metaLine}<br>
-          ${t.createdAt?.toDate()?.toLocaleString() || ""}
-        </span>
-      </div>
-    `;
-  });
-
-  document.getElementById("history").innerHTML =
-    html || `<span class="small">${emptyText}</span>`;
-}
+  <script type="module" src="./js/app.js"></script>
   
-/* ================= VALIDATOR PANEL ================= */
-function validatorPanel(){
-  return `
-    <hr>
-    <h3>Validator Panel</h3>
+ <!-- ===== Error Tool===== -->
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
 
-    <input id="vUser" placeholder="Target User ID (TG_xxx)">
-    <select id="vType">
-      <option value="deposit">Deposit</option>
-      <option value="withdraw">Withdraw</option>
-    </select>
-    <input id="vAmount" type="number" placeholder="Amount">
-    <button onclick="checkUserBalance()">Check Balance</button>
-<div id="balanceOut" class="small" style="margin-top:8px"></div>
-
-    <button onclick="validatorAdjust()">Apply</button>
-
-    <hr>
-    <button onclick="loadRequests()">Load Pending</button>
-    <div id="vout"></div>
-    <hr>
-<h3>All Users</h3>
-
-<button onclick="loadAllUsers()">Load Users</button>
-
-<div id="userCount" class="small" style="margin-top:6px"></div>
-<div id="userList" style="margin-top:10px"></div>
-  `;
-}
-window.validatorAdjust = async ()=>{
-  try{
-    const uid = document.getElementById("vUser").value.trim();
-    const type = document.getElementById("vType").value;
-    const amount = Number(document.getElementById("vAmount").value);
-
-    if(!uid || amount <= 0){
-      alert("Invalid input");
-      return;
-    }
-
-    const targetRef = doc(db,"users",uid);
-
-    await runTransaction(db, async(tx)=>{
-      const snap = await tx.get(targetRef);
-      if(!snap.exists()) throw "User not found";
-
-      let bal = snap.data().balance;
-
-      if(type === "deposit"){
-        bal += amount;
-      }else{
-        bal -= amount;
-      }
-
-      if(bal < 0) throw "Insufficient balance";
-
-      tx.update(targetRef,{ balance: bal });
-
-      tx.set(doc(collection(db,"transactions")),{
-        userId: uid,
-        type: type,              // deposit / withdraw
-        amount: amount,
-        counterparty: "VALIDATOR",
-        createdAt: serverTimestamp()
-      });
-    });
-
-    alert("Balance updated successfully");
-  }catch(e){
-    alert("Validator error: " + e);
-  }
+<script>
+window.onerror = function(msg, url, line, col, error) {
+  console.log("❌ ERROR:", msg);
+  console.log("📍 File:", url);
+  console.log("📌 Line:", line, "Column:", col);
 };
-  window.loadRequests = async ()=>{
-  const q = query(
-    collection(db,"requests"),
-    where("status","==","pending")
-  );
-
-  const snap = await getDocs(q);
-  let html = "";
-
-  snap.forEach(d=>{
-    const r = d.data();
-
-    const time = r.createdAt
-      ? r.createdAt.toDate().toLocaleString()
-      : "";
-
-    html += `
-      <div class="tx">
-        <b>${r.type.toUpperCase()} ${r.amount} USDC</b><br>
-
-        <span class="small">
-          User ID: ${r.userId}<br>
-          Wallet: ${r.walletAddress}<br>
-          ${r.txHash ? `Tx Hash: ${r.txHash}<br>` : ""}
-          Time: ${time}
-        </span>
-
-        <br><br>
-        <button onclick="approveReq('${d.id}')">Approve</button>
-        <button onclick="rejectReq('${d.id}')">Reject</button>
-      </div>
-    `;
-  });
-
-  document.getElementById("vout").innerHTML =
-    html || "<span class='small'>No pending requests</span>";
-};
-  window.loadAllUsers = async ()=>{
-  const listDiv = document.getElementById("userList");
-  const countDiv = document.getElementById("userCount");
-
-  listDiv.innerHTML = "Loading...";
-  countDiv.innerHTML = "";
-
-  try{
-    const snap = await getDocs(collection(db,"users"));
-
-    countDiv.innerHTML = `Total Users: <b>${snap.size}</b>`;
-
-    let html = "";
-
-    snap.forEach(d=>{
-      const u = d.data();
-
-      const username = u.username ? u.username : "No username";
-      const tgWallet = u.walletAddress ? u.walletAddress : d.id;
-      const eoa = u.eoaAddress ? u.eoaAddress : "Not added";
-
-      html += `
-        <div class="tx">
-          <b>${username}</b><br>
-
-          <span class="small">
-            TG: ${tgWallet}
-          </span><br>
-
-          <span class="small">
-            EOA: ${eoa}
-          </span>
-        </div>
-      `;
-    });
-
-    listDiv.innerHTML =
-      html || "<span class='small'>No users found</span>";
-
-  }catch(e){
-    listDiv.innerHTML =
-      "<span class='small'>Error loading users</span>";
-  }
-};
-  window.approveReq = async (reqId)=>{
-
-  const reqRef = doc(db,"requests",reqId);
-
-  await runTransaction(db, async(tx)=>{
-
-    const reqSnap = await tx.get(reqRef);
-    if(!reqSnap.exists()) throw "Request not found";
-
-    const r = reqSnap.data();
-
-    const userRefX = doc(db,"users",r.userId);
-    const userSnap = await tx.get(userRefX);
-
-    if(!userSnap.exists()) throw "User not found";
-
-    let bal = userSnap.data().balance || 0;
-
-    // Deposit approve
-    if(r.type === "deposit"){
-      bal = bal + r.amount;
-    }
-
-    // Withdraw approve
-    if(r.type === "withdraw"){
-      if(bal < r.amount) throw "Insufficient balance";
-      bal = bal - r.amount;
-    }
-
-    // update user
-    tx.update(userRefX,{
-      balance: bal,
-      pendingRequest:false
-    });
-
-    // mark request approved
-    tx.update(reqRef,{
-      status:"approved"
-    });
-
-    // add transaction history
-    tx.set(doc(collection(db,"transactions")),{
-      userId: r.userId,
-      type: r.type,
-      amount: r.amount,
-      counterparty:"VALIDATOR",
-      createdAt: serverTimestamp()
-    });
-
-  });
-
-  alert("Request approved");
-  loadRequests();
-};
-
-  window.rejectReq = async (reqId)=>{
-  const reqRef = doc(db,"requests",reqId);
-  const snap = await getDoc(reqRef);
-
-  await updateDoc(doc(db,"users", snap.data().userId),{
-    pendingRequest:false   // 🔓 UNFREEZE
-  });
-
-  await updateDoc(reqRef,{ status:"rejected" });
-
-  alert("Rejected");
-  loadRequests();
-  renderApp();
-};
-  window.checkUserBalance = async ()=>{
-  const uid = document.getElementById("vUser").value.trim();
-  const out = document.getElementById("balanceOut");
-
-  if(!uid){
-    out.innerText = "Enter User ID";
-    return;
-  }
-
-  try{
-    const snap = await getDoc(doc(db,"users",uid));
-    if(!snap.exists()){
-      out.innerText = "User not found";
-      return;
-    }
-
-    out.innerText =
-      `Balance: ${snap.data().balance.toFixed(2)} USDC`;
-  }catch(e){
-    out.innerText = "Error fetching balance";
-  }
-};
-  function showTxPopup(msg){
-  const pop = document.getElementById("txPopup");
-  const spin = document.getElementById("txSpinner");
-  const check = document.getElementById("txCheck");
-  const txt = document.getElementById("txMsg");
-  const time = document.getElementById("txTime");
-  const doneBtn = document.getElementById("txDoneBtn");
-
-  // message + time
-  txt.innerText = msg;
-  time.innerText = new Date().toLocaleString();
-
-  // ✅ FINAL STATE (NO TIMER)
-  spin.style.display = "none";      // ❌ spinner band
-  check.style.display = "block";    // ✅ success
-  doneBtn.style.display = "block";  // ✅ DONE button
-  pop.style.display = "flex";
-  }
-
-  window.closeTxPopup = function (){
-  const pop = document.getElementById("txPopup");
-  if(pop) pop.style.display = "none";
-};
-  // ✅ DONE button handler (module-safe)
-const doneBtnEl = document.getElementById("txDoneBtn");
-if (doneBtnEl) {
-  doneBtnEl.addEventListener("click", () => {
-    const pop = document.getElementById("txPopup");
-    if (pop) pop.style.display = "none";
-  });
-}
-  window.softRefresh = async function(){
-  try{
-    // 🔄 re-fetch user data
-    const snap = await getDoc(userRef);
-    if(!snap.exists()){
-      alert("Session expired");
-      return;
-    }
-
-    // 🔁 sirf UI refresh
-    renderApp();
-  }catch(e){
-    alert("Refresh failed");
-  }
-};
-  // ================= EOA WALLET =================
-window.editEOA = async ()=>{
-  const snap = await getDoc(userRef);
-  const current = snap.data()?.eoaAddress;
-
-  const addr = prompt(
-    "Enter your EOA Wallet Address",
-    current || ""
-  );
-
-  if(!addr) return;
-
-  if(addr.length < 20){
-    alert("Invalid wallet address");
-    return;
-  }
-
-  // 🔒 LOCK
-  if (current) {
-    alert("EOA wallet already locked");
-    return;
-  }
-
-  await updateDoc(userRef,{
-    eoaAddress: addr.trim()
-  });
-
-  alert("EOA wallet locked successfully");
-  renderApp();
-};
-    
-/* ================= UTIL ================= */
-function appDiv(h){ document.getElementById("app").innerHTML = h; }
-
-init();
 </script>
+
+
+  
 </body>
 </html>
+
