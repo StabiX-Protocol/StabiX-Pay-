@@ -750,7 +750,6 @@ document.getElementById("previewTitle").innerText ="Send " + (window.primaryAsse
 window.scannedId = targetId  
 window.isScanFlow = true;
 document.getElementById("previewScreen").style.display = "flex"
-document.getElementById("previewTitle").innerText ="Send " + window.primaryAsset;
 document.getElementById("amountScreen").style.display = "none"
 }
 )
