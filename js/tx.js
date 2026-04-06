@@ -200,6 +200,7 @@ await addDoc(collection(db,"requests"),{
 userId: WALLET,
 type:"withdraw",
 amount: amount,
+asset: window.primaryAsset,
 walletAddress: user.eoaAddress,
 txHash:"",
 status:"pending",
