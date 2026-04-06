@@ -500,6 +500,7 @@ window.selectedAsset = null;
 window.confirmPrimary = function(asset){
 if(asset === window.primaryAsset){
 return;}
+window.selectedAsset = asset;
 document.getElementById("confirmText").innerText =
 "Set " + asset + " as primary?";
 document.getElementById("confirmBox").style.display = "flex";
@@ -547,6 +548,7 @@ const qrData = JSON.stringify({
 type: "stabix",
 id: wallet,
 })
+}
 const qr = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(qrData)
 document.getElementById("qrImg").src = qr
 document.getElementById("walletAddr").innerText = wallet
