@@ -282,23 +282,29 @@ html += `
   <!-- RIGHT -->
   <div style="text-align:right">
 
-    <div style="font-weight:bold;color:${color};font-size:15px">
-      ${isCredit ? "+" : "-"} ${t.amount} ${t.asset || "USDT"}
-    </div>
-
-    <div style="
-      margin-top:4px;
-      font-size:11px;
-      padding:3px 8px;
-      border-radius:999px;
-      display:inline-block;
-      background:rgba(34,197,94,0.1);
-      color:${isCredit ? "#22c55e" : "#ef4444"};
-    ">
-      ${label}
-    </div>
-
+  <!-- LABEL (TOP) -->
+  <div style="
+    font-size:11px;
+    padding:3px 8px;
+    border-radius:999px;
+    display:inline-block;
+    background:rgba(34,197,94,0.1);
+    color:${isCredit ? "#22c55e" : "#ef4444"};
+  ">
+    ${label}
   </div>
+
+  <!-- AMOUNT (BOTTOM) -->
+  <div style="
+    margin-top:4px;
+    font-weight:bold;
+    color:${color};
+    font-size:15px;
+  ">
+    ${isCredit ? "+" : "-"} ${t.amount} ${t.asset || "USDT"}
+  </div>
+
+</div>
 
 </div>
 `;
