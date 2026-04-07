@@ -2,6 +2,12 @@ window.primaryAsset = localStorage.getItem("primaryAsset") || "USDC";
 window.keepAssetOpen = false;
 window.scanDone = false
 window.scanTargetId = null
+window.filters = {
+type:null,
+asset:null,
+amount:null,
+date:null
+};
 window.isScanFlow = false;
 import {
   doc,
@@ -1169,15 +1175,9 @@ selectTab("deposit");
 window.goHistory = () => {
 document.querySelector(".box").innerHTML = `
 <h2>Transaction History</h2>
-
-<input
-id="historyDate"
-type="date"
-onchange="loadHistoryByDate()"/>
-
 <input
 id="searchInput"
-placeholder="Search by TG ID..."
+placeholder="Search Transactions..."
 style="
 width:100%;
 margin-top:10px;
@@ -1187,6 +1187,17 @@ border:1px solid #1e293b;
 background:#020617;
 color:white;
 ">
+<div id="filterBar" style="
+display:flex;
+gap:8px;
+overflow-x:auto;
+margin:10px 0;
+">
+<button onclick="openFilter('date')" class="fbtn">Date ▼</button>
+<button onclick="openFilter('asset')" class="fbtn">Asset ▼</button>
+<button onclick="openFilter('amount')" class="fbtn">Amount ▼</button>
+<button onclick="openFilter('type')" class="fbtn">Type ▼</button>
+</div>
 
 <div id="history">Loading...</div>
 `;
@@ -1207,6 +1218,74 @@ if(el) el.classList.remove("nav-item-active");
 const active = document.getElementById("tab-"+tab);
 if(active) active.classList.add("nav-item-active");
 }
+window.openFilter = (type)=>{
+let html = "";
+
+if(type === "amount"){
+html = `
+<div class="sheet">
+<h3>Amount</h3>
+
+<label><input type="checkbox" value="0-200"> Up to 200</label>
+<label><input type="checkbox" value="200-500"> 200 - 500</label>
+<label><input type="checkbox" value="500-2000"> 500 - 2000</label>
+
+<button onclick="applyFilter('amount')">Apply</button>
+</div>
+`;
+}
+
+if(type === "type"){
+html = `
+<div class="sheet">
+<h3>Payment Type</h3>
+
+<button onclick="setType('sent')">Sent</button>
+<button onclick="setType('received')">Received</button>
+
+<button onclick="applyFilter('type')">Apply</button>
+</div>
+`;
+}
+
+if(type === "asset"){
+html = `
+<div class="sheet">
+<h3>Asset</h3>
+
+<button onclick="setAsset('USDT')">USDT</button>
+<button onclick="setAsset('USDC')">USDC</button>
+
+<button onclick="applyFilter('asset')">Apply</button>
+</div>
+`;
+}
+
+if(type === "date"){
+html = `
+<div class="sheet">
+<h3>Select Date</h3>
+
+<input type="date" id="filterDate"/>
+
+<button onclick="applyFilter('date')">Apply</button>
+</div>
+`;
+}
+
+document.body.insertAdjacentHTML("beforeend", `
+<div id="overlay" onclick="closeFilter()"></div>
+<div id="bottomSheet">${html}</div>
+`);
+};
+window.closeFilter = ()=>{
+document.getElementById("overlay")?.remove();
+document.getElementById("bottomSheet")?.remove();
+};
+window.applyFilter = (type)=>{
+closeFilter();
+loadHistory(); 
+};
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
 return `
