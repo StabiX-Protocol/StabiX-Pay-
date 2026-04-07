@@ -57,14 +57,6 @@ createdAt:serverTimestamp()
 });
 });
 if(!failed){
-await addDoc(collection(db, "notifications"), {
-to: toWallet,
-from: WALLET,
-amount: Number(amount),
-type: "receive",
-time: serverTimestamp(),
-read: false
-});
 if(window.isSender){
 showTxPopup(`Sent ${amount} ${asset} to ${toWallet}`, "success");
 }
