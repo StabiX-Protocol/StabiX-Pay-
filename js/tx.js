@@ -250,17 +250,18 @@ padding:12px 0;
 border-bottom:1px solid rgba(255,255,255,0.05);">
 
 <div style="display:flex;gap:10px;align-items:center">
-  <img 
-  src="${t.asset === 'USDT' 
-    ? './media/tether-usdt-logo.png' 
-    : './media/usd-coin-usdc-logo.png'}"
-  style="
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    background:#020617;
-    padding:4px;
-  "
+<img 
+src="${t.asset === 'USDT' 
+? './media/tether-usdt-logo.png' 
+: './media/usd-coin-usdc-logo.png'}"
+style="
+width:34px;
+height:34px;
+border-radius:50%;
+background:#020617;
+padding:4px;
+border:1px solid #1e293b;
+"
 />
   <div>
 <div style="font-weight:600;font-size:14px">
