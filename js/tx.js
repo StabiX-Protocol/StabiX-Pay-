@@ -243,72 +243,58 @@ const userId = t.counterparty || "Unknown";
 
 html += `
 <div style="
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px 0;
-  border-bottom:1px solid rgba(255,255,255,0.05);
-">
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 0;
+border-bottom:1px solid rgba(255,255,255,0.05);">
 
-  <!-- LEFT -->
-  <div style="display:flex;gap:10px;align-items:center">
+<div style="display:flex;gap:10px;align-items:center">
+<img 
+src="${t.asset === 'USDT' 
+? './media/tether-usdt-logo.png' 
+: './media/usd-coin-usdc-logo.png'}"
+style="
+width:34px;
+height:34px;
+border-radius:50%;
+background:#020617;
+padding:4px;
+border:1px solid #1e293b;
+"/>
+<div>
+<div style="font-weight:600;font-size:14px">
+${userId}
+</div>
+<div style="font-size:11px;opacity:.6">
+${dateStr}
+</div>
+</div>
 
-    <img 
-      src="${t.asset === 'USDT' 
-        ? './media/tether-usdt-logo.png' 
-        : './media/usd-coin-usdc-logo.png'}"
-      style="
-        width:34px;
-        height:34px;
-        border-radius:50%;
-        background:#020617;
-        padding:4px;
-        border:1px solid #1e293b;
-      "
-    />
+</div>
 
-    <div>
-      <div style="font-weight:600;font-size:14px">
-        ${userId}
-      </div>
+<div style="text-align:right">
+<div style="
+font-size:11px;
+padding:3px 8px;
+border-radius:999px;
+display:inline-block;
+background:rgba(34,197,94,0.1);
+color:${isCredit ? "#22c55e" : "#ef4444"};">
+${label}
+</div>
 
-      <div style="font-size:11px;opacity:.6">
-        ${dateStr}
-      </div>
-    </div>
-
-  </div>
-
-  <!-- RIGHT -->
-  <div style="text-align:right">
-
-  <!-- LABEL (TOP) -->
-  <div style="
-    font-size:11px;
-    padding:3px 8px;
-    border-radius:999px;
-    display:inline-block;
-    background:rgba(34,197,94,0.1);
-    color:${isCredit ? "#22c55e" : "#ef4444"};
-  ">
-    ${label}
-  </div>
-
-  <!-- AMOUNT (BOTTOM) -->
-  <div style="
-    margin-top:4px;
-    font-weight:bold;
-    color:${color};
-    font-size:15px;
-  ">
-    ${isCredit ? "+" : "-"} ${t.amount} ${t.asset || "USDT"}
-  </div>
-
+<div style="
+margin-top:4px;
+font-weight:bold;
+color:${color};
+font-size:15px;">
+${isCredit ? "+" : "-"} ${t.amount} ${t.asset || "USDT"}
+</div>
 </div>
 
 </div>
 `;
-
 });
 });
 document.getElementById("history").innerHTML =
