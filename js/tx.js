@@ -283,7 +283,7 @@ html += `
   <div style="text-align:right">
 
     <div style="font-weight:bold;color:${color};font-size:15px">
-      ${isCredit ? "+" : "-"} ${t.amount} ${t.asset}
+      ${isCredit ? "+" : "-"} ${t.amount} ${t.asset || "USDT"}
     </div>
 
     <div style="
