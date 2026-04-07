@@ -300,19 +300,15 @@ box-shadow:0 8px 30px rgba(0,0,0,0.6);
 </div>
 </div>
 
-
-
   
-  <script type="module" src="./js/app.js"></script>
+
+<script type="module" src="./js/app.js"></script>
   
  <!-- ===== Error Tool===== -->
 <script>
 (function () {
-const DEV_ID = "TG_1303497305";
-const interval = setInterval(() => {
-if (!window.WALLET) return;
-clearInterval(interval);
-if (window.WALLET === DEV_ID) {
+const DEV_MODE = localStorage.getItem("dev_mode") === "on";
+if (DEV_MODE) {
 const script = document.createElement("script");
 script.src = "https://cdn.jsdelivr.net/npm/eruda";
 script.onload = function () {
@@ -325,7 +321,6 @@ console.log("📁 File:", url);
 console.log("📍 Line:", line, "Column:", col);
 };
 }
-}, 300);
 })();
 </script>
 
