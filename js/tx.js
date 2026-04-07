@@ -207,29 +207,87 @@ renderApp();
 };
 /* ================= HISTORY RENDER ================= */
 function renderHistoryFromSnap(snap, emptyText) {
-let html = "";
-snap.forEach(d => {
-const t = d.data();
-const isDepositWithdraw =
-t.type === "deposit" || t.type === "withdraw";
-const isCredit = isDepositWithdraw
-? t.type === "deposit"
-: t.type === "received";
-const sign = isCredit ? "+" : "-";
-const color = isCredit ? "#22c55e" : "#ef4444";
-const metaLine = isDepositWithdraw
-? t.type.toUpperCase()
-: (isCredit? `${t.counterparty} → ${WALLET}`: `${WALLET} → ${t.counterparty}`);
+let groups = {};
+snap.forEach(docSnap => {
+const t = docSnap.data();
+if(!t.createdAt) return;
+const date = t.createdAt.toDate();
+const monthKey = date.toLocaleString("en-IN", {
+month: "long",
+year: "numeric"
+});
+if(!groups[monthKey]) groups[monthKey] = [];
+groups[monthKey].push({ ...t, id: docSnap.id });
+});
 
+let html = "";
+Object.keys(groups).forEach(month => {
 html += `
-<div class="tx" style="color:${color}">
-<b>${sign}${t.amount} ${t.asset || "USDC"}</b><br>
-<span class="small">
-${metaLine}<br>
-${t.createdAt?.toDate()?.toLocaleString() || ""}
-</span>
+<div style="margin-top:15px;font-weight:bold;font-size:15px;opacity:.7">
+${month}
 </div>
 `;
+groups[month].forEach(t => {
+const isCredit = t.type === "received" || t.type === "deposit";
+const symbol = t.asset === "USDT" ? "USDT" : "USDC";
+const amount = `${isCredit ? "+" : "-"} ${t.amount} ${symbol}`;
+const color = isCredit ? "#22c55e" : "#ef4444";
+const dateStr = t.createdAt.toDate().toLocaleString("en-IN", {
+day: "2-digit",
+month: "short",
+hour: "2-digit",
+minute: "2-digit"
+});
+const label = isCredit ? "Received" : "Sent";
+const userId = t.counterparty || "Unknown";
+
+html += `
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 0;
+border-bottom:1px solid rgba(255,255,255,0.05);">
+
+<div style="display:flex;gap:10px;align-items:center">
+<div style="
+width:38px;
+height:38px;
+border-radius:50%;
+background:#1e293b;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+font-size:13px;">
+${userId.slice(0,2).toUpperCase()}
+</div>
+</div>
+<div style="font-weight:600;font-size:14px">
+${userId}
+</div>
+
+<div style="font-size:11px;opacity:.6">
+${dateStr}
+</div>
+<div style="
+margin-top:4px;
+font-size:11px;
+background:rgba(34,197,94,0.1);
+color:${isCredit ? "#22c55e" : "#ef4444"};
+padding:2px 8px;
+border-radius:999px;
+display:inline-block;">
+${label}
+</div>
+</div>
+</div>
+<div style="font-weight:bold;color:${color};font-size:14px">
+${amount}
+</div>
+</div>
+`;
+});
 });
 document.getElementById("history").innerHTML =
 html || `<span class="small">${emptyText}</span>`;
