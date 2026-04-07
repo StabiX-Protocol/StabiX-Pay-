@@ -778,7 +778,7 @@ asset === "USDT"
 )
 }
 
-window.closeScanner = () => {
+window.closeScanner = async () => {
 try {
 if (qrScanner && qrScanner.getState() === 2) {
 await qrScanner.stop();
