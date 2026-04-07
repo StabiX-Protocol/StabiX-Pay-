@@ -249,20 +249,7 @@ align-items:center;
 padding:12px 0;
 border-bottom:1px solid rgba(255,255,255,0.05);">
 
-<div style="display:flex;gap:10px;align-items:center">
-<div style="
-width:38px;
-height:38px;
-border-radius:50%;
-background:#1e293b;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:bold;
-font-size:13px;">
-${userId.slice(0,2).toUpperCase()}
-</div>
-</div>
+<div style="display:flex;justify-content:space-between;align-items:center;width:100%">
 <div style="font-weight:600;font-size:14px">
 ${userId}
 </div>
