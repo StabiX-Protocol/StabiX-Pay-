@@ -221,24 +221,6 @@ groups[monthKey].push({ ...t, id: docSnap.id });
 });
 
 let html = "";
-html += `
-<input 
-  id="searchInput"
-  placeholder="Search Transactions..."
-  oninput="loadHistory()"
-  style="
-    width:100%;
-    padding:10px;
-    border-radius:10px;
-    border:1px solid #1e293b;
-    background:#020617;
-    color:white;
-    margin-bottom:12px;
-    outline:none;
-  "
-/>
-`;
-const search = document.getElementById("searchInput")?.value?.toLowerCase() || "";
 Object.keys(groups).forEach(month => {
 html += `
 <div style="margin-top:15px;font-weight:bold;font-size:15px;opacity:.7">
@@ -246,7 +228,6 @@ ${month}
 </div>
 `;
 groups[month].forEach(t => {
-if (search && !t.counterparty?.toLowerCase().includes(search)) return;
 const isCredit = t.type === "received" || t.type === "deposit";
 const symbol = t.asset === "USDT" ? "USDT" : "USDC";
 const amount = `${isCredit ? "+" : "-"} ${t.amount} ${symbol}`;
