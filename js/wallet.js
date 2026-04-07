@@ -410,6 +410,18 @@ appDiv(`
     <hr>
     <h3>Transaction History</h3>
     <input
+id="searchInput"
+placeholder="Search by TG ID..."
+style="
+width:100%;
+margin-top:10px;
+padding:10px;
+border-radius:8px;
+border:1px solid #1e293b;
+background:#020617;
+color:white;
+">
+    <input
     id="historyDate"
     type="date"
     value="${today}"
