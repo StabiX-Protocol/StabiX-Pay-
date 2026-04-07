@@ -1168,12 +1168,24 @@ selectTab("deposit");
 
 window.goHistory = () => {
 document.querySelector(".box").innerHTML = `
-<h2>Transaction History</h2>
+<div style="padding-top:4px;">
+<h2 style="margin:0 0 14px 0;">Transaction History</h2>
 <input
 id="historyDate"
 type="date"
-onchange="loadHistoryByDate()"/>
+onchange="loadHistoryByDate()"
+style="
+margin-bottom:12px;
+background:#020617;
+color:white;
+border:1px solid #1e293b;
+padding:10px;
+border-radius:10px;
+width:100%;
+box-sizing:border-box;
+"/>
 <div id="history">Loading...</div>
+</div>
 `;
 loadHistoryByDate();
 selectTab("history");
