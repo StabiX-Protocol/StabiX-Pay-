@@ -221,12 +221,11 @@ let d = new Date(t.createdAt?.seconds * 1000)
 .toISOString().slice(0,10);
 if(d !== window.filters.date) return;
 }
-  if(window.filters?.fromDate && window.filters?.toDate){
-  let d = new Date(t.createdAt.seconds * 1000)
-    .toISOString().slice(0,10);
-
-  if(d < window.filters.fromDate || d > window.filters.toDate) return;
-  }
+if(window.filters?.fromDate && window.filters?.toDate){
+let d = new Date(t.createdAt.seconds * 1000)
+.toISOString().slice(0,10);
+if(d < window.filters.fromDate || d > window.filters.toDate) return;
+}
 if(!t.createdAt) return;
 const date = t.createdAt.toDate();
 const monthKey = date.toLocaleString("en-IN", {
