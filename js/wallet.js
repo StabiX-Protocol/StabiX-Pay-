@@ -1253,10 +1253,18 @@ html = `
 `;
 }
 if(type === "date"){
+ const input = document.getElementById("filterDate");
+
+  const today = new Date().toISOString().split("T")[0];
+
+  if(input){
+    input.max = today;    
+    input.value = today;  
+  }
 html = `
 <div class="sheet">
 <h3>Select Date</h3>
-<input type="date" id="filterDate"/>
+<input type="date" id="filterDate" max="" />
 <button onclick="applyFilter('date')">Apply</button>
 </div>
 `;
