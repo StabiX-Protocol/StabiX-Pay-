@@ -1384,8 +1384,8 @@ document.querySelector('[onclick="openFilter(\'asset\')"]')
 if(type === "amount"){
 const min = document.getElementById("minAmount")?.value;
 const max = document.getElementById("maxAmount")?.value;
-window.filters.minAmount = min ? Number(min) : window.filters.minAmount || null;
-window.filters.maxAmount = max ? Number(max) : window.filters.maxAmount || null;
+window.filters.minAmount =window.filters.tempMin ?? (min ? Number(min) : null);
+window.filters.maxAmount =window.filters.tempMax ?? (max ? Number(max) : null);
 let label = "Amount ▼";
 if(window.filters.minAmount != null && window.filters.maxAmount != null){
 label = `${window.filters.minAmount} - ${window.filters.maxAmount}`;
@@ -1435,21 +1435,12 @@ loadHistory();
 };
 
 window.setAmountRange = (min, max) => {
-  window.filters.minAmount = min;
-  window.filters.maxAmount = max;
-
-  let label = "Amount ▼";
-
-  if(min != null && max != null){
-    label = `${min} - ${max}`;
-  } else if(min != null){
-    label = `${min}+`;
-  }
-
-document.getElementById("amountFilterBtn").innerText = label;
-
-  closeFilter();
-  loadHistory();
+window.filters.tempMin = min;
+window.filters.tempMax = max;
+document.querySelectorAll('.assetItem').forEach(el=>{
+el.style.border = "1px solid #1e293b";
+});
+event.currentTarget.style.border = "1px solid #2563eb";
 };
 
  /* ================= VALIDATOR PANEL ================= */
