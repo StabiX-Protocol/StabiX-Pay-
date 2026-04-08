@@ -565,10 +565,10 @@ document.getElementById("amountScreen").style.display = "none"
 document.getElementById("confirmScreen").style.display = "none"
 }
 window.closeReceive = ()=>{
-  document.getElementById("receiveScreen").style.display = "none"
+document.getElementById("receiveScreen").style.display = "none"
 }
 window.copyWallet = ()=>{
-  navigator.clipboard.writeText(WALLET)
+navigator.clipboard.writeText(WALLET)
 }
 
  /*=============Sending UI========*/
