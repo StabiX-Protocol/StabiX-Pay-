@@ -1223,15 +1223,28 @@ window.openFilter = (type)=>{
 let html = "";
 if(type === "amount"){
 html = `
-<div class="sheet">
-<h3>Amount</h3>
-<label><input type="checkbox" value="0-200"> Up to 200</label>
-<label><input type="checkbox" value="200-500"> 200 - 500</label>
-<label><input type="checkbox" value="500-2000"> 500 - 2000</label>
-<button onclick="applyFilter('amount')">Apply</button>
+<div class="filter-section">
+  <h3>Amount</h3>
+
+  <label class="filter-option">
+    <input type="radio" name="amount" value="0-100">
+    <span>0 – 100</span>
+  </label>
+
+  <label class="filter-option">
+    <input type="radio" name="amount" value="100-500">
+    <span>100 – 500</span>
+  </label>
+
+  <label class="filter-option">
+    <input type="radio" name="amount" value="500+">
+    <span>500+</span>
+  </label>
+
 </div>
 `;
 }
+  
 if(type === "type"){
 }
 
