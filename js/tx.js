@@ -216,13 +216,31 @@ if(t.type !== window.filters.type) return;
 if(window.filters.asset){
 if(t.asset !== window.filters.asset) return;
 }
+// ✅ DATE FILTER
 if(window.filters.date){
-    if(window.filters.minAmount != null || window.filters.maxAmount != null){
+  let d = new Date(t.createdAt.seconds * 1000)
+    .toISOString().slice(0,10);
+
+  if(d != window.filters.date) return;
+}
+
+// ✅ RANGE DATE (from-to)
+if(window.filters?.fromDate && window.filters?.toDate){
+  let d = new Date(t.createdAt.seconds * 1000)
+    .toISOString().slice(0,10);
+
+  if(d < window.filters.fromDate || d > window.filters.toDate) return;
+}
+
+// ✅ 🔥 AMOUNT FILTER (ALAG)
+if(window.filters.minAmount != null || window.filters.maxAmount != null){
+  const amt = Number(t.amount);
+
   if(
-    (window.filters.minAmount != null && t.amount < window.filters.minAmount) ||
-    (window.filters.maxAmount != null && t.amount > window.filters.maxAmount)
+    (window.filters.minAmount != null && amt < window.filters.minAmount) ||
+    (window.filters.maxAmount != null && amt > window.filters.maxAmount)
   ) return;
-    }
+}
 let d = new Date(t.createdAt?.seconds * 1000)
 .toISOString().slice(0,10);
 if(d !== window.filters.date) return;
