@@ -1411,8 +1411,13 @@ closeFilter();
 loadHistory();
 };
 
-window.setAmount = (amount) => {
+window.setAmount = (amount, el) => {
 window.filters.amount = amount;
+console.log("Selected amount:", amount);
+document.querySelectorAll('.filter-option').forEach(e => {
+e.style.border = '1px solid #1e293b';
+});
+el.style.border = '1px solid #2563eb';
 };
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
