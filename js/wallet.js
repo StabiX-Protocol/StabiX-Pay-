@@ -1195,7 +1195,7 @@ margin:10px 0;
 ">
 <button onclick="openFilter('date')" class="fbtn">Date ▼</button>
 <button onclick="openFilter('asset')" class="fbtn">Asset ▼</button>
-<button onclick="openFilter('amount')" class="fbtn">Amount ▼</button>
+<button id="amountFilterBtn" onclick="openFilter('amount')" class="fbtn">Amount ▼</button>
 <button onclick="openFilter('type')" class="fbtn">Type ▼</button>
 </div>
 
