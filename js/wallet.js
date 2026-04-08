@@ -1256,13 +1256,25 @@ if(type === "date"){
 const today = new Date().toISOString().split("T")[0];
 html = `
 <div class="sheet">
-  <h3 style="margin:0 0 10px 0;">Select Date</h3>
+<h3 style="margin:0 0 10px 0;">Select Date</h3>
+<input type="date" id="filterDate" value="${today}" max="${today}" />
 
-  <input type="date" id="filterDate" value="${today}" max="${today}" />
+<div style="margin-top:12px; width:100%;">
+<button onclick="enableRange()" style="width:100%;padding:12px;border-radius:10px;background:#1e293b;color:white;border:none;">
+Custom Date 
+</button>
+</div>
+<div id="rangeBox" style="display:none; margin-top:12px; width:100%;">
+<label>From</label>
+<input type="date" id="fromDate" />
+<label style="margin-top:8px;display:block;">To</label>
+<input type="date" id="toDate" />
+</div>
 
-  <button onclick="applyFilter('date')">
-    Apply Filter
-  </button>
+
+<button onclick="applyFilter('date')">
+Apply Filter
+</button>
 </div>
 `;
 }
@@ -1271,13 +1283,12 @@ document.body.insertAdjacentHTML("beforeend", `
 <div id="bottomSheet">${html}</div>
 `);
 setTimeout(() => {
-  const input = document.getElementById("filterDate");
-  const today = new Date().toISOString().split("T")[0];
-
-  if(input){
-    input.value = today;
-    input.max = today;
-  }
+const input = document.getElementById("filterDate");
+const today = new Date().toISOString().split("T")[0];
+if(input){
+input.value = today;
+input.max = today;
+}
 }, 0);
 };
 
@@ -1287,14 +1298,42 @@ document.getElementById("bottomSheet")?.remove();
 };
 
 window.applyFilter = (type)=>{
+window.filters = window.filters || {};
 if(type === "date"){
-const val = document.getElementById("filterDate")?.value;
-window.filters.date = val || null;
+const single = document.getElementById("filterDate")?.value;
+const from = document.getElementById("fromDate")?.value;
+const to = document.getElementById("toDate")?.value;
+if(from && to){
+if(from > to){
+alert("From date cannot be after To date");
+return;
+}
+window.filters.fromDate = from;
+window.filters.toDate = to;
+delete window.filters.date;
+}
+else{
+window.filters.date = single || null;
+delete window.filters.fromDate;
+delete window.filters.toDate;
+}
 }
 closeFilter();
-document.querySelector('[onclick="openFilter(\'date\')"]')
-.innerText = window.filters.date || "Date ▼";
-window.loadHistory();  
+const btn = document.querySelector('[onclick="openFilter(\'date\')"]');
+if(window.filters.fromDate && window.filters.toDate){
+btn.innerText = window.filters.fromDate + " → " + window.filters.toDate;
+} else {
+btn.innerText = window.filters.date || "Date ▼";
+}
+window.loadHistory();
+};
+
+
+window.enableRange = () => {
+document.getElementById("rangeBox").style.display = "block";
+const today = new Date().toISOString().split("T")[0];
+document.getElementById("fromDate").max = today;
+document.getElementById("toDate").max = today;
 };
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
