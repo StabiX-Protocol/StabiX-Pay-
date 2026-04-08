@@ -1224,43 +1224,32 @@ let html = "";
 if(type === "amount"){
 html = `
 <div class="sheet">
-
 <h3 style="margin:0 0 12px 0;">Amount Filter</h3>
-
-<!-- Presets -->
 <div class="assetList">
-
-  <div class="assetItem" onclick="setAmountRange(0,50)">
-    <span>0 - 50</span>
-  </div>
-
-  <div class="assetItem" onclick="setAmountRange(50,500)">
-    <span>50 - 500</span>
-  </div>
-
-  <div class="assetItem" onclick="setAmountRange(500,null)">
-    <span>500+</span>
-  </div>
-
+<div class="assetItem" onclick="setAmountRange(0,50)">
+<span>0 - 50</span>
 </div>
-
-<!-- Custom -->
+<div class="assetItem" onclick="setAmountRange(50,500)">
+<span>50 - 500</span>
+</div>
+<div class="assetItem" onclick="setAmountRange(500,null)">
+<span>500+</span>
+</div>
+</div>
 <div style="margin-top:14px;">
-  <input type="number" id="minAmount" placeholder="Min Amount" />
-  <input type="number" id="maxAmount" placeholder="Max Amount" style="margin-top:10px;" />
+<input type="number" id="minAmount" placeholder="Min Amount" />
+<input type="number" id="maxAmount" placeholder="Max Amount" style="margin-top:10px;" />
 </div>
-
+<button onclick="clearFilters()" 
+style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
+background:#1e293b;color:#e5e7eb;border:none;">
+Clear Filter
+</button>
 <button onclick="applyFilter('amount')" class="applyBtn">
   Apply Filter
 </button>
-
-<button onclick="clearAmountFilter()" class="clearBtn">
-  Clear Filter
-</button>
-
 </div>
 `;
-
 }
   
 if(type === "type"){
