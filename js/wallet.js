@@ -1223,26 +1223,36 @@ window.openFilter = (type)=>{
 let html = "";
 if(type === "amount"){
 html = `
-<div class="sheet">
-  <h3>Amount</h3>
+  <div class="sheet">
+    <h3 style="margin:0 0 12px 0;">Amount</h3>
 
-  <label class="filter-option">
-    <input type="radio" name="amount" value="0-100">
-    <span>0 – 100</span>
-  </label>
+    <label class="filter-option">
+      <input type="radio" name="amount" value="0-100">
+      <span>0 – 100</span>
+    </label>
 
-  <label class="filter-option">
-    <input type="radio" name="amount" value="100-500">
-    <span>100 – 500</span>
-  </label>
+    <label class="filter-option">
+      <input type="radio" name="amount" value="100-500">
+      <span>100 – 500</span>
+    </label>
 
-  <label class="filter-option">
-    <input type="radio" name="amount" value="500+">
-    <span>500+</span>
-  </label>
+    <label class="filter-option">
+      <input type="radio" name="amount" value="500+">
+      <span>500+</span>
+    </label>
 
-</div>
-`;
+    <button onclick="clearFilters()"
+    style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
+    background:#1e293b;color:#e5e7eb;border:none;">
+    Clear Filter
+    </button>
+
+    <button onclick="applyFilter('amount')" class="applyBtn">
+      Apply
+    </button>
+
+  </div>
+  `;
 }
   
 if(type === "type"){
