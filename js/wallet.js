@@ -1382,23 +1382,19 @@ document.querySelector('[onclick="openFilter(\'asset\')"]')
 .innerText = val || "Asset ▼";
 }
 if(type === "amount"){
-  const min = document.getElementById("minAmount")?.value;
-  const max = document.getElementById("maxAmount")?.value;
-
-  window.filters.minAmount = min ? Number(min) : window.filters.minAmount || null;
-  window.filters.maxAmount = max ? Number(max) : window.filters.maxAmount || null;
-
-  let label = "Amount ▼";
-
-  if(window.filters.minAmount != null && window.filters.maxAmount != null){
-    label = `${window.filters.minAmount} - ${window.filters.maxAmount}`;
-  } else if(window.filters.minAmount != null){
-    label = `${window.filters.minAmount}+`;
-  } else if(window.filters.maxAmount != null){
-    label = `< ${window.filters.maxAmount}`;
-  }
-
-  document.getElementById("amountFilterBtn").innerText = label;
+const min = document.getElementById("minAmount")?.value;
+const max = document.getElementById("maxAmount")?.value;
+window.filters.minAmount = min ? Number(min) : window.filters.minAmount || null;
+window.filters.maxAmount = max ? Number(max) : window.filters.maxAmount || null;
+let label = "Amount ▼";
+if(window.filters.minAmount != null && window.filters.maxAmount != null){
+label = `${window.filters.minAmount} - ${window.filters.maxAmount}`;
+} else if(window.filters.minAmount != null){
+label = `${window.filters.minAmount}+`;
+} else if(window.filters.maxAmount != null){
+label = `< ${window.filters.maxAmount}`;
+}
+document.getElementById("amountFilterBtn").innerText = label;
 }
 };
 
@@ -1450,7 +1446,7 @@ window.setAmountRange = (min, max) => {
     label = `${min}+`;
   }
 
-  document.getElementById("amountFilterBtn").innerText = label;
+document.getElementById("amountFilterBtn")?.innerText = label;
 
   closeFilter();
   loadHistory();
