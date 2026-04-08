@@ -1233,6 +1233,9 @@ html = `
 `;
 }
 if(type === "type"){
+}
+
+if(type === "asset"){
 html = `
 <div class="sheet">
 
@@ -1256,16 +1259,6 @@ html = `
   Apply
 </button>
 
-</div>
-`;
-}
-if(type === "asset"){
-html = `
-<div class="sheet">
-<h3>Asset</h3>
-<button onclick="setAsset('USDT')">USDT</button>
-<button onclick="setAsset('USDC')">USDC</button>
-<button onclick="applyFilter('asset')">Apply</button>
 </div>
 `;
 }
@@ -1321,6 +1314,7 @@ document.getElementById("bottomSheet")?.remove();
 
 window.applyFilter = (type)=>{
 window.filters = window.filters || {};
+
 if(type === "date"){
 const single = document.getElementById("filterDate")?.value;
 const from = document.getElementById("fromDate")?.value;
@@ -1348,6 +1342,13 @@ btn.innerText = window.filters.fromDate + " → " + window.filters.toDate;
 btn.innerText = window.filters.date || "Date ▼";
 }
 window.loadHistory();
+
+if(type === "asset"){
+const val = window.filters.asset || null;
+window.filters.asset = val;
+document.querySelector('[onclick="openFilter(\'asset\')"]')
+.innerText = val || "Asset ▼";
+}
 };
 
 window.enableRange = () => {
