@@ -1223,36 +1223,44 @@ window.openFilter = (type)=>{
 let html = "";
 if(type === "amount"){
 html = `
-  <div class="sheet">
-    <h3 style="margin:0 0 12px 0;">Amount</h3>
+<div class="sheet">
 
-    <label class="filter-option">
-      <input type="radio" name="amount" value="0-100">
-      <span>0 – 100</span>
-    </label>
+<h3 style="margin:0 0 12px 0;">Amount Filter</h3>
 
-    <label class="filter-option">
-      <input type="radio" name="amount" value="100-500">
-      <span>100 – 500</span>
-    </label>
+<!-- Presets -->
+<div class="assetList">
 
-    <label class="filter-option">
-      <input type="radio" name="amount" value="500+">
-      <span>500+</span>
-    </label>
-
-    <button onclick="clearFilters()"
-    style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
-    background:#1e293b;color:#e5e7eb;border:none;">
-    Clear Filter
-    </button>
-
-    <button onclick="applyFilter('amount')" class="applyBtn">
-      Apply
-    </button>
-
+  <div class="assetItem" onclick="setAmountRange(0,50)">
+    <span>0 - 50</span>
   </div>
-  `;
+
+  <div class="assetItem" onclick="setAmountRange(50,500)">
+    <span>50 - 500</span>
+  </div>
+
+  <div class="assetItem" onclick="setAmountRange(500,null)">
+    <span>500+</span>
+  </div>
+
+</div>
+
+<!-- Custom -->
+<div style="margin-top:14px;">
+  <input type="number" id="minAmount" placeholder="Min Amount" />
+  <input type="number" id="maxAmount" placeholder="Max Amount" style="margin-top:10px;" />
+</div>
+
+<button onclick="applyFilter('amount')" class="applyBtn">
+  Apply Filter
+</button>
+
+<button onclick="clearAmountFilter()" class="clearBtn">
+  Clear Filter
+</button>
+
+</div>
+`;
+
 }
   
 if(type === "type"){
@@ -1373,6 +1381,25 @@ window.filters.asset = val;
 document.querySelector('[onclick="openFilter(\'asset\')"]')
 .innerText = val || "Asset ▼";
 }
+if(type === "amount"){
+  const min = document.getElementById("minAmount")?.value;
+  const max = document.getElementById("maxAmount")?.value;
+
+  window.filters.minAmount = min ? Number(min) : window.filters.minAmount || null;
+  window.filters.maxAmount = max ? Number(max) : window.filters.maxAmount || null;
+
+  let label = "Amount ▼";
+
+  if(window.filters.minAmount != null && window.filters.maxAmount != null){
+    label = `${window.filters.minAmount} - ${window.filters.maxAmount}`;
+  } else if(window.filters.minAmount != null){
+    label = `${window.filters.minAmount}+`;
+  } else if(window.filters.maxAmount != null){
+    label = `< ${window.filters.maxAmount}`;
+  }
+
+  document.getElementById("amountFilterBtn").innerText = label;
+}
 };
 
 window.enableRange = () => {
@@ -1411,14 +1438,24 @@ closeFilter();
 loadHistory();
 };
 
-window.setAmount = (amount, el) => {
-window.filters.amount = amount;
-console.log("Selected amount:", amount);
-document.querySelectorAll('.filter-option').forEach(e => {
-e.style.border = '1px solid #1e293b';
-});
-el.style.border = '1px solid #2563eb';
+window.setAmountRange = (min, max) => {
+  window.filters.minAmount = min;
+  window.filters.maxAmount = max;
+
+  let label = "Amount ▼";
+
+  if(min != null && max != null){
+    label = `${min} - ${max}`;
+  } else if(min != null){
+    label = `${min}+`;
+  }
+
+  document.getElementById("amountFilterBtn").innerText = label;
+
+  closeFilter();
+  loadHistory();
 };
+
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
 return `
