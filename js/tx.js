@@ -218,10 +218,10 @@ if(t.asset !== window.filters.asset) return;
 }
 if(window.filters.date){
     if(window.filters.minAmount != null || window.filters.maxAmount != null){
-  const amt = Number(t.amount);
-
-  if(window.filters.minAmount != null && amt < window.filters.minAmount) return;
-  if(window.filters.maxAmount != null && amt > window.filters.maxAmount) return;
+  if(
+    (window.filters.minAmount != null && t.amount < window.filters.minAmount) ||
+    (window.filters.maxAmount != null && t.amount > window.filters.maxAmount)
+  ) return;
     }
 let d = new Date(t.createdAt?.seconds * 1000)
 .toISOString().slice(0,10);
