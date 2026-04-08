@@ -216,14 +216,13 @@ if(t.type !== window.filters.type) return;
 if(window.filters.asset){
 if(t.asset !== window.filters.asset) return;
 }
-  if(window.filters.amount){
+if(window.filters.date){
+    if(window.filters.minAmount != null || window.filters.maxAmount != null){
   const amt = Number(t.amount);
 
-  if(window.filters.amount === "0-100" && !(amt <= 100)) return;
-  if(window.filters.amount === "100-500" && !(amt > 100 && amt <= 500)) return;
-  if(window.filters.amount === "500+" && !(amt > 500)) return;
-  }
-if(window.filters.date){
+  if(window.filters.minAmount != null && amt < window.filters.minAmount) return;
+  if(window.filters.maxAmount != null && amt > window.filters.maxAmount) return;
+    }
 let d = new Date(t.createdAt?.seconds * 1000)
 .toISOString().slice(0,10);
 if(d !== window.filters.date) return;
