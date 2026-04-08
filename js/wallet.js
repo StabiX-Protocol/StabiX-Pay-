@@ -1235,10 +1235,27 @@ html = `
 if(type === "type"){
 html = `
 <div class="sheet">
-<h3>Payment Type</h3>
-<button onclick="setType('sent')">Sent</button>
-<button onclick="setType('received')">Received</button>
-<button onclick="applyFilter('type')">Apply</button>
+
+<h3 style="margin:0 0 12px 0;">Select Asset</h3>
+
+<div class="assetList">
+
+  <div class="assetItem" onclick="setAsset('USDT')">
+    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" />
+    <span>USDT</span>
+  </div>
+
+  <div class="assetItem" onclick="setAsset('USDC')">
+    <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" />
+    <span>USDC</span>
+  </div>
+
+</div>
+
+<button onclick="applyFilter('asset')" class="applyBtn">
+  Apply
+</button>
+
 </div>
 `;
 }
@@ -1352,6 +1369,14 @@ document.querySelector('[onclick="openFilter(\'type\')"]')
 .innerText = "Type ▼";
 closeFilter();
 window.loadHistory();
+};
+
+window.setAsset = (asset) => {
+window.filters.asset = asset;
+document.querySelectorAll('.assetItem').forEach(el=>{
+el.style.border = '1px solid #1e293b';
+});
+event.currentTarget.style.border = '1px solid #2563eb';
 };
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
