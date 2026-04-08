@@ -1250,7 +1250,9 @@ html = `
 </div>
 </div>
 
-<button onclick="clearAssetFilter()" class="clearBtn">
+<button onclick="clearFilters()" 
+style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
+background:#1e293b;color:#e5e7eb;border:none;">
 Clear Filter
 </button>
 
@@ -1283,7 +1285,7 @@ Custom Date
 <button onclick="clearFilters()" 
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
 background:#1e293b;color:#e5e7eb;border:none;">
-  Clear Filter
+Clear Filter
 </button>
 
 <button onclick="applyFilter('date')">
