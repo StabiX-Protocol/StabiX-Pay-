@@ -1223,7 +1223,7 @@ window.openFilter = (type)=>{
 let html = "";
 if(type === "amount"){
 html = `
-<div class="filter-section">
+<div class="sheet">
   <h3>Amount</h3>
 
   <label class="filter-option">
