@@ -822,7 +822,7 @@ const file = e.target.files[0];
 if (!file) return;
 try {
 const html5Qr = new Html5Qrcode("qr-reader");
-const result = await html5Qr.scanFile(file, flse);
+const result = await html5Qr.scanFile(file, false);
 await html5Qr.clear();
 let data;
 try {
