@@ -1276,6 +1276,12 @@ Custom Date
 Apply Filter
 </button>
 </div>
+
+<button onclick="clearFilters()" 
+style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
+background:#1e293b;color:#e5e7eb;border:none;">
+  Clear Filter
+</button>
 `;
 }
 document.body.insertAdjacentHTML("beforeend", `
@@ -1328,12 +1334,25 @@ btn.innerText = window.filters.date || "Date ▼";
 window.loadHistory();
 };
 
-
 window.enableRange = () => {
 document.getElementById("rangeBox").style.display = "block";
 const today = new Date().toISOString().split("T")[0];
 document.getElementById("fromDate").max = today;
 document.getElementById("toDate").max = today;
+};
+
+window.clearFilters = () => {
+window.filters = {};
+document.querySelector('[onclick="openFilter(\'date\')"]')
+.innerText = "Date ▼";
+document.querySelector('[onclick="openFilter(\'asset\')"]')
+.innerText = "Asset ▼";
+document.querySelector('[onclick="openFilter(\'amount\')"]')
+.innerText = "Amount ▼";
+document.querySelector('[onclick="openFilter(\'type\')"]')
+.innerText = "Type ▼";
+closeFilter();
+window.loadHistory();
 };
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
