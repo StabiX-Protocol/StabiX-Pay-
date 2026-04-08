@@ -1446,7 +1446,7 @@ window.setAmountRange = (min, max) => {
     label = `${min}+`;
   }
 
-document.getElementById("amountFilterBtn")?.innerText = label;
+document.getElementById("amountFilterBtn").innerText = label;
 
   closeFilter();
   loadHistory();
