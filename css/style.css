@@ -667,9 +667,33 @@ border-radius:20px 20px 0 0;
 z-index:1000;
 }
 
-.sheet button{
-width:100%;
-margin-top:10px;
-padding:10px;
-border-radius:10px;
+.sheet {
+  padding: 16px;
+  background: #0f172a;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.sheet input {
+  width: 100%;
+  box-sizing: border-box;  
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  background: #020617;
+  color: white;
+  margin-top: 10px;
+}
+
+.sheet button {
+  width: 100%;           
+  box-sizing: border-box;   
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
 }
