@@ -678,6 +678,7 @@ white-space:nowrap;
   align-items: stretch; 
   max-width: 500px;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .sheet input {
@@ -690,6 +691,7 @@ white-space:nowrap;
   background: #020617;
   color: white;
   margin-top: 10px;
+  display: block;
 }
 
 .sheet button {
