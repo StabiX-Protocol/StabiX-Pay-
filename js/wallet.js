@@ -1271,17 +1271,16 @@ Custom Date
 <input type="date" id="toDate" />
 </div>
 
-
-<button onclick="applyFilter('date')">
-Apply Filter
-</button>
-</div>
-
 <button onclick="clearFilters()" 
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
 background:#1e293b;color:#e5e7eb;border:none;">
   Clear Filter
 </button>
+
+<button onclick="applyFilter('date')">
+Apply Filter
+</button>
+</div>
 `;
 }
 document.body.insertAdjacentHTML("beforeend", `
