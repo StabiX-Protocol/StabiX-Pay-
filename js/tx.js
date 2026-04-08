@@ -136,7 +136,7 @@ alert("Deposit request sent to validator")
 renderApp()
 }
 /* ================= HISTORY ================= */
-async function loadHistory() {
+window.loadHistory = async function() {
 const q = query(
 collection(db, "transactions"),
 where("userId", "==", WALLET)
