@@ -1410,6 +1410,10 @@ document.getElementById("assetFilterBtn").innerText = "Asset ▼";
 closeFilter();
 loadHistory();
 };
+
+window.setAmount = (amount) => {
+window.filters.amount = amount;
+};
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
 return `
