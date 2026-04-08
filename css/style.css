@@ -659,17 +659,14 @@ white-space:nowrap;
 
 #bottomSheet {
   position: fixed;
-  bottom: 0;          /* 🔥 always bottom */
+  bottom: 70px;  /* 🔥 yaha change kar */
   left: 0;
   width: 100%;
-
   background: #0f172a;
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
-
   padding: 16px;
 }
-
 .sheet {
   padding: 16px;
   background: #0f172a;
