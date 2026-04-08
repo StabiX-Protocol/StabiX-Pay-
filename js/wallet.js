@@ -1256,11 +1256,15 @@ if(type === "date"){
 const today = new Date().toISOString().split("T")[0];
 html = `
 <div class="sheet">
-    <h3>Select Date</h3>
-    <input type="date" id="filterDate" value="${today}" max="${today}" />
-    <button onclick="applyFilter('date')">Apply</button>
-  </div>
-  `;
+  <h3 style="margin:0 0 10px 0;">Select Date</h3>
+
+  <input type="date" id="filterDate" value="${today}" max="${today}" />
+
+  <button onclick="applyFilter('date')">
+    Apply Filter
+  </button>
+</div>
+`;
 }
 document.body.insertAdjacentHTML("beforeend", `
 <div id="overlay" onclick="closeFilter()"></div>
