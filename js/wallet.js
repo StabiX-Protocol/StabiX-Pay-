@@ -1218,66 +1218,55 @@ if(el) el.classList.remove("nav-item-active");
 const active = document.getElementById("tab-"+tab);
 if(active) active.classList.add("nav-item-active");
 }
+ /* ================= Filter ================= */
 window.openFilter = (type)=>{
 let html = "";
-
 if(type === "amount"){
 html = `
 <div class="sheet">
 <h3>Amount</h3>
-
 <label><input type="checkbox" value="0-200"> Up to 200</label>
 <label><input type="checkbox" value="200-500"> 200 - 500</label>
 <label><input type="checkbox" value="500-2000"> 500 - 2000</label>
-
 <button onclick="applyFilter('amount')">Apply</button>
 </div>
 `;
 }
-
 if(type === "type"){
 html = `
 <div class="sheet">
 <h3>Payment Type</h3>
-
 <button onclick="setType('sent')">Sent</button>
 <button onclick="setType('received')">Received</button>
-
 <button onclick="applyFilter('type')">Apply</button>
 </div>
 `;
 }
-
 if(type === "asset"){
 html = `
 <div class="sheet">
 <h3>Asset</h3>
-
 <button onclick="setAsset('USDT')">USDT</button>
 <button onclick="setAsset('USDC')">USDC</button>
-
 <button onclick="applyFilter('asset')">Apply</button>
 </div>
 `;
 }
-
 if(type === "date"){
 html = `
 <div class="sheet">
 <h3>Select Date</h3>
-
 <input type="date" id="filterDate"/>
-
 <button onclick="applyFilter('date')">Apply</button>
 </div>
 `;
 }
-
 document.body.insertAdjacentHTML("beforeend", `
 <div id="overlay" onclick="closeFilter()"></div>
 <div id="bottomSheet">${html}</div>
 `);
 };
+
 window.closeFilter = ()=>{
 document.getElementById("overlay")?.remove();
 document.getElementById("bottomSheet")?.remove();
@@ -1285,6 +1274,15 @@ document.getElementById("bottomSheet")?.remove();
 window.applyFilter = (type)=>{
 closeFilter();
 loadHistory(); 
+};
+
+window.applyFilter = (type)=>{
+if(type === "date"){
+const val = document.getElementById("filterDate")?.value;
+window.filters.date = val || null;
+}
+closeFilter();
+window.loadHistory();  
 };
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
