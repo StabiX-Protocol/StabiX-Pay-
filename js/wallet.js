@@ -1282,6 +1282,8 @@ const val = document.getElementById("filterDate")?.value;
 window.filters.date = val || null;
 }
 closeFilter();
+document.querySelector('[onclick="openFilter(\'date\')"]')
+.innerText = window.filters.date || "Date ▼";
 window.loadHistory();  
 };
  /* ================= VALIDATOR PANEL ================= */
