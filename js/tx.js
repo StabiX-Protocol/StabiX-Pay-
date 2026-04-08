@@ -216,6 +216,13 @@ if(t.type !== window.filters.type) return;
 if(window.filters.asset){
 if(t.asset !== window.filters.asset) return;
 }
+  if(window.filters.amount){
+  const amt = Number(t.amount);
+
+  if(window.filters.amount === "0-100" && !(amt <= 100)) return;
+  if(window.filters.amount === "100-500" && !(amt > 100 && amt <= 500)) return;
+  if(window.filters.amount === "500+" && !(amt > 500)) return;
+  }
 if(window.filters.date){
 let d = new Date(t.createdAt?.seconds * 1000)
 .toISOString().slice(0,10);
