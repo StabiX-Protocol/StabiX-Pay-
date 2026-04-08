@@ -1432,6 +1432,15 @@ el.style.border = "1px solid #1e293b";
 event.currentTarget.style.border = "1px solid #2563eb";
 };
 
+window.clearAmountFilter = () => {
+window.filters.minAmount = null;
+window.filters.maxAmount = null;
+const btn = document.getElementById("amountFilterBtn");
+if(btn) btn.innerText = "Amount ▼";
+closeFilter();
+loadHistory();
+};
+
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
 return `
