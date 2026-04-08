@@ -1253,35 +1253,33 @@ html = `
 `;
 }
 if(type === "date"){
- const input = document.getElementById("filterDate");
-
-  const today = new Date().toISOString().split("T")[0];
-
-  if(input){
-    input.max = today;    
-    input.value = today;  
-  }
+const today = new Date().toISOString().split("T")[0];
 html = `
 <div class="sheet">
-<h3>Select Date</h3>
-<input type="date" id="filterDate" max="" />
-<button onclick="applyFilter('date')">Apply</button>
-</div>
-`;
+    <h3>Select Date</h3>
+    <input type="date" id="filterDate" value="${today}" max="${today}" />
+    <button onclick="applyFilter('date')">Apply</button>
+  </div>
+  `;
 }
 document.body.insertAdjacentHTML("beforeend", `
 <div id="overlay" onclick="closeFilter()"></div>
 <div id="bottomSheet">${html}</div>
 `);
+setTimeout(() => {
+  const input = document.getElementById("filterDate");
+  const today = new Date().toISOString().split("T")[0];
+
+  if(input){
+    input.value = today;
+    input.max = today;
+  }
+}, 0);
 };
 
 window.closeFilter = ()=>{
 document.getElementById("overlay")?.remove();
 document.getElementById("bottomSheet")?.remove();
-};
-window.applyFilter = (type)=>{
-closeFilter();
-loadHistory(); 
 };
 
 window.applyFilter = (type)=>{
