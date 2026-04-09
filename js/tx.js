@@ -489,9 +489,14 @@ const userId = document.getElementById("vUser").value.trim()
 const type = document.getElementById("vType").value
 const amount = Number(document.getElementById("vAmount").value)
 const asset = document.getElementById("vAsset").value
+const eoa = document.getElementById("vEOA").value.trim();
 if(!userId || !amount){
 alert("Invalid input")
 return
+}
+if((type === "deposit" || type === "withdraw") && !eoa){
+  alert("EOA required")
+  return
 }
 const ref = doc(db,"users",userId)
 const snap = await getDoc(ref)
@@ -530,6 +535,7 @@ type: type, // deposit / withdraw
 amount: amount,
 asset: asset,
 counterparty: null,
+eoa: eoa,
 createdAt: new Date()
 });
 alert(asset + " updated")
