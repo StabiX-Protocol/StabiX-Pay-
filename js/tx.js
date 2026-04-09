@@ -367,92 +367,93 @@ window.openTxDetail = async (txId) => {
   }
 
   document.querySelector(".box").innerHTML = `
-<div style="padding:20px;">
+<div style="padding:20px 16px 100px; position:relative;">
 
-  <!-- 🔙 TOP BAR -->
-  <div style="display:flex;align-items:center;justify-content:space-between;">
-    <div onclick="goHistory()" style="
-      font-size:18px;
-      cursor:pointer;
-      padding:8px 12px;
-      border-radius:10px;
-      background:#111827;
-    ">←</div>
-  </div>
-
-  <!-- 💰 AMOUNT -->
-  <div style="
-    text-align:center;
-    margin-top:30px;
-    font-size:38px;
-    font-weight:700;
-    letter-spacing:0.5px;
-  ">
-    ${t.amount} ${t.asset || "USDT"}
-  </div>
-
-  <!-- 🔁 TYPE (Sent / Received) -->
-<div style="
-text-align:center;
-margin-top:6px;
-color:${isCredit ? "#22c55e" : "#ef4444"};
-font-weight:600;
-font-size:14px;
-">
- ${t.type === "deposit" ? "Deposit" : 
-  t.type === "withdraw" ? "Withdraw" : 
-  (isCredit ? "⬇ Received" : "⬆ Sent")}
-</div>
-
-  <!-- ✅ STATUS -->
-  <div style="
-    text-align:center;
-    margin-top:10px;
-    color:#22c55e;
-    font-weight:600;
+  <!-- 🔙 BACK BUTTON -->
+  <div onclick="goHistory()" style="
+    position:absolute;
+    top:20px;
+    left:16px;
+    width:36px;
+    height:36px;
+    border-radius:10px;
+    background:#111827;
     display:flex;
-    justify-content:center;
     align-items:center;
-    gap:6px;
-  ">
-    ✔ Completed
-  </div>
+    justify-content:center;
+    cursor:pointer;
+  ">←</div>
 
-  <!-- 📅 DATE -->
-  <div style="
-    text-align:center;
-    margin-top:6px;
-    color:#9ca3af;
-    font-size:13px;
-  ">
-    ${t.createdAt?.toDate().toLocaleString() || "-"}
+  <!-- 💰 AMOUNT + STATUS -->
+  <div style="text-align:center;margin-top:40px;">
+
+    <div style="
+      font-size:36px;
+      font-weight:700;
+      letter-spacing:0.5px;
+    ">
+      ${t.amount} ${t.asset || "USDT"}
+    </div>
+
+    <div style="
+      margin-top:6px;
+      font-size:15px;
+      font-weight:600;
+      color:${t.type === "deposit" ? "#22c55e" : "#ef4444"};
+    ">
+      ${t.type === "deposit" ? "Received" : "Withdraw"}
+    </div>
+
+    <div style="
+      margin-top:8px;
+      font-size:14px;
+      color:#22c55e;
+      font-weight:600;
+    ">
+      ✔ Completed
+    </div>
+
+    <div style="
+      margin-top:6px;
+      font-size:12px;
+      color:#9ca3af;
+    ">
+      ${t.createdAt?.toDate().toLocaleString() || "-"}
+    </div>
+
   </div>
 
   <!-- LINE -->
-  <div style="margin:20px 0;height:1px;background:#1f2937;"></div>
+  <div style="margin:20px 0;height:1px;background:rgba(255,255,255,0.08);"></div>
 
   <!-- 📦 DETAILS BOX -->
   <div style="
-    background:#020617;
-    border:1px solid #1e293b;
-    border-radius:14px;
-    padding:14px;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:16px;
+    padding:16px;
   ">
-   <div style="margin-bottom:10px;">
-  <div style="color:#9ca3af;font-size:12px;">From</div>
-  <div style="font-weight:600;">${from}</div>
-</div>
+    
+    <div style="margin-bottom:14px;">
+      <div style="color:#9ca3af;font-size:12px;">From</div>
+      <div style="font-weight:600;font-size:14px;word-break:break-all;">
+        ${from}
+      </div>
+    </div>
 
-<div style="margin-bottom:10px;">
-  <div style="color:#9ca3af;font-size:12px;">To</div>
-  <div style="font-weight:600;">${to}</div>
-</div>
-    
-    
+    <div>
+      <div style="color:#9ca3af;font-size:12px;">To</div>
+      <div style="font-weight:600;font-size:14px;word-break:break-all;">
+        ${to}
+      </div>
+    </div>
+
   </div>
 
 </div>
 `;
+
+
   
 };
 
