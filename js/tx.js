@@ -349,6 +349,21 @@ window.openTxDetail = async (txId) => {
 
   const isCredit = t.type === "received" || t.type === "deposit";
   const amount = `${isCredit ? "+" : "-"} ${t.amount} ${t.asset || "USDT"}`;
+  
+  let from = "";
+  let to = "";
+  if(t.type === "deposit"){
+  from = t.eoa || "External";
+  to = t.userId;
+  }
+  else if(t.type === "withdraw"){
+  from = t.userId;
+  to = t.eoa || "External";
+  }
+  else{
+  from = isCredit ? (t.counterparty || "System") : t.userId;
+  to = isCredit ? t.userId : (t.counterparty || "System");
+  }
 
   document.querySelector(".box").innerHTML = `
 <div style="padding:20px;">
@@ -383,7 +398,9 @@ color:${isCredit ? "#22c55e" : "#ef4444"};
 font-weight:600;
 font-size:14px;
 ">
-  ${isCredit ? "⬇ Received" : "⬆ Sent"}
+ ${t.type === "deposit" ? "Deposit" : 
+  t.type === "withdraw" ? "Withdraw" : 
+  (isCredit ? "⬇ Received" : "⬆ Sent")
 </div>
 
   <!-- ✅ STATUS -->
@@ -420,16 +437,16 @@ font-size:14px;
     border-radius:14px;
     padding:14px;
   ">
+   <div style="margin-bottom:10px;">
+  <div style="color:#9ca3af;font-size:12px;">From</div>
+  <div style="font-weight:600;">${from}</div>
+</div>
 
-    <div style="margin-bottom:10px;">
-      <div style="color:#9ca3af;font-size:12px;">From</div>
-      <div style="font-weight:600;">${isCredit ? t.counterparty : t.counterparty}</div>
-    </div>
-
-    <div style="margin-bottom:10px;">
-      <div style="color:#9ca3af;font-size:12px;">To</div>
-      <div style="font-weight:600;">${isCredit ? t.userId : t.counterparty}</div>
-    </div>
+<div style="margin-bottom:10px;">
+  <div style="color:#9ca3af;font-size:12px;">To</div>
+  <div style="font-weight:600;">${to}</div>
+</div>
+    
     
   </div>
 
