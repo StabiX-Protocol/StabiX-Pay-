@@ -401,7 +401,7 @@ font-size:14px;
 ">
  ${t.type === "deposit" ? "Deposit" : 
   t.type === "withdraw" ? "Withdraw" : 
-  (isCredit ? "⬇ Received" : "⬆ Sent")
+  (isCredit ? "⬇ Received" : "⬆ Sent")}
 </div>
 
   <!-- ✅ STATUS -->
