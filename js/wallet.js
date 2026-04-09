@@ -1236,7 +1236,7 @@ html = `
 <span>500+</span>
 </div>
 </div>
-<button onclick="clearAmountFilter()">
+<button onclick="clearAmountFilter()" 
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
 background:#1e293b;color:#e5e7eb;border:none;">
 Clear Filter
@@ -1266,7 +1266,7 @@ html = `
 </div>
 </div>
 
-<button onclick="clearAssetFilter()">
+<button onclick="clearAssetFilter()" 
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
 background:#1e293b;color:#e5e7eb;border:none;">
 Clear Filter
@@ -1298,7 +1298,7 @@ Custom Date
 <input type="date" id="toDate" />
 </div>
 
-<button onclick="clearDateFilter()">
+<button onclick="clearDateFilter()" 
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
 background:#1e293b;color:#e5e7eb;border:none;">
 Clear Filter
