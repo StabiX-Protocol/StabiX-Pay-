@@ -1419,11 +1419,6 @@ closeFilter();
 loadHistory();
 };
 
-
-
-
-
-
 window.clearAmountFilter = () => {
 window.filters.minAmount = null;
 window.filters.maxAmount = null;
