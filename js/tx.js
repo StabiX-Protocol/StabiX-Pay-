@@ -430,12 +430,7 @@ font-size:14px;
       <div style="color:#9ca3af;font-size:12px;">To</div>
       <div style="font-weight:600;">${isCredit ? t.userId : t.counterparty}</div>
     </div>
-
     
-    <div style="font-size:13px;">
-      ${t.id || "-"}
-    </div>
-
   </div>
 
 </div>
