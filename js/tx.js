@@ -162,7 +162,8 @@ const q = query(
 collection(db, "transactions"),
 where("userId", "==", WALLET),
 where("createdAt", ">=", start),
-where("createdAt", "<=", end)
+where("createdAt", "<=", end),
+orderBy("createdAt", "desc")
 );
 const snap = await getDocs(q);
 renderHistoryFromSnap(snap, "No transactions for this date");
@@ -247,7 +248,7 @@ groups[monthKey].push({ ...t, id: docSnap.id });
 });
 
 let html = "";
-Object.keys(groups).forEach(month => {
+Object.keys(groups).sort((a, b) => new Date(b) - new Date(a)) .forEach(month => {
 html += `
 <div style="margin-top:16px;margin-bottom:6px;font-weight:700;font-size:18px;color:#cbd5f5;">
 ${month}
@@ -481,8 +482,8 @@ alert("Invalid input")
 return
 }
 if((type === "deposit" || type === "withdraw") && !eoa){
-  alert("EOA required")
-  return
+alert("EOA required")
+return
 }
 const ref = doc(db,"users",userId)
 const snap = await getDoc(ref)
@@ -517,7 +518,7 @@ usdtBalance: balance
 }
 await addDoc(collection(db,"transactions"),{
 userId: userId,
-type: type, // deposit / withdraw
+type: type, 
 amount: amount,
 asset: asset,
 counterparty: null,
