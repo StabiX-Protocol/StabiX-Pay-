@@ -1205,7 +1205,7 @@ onblur="this.style.border='1px solid #1e293b'"
 <svg viewBox="0 0 24 24" fill="none" style="
 position:absolute;
 left:12px;
-top:55%;
+top:70%;
 transform:translateY(-50%);
 width:16px;
 height:16px;
