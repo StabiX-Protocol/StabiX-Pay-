@@ -129,6 +129,7 @@ asset: window.primaryAsset,
 walletAddress:"",
 txHash: txHash,
 status:"pending",
+eoa: eoa,
 createdAt: serverTimestamp()
 })
 await updateDoc(userRef,{ pendingRequest:true })
@@ -651,6 +652,7 @@ type: r.type,
 amount: r.amount,
 asset: asset,
 counterparty: null,
+eoa: r.eoa || null,
 createdAt: serverTimestamp()
 });
 });
