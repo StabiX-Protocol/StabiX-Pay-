@@ -1419,14 +1419,10 @@ closeFilter();
 loadHistory();
 };
 
-window.setAmountRange = (min, max) => {
-window.filters.tempMin = min;
-window.filters.tempMax = max;
-document.querySelectorAll('.assetItem').forEach(el=>{
-el.style.border = "1px solid #1e293b";
-});
-event.currentTarget.style.border = "1px solid #2563eb";
-};
+
+
+
+
 
 window.clearAmountFilter = () => {
 window.filters.minAmount = null;
