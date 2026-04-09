@@ -351,44 +351,61 @@ window.openTxDetail = async (txId) => {
   const amount = `${isCredit ? "+" : "-"} ${t.amount} ${t.asset || "USDT"}`;
 
   document.querySelector(".box").innerHTML = `
-  <div style="padding:20px;text-align:center">
+<div style="padding:20px;">
 
-    <div style="font-size:40px;font-weight:700;margin-top:20px;">
-      ${amount}
-    </div>
+  <!-- 🔙 TOP BAR -->
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div onclick="goHistory()" style="
+      font-size:20px;
+      cursor:pointer;
+      padding:6px 10px;
+      border-radius:8px;
+      background:#1e293b;
+    ">←</div>
+  </div>
+
+  <!-- 💰 AMOUNT -->
+  <div style="
+    text-align:center;
+    margin-top:30px;
+    font-size:36px;
+    font-weight:700;
+  ">
+    ${t.amount} ${t.asset || "USDT"}
+  </div>
+
+  <!-- STATUS -->
+  <div style="
+    text-align:center;
+    margin-top:8px;
+    color:${isCredit ? "#22c55e" : "#ef4444"};
+    font-weight:600;
+  ">
+    ${isCredit ? "Received" : "Sent"}
+  </div>
+
+  <!-- LINE -->
+  <div style="margin:20px 0;height:1px;background:#1e293b;"></div>
+
+  <!-- FROM TO -->
+  <div style="font-size:14px;line-height:1.8;color:#e5e7eb">
+
+    <div><b>From:</b> ${
+      isCredit ? (t.counterparty || "External") : "You"
+    }</div>
+
+    <div><b>To:</b> ${
+      isCredit ? "You" : (t.counterparty || "External")
+    }</div>
 
     <div style="margin-top:10px;color:#9ca3af;">
-      ${t.type.toUpperCase()}
+      ${t.createdAt?.toDate().toLocaleString() || "-"}
     </div>
-
-    <div style="margin-top:20px;height:1px;background:#1e293b;"></div>
-
-    <div style="text-align:left;margin-top:20px;font-size:14px;line-height:1.6">
-
-      <div><b>User:</b> ${t.counterparty || "Self"}</div>
-      <div><b>Asset:</b> ${t.asset || "USDT"}</div>
-      <div><b>Amount:</b> ${t.amount}</div>
-      <div><b>Type:</b> ${t.type}</div>
-      <div><b>Date:</b> ${
-        t.createdAt?.toDate().toLocaleString() || "-"
-      }</div>
-
-    </div>
-
-    <button onclick="goHistory()" style="
-    margin-top:30px;
-    width:100%;
-    padding:12px;
-    border-radius:12px;
-    background:#2563eb;
-    color:white;
-    border:none;
-    ">
-    Back
-    </button>
 
   </div>
-  `;
+
+</div>
+`;
 };
 
 window.setupHistorySearch = ()=>{
