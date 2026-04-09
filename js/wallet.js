@@ -1402,6 +1402,7 @@ window.filters.asset = val;
 document.querySelector('[onclick="openFilter(\'asset\')"]')
 .innerText = val || "Asset ▼";
 }
+  
 if(type === "amount"){
 const min = document.getElementById("minAmount")?.value;
 const max = document.getElementById("maxAmount")?.value;
@@ -1417,7 +1418,6 @@ label = `< ${window.filters.maxAmount}`;
 }
 document.getElementById("amountFilterBtn").innerText = label;
 }
-};
 
 if(type === "type"){
 const val = window.filters.type || null;
@@ -1425,6 +1425,10 @@ window.filters.type = val;
 const btn = document.getElementById("typeFilterBtn");
 if(btn) btn.innerText = val ? val.charAt(0).toUpperCase() + val.slice(1) : "Type ▼";
 }
+  
+};
+
+
 
 window.enableRange = () => {
 document.getElementById("rangeBox").style.display = "block";
