@@ -1175,18 +1175,45 @@ selectTab("deposit");
 window.goHistory = () => {
 document.querySelector(".box").innerHTML = `
 <h2>Transaction History</h2>
+
+<div style="
+position:relative;
+margin-top:12px;
+">
+
 <input
 id="searchInput"
-placeholder="Search Transactions..."
+placeholder="Search transactions..."
 style="
 width:100%;
-margin-top:10px;
-padding:10px;
-border-radius:8px;
-border:1px solid #1e293b;
+padding:12px 14px 12px 42px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.08);
 background:#020617;
-color:white;
+color:#e5e7eb;
+font-size:14px;
+outline:none;
+transition:0.2s;
+box-shadow:0 0 0 rgba(0,0,0,0);
+"
+onfocus="this.style.border='1px solid #3b82f6'; this.style.boxShadow='0 0 0 2px rgba(59,130,246,0.2)'"
+onblur="this.style.border='1px solid rgba(255,255,255,0.08)'; this.style.boxShadow='none'"
+>
+
+<svg viewBox="0 0 24 24" fill="none" style="
+position:absolute;
+left:12px;
+top:50%;
+transform:translateY(-50%);
+width:18px;
+height:18px;
+opacity:0.5;
 ">
+<circle cx="11" cy="11" r="7" stroke="white" stroke-width="2"/>
+<path d="M20 20L17 17" stroke="white" stroke-width="2" stroke-linecap="round"/>
+</svg>
+</div>
+
 <div id="filterBar" style="
 display:flex;
 gap:8px;
