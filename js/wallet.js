@@ -1225,7 +1225,7 @@ margin:10px 0;
 <button id="typeFilterBtn" onclick="openFilter('type')" class="fbtn">Type ▼</button>
 </div>
 
-<div id="history">Loading...</div>
+<div id="history" style="padding-bottom:100px;">Loading...</div>
 `;
 loadHistoryByDate();
 setTimeout(setupHistorySearch, 100);
