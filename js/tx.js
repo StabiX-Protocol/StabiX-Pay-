@@ -248,7 +248,7 @@ groups[monthKey].push({ ...t, id: docSnap.id });
 let html = "";
 Object.keys(groups).forEach(month => {
 html += `
-<div style="margin-top:16px;margin-bottom:6px;font-weight:700;font-size:18px;color:#e5e7eb;">
+<div style="margin-top:16px;margin-bottom:6px;font-weight:700;font-size:18px;color:#cbd5f5;">
 ${month}
 </div>
 `;
