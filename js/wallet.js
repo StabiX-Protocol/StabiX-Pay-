@@ -1202,11 +1202,10 @@ onfocus="this.style.border='1px solid #2563eb'"
 onblur="this.style.border='1px solid #1e293b'"
 >
 
-<!-- Icon -->
 <svg viewBox="0 0 24 24" fill="none" style="
 position:absolute;
 left:12px;
-top:50%;
+top:55%;
 transform:translateY(-50%);
 width:16px;
 height:16px;
