@@ -265,8 +265,15 @@ month: "short",
 hour: "2-digit",
 minute: "2-digit"
 });
-const label = isCredit ? "Received" : "Sent";
-const userId = t.counterparty || "Unknown";
+let label = "Sent";
+if(t.type === "received") label = "Received";
+if(t.type === "deposit") label = "Deposit";
+if(t.type === "withdraw") label = "Withdraw";
+
+let userId = t.counterparty;
+if(t.type === "deposit") userId = "Deposit";
+if(t.type === "withdraw") userId = "Withdraw";
+if(!userId) userId = "System";
 
 html += `
 <div style="
@@ -509,7 +516,7 @@ userId: r.userId,
 type: r.type,
 amount: r.amount,
 asset: asset,
-counterparty:"VALIDATOR",
+counterparty: null,
 createdAt: serverTimestamp()
 });
 });
