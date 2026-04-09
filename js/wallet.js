@@ -1175,15 +1175,12 @@ selectTab("deposit");
 window.goHistory = () => {
 document.querySelector(".box").innerHTML = `
 <h2>Transaction History</h2>
-
 <div style="
 margin-top:12px;
 ">
-
 <div style="
 position:relative;
 ">
-
 <input
 id="searchInput"
 placeholder="Search transactions..."
@@ -1197,11 +1194,9 @@ color:#e5e7eb;
 font-size:14px;
 box-sizing:border-box;
 outline:none;
-"
-onfocus="this.style.border='1px solid #2563eb'"
+"onfocus="this.style.border='1px solid #2563eb'"
 onblur="this.style.border='1px solid #1e293b'"
 >
-
 <svg viewBox="0 0 24 24" fill="none" style="
 position:absolute;
 left:12px;
@@ -1215,10 +1210,8 @@ pointer-events:none;
 <circle cx="11" cy="11" r="7" stroke="white" stroke-width="2"/>
 <path d="M20 20L17 17" stroke="white" stroke-width="2" stroke-linecap="round"/>
 </svg>
-
 </div>
 </div>
-
 
 <div id="filterBar" style="
 display:flex;
