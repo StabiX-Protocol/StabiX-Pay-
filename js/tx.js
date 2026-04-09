@@ -354,13 +354,13 @@ window.openTxDetail = async (txId) => {
 <div style="padding:20px;">
 
   <!-- 🔙 TOP BAR -->
-  <div style="display:flex;align-items:center;gap:10px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
     <div onclick="goHistory()" style="
-      font-size:20px;
+      font-size:18px;
       cursor:pointer;
-      padding:6px 10px;
-      border-radius:8px;
-      background:#1e293b;
+      padding:8px 12px;
+      border-radius:10px;
+      background:#111827;
     ">←</div>
   </div>
 
@@ -368,44 +368,70 @@ window.openTxDetail = async (txId) => {
   <div style="
     text-align:center;
     margin-top:30px;
-    font-size:36px;
+    font-size:38px;
     font-weight:700;
+    letter-spacing:0.5px;
   ">
     ${t.amount} ${t.asset || "USDT"}
   </div>
 
-  <!-- STATUS -->
+  <!-- ✅ STATUS -->
   <div style="
     text-align:center;
-    margin-top:8px;
-    color:${isCredit ? "#22c55e" : "#ef4444"};
+    margin-top:10px;
+    color:#22c55e;
     font-weight:600;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:6px;
   ">
-    ${isCredit ? "Received" : "Sent"}
+    ✔ Completed
+  </div>
+
+  <!-- 📅 DATE -->
+  <div style="
+    text-align:center;
+    margin-top:6px;
+    color:#9ca3af;
+    font-size:13px;
+  ">
+    ${t.createdAt?.toDate().toLocaleString() || "-"}
   </div>
 
   <!-- LINE -->
-  <div style="margin:20px 0;height:1px;background:#1e293b;"></div>
+  <div style="margin:20px 0;height:1px;background:#1f2937;"></div>
 
-  <!-- FROM TO -->
-  <div style="font-size:14px;line-height:1.8;color:#e5e7eb">
+  <!-- 📦 DETAILS BOX -->
+  <div style="
+    background:#020617;
+    border:1px solid #1e293b;
+    border-radius:14px;
+    padding:14px;
+  ">
 
-    <div><b>From:</b> ${
-      isCredit ? (t.counterparty || "External") : "You"
-    }</div>
+    <div style="margin-bottom:10px;">
+      <div style="color:#9ca3af;font-size:12px;">From</div>
+      <div style="font-weight:600;">${isCredit ? t.counterparty : t.counterparty}</div>
+    </div>
 
-    <div><b>To:</b> ${
-      isCredit ? "You" : (t.counterparty || "External")
-    }</div>
+    <div style="margin-bottom:10px;">
+      <div style="color:#9ca3af;font-size:12px;">To</div>
+      <div style="font-weight:600;">${isCredit ? t.userId : t.counterparty}</div>
+    </div>
 
-    <div style="margin-top:10px;color:#9ca3af;">
-      ${t.createdAt?.toDate().toLocaleString() || "-"}
+    <div style="margin-top:12px;color:#9ca3af;font-size:12px;">
+      Transaction ID
+    </div>
+    <div style="font-size:13px;">
+      ${t.id || "-"}
     </div>
 
   </div>
 
 </div>
 `;
+  
 };
 
 window.setupHistorySearch = ()=>{
