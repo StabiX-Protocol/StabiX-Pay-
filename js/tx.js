@@ -404,6 +404,14 @@ await updateDoc(ref,{
 usdtBalance: balance
 })
 }
+await addDoc(collection(db,"transactions"),{
+  userId: userId,
+  type: type, // deposit / withdraw
+  amount: amount,
+  asset: asset,
+  counterparty: null,
+  createdAt: new Date()
+});
 alert(asset + " updated")
 }
 
