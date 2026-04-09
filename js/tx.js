@@ -279,7 +279,7 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 padding:12px 0;
-border-bottom:1px solid rgba(255,255,255,0.05);">
+border-bottom:1px solid rgba(203,213,245,0.3);">
 
 <div style="display:flex;gap:10px;align-items:center">
 <img 
