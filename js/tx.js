@@ -375,6 +375,17 @@ window.openTxDetail = async (txId) => {
     ${t.amount} ${t.asset || "USDT"}
   </div>
 
+  <!-- 🔁 TYPE (Sent / Received) -->
+<div style="
+text-align:center;
+margin-top:6px;
+color:${isCredit ? "#22c55e" : "#ef4444"};
+font-weight:600;
+font-size:14px;
+">
+  ${isCredit ? "⬇ Received" : "⬆ Sent"}
+</div>
+
   <!-- ✅ STATUS -->
   <div style="
     text-align:center;
