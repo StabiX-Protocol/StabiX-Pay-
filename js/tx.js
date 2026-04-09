@@ -431,9 +431,7 @@ font-size:14px;
       <div style="font-weight:600;">${isCredit ? t.userId : t.counterparty}</div>
     </div>
 
-    <div style="margin-top:12px;color:#9ca3af;font-size:12px;">
-      Transaction ID
-    </div>
+    
     <div style="font-size:13px;">
       ${t.id || "-"}
     </div>
