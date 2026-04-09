@@ -226,16 +226,15 @@ let d = new Date(t.createdAt.seconds * 1000)
 .toISOString().slice(0,10);
 if(d < window.filters.fromDate || d > window.filters.toDate) return;
 }
-   if(window.filters.minAmount != null || window.filters.maxAmount != null){
-  const amt = Number(t.amount);
-
-  if(
-    (window.filters.minAmount != null && amt < window.filters.minAmount) ||
-    (window.filters.maxAmount != null && amt > window.filters.maxAmount)
-  ){
-    return;
-  }
-   }
+if(window.filters.minAmount != null || window.filters.maxAmount != null){
+const amt = Number(t.amount);
+if(
+(window.filters.minAmount != null && amt < window.filters.minAmount) ||
+(window.filters.maxAmount != null && amt > window.filters.maxAmount)
+){
+return;
+}
+}
 if(!t.createdAt) return;
 const date = t.createdAt.toDate();
 const monthKey = date.toLocaleString("en-IN", {
@@ -249,7 +248,7 @@ groups[monthKey].push({ ...t, id: docSnap.id });
 let html = "";
 Object.keys(groups).forEach(month => {
 html += `
-<div style="margin-top:15px;font-weight:bold;font-size:15px;opacity:.7">
+<div style="margin-top:16px;margin-bottom:6px;font-weight:700;font-size:18px;color:#e5e7eb;">
 ${month}
 </div>
 `;
