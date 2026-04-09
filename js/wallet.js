@@ -1178,7 +1178,6 @@ document.querySelector(".box").innerHTML = `
 
 <div style="
 margin-top:12px;
-padding:0 2px;
 ">
 
 <div style="
@@ -1190,7 +1189,7 @@ id="searchInput"
 placeholder="Search transactions..."
 style="
 width:100%;
-padding:12px 14px 12px 40px;
+padding:12px 14px 12px 38px;
 border-radius:10px;
 border:1px solid #1e293b;
 background:#020617;
