@@ -1450,11 +1450,8 @@ const val = window.filters.type || null;
 window.filters.type = val;
 const btn = document.getElementById("typeFilterBtn");
 if(btn) btn.innerText = val ? val.charAt(0).toUpperCase() + val.slice(1) : "Type ▼";
-}
-  
+}  
 };
-
-
 
 window.enableRange = () => {
 document.getElementById("rangeBox").style.display = "block";
