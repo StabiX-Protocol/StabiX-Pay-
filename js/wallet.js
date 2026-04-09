@@ -1196,7 +1196,7 @@ margin:10px 0;
 <button onclick="openFilter('date')" class="fbtn">Date ▼</button>
 <button id="assetFilterBtn" onclick="openFilter('asset')" class="fbtn">Asset ▼</button>
 <button id="amountFilterBtn" onclick="openFilter('amount')" class="fbtn">Amount ▼</button>
-<button onclick="openFilter('type')" class="fbtn">Type ▼</button>
+<button id="typeFilterBtn" onclick="openFilter('type')" class="fbtn">Type ▼</button>
 </div>
 
 <div id="history">Loading...</div>
@@ -1249,6 +1249,42 @@ Clear Filter
 }
   
 if(type === "type"){
+html = `
+<div class="sheet">
+<h3 style="margin:0 0 12px 0;">Transaction Type</h3>
+
+<div class="assetList">
+
+<div class="assetItem" onclick="setType('sent')">
+<span>Sent</span>
+</div>
+
+<div class="assetItem" onclick="setType('received')">
+<span>Received</span>
+</div>
+
+<div class="assetItem" onclick="setType('deposit')">
+<span>Deposit</span>
+</div>
+
+<div class="assetItem" onclick="setType('withdraw')">
+<span>Withdraw</span>
+</div>
+
+</div>
+
+<button onclick="clearTypeFilter()" 
+style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
+background:#1e293b;color:#e5e7eb;border:none;">
+Clear Filter
+</button>
+
+<button onclick="applyFilter('type')" class="applyBtn">
+Apply
+</button>
+
+</div>
+`;
 }
 
 if(type === "asset"){
@@ -1383,6 +1419,13 @@ document.getElementById("amountFilterBtn").innerText = label;
 }
 };
 
+if(type === "type"){
+const val = window.filters.type || null;
+window.filters.type = val;
+const btn = document.getElementById("typeFilterBtn");
+if(btn) btn.innerText = val ? val.charAt(0).toUpperCase() + val.slice(1) : "Type ▼";
+}
+
 window.enableRange = () => {
 document.getElementById("rangeBox").style.display = "block";
 const today = new Date().toISOString().split("T")[0];
@@ -1433,6 +1476,22 @@ window.filters.fromDate = null;
 window.filters.toDate = null;
 document.querySelector('[onclick="openFilter(\'date\')"]')
 .innerText = "Date ▼";
+closeFilter();
+loadHistory();
+};
+
+window.setType = (type) => {
+window.filters.type = type;
+document.querySelectorAll('.assetItem').forEach(el=>{
+el.style.border = '1px solid #1e293b';
+});
+event.currentTarget.style.border = '1px solid #2563eb';
+};
+
+window.clearTypeFilter = () => {
+window.filters.type = null;
+const btn = document.getElementById("typeFilterBtn");
+if(btn) btn.innerText = "Type ▼";
 closeFilter();
 loadHistory();
 };
