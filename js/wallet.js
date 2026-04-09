@@ -1194,7 +1194,7 @@ overflow-x:auto;
 margin:10px 0;
 ">
 <button onclick="openFilter('date')" class="fbtn">Date ▼</button>
-<button onclick="openFilter('asset')" class="fbtn">Asset ▼</button>
+<button id="assetFilterBtn" onclick="openFilter('asset')" class="fbtn">Asset ▼</button>
 <button id="amountFilterBtn" onclick="openFilter('amount')" class="fbtn">Amount ▼</button>
 <button onclick="openFilter('type')" class="fbtn">Type ▼</button>
 </div>
@@ -1437,15 +1437,13 @@ closeFilter();
 loadHistory();
 };
 window.clearDateFilter = () => {
-  window.filters.date = null;
-  window.filters.fromDate = null;
-  window.filters.toDate = null;
-
-  document.querySelector('[onclick="openFilter(\'date\')"]')
-    .innerText = "Date ▼";
-
-  closeFilter();
-  loadHistory();
+window.filters.date = null;
+window.filters.fromDate = null;
+window.filters.toDate = null;
+document.querySelector('[onclick="openFilter(\'date\')"]')
+.innerText = "Date ▼";
+closeFilter();
+loadHistory();
 };
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
