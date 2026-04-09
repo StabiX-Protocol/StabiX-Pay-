@@ -1236,7 +1236,7 @@ html = `
 <span>500+</span>
 </div>
 </div>
-<button onclick="clearFilters()" 
+<button onclick="clearAmountFilter()">
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
 background:#1e293b;color:#e5e7eb;border:none;">
 Clear Filter
@@ -1266,7 +1266,7 @@ html = `
 </div>
 </div>
 
-<button onclick="clearFilters()" 
+<button onclick="clearAssetFilter()">
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
 background:#1e293b;color:#e5e7eb;border:none;">
 Clear Filter
@@ -1298,7 +1298,7 @@ Custom Date
 <input type="date" id="toDate" />
 </div>
 
-<button onclick="clearFilters()" 
+<button onclick="clearDateFilter()">
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
 background:#1e293b;color:#e5e7eb;border:none;">
 Clear Filter
@@ -1436,7 +1436,17 @@ if(btn) btn.innerText = "Amount ▼";
 closeFilter();
 loadHistory();
 };
+window.clearDateFilter = () => {
+  window.filters.date = null;
+  window.filters.fromDate = null;
+  window.filters.toDate = null;
 
+  document.querySelector('[onclick="openFilter(\'date\')"]')
+    .innerText = "Date ▼";
+
+  closeFilter();
+  loadHistory();
+};
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
 return `
