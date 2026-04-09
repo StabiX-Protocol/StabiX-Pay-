@@ -1236,10 +1236,6 @@ html = `
 <span>500+</span>
 </div>
 </div>
-<div style="margin-top:14px;">
-<input type="number" id="minAmount" placeholder="Min Amount" />
-<input type="number" id="maxAmount" placeholder="Max Amount" style="margin-top:10px;" />
-</div>
 <button onclick="clearFilters()" 
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
 background:#1e293b;color:#e5e7eb;border:none;">
