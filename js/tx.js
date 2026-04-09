@@ -212,8 +212,9 @@ function renderHistoryFromSnap(snap, emptyText) {
 let groups = {};
 snap.forEach(docSnap => {
 const t = docSnap.data();
-             console.log("TX:", t);
+             console.log("FULL TX:", t);
              console.log("createdAt:", t.createdAt);
+             console.log("TYPE:", typeof t.createdAt);
 if(window.filters.type){
 if(t.type !== window.filters.type) return;
 }
