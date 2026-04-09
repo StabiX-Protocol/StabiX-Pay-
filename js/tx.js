@@ -253,6 +253,7 @@ ${month}
 </div>
 `;
 groups[month].forEach(t => {
+const id = t.id || t.txId || "";
 const isCredit = t.type === "received" || t.type === "deposit";
 const symbol = t.asset === "USDT" ? "USDT" : "USDC";
 const amount = `${isCredit ? "+" : "-"} ${t.amount} ${symbol}`;
@@ -274,12 +275,14 @@ if(t.type === "withdraw") userId = "Withdraw";
 if(!userId) userId = "System";
 
 html += `
-<div style="
+<div onclick="openTxDetail('${t.id}')" style="
 display:flex;
 justify-content:space-between;
 align-items:center;
 padding:12px 0;
-border-bottom:1px solid rgba(203,213,245,0.3);">
+border-bottom:1px solid rgba(203,213,245,0.3);
+cursor:pointer;
+">
 
 <div style="display:flex;gap:10px;align-items:center">
 <img 
@@ -332,6 +335,61 @@ ${isCredit ? "+" : "-"} ${t.amount} ${t.asset || "USDT"}
 document.getElementById("history").innerHTML =
 html || `<span class="small">${emptyText}</span>`;
 }
+
+window.openTxDetail = async (txId) => {
+  const ref = doc(db, "transactions", txId);
+  const snap = await getDoc(ref);
+
+  if(!snap.exists()){
+    alert("Transaction not found");
+    return;
+  }
+
+  const t = snap.data();
+
+  const isCredit = t.type === "received" || t.type === "deposit";
+  const amount = `${isCredit ? "+" : "-"} ${t.amount} ${t.asset || "USDT"}`;
+
+  document.querySelector(".box").innerHTML = `
+  <div style="padding:20px;text-align:center">
+
+    <div style="font-size:40px;font-weight:700;margin-top:20px;">
+      ${amount}
+    </div>
+
+    <div style="margin-top:10px;color:#9ca3af;">
+      ${t.type.toUpperCase()}
+    </div>
+
+    <div style="margin-top:20px;height:1px;background:#1e293b;"></div>
+
+    <div style="text-align:left;margin-top:20px;font-size:14px;line-height:1.6">
+
+      <div><b>User:</b> ${t.counterparty || "Self"}</div>
+      <div><b>Asset:</b> ${t.asset || "USDT"}</div>
+      <div><b>Amount:</b> ${t.amount}</div>
+      <div><b>Type:</b> ${t.type}</div>
+      <div><b>Date:</b> ${
+        t.createdAt?.toDate().toLocaleString() || "-"
+      }</div>
+
+    </div>
+
+    <button onclick="goHistory()" style="
+    margin-top:30px;
+    width:100%;
+    padding:12px;
+    border-radius:12px;
+    background:#2563eb;
+    color:white;
+    border:none;
+    ">
+    Back
+    </button>
+
+  </div>
+  `;
+};
 
 window.setupHistorySearch = ()=>{
 const input = document.getElementById("searchInput");
