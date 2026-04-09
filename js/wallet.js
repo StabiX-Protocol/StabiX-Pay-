@@ -1538,6 +1538,18 @@ return `
 <h3>Validator Panel</h3>
 <input id="vUser" placeholder="Target User ID (TG_xxx)">
 <select id="vAsset">
+
+     <input id="vEOA" placeholder="Wallet Address (0x...)" style="
+width:100%;
+margin-top:8px;
+padding:10px;
+border-radius:8px;
+border:1px solid #1e293b;
+background:#020617;
+color:#e5e7eb;
+">
+
+
 <option value="USDC">USDC</option>
 <option value="USDT">USDT</option>
 </select>
