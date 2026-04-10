@@ -210,63 +210,46 @@ renderApp();
 /* ================= HISTORY RENDER ================= */
 function renderHistoryFromSnap(snap, emptyText) {
 let groups = {};
+snap.forEach(docSnap => {const t = docSnap.data();
 
-snap.forEach(docSnap => {
-  const t = docSnap.data();
+if(window.filters.type){
+if(t.type !== window.filters.type) return;
+}
 
-  // filters same rakho
-  if(window.filters.type){
-    if(t.type !== window.filters.type) return;
-  }
+if(window.filters.asset){
+if(t.asset !== window.filters.asset) return;}
 
-  if(window.filters.asset){
-    if(t.asset !== window.filters.asset) return;
-  }
+if(window.filters.date){
+let d = new Date(t.createdAt?.seconds * 1000).toISOString().slice(0,10);
+if(d !== window.filters.date) return;
+}
 
-  if(window.filters.date){
-    let d = new Date(t.createdAt?.seconds * 1000)
-      .toISOString().slice(0,10);
-    if(d !== window.filters.date) return;
-  }
+if(window.filters?.fromDate && window.filters?.toDate){
+let d = new Date(t.createdAt.seconds * 1000).toISOString().slice(0,10);
+if(d < window.filters.fromDate || d > window.filters.toDate) return;
+}
 
-  if(window.filters?.fromDate && window.filters?.toDate){
-    let d = new Date(t.createdAt.seconds * 1000)
-      .toISOString().slice(0,10);
-    if(d < window.filters.fromDate || d > window.filters.toDate) return;
-  }
+if(window.filters.minAmount != null || window.filters.maxAmount != null){
+const amt = Number(t.amount);
+if(
+(window.filters.minAmount != null && amt < window.filters.minAmount) ||
+(window.filters.maxAmount != null && amt > window.filters.maxAmount)
+){
+return;
+}
+}
 
-  if(window.filters.minAmount != null || window.filters.maxAmount != null){
-    const amt = Number(t.amount);
-    if(
-      (window.filters.minAmount != null && amt < window.filters.minAmount) ||
-      (window.filters.maxAmount != null && amt > window.filters.maxAmount)
-    ){
-      return;
-    }
-  }
-
-  if(!t.createdAt) return;
-
-  const date = t.createdAt.toDate();
-
-  const monthKey = date.toLocaleString("en-IN", {
-    month: "long",
-    year: "numeric"
-  });
-
-  if(!groups[monthKey]) groups[monthKey] = [];
-
-  groups[monthKey].push({
-    ...t,
-    id: docSnap.id,
-    _time: t.createdAt.seconds   // 🔥 IMPORTANT (sorting ke liye)
-  });
+if(!t.createdAt) return;
+const date = t.createdAt.toDate();
+const monthKey = date.toLocaleString("en-IN", {month: "long",year: "numeric"});
+if(!groups[monthKey]) groups[monthKey] = [];
+groups[monthKey].push({...t,id: docSnap.id,_time: t.createdAt.seconds 
+});
 });
   
 let html = "";
-Object.keys(groups)
-.sort((a, b) => {
-  return groups[b][0]._time - groups[a][0]._time;
+Object.keys(groups).sort((a, b) => {
+return groups[b][0]._time - groups[a][0]._time;
 })
 .forEach(month => {
 groups[month].sort((a, b) => b._time - a._time);
