@@ -637,3 +637,103 @@ opacity:.6;
   border-radius:14px;
   padding:6px 0;
 }
+/* ===== Amount Filter button===== */
+.fbtn{
+background:#020617;
+border:1px solid #1e293b;
+color:white;
+padding:8px 12px;
+border-radius:20px;
+white-space:nowrap;
+}
+
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+}
+
+#bottomSheet {
+  position: fixed;
+  bottom: 70px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center; 
+  z-index: 999;
+}
+
+.sheet {
+  width: 100%;
+  max-width: 500px;
+  background: #0f172a;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  padding: 16px;
+  box-sizing: border-box; 
+}
+
+.sheet input {
+  width: 100%;
+  box-sizing: border-box; 
+  padding: 14px;
+  border-radius: 12px;
+  border: 2px solid #f59e0b;
+  background: #020617;
+  color: white;
+  margin-top: 10px;
+}
+
+.sheet button {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+}
+/* ===== Assets Filter button===== */
+.assetList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.assetItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #020617;
+  border: 1px solid #1e293b;
+}
+
+.assetItem img {
+  width: 28px;
+  height: 28px;
+}
+
+.assetItem span {
+  color: white;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.applyBtn {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg,#2563eb,#1d4ed8);
+  color: white;
+  font-weight: 600;
+}

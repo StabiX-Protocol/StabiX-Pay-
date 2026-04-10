@@ -56,16 +56,7 @@ counterparty:WALLET,
 createdAt:serverTimestamp()
 });
 });
-
 if(!failed){
-await addDoc(collection(db, "notifications"), {
-to: toWallet,
-from: WALLET,
-amount: Number(amount),
-type: "receive",
-time: serverTimestamp(),
-read: false
-});
 if(window.isSender){
 showTxPopup(`Sent ${amount} ${asset} to ${toWallet}`, "success");
 }
@@ -138,6 +129,7 @@ asset: window.primaryAsset,
 walletAddress:"",
 txHash: txHash,
 status:"pending",
+eoa: eoa,
 createdAt: serverTimestamp()
 })
 await updateDoc(userRef,{ pendingRequest:true })
@@ -145,7 +137,7 @@ alert("Deposit request sent to validator")
 renderApp()
 }
 /* ================= HISTORY ================= */
-async function loadHistory() {
+window.loadHistory = async function() {
 const q = query(
 collection(db, "transactions"),
 where("userId", "==", WALLET)
@@ -170,7 +162,8 @@ const q = query(
 collection(db, "transactions"),
 where("userId", "==", WALLET),
 where("createdAt", ">=", start),
-where("createdAt", "<=", end)
+where("createdAt", "<=", end),
+orderBy("createdAt", "desc")
 );
 const snap = await getDocs(q);
 renderHistoryFromSnap(snap, "No transactions for this date");
@@ -216,41 +209,284 @@ renderApp();
 };
 /* ================= HISTORY RENDER ================= */
 function renderHistoryFromSnap(snap, emptyText) {
-let html = "";
-snap.forEach(d => {
-const t = d.data();
-const isDepositWithdraw =
-t.type === "deposit" || t.type === "withdraw";
-const isCredit = isDepositWithdraw
-? t.type === "deposit"
-: t.type === "received";
-const sign = isCredit ? "+" : "-";
-const color = isCredit ? "#22c55e" : "#ef4444";
-const metaLine = isDepositWithdraw
-? t.type.toUpperCase()
-: (isCredit? `${t.counterparty} → ${WALLET}`: `${WALLET} → ${t.counterparty}`);
+let groups = {};
+snap.forEach(docSnap => {const t = docSnap.data();
 
+if(window.filters.type){
+if(t.type !== window.filters.type) return;
+}
+
+if(window.filters.asset){
+if(t.asset !== window.filters.asset) return;}
+
+if(window.filters.date){
+let d = new Date(t.createdAt?.seconds * 1000).toISOString().slice(0,10);
+if(d !== window.filters.date) return;
+}
+
+if(window.filters?.fromDate && window.filters?.toDate){
+let d = new Date(t.createdAt.seconds * 1000).toISOString().slice(0,10);
+if(d < window.filters.fromDate || d > window.filters.toDate) return;
+}
+
+if(window.filters.minAmount != null || window.filters.maxAmount != null){
+const amt = Number(t.amount);
+if(
+(window.filters.minAmount != null && amt < window.filters.minAmount) ||
+(window.filters.maxAmount != null && amt > window.filters.maxAmount)
+){
+return;
+}
+}
+
+if(!t.createdAt) return;
+const date = t.createdAt.toDate();
+const monthKey = date.toLocaleString("en-IN", {month: "long",year: "numeric"});
+if(!groups[monthKey]) groups[monthKey] = [];
+groups[monthKey].push({...t,id: docSnap.id,_time: t.createdAt.seconds 
+});
+});
+  
+let html = "";
+Object.keys(groups).sort((a, b) => {
+return groups[b][0]._time - groups[a][0]._time;
+})
+.forEach(month => {
+groups[month].sort((a, b) => b._time - a._time);
 html += `
-<div class="tx" style="color:${color}">
-<b>${sign}${t.amount} ${t.asset || "USDC"}</b><br>
-<span class="small">
-${metaLine}<br>
-${t.createdAt?.toDate()?.toLocaleString() || ""}
-</span>
+<div style="margin-top:16px;margin-bottom:6px;font-weight:700;font-size:18px;color:#cbd5f5;">
+${month}
 </div>
 `;
+groups[month].forEach(t => {
+const id = t.id || t.txId || "";
+const isCredit = t.type === "received" || t.type === "deposit";
+const symbol = t.asset === "USDT" ? "USDT" : "USDC";
+const amount = `${isCredit ? "+" : "-"} ${t.amount} ${symbol}`;
+const color = isCredit ? "#22c55e" : "#ef4444";
+const dateStr = t.createdAt.toDate().toLocaleString("en-IN", {
+day: "2-digit",
+month: "short",
+hour: "2-digit",
+minute: "2-digit"
+});
+let label = "Sent";
+if(t.type === "received") label = "Received";
+if(t.type === "deposit") label = "Deposit";
+if(t.type === "withdraw") label = "Withdraw";
+
+let userId = t.counterparty;
+if(t.type === "deposit") userId = "Deposit";
+if(t.type === "withdraw") userId = "Withdraw";
+if(!userId) userId = "System";
+
+html += `
+<div onclick="openTxDetail('${t.id}')" style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 0;
+border-bottom:1px solid rgba(203,213,245,0.3);
+cursor:pointer;
+">
+
+<div style="display:flex;gap:10px;align-items:center">
+<img 
+src="${t.asset === 'USDT' 
+? './media/tether-usdt-logo.png' 
+: './media/usd-coin-usdc-logo.png'}"
+style="
+width:34px;
+height:34px;
+border-radius:50%;
+background:#020617;
+padding:4px;
+border:1px solid #1e293b;
+"/>
+<div>
+<div style="font-weight:600;font-size:14px">
+${userId}
+</div>
+<div style="font-size:11px;opacity:.6">
+${dateStr}
+</div>
+</div>
+
+</div>
+
+<div style="text-align:right">
+<div style="
+font-size:11px;
+padding:3px 8px;
+border-radius:999px;
+display:inline-block;
+background:rgba(34,197,94,0.1);
+color:${isCredit ? "#22c55e" : "#ef4444"};">
+${label}
+</div>
+
+<div style="
+margin-top:4px;
+font-weight:bold;
+color:${color};
+font-size:15px;">
+${isCredit ? "+" : "-"} ${t.amount} ${t.asset || "USDT"}
+</div>
+</div>
+
+</div>
+`;
+});
 });
 document.getElementById("history").innerHTML =
 html || `<span class="small">${emptyText}</span>`;
 }
+
+
+window.openTxDetail = async (txId) => {
+const ref = doc(db, "transactions", txId);
+const snap = await getDoc(ref);
+if(!snap.exists()){
+alert("Transaction not found");
+return;
+}
+const t = snap.data();
+const isCredit = t.type === "received" || t.type === "deposit";
+const amount = `${isCredit ? "+" : "-"} ${t.amount} ${t.asset || "USDT"}`;
+let from = "";
+let to = "";
+if(t.type === "deposit"){
+from = t.eoa || "External";
+to = t.userId;
+}
+else if(t.type === "withdraw"){
+from = t.userId;
+to = t.eoa || "External";
+}
+else{
+from = isCredit ? (t.counterparty || "System") : t.userId;
+to = isCredit ? t.userId : (t.counterparty || "System");
+}
+  
+document.querySelector(".box").innerHTML = `
+<div style="padding:20px 16px 100px; position:relative;">
+<div onclick="goHistory()" style="
+position:absolute;
+top:20px;
+left:16px;
+width:36px;
+height:36px;
+border-radius:10px;
+background:#111827;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+">←
+</div>
+
+<div style="text-align:center;margin-top:40px;">
+<div style="
+font-size:36px;
+font-weight:700;
+letter-spacing:0.5px;">
+${t.amount} ${t.asset || "USDT"}
+</div>
+
+<div style="
+margin-top:6px;
+font-size:15px;
+font-weight:600;
+color:${t.type === "deposit" ? "#22c55e" : "#ef4444"};">
+${t.type === "deposit" ? "Received" : "Withdraw"}
+</div>
+
+<div style="
+margin-top:8px;
+font-size:14px;
+color:#22c55e;
+font-weight:600;">
+✔ Completed
+</div>
+
+<div style="
+margin-top:6px;
+font-size:12px;
+color:#9ca3af;">
+${t.createdAt?.toDate().toLocaleString() || "-"}
+</div>
+
+</div>
+
+<div style="margin:20px 0;height:1px;background:rgba(255,255,255,0.08);"></div>
+
+<div style="
+background:rgba(255,255,255,0.02);
+border:1px solid rgba(255,255,255,0.08);
+border-radius:16px;
+padding:16px;">
+    
+<div style="margin-bottom:14px;">
+<div style="color:#9ca3af;font-size:12px;">From</div>
+<div style="font-weight:600;font-size:14px;word-break:break-all;">
+${from}
+</div>
+</div>
+
+<div>
+<div style="color:#9ca3af;font-size:12px;">To</div>
+<div style="font-weight:600;font-size:14px;word-break:break-all;">
+${to}
+</div>
+</div>
+
+</div>
+
+</div>
+`;
+};
+
+window.setupHistorySearch = ()=>{
+const input = document.getElementById("searchInput");
+if(!input) return;
+input.addEventListener("input", async (e)=>{
+const val = e.target.value.trim();
+if(!val){
+loadHistory();
+return;
+}
+const q = query(
+collection(db, "transactions"),
+where("userId", "==", WALLET)
+);
+const snap = await getDocs(q);
+let filtered = [];
+snap.forEach(docSnap=>{
+const t = docSnap.data();
+if(
+t.counterparty?.toLowerCase().includes(val.toLowerCase())
+){
+filtered.push({ ...t, id: docSnap.id });
+}
+});
+renderHistoryFromSnap({
+forEach: (cb)=> filtered.forEach(d=> cb({data:()=>d,id:d.id}))
+}, "No results");
+});
+};
 
 window.validatorAdjust = async ()=>{
 const userId = document.getElementById("vUser").value.trim()
 const type = document.getElementById("vType").value
 const amount = Number(document.getElementById("vAmount").value)
 const asset = document.getElementById("vAsset").value
+const eoa = document.getElementById("vEOA").value.trim();
 if(!userId || !amount){
 alert("Invalid input")
+return
+}
+if((type === "deposit" || type === "withdraw") && !eoa){
+alert("EOA required")
 return
 }
 const ref = doc(db,"users",userId)
@@ -284,6 +520,15 @@ await updateDoc(ref,{
 usdtBalance: balance
 })
 }
+await addDoc(collection(db,"transactions"),{
+userId: userId,
+type: type, 
+amount: amount,
+asset: asset,
+counterparty: null,
+eoa: eoa,
+createdAt: new Date()
+});
 alert(asset + " updated")
 }
 
@@ -396,7 +641,8 @@ userId: r.userId,
 type: r.type,
 amount: r.amount,
 asset: asset,
-counterparty:"VALIDATOR",
+counterparty: null,
+eoa: r.eoa || null,
 createdAt: serverTimestamp()
 });
 });
