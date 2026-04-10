@@ -1155,22 +1155,87 @@ console.log("navigateHome error:", e);
 }
 };
 
+
 window.goDeposit = () => {
+
 document.querySelector(".box").innerHTML = `
-<h2>Deposit / Withdraw</h2>
+
+<h2>Deposit and Withdraw</h2>
+
+<!-- STEP 1: ASSETS -->
+<div id="dwAssets" style="margin-top:12px;display:flex;flex-direction:column;gap:10px;">
+
+<div onclick="selectDWAsset('USDT')" style="
+background:#020617;
+border:1px solid #1e293b;
+border-radius:12px;
+padding:12px;
+display:flex;
+align-items:center;
+gap:10px;
+cursor:pointer;">
+<img src="./media/tether-usdt-logo.png" style="width:32px;height:32px;border-radius:50%;">
+<div>
+<div style="font-size:14px">USDT</div>
+<div style="font-size:11px;opacity:.6">Tap to continue</div>
+</div>
+</div>
+
+<div onclick="selectDWAsset('USDC')" style="
+background:#020617;
+border:1px solid #1e293b;
+border-radius:12px;
+padding:12px;
+display:flex;
+align-items:center;
+gap:10px;
+cursor:pointer;">
+<img src="./media/usd-coin-usdc-logo.png" style="width:32px;height:32px;border-radius:50%;">
+<div>
+<div style="font-size:14px">USDC</div>
+<div style="font-size:11px;opacity:.6">Tap to continue</div>
+</div>
+</div>
+
+</div>
+
+<!-- STEP 2: ACTION -->
+<div id="actionScreen" style="display:none;margin-top:20px;">
+
+<h3 id="selectedAssetText"></h3>
+
 <div style="display:flex;gap:10px;margin-top:10px;">
 <button onclick="openDeposit()" style="background:#22c55e;color:#022c22;font-weight:bold">
 Deposit
 </button>
+
 <button onclick="openWithdraw()" style="background:#ef4444;color:white;font-weight:bold">
 Withdraw
 </button>
 </div>
+
+</div>
+
+<!-- STEP 3: SCREENS -->
 <div id="depositBox"></div>
 <div id="withdrawBox"></div>
+
 `;
+
 selectTab("deposit");
 };
+
+window.selectDWAsset = (asset) => {
+  window.selectedDWAsset = asset;
+
+  document.getElementById("dwAssets").style.display = "none";
+  document.getElementById("actionScreen").style.display = "block";
+
+  document.getElementById("selectedAssetText").innerText = asset;
+};
+
+
+
 
 window.goHistory = () => {
 document.querySelector(".box").innerHTML = `
