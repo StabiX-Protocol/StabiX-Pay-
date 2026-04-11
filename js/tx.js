@@ -67,75 +67,7 @@ window.isSender = false;
 if(e!=="Receiver not found") console.log(e);
 }
 };
-  /*===============Deposit & Withdraw Logic======*/
-window.openDeposit = ()=>{
-const box = document.getElementById("depositBox")
-if(box.style.display==="block"){
-box.style.display="none"
-}else{
-box.style.display="block"
-}
-document.getElementById("withdrawBox").style.display="none"
-}
-window.openWithdraw = ()=>{
-const box = document.getElementById("withdrawBox")
-if(box.style.display==="block"){
-box.style.display="none"
-}else{
-box.style.display="block"
-}
-document.getElementById("depositBox").style.display="none"
-}
 
-window.showVault = ()=>{
-const net = document.getElementById("networkSelect").value
-const vault = document.getElementById("vaultSection")
-if(net==="sepolia"){
-vault.style.display="block"
-}else{
-vault.style.display="none"
-}
-}
-
-window.copyVault = ()=>{
-navigator.clipboard.writeText("0x710c5D40a97123903b7cB482dBe39EB35D52af0a")
-alert("Vault address copied")
-}
-
-window.showDepositForm = ()=>{
-document.getElementById("depositForm").style.display="block"
-}
-
-window.submitDeposit = async ()=>{
-const amount = depAmount.value.trim()
-const txHash = depHash.value.trim()
-if(!amount || Number(amount) <= 0){
-alert("Enter valid amount")
-return
-}
-if(!txHash.startsWith("0x") || txHash.length !== 66){
-alert("Invalid Transaction Hash")
-return
-}
-if(txHash.length !== 66){
-alert("Invalid transaction hash")
-return
-}
-await addDoc(collection(db,"requests"),{
-userId: WALLET,
-type:"deposit",
-amount: Number(amount),
-asset: window.primaryAsset,
-walletAddress:"",
-txHash: txHash,
-status:"pending",
-eoa: eoa,
-createdAt: serverTimestamp()
-})
-await updateDoc(userRef,{ pendingRequest:true })
-alert("Deposit request sent to validator")
-renderApp()
-}
 /* ================= HISTORY ================= */
 window.loadHistory = async function() {
 const q = query(
@@ -167,45 +99,6 @@ orderBy("createdAt", "desc")
 );
 const snap = await getDocs(q);
 renderHistoryFromSnap(snap, "No transactions for this date");
-};
-  
-window.submitWithdraw = async ()=>{
-const amount = Number(document.getElementById("wdAmount").value);
-const snap = await getDoc(userRef);
-const user = snap.data();
-if(!user.eoaAddress){
-alert("Please register EOA wallet first");
-return;
-}
-if(!amount || amount <= 0){
-alert("Enter valid amount");
-return;
-}
-if(user.pendingRequest){
-alert("Account frozen. Pending request under review.");
-return;
-}
-if(amount > user.balance){
-alert("Insufficient balance");
-return;
-}
-await addDoc(collection(db,"requests"),{
-userId: WALLET,
-type:"withdraw",
-amount: amount,
-asset: window.primaryAsset,
-walletAddress: user.eoaAddress,
-txHash:"",
-status:"pending",
-createdAt: serverTimestamp()
-});
-await updateDoc(userRef,{ pendingRequest:true });
-tg.showPopup({
-title:"Request Submitted",
-message:"Wait for Validator Verification",
-buttons:[{type:"ok"}]
-});
-renderApp();
 };
 /* ================= HISTORY RENDER ================= */
 function renderHistoryFromSnap(snap, emptyText) {
