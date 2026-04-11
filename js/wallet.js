@@ -1596,16 +1596,43 @@ window.selectDWAsset = (asset) => {
 window.selectedDWAsset = asset;
 
 document.querySelector(".box").innerHTML = `
-<h2>${asset}</h2>
 
-<div style="display:flex;gap:12px;margin-top:20px;">
+
+<div style="
+display:flex;
+flex-direction:column;
+align-items:center;
+margin-top:20px;
+gap:10px;
+">
+
+<img 
+src="${asset === 'USDT' 
+? './media/tether-usdt-logo.png' 
+: './media/usd-coin-usdc-logo.png'}"
+style="
+width:60px;
+height:60px;
+border-radius:50%;
+">
+
+<div style="
+font-size:20px;
+font-weight:bold;
+">
+${asset}
+</div>
+</div>
+
+
+<div style="display:flex;gap:12px;margin-top:30px;">
 
 <button onclick="openDeposit('${asset}')" style="
 flex:1;
 padding:14px;
 border-radius:12px;
-background:#3b82f6;
-color:white;
+background:#22c55e;
+color:#022c22;
 font-weight:bold;">
 Deposit
 </button>
@@ -1614,23 +1641,23 @@ Deposit
 flex:1;
 padding:14px;
 border-radius:12px;
-background:#facc15;
-color:#000;
+background:#ef4444;
+color:white;
 font-weight:bold;">
 Withdraw
 </button>
 
 </div>
 
-<div style="margin-top:20px;">
-<button onclick="goDeposit()" style="
-width:100%;
-padding:10px;
-border-radius:10px;
-background:#1e293b;
-color:white;">
-← Back
-</button>
+<div onclick="goDeposit()" style="
+position:absolute;
+top:15px;
+left:15px;
+font-size:22px;
+cursor:pointer;
+opacity:0.8;
+">
+←
 </div>
 `;
 };
