@@ -1162,23 +1162,64 @@ console.log("navigateHome error:", e);
 
 
 
-window.goDeposit = () => {
+window.goDeposit = async () => {
+const snap = await getDoc(userRef);
+const user = snap.data();
+
 document.querySelector(".box").innerHTML = `
-<h2>Deposit / Withdraw</h2>
-<div style="display:flex;gap:10px;margin-top:10px;">
-<button onclick="openDeposit()" style="background:#22c55e;color:#022c22;font-weight:bold">
-Deposit
-</button>
-<button onclick="openWithdraw()" style="background:#ef4444;color:white;font-weight:bold">
-Withdraw
-</button>
+<h2>Select Asset</h2>
+
+<div style="display:flex;flex-direction:column;gap:12px;margin-top:15px;">
+
+<!-- USDT -->
+<div onclick="selectDWAsset('USDT')" style="
+background:#020617;
+border:1px solid #1e293b;
+border-radius:12px;
+padding:14px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+cursor:pointer;">
+  
+<div style="display:flex;align-items:center;gap:10px;">
+<img src="./media/tether-usdt-logo.png" style="width:32px;height:32px;border-radius:50%;">
+<div>USDT</div>
 </div>
-<div id="depositBox"></div>
-<div id="withdrawBox"></div>
+
+<div style="font-weight:bold">
+${user.usdtBalance?.toFixed(2) || "0.00"}
+</div>
+
+</div>
+
+<!-- USDC -->
+<div onclick="selectDWAsset('USDC')" style="
+background:#020617;
+border:1px solid #1e293b;
+border-radius:12px;
+padding:14px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+cursor:pointer;">
+  
+<div style="display:flex;align-items:center;gap:10px;">
+<img src="./media/usd-coin-usdc-logo.png" style="width:32px;height:32px;border-radius:50%;">
+<div>USDC</div>
+</div>
+
+<div style="font-weight:bold">
+${user.balance?.toFixed(2) || "0.00"}
+</div>
+
+</div>
+
+</div>
 `;
+
 selectTab("deposit");
 };
-
 
 
 
@@ -1545,6 +1586,62 @@ if(btn) btn.innerText = "Type ▼";
 closeFilter();
 loadHistory();
 };
+
+
+
+
+
+
+window.selectDWAsset = (asset) => {
+window.selectedDWAsset = asset;
+
+document.querySelector(".box").innerHTML = `
+<h2>${asset}</h2>
+
+<div style="display:flex;gap:12px;margin-top:20px;">
+
+<button onclick="openDeposit('${asset}')" style="
+flex:1;
+padding:14px;
+border-radius:12px;
+background:#3b82f6;
+color:white;
+font-weight:bold;">
+Deposit
+</button>
+
+<button onclick="openWithdraw('${asset}')" style="
+flex:1;
+padding:14px;
+border-radius:12px;
+background:#facc15;
+color:#000;
+font-weight:bold;">
+Withdraw
+</button>
+
+</div>
+
+<div style="margin-top:20px;">
+<button onclick="goDeposit()" style="
+width:100%;
+padding:10px;
+border-radius:10px;
+background:#1e293b;
+color:white;">
+← Back
+</button>
+</div>
+`;
+};
+
+
+
+
+
+
+
+
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
 return `
