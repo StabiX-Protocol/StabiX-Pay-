@@ -1651,16 +1651,22 @@ Withdraw
 
 <div onclick="goDeposit()" style="
 position:absolute;
-top:15px;
-left:15px;
+top:20px;
+left:20px;
+width:40px;
+height:40px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(6px);
 font-size:22px;
 cursor:pointer;
-opacity:0.8;
 ">
 ←
-</button>
-
 </div>
+
 `;
 };
 
