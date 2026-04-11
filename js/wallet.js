@@ -1155,6 +1155,13 @@ console.log("navigateHome error:", e);
 }
 };
 
+
+
+
+
+
+
+
 window.goDeposit = () => {
 document.querySelector(".box").innerHTML = `
 <h2>Deposit / Withdraw</h2>
@@ -1171,6 +1178,13 @@ Withdraw
 `;
 selectTab("deposit");
 };
+
+
+
+
+
+
+
 
 window.goHistory = () => {
 document.querySelector(".box").innerHTML = `
