@@ -1658,6 +1658,8 @@ cursor:pointer;
 opacity:0.8;
 ">
 ←
+</button>
+
 </div>
 `;
 };
