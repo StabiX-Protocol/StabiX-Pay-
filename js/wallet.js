@@ -1213,27 +1213,24 @@ cursor:pointer;">
 ${user.balance?.toFixed(2) || "0.00"}
 </div>
 </div>
-</div>
-`;
 
-html += `
 <div style="margin-top:25px;">
+  <div style="
+    font-weight:600;
+    font-size:14px;
+    opacity:0.8;
+    margin-bottom:10px;
+  ">
+    Recent Activity
+  </div>
+  <div id="recentTxs"></div>
+</div> 
 
-<div style="
-font-weight:600;
-font-size:14px;
-opacity:0.8;
-margin-bottom:10px;
-">
-Recent Activity
-</div>
-
-<div id="recentTxs"></div>
 
 </div>
 `;
 
-  
+ 
 selectTab("deposit");
 };
 
