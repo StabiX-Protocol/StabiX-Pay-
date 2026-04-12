@@ -2015,8 +2015,6 @@ function networkCardWithdraw(asset, name, type, speed, fee){
 // ================== OPTIONAL / DUPLICATE ==================
 // YE ALAG FLOW HAI (network → then form)
 window.selectWithdrawNetwork = function(asset, network){
-
-  // 👉 selected network ka vault fetch
   const vault = VAULTS[network] || "Not available";
 
   document.querySelector(".box").innerHTML = `
@@ -2039,23 +2037,31 @@ window.selectWithdrawNetwork = function(asset, network){
     </div>
   </div>
 
-  <!-- FORM CARD -->
-  <div style="
-    background:#0b1220;
-    padding:14px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,0.06);
-  ">
+  <!-- NETWORK -->
+<div style="
+  background:#0b1220;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.06);
+  margin-bottom:10px;
+">
+  <div style="font-size:12px;opacity:0.6;">Network</div>
+  <div>${network}</div>
+</div>
 
-    <!-- NETWORK -->
-    <div style="font-size:12px;opacity:0.6;">Network</div>
-    <div style="margin-bottom:10px;">${network}</div>
-
-    <!-- VAULT ADDRESS -->
-    <div style="font-size:12px;opacity:0.6;">Vault Address</div>
-    <div style="color:#60a5fa;margin-bottom:10px;word-break:break-all;">
-      ${vault}
-    </div>
+<!-- VAULT -->
+<div style="
+  background:#0b1220;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.06);
+  margin-bottom:15px;
+">
+  <div style="font-size:12px;opacity:0.6;">Vault Address</div>
+  <div style="font-size:13px;color:#60a5fa;word-break:break-all;">
+    ${VAULTS[network] || "Not available"}
+  </div>
+</div>
 
     <!-- USER INPUT -->
     <div style="font-size:12px;opacity:0.6;">Recipient Address</div>
