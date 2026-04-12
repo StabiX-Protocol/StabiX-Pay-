@@ -1957,7 +1957,7 @@ window.openWithdrawNetwork = function(asset){
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
     
     <!-- BACK BUTTON -->
-    <div onclick="goDeposit()" style="
+    <div onclick="selectDWAsset('${asset}')" style="
       width:36px;height:36px;
       display:flex;align-items:center;justify-content:center;
       border-radius:10px;
@@ -2013,7 +2013,6 @@ function networkCardWithdraw(asset, name, type, speed, fee){
   `;
 }
 // ================== OPTIONAL / DUPLICATE ==================
-// YE ALAG FLOW HAI (network → then form)
 window.selectWithdrawNetwork = function(asset, network){
   const vault = VAULTS[network] || "Not available";
 
