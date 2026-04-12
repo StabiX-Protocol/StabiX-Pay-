@@ -1895,18 +1895,18 @@ window.openWithdrawNetwork = function(asset){
   document.querySelector(".box").innerHTML = `
 
   <!-- HEADER -->
-  <div onclick="selectDWAsset('${asset}')" style="
-  width:36px;
-  height:36px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:10px;
-  background:rgba(255,255,255,0.05);
-  cursor:pointer;
-">
-←
-</div>
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openWithdrawNetwork('${asset}')" style="
+      width:36px;
+      height:36px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:10px;
+      background:rgba(255,255,255,0.05);
+      cursor:pointer;
+      font-size:18px;
+    ">←</div>
 
     <div style="font-size:18px;font-weight:600;">
       Select Network
@@ -1958,7 +1958,7 @@ window.selectWithdrawNetwork = function(asset, network){
 
   <!-- HEADER -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    <div onclick="openWithdrawNetwork('${asset}')" style="
+    
       width:36px;height:36px;
       display:flex;align-items:center;justify-content:center;
       border-radius:10px;
