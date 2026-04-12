@@ -1904,29 +1904,29 @@ window.openWithdrawNetwork = function(asset){
 }
 function networkCardWithdraw(asset, name, type, speed, fee){
   return `
-  onclick="SELECTED_NETWORK='${name}'; openWithdraw('${asset}','${name}')"
-    padding:14px;
-    border-radius:14px;
-    background:#0b1220;
-    border:1px solid rgba(255,255,255,0.06);
-    cursor:pointer;
-  ">
+<div onclick="SELECTED_NETWORK='${name}'; openWithdraw('${asset}','${name}')" style="
+  padding:14px;
+  border-radius:14px;
+  background:#0b1220;
+  border:1px solid rgba(255,255,255,0.06);
+  cursor:pointer;
+">
 
-    <div style="font-weight:600;font-size:15px;">
-      ${name}
-      <span style="opacity:0.5;font-size:12px;"> ${type}</span>
-    </div>
-
-    <div style="font-size:12px;opacity:0.6;margin-top:6px;">
-      Speed: ${speed}
-    </div>
-
-    <div style="font-size:12px;opacity:0.6;">
-      Fee: ${fee}
-    </div>
-
+  <div style="font-weight:600;font-size:15px;">
+    ${name}
+    <span style="opacity:0.5;font-size:12px;"> ${type}</span>
   </div>
-  `;
+
+  <div style="font-size:12px;opacity:0.6;margin-top:6px;">
+    Speed: ${speed}
+  </div>
+
+  <div style="font-size:12px;opacity:0.6;">
+    Fee: ${fee}
+  </div>
+
+</div>
+`;
 }
 window.selectWithdrawNetwork = function(asset, network){
 
