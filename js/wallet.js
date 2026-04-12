@@ -1794,7 +1794,7 @@ window.openDeposit = function(asset){
 
   <!-- HEADER -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    <div onclick="goDeposit()" style="
+    <div onclick="openAssetPage('${asset}')"style="
       width:36px;
       height:36px;
       display:flex;
@@ -1836,7 +1836,7 @@ window.selectNetwork = function(asset, network){
   <!-- HEADER -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
     
-    <div onclick="openAssetPage('${asset}')" style="
+    <div onclick="selectNetwork('${asset}', '${name} ${type}')" style="
       width:36px;
       height:36px;
       display:flex;
@@ -1906,7 +1906,7 @@ window.openWithdraw = function(asset, network){
 
   <!-- HEADER -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    <div onclick="openWithdrawNetwork('${asset}')" style="
+    <div onclick="SELECTED_NETWORK='${name}'; openWithdraw('${asset}','${name}')" style="
       width:36px;
       height:36px;
       display:flex;
@@ -2049,81 +2049,6 @@ function networkCardWithdraw(asset, name, type, speed, fee){
   </div>
   `;
 }
-// ================== OPTIONAL / DUPLICATE ==================
-window.selectWithdrawNetwork = function(asset, network){
-  const vault = VAULTS[network] || "Not available";
-
-  document.querySelector(".box").innerHTML = `
-
-  <!-- HEADER -->
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    
-    <!-- BACK BUTTON -->
-    <div onclick="openWithdrawNetwork('${asset}')" style="
-      width:36px;height:36px;
-      display:flex;align-items:center;justify-content:center;
-      border-radius:10px;
-      background:rgba(255,255,255,0.05);
-      cursor:pointer;
-      font-size:18px;
-    ">←</div>
-
-    <div style="font-size:18px;font-weight:600;">
-      ${asset} Withdraw
-    </div>
-  </div>
-
-  <!-- NETWORK -->
-<div style="
-  background:#0b1220;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.06);
-  margin-bottom:10px;
-">
-  <div style="font-size:12px;opacity:0.6;">Network</div>
-  <div>${network}</div>
-</div>
-
-<!-- VAULT -->
-<div style="
-  background:#0b1220;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.06);
-  margin-bottom:15px;
-">
-  <div style="font-size:12px;opacity:0.6;">Vault Address</div>
-  <div style="font-size:13px;color:#60a5fa;word-break:break-all;">
-    ${VAULTS[network] || "Not available"}
-  </div>
-</div>
-
-    <!-- USER INPUT -->
-    <div style="font-size:12px;opacity:0.6;">Recipient Address</div>
-    <input id="eoa" placeholder="Enter wallet address" style="width:100%;margin-bottom:12px;">
-
-    <div style="font-size:12px;opacity:0.6;">Amount</div>
-    <input id="amount" placeholder="Enter amount" style="width:100%;margin-bottom:15px;">
-
-    <!-- SUBMIT -->
-    <button onclick="submitWithdrawFinal('${asset}','${network}')" style="
-      width:100%;
-      padding:14px;
-      border-radius:12px;
-      background:#ef4444;
-      color:white;
-      font-weight:600;
-    ">
-      Submit Withdraw
-    </button>
-
-  </div>
-  `;
-};
-
-
-
 
 // ================== SUBMIT DEPOSIT ==================
 window.submitDepositFinal = async function(asset, network){
