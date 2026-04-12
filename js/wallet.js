@@ -1697,6 +1697,83 @@ cursor:pointer;
 
 
 
+// ================= OPEN FUNCTIONS =================
+function openDeposit(asset){
+  const amount = prompt("Enter amount");
+  const txHash = prompt("Enter tx hash");
+  submitDeposit(asset, amount, txHash);
+}
+
+function openWithdraw(asset){
+  const amount = prompt("Enter amount");
+  const address = prompt("Enter wallet address");
+  submitWithdraw(asset, amount, address);
+}
+
+
+
+// ================== SUBMIT DEPOSIT ==================
+async function submitDeposit(asset, amount, txHash) {
+
+  if (!amount || amount <= 0) {
+    alert("Invalid amount");
+    return;
+  }
+
+  await addDoc(collection(db, "transactions"), {
+    userId: WALLET,
+    type: "deposit",
+    asset: asset,
+    amount: Number(amount),
+    txHash: txHash || "",
+    status: "pending",
+    createdAt: serverTimestamp()
+  });
+
+  alert("Deposit submitted ✅");
+}
+
+
+// ================== SUBMIT WITHDRAW ==================
+async function submitWithdraw(asset, amount, address) {
+
+  if (!amount || amount <= 0) {
+    alert("Invalid amount");
+    return;
+  }
+
+  const userRef = doc(db, "users", WALLET);
+  const snap = await getDoc(userRef);
+  const user = snap.data();
+
+  const balance = asset === "USDT"
+    ? user.usdtBalance || 0
+    : user.balance || 0;
+
+  if (amount > balance) {
+    alert("Insufficient balance ❌");
+    return;
+  }
+
+  await updateDoc(userRef, {
+    ...(asset === "USDT"
+      ? { usdtBalance: balance - amount }
+      : { balance: balance - amount })
+  });
+
+  await addDoc(collection(db, "transactions"), {
+    userId: WALLET,
+    type: "withdraw",
+    asset: asset,
+    amount: Number(amount),
+    address: address,
+    status: "pending",
+    createdAt: serverTimestamp()
+  });
+
+  alert("Withdraw requested 🚀");
+  }
+
 
 
 
