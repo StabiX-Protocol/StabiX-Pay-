@@ -1662,7 +1662,7 @@ font-weight:bold;">
 Deposit
 </button>
 
-<button onclick="openWithdraw('${asset}')" style="
+<button onclick="openWithdrawNetwork('${asset}')" style="
 flex:1;
 padding:14px;
 border-radius:12px;
@@ -1817,7 +1817,7 @@ window.selectNetwork = function(asset, network){
   `;
 }
 
-window.openWithdraw = function(asset){
+window.openWithdraw = function(asset, network){
 
   document.querySelector(".box").innerHTML = `
 
@@ -1904,7 +1904,7 @@ window.openWithdrawNetwork = function(asset){
 }
 function networkCardWithdraw(asset, name, type, speed, fee){
   return `
-  <div onclick="selectWithdrawNetwork('${asset}','${name.toLowerCase()}')" style="
+  <div onclick="openWithdraw('${asset}','${name}')" style="
     padding:14px;
     border-radius:14px;
     background:#0b1220;
