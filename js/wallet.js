@@ -1873,6 +1873,110 @@ window.selectNetwork = function(asset, network){
   </button>
   `;
 }
+window.openWithdrawNetwork = function(asset){
+
+  document.querySelector(".box").innerHTML = `
+
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+    <div onclick="goDepositAsset()" style="
+      width:36px;height:36px;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:10px;
+      background:rgba(255,255,255,0.05);
+      cursor:pointer;
+    ">←</div>
+
+    <div style="font-size:18px;font-weight:600;">
+      Select Network
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;">
+
+    ${networkCardWithdraw(asset,"Ethereum","ERC20","~2 min","$5")}
+    ${networkCardWithdraw(asset,"Arbitrum","L2","~10 sec","Low")}
+    ${networkCardWithdraw(asset,"Polygon","PoS","~5 sec","Very low")}
+    ${networkCardWithdraw(asset,"Base","L2","~5 sec","Low")}
+
+  </div>
+  `;
+}
+function networkCardWithdraw(asset, name, type, speed, fee){
+  return `
+  <div onclick="selectWithdrawNetwork('${asset}','${name.toLowerCase()}')" style="
+    padding:14px;
+    border-radius:14px;
+    background:#0b1220;
+    border:1px solid rgba(255,255,255,0.06);
+    cursor:pointer;
+  ">
+
+    <div style="font-weight:600;font-size:15px;">
+      ${name}
+      <span style="opacity:0.5;font-size:12px;"> ${type}</span>
+    </div>
+
+    <div style="font-size:12px;opacity:0.6;margin-top:6px;">
+      Speed: ${speed}
+    </div>
+
+    <div style="font-size:12px;opacity:0.6;">
+      Fee: ${fee}
+    </div>
+
+  </div>
+  `;
+}
+window.selectWithdrawNetwork = function(asset, network){
+
+  document.querySelector(".box").innerHTML = `
+
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+    <div onclick="openWithdrawNetwork('${asset}')" style="
+      width:36px;height:36px;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:10px;
+      background:rgba(255,255,255,0.05);
+      cursor:pointer;
+    ">←</div>
+
+    <div style="font-size:18px;font-weight:600;">
+      ${asset} Withdraw
+    </div>
+  </div>
+
+  <div style="
+    background:#0b1220;
+    padding:14px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,0.06);
+  ">
+
+    <div style="font-size:12px;opacity:0.6;">Network</div>
+    <div style="margin-bottom:10px;">${network}</div>
+
+    <div style="font-size:12px;opacity:0.6;">Recipient Address</div>
+    <input id="eoa" placeholder="Enter wallet address" style="width:100%;margin-bottom:12px;">
+
+    <div style="font-size:12px;opacity:0.6;">Amount</div>
+    <input id="amount" placeholder="Enter amount" style="width:100%;margin-bottom:15px;">
+
+    <button onclick="submitWithdrawFinal('${asset}','${network}')" style="
+      width:100%;
+      padding:14px;
+      border-radius:12px;
+      background:#ef4444;
+      color:white;
+      font-weight:600;
+    ">
+      Submit Withdraw
+    </button>
+
+  </div>
+  `;
+}
 
 
 
@@ -1911,8 +2015,7 @@ window.submitDepositFinal = async function(asset, network){
 }
 
 // ================== SUBMIT WITHDRAW ==================
-
-window.submitWithdrawFinal = async function(asset){
+window.submitWithdrawFinal = async function(asset, network){
 
   const amount = document.getElementById("amount").value;
   const eoa = document.getElementById("eoa").value;
@@ -1926,6 +2029,7 @@ window.submitWithdrawFinal = async function(asset){
     userId: WALLET,
     type: "withdraw",
     asset,
+    network,
     amount: Number(amount),
     eoa,
     status: "pending",
@@ -1936,7 +2040,7 @@ window.submitWithdrawFinal = async function(asset){
     pendingRequest: true
   });
 
-  alert("Withdraw request sent");
+  alert("Withdraw request received 🚀\n\nBatching in progress...\nMerkle root banne ke baad aapko leaf milega.\nStay tuned 🔔");
 
   goDeposit();
 }
