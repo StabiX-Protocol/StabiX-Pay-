@@ -2040,7 +2040,7 @@ window.submitWithdrawFinal = async function(asset, network){
     pendingRequest: true
   });
 
-  alert("Withdraw request received 🚀\n\nBatching in progress...\nMerkle root banne ke baad aapko leaf milega.\nStay tuned 🔔");
+  alert("Withdraw request submitted. Your request is in batching. You will receive your merkle proof(Leaf) in notification after merkle root once ready.");
 
   goDeposit();
 }
