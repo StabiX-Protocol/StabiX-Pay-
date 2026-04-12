@@ -1706,27 +1706,40 @@ cursor:pointer;
 
 
 
-// ================= OPEN FUNCTIONS =================
 
+// ================== VAULT CONFIG (COMMON) ==================
+const VAULTS = {
+  "Ethereum ERC20": "0xETH_VAULT",
+  "Arbitrum L2": "0xARB_VAULT",
+  "Polygon PoS": "0xPOLY_VAULT",
+  "Base L2": "0xBASE_VAULT",
+  "Tron TRC20": "TXYZ_TRON_VAULT"
+};
+
+// ================= OPEN FUNCTIONS =================
 function networkCard(asset, name, type, speed, fee){
   return `
-  <div onclick="selectNetwork('${asset}','${name.toLowerCase()}')" style="
-    padding:14px;
-    border-radius:14px;
-    background:#0b1220;
-    border:1px solid rgba(255,255,255,0.06);
-    cursor:pointer;
-  ">
+  <div onclick="selectNetwork('${asset}','${name} ${type}')"
+    style="
+      padding:14px;
+      border-radius:14px;
+      background:#0b1220;
+      border:1px solid rgba(255,255,255,0.06);
+      cursor:pointer;
+    ">
 
+    <!-- NETWORK NAME -->
     <div style="font-weight:600;font-size:15px;">
       ${name}
       <span style="opacity:0.5;font-size:12px;"> ${type}</span>
     </div>
 
+    <!-- SPEED -->
     <div style="font-size:12px;opacity:0.6;margin-top:6px;">
       Speed: ${speed}
     </div>
 
+    <!-- FEE -->
     <div style="font-size:12px;opacity:0.6;">
       Fee: ${fee}
     </div>
@@ -1777,10 +1790,15 @@ window.openDeposit = function(asset){
 // ================== PAGE 4 ==================
 // VAULT + TX HASH + AMOUNT + EOA
 window.selectNetwork = function(asset, network){
+
+  // 👉 correct vault fetch
+  const vault = VAULTS[network] || "Not available";
+
   document.querySelector(".box").innerHTML = `
 
   <!-- HEADER -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+    
     <div onclick="openDeposit('${asset}')" style="
       width:36px;
       height:36px;
@@ -1798,6 +1816,18 @@ window.selectNetwork = function(asset, network){
     </div>
   </div>
 
+  <!-- NETWORK -->
+  <div style="
+    background:#0b1220;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.06);
+    margin-bottom:10px;
+  ">
+    <div style="font-size:12px;opacity:0.6;">Network</div>
+    <div>${network}</div>
+  </div>
+
   <!-- VAULT -->
   <div style="
     background:#0b1220;
@@ -1808,7 +1838,7 @@ window.selectNetwork = function(asset, network){
   ">
     <div style="font-size:12px;opacity:0.6;">Vault Address</div>
     <div style="font-size:13px;color:#60a5fa;word-break:break-all;">
-      0xYOUR_VAULT_ADDRESS
+      ${vault}
     </div>
   </div>
 
@@ -1817,6 +1847,7 @@ window.selectNetwork = function(asset, network){
   <input id="txHash" placeholder="Transaction Hash" style="width:100%;margin-bottom:10px;">
   <input id="eoa" placeholder="Your Wallet Address" style="width:100%;margin-bottom:15px;">
 
+  <!-- SUBMIT -->
   <button onclick="submitDepositFinal('${asset}','${network}')" style="
     width:100%;
     padding:14px;
@@ -1923,76 +1954,84 @@ window.openWithdrawNetwork = function(asset){
   document.querySelector(".box").innerHTML = `
 
   <!-- HEADER -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-  <div onclick="selectDWAsset('${asset}')" style="
-    width:36px;
-    height:36px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:10px;
-    background:rgba(255,255,255,0.05);
-    cursor:pointer;
-  ">←</div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+    
+    <!-- BACK BUTTON -->
+    <div onclick="goDeposit()" style="
+      width:36px;height:36px;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:10px;
+      background:rgba(255,255,255,0.05);
+      cursor:pointer;
+      font-size:18px;
+    ">←</div>
 
     <div style="font-size:18px;font-weight:600;">
       Select Network
     </div>
   </div>
 
+  <!-- NETWORK LIST -->
   <div style="display:flex;flex-direction:column;gap:12px;">
-
     ${networkCardWithdraw(asset,"Ethereum","ERC20","~2 min","$5")}
     ${networkCardWithdraw(asset,"Arbitrum","L2","~10 sec","Low")}
     ${networkCardWithdraw(asset,"Polygon","PoS","~5 sec","Very low")}
     ${networkCardWithdraw(asset,"Base","L2","~5 sec","Low")}
-
   </div>
   `;
-}
+};
 
 
 function networkCardWithdraw(asset, name, type, speed, fee){
   return `
-<div onclick="SELECTED_NETWORK='${name}'; openWithdraw('${asset}','${name}')" style="
-  padding:14px;
-  border-radius:14px;
-  background:#0b1220;
-  border:1px solid rgba(255,255,255,0.06);
-  cursor:pointer;
-">
+  <div onclick="selectWithdrawNetwork('${asset}','${name} ${type}')"
+    style="
+      padding:14px;
+      border-radius:14px;
+      background:#0b1220;
+      border:1px solid rgba(255,255,255,0.06);
+      cursor:pointer;
+    ">
 
-  <div style="font-weight:600;font-size:15px;">
-    ${name}
-    <span style="opacity:0.5;font-size:12px;"> ${type}</span>
+    <!-- NETWORK NAME -->
+    <div style="font-weight:600;font-size:15px;">
+      ${name}
+      <span style="opacity:0.5;font-size:12px;"> ${type}</span>
+    </div>
+
+    <!-- SPEED -->
+    <div style="font-size:12px;opacity:0.6;margin-top:6px;">
+      Speed: ${speed}
+    </div>
+
+    <!-- FEE -->
+    <div style="font-size:12px;opacity:0.6;">
+      Fee: ${fee}
+    </div>
+
   </div>
-
-  <div style="font-size:12px;opacity:0.6;margin-top:6px;">
-    Speed: ${speed}
-  </div>
-
-  <div style="font-size:12px;opacity:0.6;">
-    Fee: ${fee}
-  </div>
-
-</div>
-`;
+  `;
 }
 // ================== OPTIONAL / DUPLICATE ==================
 // YE ALAG FLOW HAI (network → then form)
-
 window.selectWithdrawNetwork = function(asset, network){
+
+  // 👉 selected network ka vault fetch
+  const vault = VAULTS[network] || "Not available";
 
   document.querySelector(".box").innerHTML = `
 
   <!-- HEADER -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
     
+    <!-- BACK BUTTON -->
+    <div onclick="openWithdrawNetwork('${asset}')" style="
       width:36px;height:36px;
       display:flex;align-items:center;justify-content:center;
       border-radius:10px;
       background:rgba(255,255,255,0.05);
       cursor:pointer;
+      font-size:18px;
     ">←</div>
 
     <div style="font-size:18px;font-weight:600;">
@@ -2000,6 +2039,7 @@ window.selectWithdrawNetwork = function(asset, network){
     </div>
   </div>
 
+  <!-- FORM CARD -->
   <div style="
     background:#0b1220;
     padding:14px;
@@ -2007,15 +2047,24 @@ window.selectWithdrawNetwork = function(asset, network){
     border:1px solid rgba(255,255,255,0.06);
   ">
 
+    <!-- NETWORK -->
     <div style="font-size:12px;opacity:0.6;">Network</div>
     <div style="margin-bottom:10px;">${network}</div>
 
+    <!-- VAULT ADDRESS -->
+    <div style="font-size:12px;opacity:0.6;">Vault Address</div>
+    <div style="color:#60a5fa;margin-bottom:10px;word-break:break-all;">
+      ${vault}
+    </div>
+
+    <!-- USER INPUT -->
     <div style="font-size:12px;opacity:0.6;">Recipient Address</div>
     <input id="eoa" placeholder="Enter wallet address" style="width:100%;margin-bottom:12px;">
 
     <div style="font-size:12px;opacity:0.6;">Amount</div>
     <input id="amount" placeholder="Enter amount" style="width:100%;margin-bottom:15px;">
 
+    <!-- SUBMIT -->
     <button onclick="submitWithdrawFinal('${asset}','${network}')" style="
       width:100%;
       padding:14px;
@@ -2029,7 +2078,7 @@ window.selectWithdrawNetwork = function(asset, network){
 
   </div>
   `;
-}
+};
 
 
 
@@ -2068,7 +2117,6 @@ window.submitDepositFinal = async function(asset, network){
 }
 
 // ================== SUBMIT WITHDRAW ==================
-let SELECTED_NETWORK = "";
 window.submitWithdrawFinal = async function(asset, network){
 
   const amount = document.getElementById("amount").value;
@@ -2078,7 +2126,6 @@ window.submitWithdrawFinal = async function(asset, network){
     alert("Fill all fields");
     return;
   }
-
   await addDoc(collection(db, "requests"), {
     userId: WALLET,
     type: "withdraw",
@@ -2094,11 +2141,10 @@ window.submitWithdrawFinal = async function(asset, network){
     pendingRequest: true
   });
 
-  alert("Withdraw request submitted. Your request is in batching. You will receive your merkle proof(Leaf) in notification after merkle root once ready.");
+  alert("Withdraw request submitted. Batching in progress. You will receive Merkle proof soon.");
 
   goDeposit();
-}
-
+};
 
 
 
