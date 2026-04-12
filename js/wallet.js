@@ -1699,81 +1699,117 @@ cursor:pointer;
 
 // ================= OPEN FUNCTIONS =================
 window.openDeposit = function(asset){
-  const amount = prompt("Enter amount");
-  const txHash = prompt("Enter tx hash");
-  submitDeposit(asset, amount, txHash);
+  window.selectedDWAsset = asset;
+
+  document.querySelector(".box").innerHTML = `
+  <h2>Select Network</h2>
+
+  <div onclick="selectNetwork('${asset}','ethereum')" class="net">Ethereum</div>
+  <div onclick="selectNetwork('${asset}','arbitrum')" class="net">Arbitrum</div>
+  <div onclick="selectNetwork('${asset}','polygon')" class="net">Polygon</div>
+  <div onclick="selectNetwork('${asset}','base')" class="net">Base</div>
+  `;
 }
 
 window.openWithdraw = function(asset){
-  const amount = prompt("Enter amount");
-  const address = prompt("Enter wallet address");
-  submitWithdraw(asset, amount, address);
+
+  document.querySelector(".box").innerHTML = `
+    <h2>${asset} Withdraw</h2>
+
+    <input id="amount" placeholder="Amount">
+    <input id="eoa" placeholder="Your Wallet Address">
+
+    <button onclick="submitWithdrawFinal('${asset}')">
+      Submit Withdraw
+    </button>
+  `;
+}
+window.selectNetwork = function(asset, network){
+
+  document.querySelector(".box").innerHTML = `
+
+  <h2>${asset} Deposit (${network})</h2>
+
+  <div>Vault Address:</div>
+  <div style="font-size:12px;color:#60a5fa;">
+    0xYOUR_VAULT_ADDRESS
+  </div>
+
+  <input id="amount" placeholder="Amount">
+  <input id="txHash" placeholder="Transaction Hash">
+  <input id="eoa" placeholder="Your Wallet Address">
+
+  <button onclick="submitDepositFinal('${asset}','${network}')">
+    Submit Deposit
+  </button>
+  `;
 }
 
 
 
 // ================== SUBMIT DEPOSIT ==================
-async function submitDeposit(asset, amount, txHash) {
+window.submitDepositFinal = async function(asset, network){
 
-  if (!amount || amount <= 0) {
-    alert("Invalid amount");
+  const amount = document.getElementById("amount").value;
+  const txHash = document.getElementById("txHash").value;
+  const eoa = document.getElementById("eoa").value;
+
+  if(!amount || !txHash || !eoa){
+    alert("Fill all fields");
     return;
   }
 
-  await addDoc(collection(db, "transactions"), {
+  await addDoc(collection(db, "requests"), {
     userId: WALLET,
     type: "deposit",
-    asset: asset,
+    asset,
+    network,
     amount: Number(amount),
-    txHash: txHash || "",
+    txHash,
+    eoa,
     status: "pending",
     createdAt: serverTimestamp()
   });
-
-  alert("Deposit submitted ✅");
-}
-
-
-// ================== SUBMIT WITHDRAW ==================
-async function submitWithdraw(asset, amount, address) {
-
-  if (!amount || amount <= 0) {
-    alert("Invalid amount");
-    return;
-  }
-
-  const userRef = doc(db, "users", WALLET);
-  const snap = await getDoc(userRef);
-  const user = snap.data();
-
-  const balance = asset === "USDT"
-    ? user.usdtBalance || 0
-    : user.balance || 0;
-
-  if (amount > balance) {
-    alert("Insufficient balance ❌");
-    return;
-  }
 
   await updateDoc(userRef, {
-    ...(asset === "USDT"
-      ? { usdtBalance: balance - amount }
-      : { balance: balance - amount })
+    pendingRequest: true
   });
 
-  await addDoc(collection(db, "transactions"), {
+  alert("Deposit request sent");
+
+  goDeposit();
+}
+
+// ================== SUBMIT WITHDRAW ==================
+
+window.submitWithdrawFinal = async function(asset){
+
+  const amount = document.getElementById("amount").value;
+  const eoa = document.getElementById("eoa").value;
+
+  if(!amount || !eoa){
+    alert("Fill all fields");
+    return;
+  }
+
+  await addDoc(collection(db, "requests"), {
     userId: WALLET,
     type: "withdraw",
-    asset: asset,
+    asset,
     amount: Number(amount),
-    address: address,
+    eoa,
     status: "pending",
     createdAt: serverTimestamp()
   });
 
-  alert("Withdraw requested 🚀");
-  }
+  await updateDoc(userRef, {
+    pendingRequest: true
+  });
 
+  alert("Withdraw request sent");
+
+  goDeposit();
+}
 
 
 
