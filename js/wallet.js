@@ -1698,52 +1698,182 @@ cursor:pointer;
 
 
 // ================= OPEN FUNCTIONS =================
-window.openDeposit = function(asset){
-  window.selectedDWAsset = asset;
 
-  document.querySelector(".box").innerHTML = `
-  <h2>Select Network</h2>
+function networkCard(asset, name, type, speed, fee){
+  return `
+  <div onclick="selectNetwork('${asset}','${name.toLowerCase()}')" style="
+    padding:14px;
+    border-radius:14px;
+    background:#0b1220;
+    border:1px solid rgba(255,255,255,0.06);
+    cursor:pointer;
+  ">
 
-  <div onclick="selectNetwork('${asset}','ethereum')" class="net">Ethereum</div>
-  <div onclick="selectNetwork('${asset}','arbitrum')" class="net">Arbitrum</div>
-  <div onclick="selectNetwork('${asset}','polygon')" class="net">Polygon</div>
-  <div onclick="selectNetwork('${asset}','base')" class="net">Base</div>
+    <div style="font-weight:600;font-size:15px;">
+      ${name}
+      <span style="opacity:0.5;font-size:12px;"> ${type}</span>
+    </div>
+
+    <div style="font-size:12px;opacity:0.6;margin-top:6px;">
+      Speed: ${speed}
+    </div>
+
+    <div style="font-size:12px;opacity:0.6;">
+      Fee: ${fee}
+    </div>
+
+  </div>
   `;
 }
+
+
+
+window.openDeposit = function(asset){
+
+  document.querySelector(".box").innerHTML = `
+
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+    <div onclick="goDeposit()" style="
+      width:36px;
+      height:36px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:10px;
+      background:rgba(255,255,255,0.05);
+      cursor:pointer;
+      font-size:18px;
+    ">←</div>
+
+    <div style="font-size:18px;font-weight:600;">
+      Select Network
+    </div>
+  </div>
+
+  <!-- NETWORK LIST -->
+  <div style="display:flex;flex-direction:column;gap:12px;">
+
+    ${networkCard(asset,"Ethereum","ERC20","~2 min","$5 fee")}
+    ${networkCard(asset,"Arbitrum","L2","~10 sec","Low fee")}
+    ${networkCard(asset,"Polygon","PoS","~5 sec","Very low")}
+    ${networkCard(asset,"Base","L2","~5 sec","Low fee")}
+
+  </div>
+  `;
+}
+
 
 window.openWithdraw = function(asset){
 
   document.querySelector(".box").innerHTML = `
-    <h2>${asset} Withdraw</h2>
 
-    <input id="amount" placeholder="Amount">
-    <input id="eoa" placeholder="Your Wallet Address">
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+    <div onclick="goDeposit()" style="
+      width:36px;
+      height:36px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:10px;
+      background:rgba(255,255,255,0.05);
+      cursor:pointer;
+      font-size:18px;
+    ">←</div>
 
-    <button onclick="submitWithdrawFinal('${asset}')">
-      Submit Withdraw
-    </button>
-  `;
-}
-window.selectNetwork = function(asset, network){
-
-  document.querySelector(".box").innerHTML = `
-
-  <h2>${asset} Deposit (${network})</h2>
-
-  <div>Vault Address:</div>
-  <div style="font-size:12px;color:#60a5fa;">
-    0xYOUR_VAULT_ADDRESS
+    <div style="font-size:18px;font-weight:600;">
+      ${asset} Withdraw
+    </div>
   </div>
 
-  <input id="amount" placeholder="Amount">
-  <input id="txHash" placeholder="Transaction Hash">
-  <input id="eoa" placeholder="Your Wallet Address">
+  <!-- FORM CARD -->
+  <div style="
+    background:#0b1220;
+    padding:14px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,0.06);
+  ">
 
-  <button onclick="submitDepositFinal('${asset}','${network}')">
+    <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
+      Recipient Address
+    </div>
+    <input id="eoa" placeholder="Enter wallet address" style="width:100%;margin-bottom:12px;">
+
+    <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
+      Amount
+    </div>
+    <input id="amount" placeholder="Enter amount" style="width:100%;margin-bottom:15px;">
+
+    <button onclick="submitWithdrawFinal('${asset}')" style="
+      width:100%;
+      padding:14px;
+      border-radius:12px;
+      background:#ef4444;
+      color:white;
+      font-weight:600;
+    ">
+      Submit Withdraw
+    </button>
+
+  </div>
+  `;
+}
+
+window.selectNetwork = function(asset, network){
+  document.querySelector(".box").innerHTML = `
+
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+    <div onclick="openDeposit('${asset}')" style="
+      width:36px;
+      height:36px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:10px;
+      background:rgba(255,255,255,0.05);
+      cursor:pointer;
+      font-size:18px;
+    ">←</div>
+
+    <div style="font-size:18px;font-weight:600;">
+      ${asset} Deposit
+    </div>
+  </div>
+
+  <!-- VAULT -->
+  <div style="
+    background:#0b1220;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.06);
+    margin-bottom:15px;
+  ">
+    <div style="font-size:12px;opacity:0.6;">Vault Address</div>
+    <div style="font-size:13px;color:#60a5fa;word-break:break-all;">
+      0xYOUR_VAULT_ADDRESS
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <input id="amount" placeholder="Amount" style="width:100%;margin-bottom:10px;">
+  <input id="txHash" placeholder="Transaction Hash" style="width:100%;margin-bottom:10px;">
+  <input id="eoa" placeholder="Your Wallet Address" style="width:100%;margin-bottom:15px;">
+
+  <button onclick="submitDepositFinal('${asset}','${network}')" style="
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    background:#22c55e;
+    color:black;
+    font-weight:600;
+  ">
     Submit Deposit
   </button>
   `;
 }
+
 
 
 
