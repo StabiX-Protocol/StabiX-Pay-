@@ -1838,7 +1838,7 @@ window.openWithdraw = function(asset, network){
 
   <!-- HEADER -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    <div onclick="goDeposit()" style="
+    <div onclick="openWithdrawNetwork('${asset}')" style="
       width:36px;
       height:36px;
       display:flex;
@@ -1855,7 +1855,35 @@ window.openWithdraw = function(asset, network){
     </div>
   </div>
 
-  <!-- FORM CARD -->
+  <!-- NETWORK SHOW -->
+  <div style="
+    background:#0b1220;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.06);
+    margin-bottom:12px;
+  ">
+    <div style="font-size:12px;opacity:0.6;">Network</div>
+    <div style="font-size:14px;font-weight:600;">
+      ${network}
+    </div>
+  </div>
+
+  <!-- VAULT ADDRESS -->
+  <div style="
+    background:#0b1220;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.06);
+    margin-bottom:15px;
+  ">
+    <div style="font-size:12px;opacity:0.6;">Vault Address</div>
+    <div style="font-size:13px;color:#60a5fa;word-break:break-all;">
+      0xYOUR_VAULT_ADDRESS
+    </div>
+  </div>
+
+  <!-- FORM -->
   <div style="
     background:#0b1220;
     padding:14px;
@@ -1873,7 +1901,7 @@ window.openWithdraw = function(asset, network){
     </div>
     <input id="amount" placeholder="Enter amount" style="width:100%;margin-bottom:15px;">
 
-    <button onclick="submitWithdrawFinal('${asset}', SELECTED_NETWORK)" style="
+    <button onclick="submitWithdrawFinal('${asset}','${network}')" style="
       width:100%;
       padding:14px;
       border-radius:12px;
@@ -1922,6 +1950,8 @@ window.openWithdrawNetwork = function(asset){
   </div>
   `;
 }
+
+
 function networkCardWithdraw(asset, name, type, speed, fee){
   return `
 <div onclick="SELECTED_NETWORK='${name}'; openWithdraw('${asset}','${name}')" style="
