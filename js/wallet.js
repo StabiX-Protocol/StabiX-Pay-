@@ -1156,22 +1156,14 @@ console.log("navigateHome error:", e);
 };
 
 
-
-
-
-
-
-
 window.goDeposit = async () => {
 const snap = await getDoc(userRef);
 const user = snap.data();
 
 document.querySelector(".box").innerHTML = `
 <h2>Select Asset</h2>
-
 <div style="display:flex;flex-direction:column;gap:12px;margin-top:15px;">
 
-<!-- USDT -->
 <div onclick="selectDWAsset('USDT')" style="
 background:#020617;
 border:1px solid #1e293b;
@@ -1181,19 +1173,15 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 cursor:pointer;">
-  
 <div style="display:flex;align-items:center;gap:10px;">
 <img src="./media/tether-usdt-logo.png" style="width:32px;height:32px;border-radius:50%;">
 <div>USDT</div>
 </div>
-
 <div style="font-weight:bold">
 ${user.usdtBalance?.toFixed(2) || "0.00"}
 </div>
-
 </div>
 
-<!-- USDC -->
 <div onclick="selectDWAsset('USDC')" style="
 background:#020617;
 border:1px solid #1e293b;
@@ -1203,109 +1191,75 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 cursor:pointer;">
-  
 <div style="display:flex;align-items:center;gap:10px;">
 <img src="./media/usd-coin-usdc-logo.png" style="width:32px;height:32px;border-radius:50%;">
 <div>USDC</div>
 </div>
-
 <div style="font-weight:bold">
 ${user.balance?.toFixed(2) || "0.00"}
 </div>
 </div>
 
 <div style="margin-top:25px;">
-  <div style="
-    font-weight:600;
-    font-size:14px;
-    opacity:0.8;
-    margin-bottom:10px;
-  ">
-    Recent Activity
-  </div>
-  <div id="recentTxs"></div>
-  
+<div style="
+font-weight:600;
+font-size:14px;
+opacity:0.8;
+margin-bottom:10px;">
+Recent Activity
+</div>
+<div id="recentTxs"></div> 
 </div>
 `;
 
 (async () => {
-
-  const q = query(
-    collection(db, "transactions"),
-    where("userId", "==", WALLET)
-  );
-
-  const snap = await getDocs(q);
-
-  let arr = [];
-
-  snap.forEach(d => {
-    const t = d.data();
-
-    if(t.type === "deposit" || t.type === "withdraw"){
-      arr.push({
-        ...t,
-        _time: t.createdAt?.seconds || 0
-      });
-    }
-  });
-
-  arr.sort((a,b)=> b._time - a._time);
-  arr = arr.slice(0,5);
-
-  let html = "";
-
-  arr.forEach(t => {
-
-    const isDeposit = t.type === "deposit";
-
-    const time = t.createdAt
-      ? new Date(t.createdAt.seconds * 1000).toLocaleString("en-IN", {
-          day: "2-digit",
-          month: "short",
-          hour: "2-digit",
-          minute: "2-digit"
-        })
-      : "";
-
-    html += `
-    <div style="
-      display:flex;
-      justify-content:space-between;
-      padding:10px 0;
-      border-bottom:1px solid rgba(255,255,255,0.05);
-    ">
-
-      <div style="font-size:13px;">
-        <div>${isDeposit ? "Deposit" : "Withdraw"}</div>
-        <div style="font-size:11px;opacity:0.6;">${time}</div>
-      </div>
-
-      <div style="
-        font-weight:600;
-        color:${isDeposit ? "#22c55e" : "#ef4444"};
-      ">
-        ${isDeposit ? "+" : "-"} ${t.amount} ${t.asset || ""}
-      </div>
-
-    </div>
-    `;
-  });
-
-  document.getElementById("recentTxs").innerHTML =
-    html || `<div style="opacity:0.5;">No recent D/W</div>`;
-
-})();
-
-  
- 
+const q = query(
+collection(db, "transactions"),
+where("userId", "==", WALLET));
+const snap = await getDocs(q);
+let arr = [];
+snap.forEach(d => {
+const t = d.data();
+if(t.type === "deposit" || t.type === "withdraw"){
+arr.push({...t,_time: t.createdAt?.seconds || 0});
+}
+});
+arr.sort((a,b)=> b._time - a._time);
+arr = arr.slice(0,5);
+let html = "";
+arr.forEach(t => {
+const isDeposit = t.type === "deposit";
+const time = t.createdAt
+? new Date(t.createdAt.seconds * 1000).toLocaleString("en-IN", {
+day: "2-digit",
+month: "short",
+hour: "2-digit",
+minute: "2-digit"
+})
+: "";
+html += `
+<div style="
+display:flex;
+justify-content:space-between;
+padding:10px 0;
+border-bottom:1px solid rgba(255,255,255,0.05);">
+<div style="font-size:13px;">
+<div>${isDeposit ? "Deposit" : "Withdraw"}</div>
+<div style="font-size:11px;opacity:0.6;">${time}</div>
+</div>
+<div style="
+font-weight:600;
+color:${isDeposit ? "#22c55e" : "#ef4444"};">
+${isDeposit ? "+" : "-"} ${t.amount} ${t.asset || ""}
+</div>
+</div>
+`;
+});
+document.getElementById("recentTxs").innerHTML =
+html || `<div style="opacity:0.5;">No recent D/W</div>`;
+})(); 
 selectTab("deposit");
 };
-
-
-
-
-
 
 
 window.goHistory = () => {
@@ -1414,37 +1368,28 @@ if(type === "type"){
 html = `
 <div class="sheet">
 <h3 style="margin:0 0 12px 0;">Transaction Type</h3>
-
 <div class="assetList">
-
 <div class="assetItem" onclick="setType('sent')">
 <span>Sent</span>
 </div>
-
 <div class="assetItem" onclick="setType('received')">
 <span>Received</span>
 </div>
-
 <div class="assetItem" onclick="setType('deposit')">
 <span>Deposit</span>
 </div>
-
 <div class="assetItem" onclick="setType('withdraw')">
 <span>Withdraw</span>
 </div>
-
 </div>
-
 <button onclick="clearTypeFilter()" 
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
 background:#1e293b;color:#e5e7eb;border:none;">
 Clear Filter
 </button>
-
 <button onclick="applyFilter('type')" class="applyBtn">
 Apply
 </button>
-
 </div>
 `;
 }
@@ -1678,7 +1623,6 @@ window.selectedDWAsset = asset;
 
 document.querySelector(".box").innerHTML = `
 
-
 <div style="
 display:flex;
 flex-direction:column;
@@ -1769,7 +1713,7 @@ return `
 <option value="USDT">USDT</option>
 </select>
 
-    <input id="vEOA" placeholder="Wallet Address (0x...)" style="
+<input id="vEOA" placeholder="Wallet Address (0x...)" style="
 width:100%;
 margin-top:8px;
 padding:10px;
