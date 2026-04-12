@@ -1984,16 +1984,40 @@ window.openWithdraw = function(asset, network){
   `;
   }
 
-// ================== PAGE 5 ==================
-// SELECT NETWORK (Withdraw)
+function networkCardWithdraw(asset, name, type, speed, fee){
+  return `
+  <div onclick="selectWithdrawNetwork('${asset}','${name} ${type}')"
+    style="
+      padding:14px;
+      border-radius:14px;
+      background:#0b1220;
+      border:1px solid rgba(255,255,255,0.06);
+      cursor:pointer;
+    ">
+
+    <div style="font-weight:600;font-size:15px;">
+      ${name}
+      <span style="opacity:0.5;font-size:12px;"> ${type}</span>
+    </div>
+
+    <div style="font-size:12px;opacity:0.6;margin-top:6px;">
+      Speed: ${speed}
+    </div>
+
+    <div style="font-size:12px;opacity:0.6;">
+      Fee: ${fee}
+    </div>
+
+  </div>
+  `;
+}
+  
 window.openWithdrawNetwork = function(asset){
 
   document.querySelector(".box").innerHTML = `
 
-  <!-- HEADER -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
     
-    <!-- BACK BUTTON -->
     <div onclick="openAssetPage('${asset}')" style="
       width:36px;height:36px;
       display:flex;align-items:center;justify-content:center;
@@ -2008,7 +2032,6 @@ window.openWithdrawNetwork = function(asset){
     </div>
   </div>
 
-  <!-- NETWORK LIST -->
   <div style="display:flex;flex-direction:column;gap:12px;">
     ${networkCardWithdraw(asset,"Ethereum","ERC20","~2 min","$5")}
     ${networkCardWithdraw(asset,"Arbitrum","L2","~10 sec","Low")}
@@ -2017,39 +2040,73 @@ window.openWithdrawNetwork = function(asset){
   </div>
   `;
 };
+window.selectWithdrawNetwork = function(asset, network){
 
+  const vault = VAULTS[network] || "Not available";
 
-function networkCardWithdraw(asset, name, type, speed, fee){
-  return `
-  <div onclick="selectWithdrawNetwork('${asset}','${name} ${type}')"
-    style="
-      padding:14px;
-      border-radius:14px;
-      background:#0b1220;
-      border:1px solid rgba(255,255,255,0.06);
+  document.querySelector(".box").innerHTML = `
+
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+    
+    <div onclick="openWithdrawNetwork('${asset}')" style="
+      width:36px;height:36px;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:10px;
+      background:rgba(255,255,255,0.05);
       cursor:pointer;
-    ">
+      font-size:18px;
+    ">←</div>
 
-    <!-- NETWORK NAME -->
-    <div style="font-weight:600;font-size:15px;">
-      ${name}
-      <span style="opacity:0.5;font-size:12px;"> ${type}</span>
+    <div style="font-size:18px;font-weight:600;">
+      ${asset} Withdraw
     </div>
-
-    <!-- SPEED -->
-    <div style="font-size:12px;opacity:0.6;margin-top:6px;">
-      Speed: ${speed}
-    </div>
-
-    <!-- FEE -->
-    <div style="font-size:12px;opacity:0.6;">
-      Fee: ${fee}
-    </div>
-
   </div>
+
+  <!-- NETWORK -->
+  <div style="
+    background:#0b1220;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.06);
+    margin-bottom:10px;
+  ">
+    <div style="font-size:12px;opacity:0.6;">Network</div>
+    <div>${network}</div>
+  </div>
+
+  <!-- VAULT -->
+  <div style="
+    background:#0b1220;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.06);
+    margin-bottom:15px;
+  ">
+    <div style="font-size:12px;opacity:0.6;">Vault Address</div>
+    <div style="font-size:13px;color:#60a5fa;word-break:break-all;">
+      ${vault}
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <input id="eoa" placeholder="Recipient Address" style="width:100%;margin-bottom:10px;">
+  <input id="amount" placeholder="Amount" style="width:100%;margin-bottom:15px;">
+
+  <!-- SUBMIT -->
+  <button onclick="submitWithdrawFinal('${asset}','${network}')" style="
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    background:#ef4444;
+    color:white;
+    font-weight:600;
+  ">
+    Submit Withdraw
+  </button>
+
   `;
 }
-
    
 // ================== SUBMIT DEPOSIT ==================
 window.submitDepositFinal = async function(asset, network){
