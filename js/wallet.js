@@ -1858,7 +1858,7 @@ window.openWithdraw = function(asset, network){
     </div>
     <input id="amount" placeholder="Enter amount" style="width:100%;margin-bottom:15px;">
 
-    <button onclick="submitWithdrawFinal('${asset}')" style="
+    <button onclick="submitWithdrawFinal('${asset}', SELECTED_NETWORK)" style="
       width:100%;
       padding:14px;
       border-radius:12px;
