@@ -1977,7 +1977,7 @@ window.selectWithdrawNetwork = function(asset, network){
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
     
     <!-- BACK BUTTON -->
-    <div onclick="SELECTED_NETWORK='${name} ${type}'; openWithdraw('${asset}', '${name} ${type}')" style="
+    <div onclick="openWithdraw('${asset}', '${network}')" style="
       width:36px;height:36px;
       display:flex;align-items:center;justify-content:center;
       border-radius:10px;
