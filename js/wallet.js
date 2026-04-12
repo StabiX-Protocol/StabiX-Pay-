@@ -1224,9 +1224,7 @@ ${user.balance?.toFixed(2) || "0.00"}
     Recent Activity
   </div>
   <div id="recentTxs"></div>
-</div> 
-
-
+  
 </div>
 `;
 
