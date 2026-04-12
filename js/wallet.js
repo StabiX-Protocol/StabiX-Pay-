@@ -1683,6 +1683,41 @@ Withdraw
 
 </div>
 
+
+
+
+<div style="
+margin-top:25px;
+background:#0b1220;
+border:1px solid rgba(255,255,255,0.06);
+border-radius:14px;
+padding:14px;
+">
+<div style="
+font-size:14px;
+font-weight:600;
+margin-bottom:10px;
+opacity:0.9;
+">
+Important Instructions
+</div>
+<ul style="
+font-size:12px;
+opacity:0.7;
+line-height:1.6;
+padding-left:16px;
+">
+<li>Ensure you select the correct network before initiating any transaction.</li>
+<li>Only send supported assets (USDT / USDC). Sending other tokens may result in permanent loss.</li>
+<li>Deposits are credited after on-chain confirmation and internal verification.</li>
+<li>Withdrawals are processed in batches and may require additional time for settlement.</li>
+<li>Incorrect wallet address or network mismatch will lead to irreversible loss of funds.</li>
+<li>Do not share your wallet credentials or private keys with anyone.</li>
+</ul>
+</div>
+
+
+
 <div onclick="goDeposit()" style="
 position:absolute;
 top:20px;
