@@ -1904,7 +1904,7 @@ window.openWithdrawNetwork = function(asset){
 }
 function networkCardWithdraw(asset, name, type, speed, fee){
   return `
-  <div onclick="openWithdraw('${asset}','${name}')" style="
+  onclick="SELECTED_NETWORK='${name}'; openWithdraw('${asset}','${name}')"
     padding:14px;
     border-radius:14px;
     background:#0b1220;
@@ -2015,6 +2015,7 @@ window.submitDepositFinal = async function(asset, network){
 }
 
 // ================== SUBMIT WITHDRAW ==================
+let SELECTED_NETWORK = "";
 window.submitWithdrawFinal = async function(asset, network){
 
   const amount = document.getElementById("amount").value;
