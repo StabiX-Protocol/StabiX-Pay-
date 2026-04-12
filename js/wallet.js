@@ -1900,89 +1900,7 @@ window.selectNetwork = function(asset, network){
 
 // ================== PAGE 6 ==================
 // WITHDRAW FORM (address + amount)
-window.openWithdraw = function(asset, network){
 
-  document.querySelector(".box").innerHTML = `
-
-  <!-- HEADER -->
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    <div onclick="SELECTED_NETWORK='${name}'; openWithdraw('${asset}','${name}')" style="
-      width:36px;
-      height:36px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:10px;
-      background:rgba(255,255,255,0.05);
-      cursor:pointer;
-      font-size:18px;
-    ">←</div>
-
-    <div style="font-size:18px;font-weight:600;">
-      ${asset} Withdraw
-    </div>
-  </div>
-
-  <!-- NETWORK SHOW -->
-  <div style="
-    background:#0b1220;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:12px;
-  ">
-    <div style="font-size:12px;opacity:0.6;">Network</div>
-    <div style="font-size:14px;font-weight:600;">
-      ${network}
-    </div>
-  </div>
-
-  <!-- VAULT ADDRESS -->
-  <div style="
-    background:#0b1220;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:15px;
-  ">
-    <div style="font-size:12px;opacity:0.6;">Vault Address</div>
-    <div style="font-size:13px;color:#60a5fa;word-break:break-all;">
-      0xYOUR_VAULT_ADDRESS
-    </div>
-  </div>
-
-  <!-- FORM -->
-  <div style="
-    background:#0b1220;
-    padding:14px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,0.06);
-  ">
-
-    <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
-      Recipient Address
-    </div>
-    <input id="eoa" placeholder="Enter wallet address" style="width:100%;margin-bottom:12px;">
-
-    <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
-      Amount
-    </div>
-    <input id="amount" placeholder="Enter amount" style="width:100%;margin-bottom:15px;">
-
-    <button onclick="submitWithdrawFinal('${asset}','${network}')" style="
-      width:100%;
-      padding:14px;
-      border-radius:12px;
-      background:#ef4444;
-      color:white;
-      font-weight:600;
-    ">
-      Submit Withdraw
-    </button>
-
-  </div>
-  `;
-}
 
 // ================== PAGE 5 ==================
 // SELECT NETWORK (Withdraw)
@@ -2049,7 +1967,79 @@ function networkCardWithdraw(asset, name, type, speed, fee){
   </div>
   `;
 }
+// ================== OPTIONAL / DUPLICATE ==================
+window.selectWithdrawNetwork = function(asset, network){
+  const vault = VAULTS[network] || "Not available";
 
+  document.querySelector(".box").innerHTML = `
+
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+    
+    <!-- BACK BUTTON -->
+    <div onclick="openWithdrawNetwork('${asset}')" style="
+      width:36px;height:36px;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:10px;
+      background:rgba(255,255,255,0.05);
+      cursor:pointer;
+      font-size:18px;
+    ">←</div>
+
+    <div style="font-size:18px;font-weight:600;">
+      ${asset} Withdraw
+    </div>
+  </div>
+
+  <!-- NETWORK -->
+<div style="
+  background:#0b1220;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.06);
+  margin-bottom:10px;
+">
+  <div style="font-size:12px;opacity:0.6;">Network</div>
+  <div>${network}</div>
+</div>
+
+<!-- VAULT -->
+<div style="
+  background:#0b1220;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.06);
+  margin-bottom:15px;
+">
+  <div style="font-size:12px;opacity:0.6;">Vault Address</div>
+  <div style="font-size:13px;color:#60a5fa;word-break:break-all;">
+    ${VAULTS[network] || "Not available"}
+  </div>
+</div>
+
+    <!-- USER INPUT -->
+    <div style="font-size:12px;opacity:0.6;">Recipient Address</div>
+    <input id="eoa" placeholder="Enter wallet address" style="width:100%;margin-bottom:12px;">
+
+    <div style="font-size:12px;opacity:0.6;">Amount</div>
+    <input id="amount" placeholder="Enter amount" style="width:100%;margin-bottom:15px;">
+
+    <!-- SUBMIT -->
+    <button onclick="submitWithdrawFinal('${asset}','${network}')" style="
+      width:100%;
+      padding:14px;
+      border-radius:12px;
+      background:#ef4444;
+      color:white;
+      font-weight:600;
+    ">
+      Submit Withdraw
+    </button>
+
+  </div>
+  `;
+};
+   
 // ================== SUBMIT DEPOSIT ==================
 window.submitDepositFinal = async function(asset, network){
 
