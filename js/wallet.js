@@ -1228,7 +1228,6 @@ ${user.balance?.toFixed(2) || "0.00"}
 </div>
 `;
 
-
 (async () => {
 
   const q = query(
@@ -1260,6 +1259,15 @@ ${user.balance?.toFixed(2) || "0.00"}
 
     const isDeposit = t.type === "deposit";
 
+    const time = t.createdAt
+      ? new Date(t.createdAt.seconds * 1000).toLocaleString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit"
+        })
+      : "";
+
     html += `
     <div style="
       display:flex;
@@ -1269,12 +1277,13 @@ ${user.balance?.toFixed(2) || "0.00"}
     ">
 
       <div style="font-size:13px;">
-        ${isDeposit ? "Deposit" : "Withdraw"}
+        <div>${isDeposit ? "Deposit" : "Withdraw"}</div>
+        <div style="font-size:11px;opacity:0.6;">${time}</div>
       </div>
 
       <div style="
         font-weight:600;
-        color:${isDeposit ? "#22c55e" : "#facc15"};
+        color:${isDeposit ? "#22c55e" : "#ef4444"};
       ">
         ${isDeposit ? "+" : "-"} ${t.amount} ${t.asset || ""}
       </div>
@@ -1287,6 +1296,7 @@ ${user.balance?.toFixed(2) || "0.00"}
     html || `<div style="opacity:0.5;">No recent D/W</div>`;
 
 })();
+
   
  
 selectTab("deposit");
