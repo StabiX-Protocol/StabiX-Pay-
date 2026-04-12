@@ -1833,7 +1833,7 @@ window.selectNetwork = function(asset, network){
   <!-- HEADER -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
     
-    <div onclick="openDeposit('${asset}')" style="
+    <div onclick="openAssetPage('${asset}')" style="
       width:36px;
       height:36px;
       display:flex;
@@ -1991,7 +1991,7 @@ window.openWithdrawNetwork = function(asset){
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
     
     <!-- BACK BUTTON -->
-    <div onclick="selectDWAsset('${asset}')" style="
+    <div onclick="openAssetPage('${asset}')" style="
       width:36px;height:36px;
       display:flex;align-items:center;justify-content:center;
       border-radius:10px;
