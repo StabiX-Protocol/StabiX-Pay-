@@ -1698,13 +1698,13 @@ cursor:pointer;
 
 
 // ================= OPEN FUNCTIONS =================
-function openDeposit(asset){
+window.openDeposit = function(asset){
   const amount = prompt("Enter amount");
   const txHash = prompt("Enter tx hash");
   submitDeposit(asset, amount, txHash);
 }
 
-function openWithdraw(asset){
+window.openWithdraw = function(asset){
   const amount = prompt("Enter amount");
   const address = prompt("Enter wallet address");
   submitWithdraw(asset, amount, address);
