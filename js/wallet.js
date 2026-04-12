@@ -1228,6 +1228,66 @@ ${user.balance?.toFixed(2) || "0.00"}
 </div>
 `;
 
+
+(async () => {
+
+  const q = query(
+    collection(db, "transactions"),
+    where("userId", "==", WALLET)
+  );
+
+  const snap = await getDocs(q);
+
+  let arr = [];
+
+  snap.forEach(d => {
+    const t = d.data();
+
+    if(t.type === "deposit" || t.type === "withdraw"){
+      arr.push({
+        ...t,
+        _time: t.createdAt?.seconds || 0
+      });
+    }
+  });
+
+  arr.sort((a,b)=> b._time - a._time);
+  arr = arr.slice(0,5);
+
+  let html = "";
+
+  arr.forEach(t => {
+
+    const isDeposit = t.type === "deposit";
+
+    html += `
+    <div style="
+      display:flex;
+      justify-content:space-between;
+      padding:10px 0;
+      border-bottom:1px solid rgba(255,255,255,0.05);
+    ">
+
+      <div style="font-size:13px;">
+        ${isDeposit ? "Deposit" : "Withdraw"}
+      </div>
+
+      <div style="
+        font-weight:600;
+        color:${isDeposit ? "#22c55e" : "#facc15"};
+      ">
+        ${isDeposit ? "+" : "-"} ${t.amount} ${t.asset || ""}
+      </div>
+
+    </div>
+    `;
+  });
+
+  document.getElementById("recentTxs").innerHTML =
+    html || `<div style="opacity:0.5;">No recent D/W</div>`;
+
+})();
+  
  
 selectTab("deposit");
 };
