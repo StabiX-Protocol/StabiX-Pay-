@@ -1738,7 +1738,10 @@ cursor:pointer;
 `;
 };
 
-
+window.openAssetPage = function(asset){
+  window.selectedDWAsset = asset;
+  selectDWAsset(asset);
+  }
 
 
 // ================== VAULT CONFIG (COMMON) ==================
