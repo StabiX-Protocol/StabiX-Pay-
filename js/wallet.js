@@ -2117,6 +2117,11 @@ window.selectWithdrawNetwork = function(asset, network){
   opacity:0.75;
   line-height:1.6;
 ">
+
+<b style="opacity:0.95;font-size:16px;font-weight:700;">
+Read before withdrawal 
+</b><br><br>
+ 
   <b style="opacity:0.9;">Withdrawal Instructions</b><br><br>
   • Funds will be withdrawn only to the recipient address (EOA) provided above.<br>
   • Ensure the selected network matches your destination wallet. Network mismatch will result in permanent loss of funds.<br>
@@ -2127,10 +2132,10 @@ window.selectWithdrawNetwork = function(asset, network){
   • Only the holder of the correct private key can execute the withdrawal. StabiX cannot access or control your funds.<br><br>
   <b style="opacity:0.9;">Time & Execution Window</b><br>
   • Withdrawal window is strictly limited to <b>20 hours</b> after Merkle Root publication.<br>
-  • Merkle Root is generated daily at <b>10:00 PM IST (16:30 UTC)</b>.<br>
+  • Merkle Root is generated daily at <b>16:30 UTC</b>.<br>
   • If not claimed within the valid window, your Leaf will expire and become invalid.<br><br>
   <b style="opacity:0.9;">Important Warnings</b><br>
-  • After submitting a withdrawal request, the equivalent balance will be deducted (burned) from your StabiX account.<br>
+  • After submitting a withdrawal request, the equivalent balance will be burn from your StabiX account.<br>
   • You must complete the on-chain withdrawal process after receiving your Leaf. Failure to do so will result in permanent loss.<br>
   • StabiX is not responsible for unclaimed, expired, or incorrectly executed withdrawals.<br>
   • Never share your private key, seed phrase, or wallet credentials with anyone.<br>
