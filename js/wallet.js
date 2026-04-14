@@ -2108,6 +2108,7 @@ window.selectWithdrawNetwork = function(asset, network){
 
 <div style="
   margin-top:15px;
+  margin-bottom:100px;
   background:#0b1220;
   padding:12px;
   border-radius:12px;
@@ -2116,15 +2117,23 @@ window.selectWithdrawNetwork = function(asset, network){
   opacity:0.75;
   line-height:1.6;
 ">
-  <b style="opacity:0.9;">Deposit Process & Instructions</b><br><br>
-  • Ensure you send funds using the selected network only. Network mismatch will result in permanent loss.<br>
-  • Before depositing, approve the vault address from your wallet. The deposit transaction must be initiated using your own private wallet (EOA).<br>
-  • After completing the on-chain transaction, submit the same wallet address, transaction hash, and exact amount used for the deposit.<br><br>
+  <b style="opacity:0.9;">Withdrawal Instructions</b><br><br>
+  • Funds will be withdrawn only to the recipient address (EOA) provided above.<br>
+  • Ensure the selected network matches your destination wallet. Network mismatch will result in permanent loss of funds.<br>
+  • Withdrawals are non-custodial. StabiX does not directly transfer funds to your wallet.<br><br>
+  <b style="opacity:0.9;">Merkle-Based Withdrawal Process</b><br>
+  • After validator submission, a Merkle Root is published and you will receive your unique Leaf via notification.<br>
+  • Using this Leaf, you must manually claim your funds from the vault smart contract.<br>
+  • Only the holder of the correct private key can execute the withdrawal. StabiX cannot access or control your funds.<br><br>
+  <b style="opacity:0.9;">Time & Execution Window</b><br>
+  • Withdrawal window is strictly limited to <b>20 hours</b> after Merkle Root publication.<br>
+  • Merkle Root is generated daily at <b>10:00 PM IST (16:30 UTC)</b>.<br>
+  • If not claimed within the valid window, your Leaf will expire and become invalid.<br><br>
   <b style="opacity:0.9;">Important Warnings</b><br>
-  • Do not send funds from exchanges or third-party custodial wallets.<br>
-  • Incorrect transaction details or reused transaction hash will lead to rejection.<br>
-  • Funds are credited only after successful verification of on-chain data.<br>
-  • Never share your private keys or wallet credentials with anyone.
+  • After submitting a withdrawal request, the equivalent balance will be deducted (burned) from your StabiX account.<br>
+  • You must complete the on-chain withdrawal process after receiving your Leaf. Failure to do so will result in permanent loss.<br>
+  • StabiX is not responsible for unclaimed, expired, or incorrectly executed withdrawals.<br>
+  • Never share your private key, seed phrase, or wallet credentials with anyone.<br>
 </div>
 
   
