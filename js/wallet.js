@@ -1895,6 +1895,51 @@ window.selectNetwork = function(asset, network){
   ">
     Submit Deposit
   </button>
+
+<div style="
+  margin-top:15px;
+  margin-bottom:100px;
+  background:#0b1220;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.06);
+  font-size:12px;
+  opacity:0.75;
+  line-height:1.6;
+">
+
+<b style="opacity:0.95;font-size:16px;font-weight:700;">
+⚠️ Read Before Deposit ⚠️
+</b><br><br>
+
+<b style="opacity:0.9;">Deposit Instructions</b><br>
+• You must first approve and deposit funds from your EOA wallet. This action requires your private key signature to on chain vault interaction.<br>
+• Ensure you are using your own wallet (EOA). Never share your private key or wallet credentials with anyone.<br>
+• Only deposit supported assets (USDT / USDC) on the selected network.<br>
+• Sending assets from the wrong network or unsupported tokens will result in permanent loss of funds.<br><br>
+
+<b style="opacity:0.9;">On-Chain Deposit Process</b><br>
+• Deposit must be executed directly from your wallet to the provided vault address.<br>
+• After completing the transaction, you must submit the same wallet address (EOA), transaction hash, and exact deposited amount.<br>
+• Incorrect or mismatched details may lead to rejection or delay in processing.<br><br>
+
+<b style="opacity:0.9;">Validation & Minting</b><br>
+• Deposits are verified by validator.<br>
+• After successful verification, the equivalent amount will be minted to your StabiX account.<br>
+• Processing time may vary depending on network confirmations it's usually takes few minutes.<br><br>
+
+<b style="opacity:0.9;">Important Warnings</b><br>
+• Always use the same wallet address (EOA) that was used to perform the deposit transaction.<br>
+• Providing a different wallet address will result in failed minting and loss of credit.<br>
+• Double-check transaction hash and amount before submission.<br>
+• Do not send funds from exchanges or custodial wallets.<br><br>
+
+<b style="opacity:0.9;">Non-Custodial Notice</b><br>
+• Your funds remain on-chain and are never held in StabiX custody.<br>
+• StabiX cannot access, control, or recover your funds.<br>
+
+</div>
+
   `;
 }
 
