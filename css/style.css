@@ -17,6 +17,7 @@ body{
   box-sizing:border-box;
   min-height: calc(100vh - 30px);
   margin-bottom: 30px;
+  padding-bottom:100px;
 }
 
 input, button, select {
