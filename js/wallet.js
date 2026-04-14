@@ -2119,10 +2119,10 @@ window.selectWithdrawNetwork = function(asset, network){
 ">
 
 <b style="opacity:0.95;font-size:16px;font-weight:700;">
-Read before withdrawal 
+⚠️Read Before Withdrawal⚠️
 </b><br><br>
  
-  <b style="opacity:0.9;">Withdrawal Instructions</b><br><br>
+  <b style="opacity:0.9;">Withdrawal Instructions</b><br>
   • Funds will be withdrawn only to the recipient address (EOA) provided above.<br>
   • Ensure the selected network matches your destination wallet. Network mismatch will result in permanent loss of funds.<br>
   • Withdrawals are non-custodial. StabiX does not directly transfer funds to your wallet.<br><br>
