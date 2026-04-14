@@ -2105,6 +2105,29 @@ window.selectWithdrawNetwork = function(asset, network){
     Submit Withdraw
   </button>
 
+
+<div style="
+  margin-top:15px;
+  background:#0b1220;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.06);
+  font-size:12px;
+  opacity:0.75;
+  line-height:1.6;
+">
+  <b style="opacity:0.9;">Deposit Process & Instructions</b><br><br>
+  • Ensure you send funds using the selected network only. Network mismatch will result in permanent loss.<br>
+  • Before depositing, approve the vault address from your wallet. The deposit transaction must be initiated using your own private wallet (EOA).<br>
+  • After completing the on-chain transaction, submit the same wallet address, transaction hash, and exact amount used for the deposit.<br><br>
+  <b style="opacity:0.9;">Important Warnings</b><br>
+  • Do not send funds from exchanges or third-party custodial wallets.<br>
+  • Incorrect transaction details or reused transaction hash will lead to rejection.<br>
+  • Funds are credited only after successful verification of on-chain data.<br>
+  • Never share your private keys or wallet credentials with anyone.
+</div>
+
+  
   `;
 }
    
