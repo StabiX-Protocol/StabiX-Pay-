@@ -1746,11 +1746,17 @@ window.openAssetPage = function(asset){
 
 // ================== VAULT CONFIG (COMMON) ==================
 const VAULTS = {
-  "Ethereum ERC20": "0xETH_VAULT",
+  "Ethereum ERC20": "0x0201B73BA3d4a43012c84B871c7d5332E176ffcc",
   "Arbitrum L2": "0xARB_VAULT",
   "Polygon PoS": "0xPOLY_VAULT",
   "Base L2": "0xBASE_VAULT",
   "Tron TRC20": "TXYZ_TRON_VAULT"
+};
+const EXPLORERS = {
+  "Ethereum ERC20": "https://etherscan.io/address/",
+  "Arbitrum L2": "https://arbiscan.io/address/",
+  "Polygon PoS": "https://polygonscan.com/address/",
+  "Base L2": "https://basescan.org/address/"
 };
 
 // ================= OPEN FUNCTIONS =================
@@ -1874,9 +1880,15 @@ window.selectNetwork = function(asset, network){
     margin-bottom:15px;
   ">
     <div style="font-size:12px;opacity:0.6;">Vault Address</div>
-    <div style="font-size:13px;color:#60a5fa;word-break:break-all;">
-      ${vault}
-    </div>
+
+     <a href="${EXPLORERS[network]}${vault}" target="_blank" style="
+  font-size:13px;
+  color:#60a5fa;
+  word-break:break-all;
+  text-decoration:none;">
+  ${vault}
+  </a>
+    
   </div>
 
   <!-- INPUT -->
@@ -2129,9 +2141,15 @@ window.selectWithdrawNetwork = function(asset, network){
     margin-bottom:15px;
   ">
     <div style="font-size:12px;opacity:0.6;">Vault Address</div>
-    <div style="font-size:13px;color:#60a5fa;word-break:break-all;">
-      ${vault}
-    </div>
+
+  <a href="${EXPLORERS[network]}${vault}" target="_blank" style="
+  font-size:13px;
+  color:#60a5fa;
+  word-break:break-all;
+  text-decoration:none;">
+  ${vault}
+  </a>
+    
   </div>
 
   <!-- INPUT -->
