@@ -1324,7 +1324,7 @@ selectTab("history");
 
 
 
-
+/* ================= Setting Navigation ================= */
 window.goSettings = () => {
 
   selectTab("settings");
@@ -1376,8 +1376,65 @@ window.goSettings = () => {
 
   `;
 };
+window.openAccount = () => {
 
+  document.querySelector(".box").innerHTML = `
 
+  <!-- HEADER -->
+  <div onclick="goSettings()" style="
+    margin-bottom:15px;
+    cursor:pointer;
+    opacity:0.7;
+  ">← Back</div>
+
+  <div style="font-size:18px;font-weight:600;margin-bottom:20px;">
+    Account
+  </div>
+
+  <!-- WALLET -->
+  <div style="margin-bottom:15px;">
+    <div style="font-size:12px;opacity:0.6;">Wallet</div>
+    <div style="color:#60a5fa;">${WALLET}</div>
+  </div>
+
+  <!-- USERNAME -->
+  <div>
+    <div style="font-size:12px;opacity:0.6;">Username</div>
+    <input id="username" placeholder="Enter username" style="width:100%;margin:10px 0;">
+    <button onclick="saveUsername()" style="
+      width:100%;
+      padding:12px;
+      border-radius:10px;
+      background:#22c55e;
+      font-weight:600;
+    ">Save</button>
+  </div>
+
+  `;
+};
+window.openSecurity = () => {
+
+  document.querySelector(".box").innerHTML = `
+
+  <!-- HEADER -->
+  <div onclick="goSettings()" style="
+    margin-bottom:15px;
+    cursor:pointer;
+    opacity:0.7;
+  ">← Back</div>
+
+  <div style="font-size:18px;font-weight:600;margin-bottom:20px;">
+    Security & Privacy
+  </div>
+
+  <div style="font-size:13px;opacity:0.7;line-height:1.6;">
+    Never share your private key or wallet credentials with anyone.
+    StabiX is non-custodial and cannot recover lost access.
+  </div>
+
+  `;
+};
+/* ================= Setting Navigation Finish================= */
 
 
 
