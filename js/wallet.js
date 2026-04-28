@@ -1339,7 +1339,7 @@ window.goSettings = () => {
   <!-- LIST -->
   <div>
 
-    <div onclick="openAccount()" style="
+    <div onclick="openTheme()" style="
       display:flex;
       justify-content:space-between;
       padding:14px 0;
