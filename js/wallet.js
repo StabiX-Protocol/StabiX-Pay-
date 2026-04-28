@@ -1409,9 +1409,7 @@ window.openSecurity = () => {
   `;
 };
 window.openSupport = () => {
-
   document.querySelector(".box").innerHTML = `
-
   <!-- HEADER -->
   <div onclick="goSettings()" style="
     margin-bottom:15px;
@@ -1432,7 +1430,7 @@ window.openSupport = () => {
     Need help or facing an issue? Reach out to our support team.
   </div>
 
-  <div onclick="window.open('https://t.me/StabiXSupport')" style="
+  <div onclick="window.open("https://t.me/StabiXSupport")" style="
     padding:14px;
     border-radius:12px;
     background:#0b1220;
@@ -1443,7 +1441,6 @@ window.openSupport = () => {
   ">
     Contact on Telegram
   </div>
-
   `;
 };
 window.openAbout = () => {
