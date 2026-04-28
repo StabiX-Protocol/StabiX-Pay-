@@ -1459,24 +1459,22 @@ window.openAbout = () => {
   </div>
 
   <div style="
-    font-size:13px;
-    opacity:0.8;
-    line-height:1.6;
-  ">
-
-  <b>StabiX Pay v1.0</b><br><br>
-
-  StabiX is a non-custodial payment and vault system designed for secure asset deposits and withdrawals.<br><br>
-
-  Withdrawals are processed using Merkle-based proofs, allowing users to claim funds directly from the vault using their own wallet.<br><br>
-
-  StabiX does not hold custody of user funds and cannot access or recover assets.<br><br>
-
-  Users are fully responsible for their transactions, wallet security, and execution.
-
-  </div>
-
-  `;
+  font-size:15px;
+  font-weight:600;
+  margin-bottom:8px;
+">
+What is StabiX?
+</div>
+<div style="
+font-size:13px;
+opacity:0.8;
+line-height:1.6;
+margin-bottom:18px;
+">
+StabiX is a non-custodial payment and vault system designed to enable fast, low-cost stablecoin transactions with minimal complexity. It allows users to deposit assets on-chain while maintaining a simplified off-chain balance experience.
+The system is built to support instant transfers and microtransactions without relying on traditional custodial infrastructure, giving users full control over their funds at all times.
+</div>
+`;
 };
 /* ================= Setting Navigation Finish================= */
 
