@@ -1429,18 +1429,18 @@ window.openSupport = () => {
   ">
     Need help or facing an issue? Reach out to our support team.
   </div>
-
-  <div onclick="window.open("https://t.me/StabiXSupport")" style="
-    padding:14px;
-    border-radius:12px;
-    background:#0b1220;
-    border:1px solid rgba(255,255,255,0.06);
-    cursor:pointer;
-    text-align:center;
-    font-weight:600;
-  ">
-    Contact on Telegram
-  </div>
+<div onclick="window.open('https://t.me/StabiXSupport')" style="
+  padding:14px;
+  border-radius:12px;
+  background:#0b1220;
+  border:1px solid rgba(255,255,255,0.06);
+  cursor:pointer;
+  text-align:center;
+  font-weight:600;
+">
+  Contact on Telegram
+</div>
+  
   `;
 };
 window.openAbout = () => {
