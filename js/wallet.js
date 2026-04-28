@@ -1338,18 +1338,6 @@ window.goSettings = () => {
 
   <!-- LIST -->
   <div>
-
-    <div onclick="openTheme()" style="
-      display:flex;
-      justify-content:space-between;
-      padding:14px 0;
-      border-bottom:1px solid rgba(255,255,255,0.06);
-      cursor:pointer;
-    ">
-      <div>Themes</div>
-      <div style="opacity:0.5;">›</div>
-    </div>
-
     <div onclick="openSecurity()" style="
       display:flex;
       justify-content:space-between;
@@ -1357,11 +1345,32 @@ window.goSettings = () => {
       border-bottom:1px solid rgba(255,255,255,0.06);
       cursor:pointer;
     ">
-      <div>Security & Privacy</div>
+      <div>Security</div>
       <div style="opacity:0.5;">›</div>
     </div>
-
   </div>
+
+  <div onclick="openSupport()" style="
+  display:flex;
+  justify-content:space-between;
+  padding:14px 0;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  cursor:pointer;
+">
+  <div>Support</div>
+  <div style="opacity:0.5;">›</div>
+</div>
+
+<div onclick="openAbout()" style="
+  display:flex;
+  justify-content:space-between;
+  padding:14px 0;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  cursor:pointer;
+">
+  <div>About</div>
+  <div style="opacity:0.5;">›</div>
+</div>
 
   <!-- LOGOUT -->
   <div onclick="logout()" style="
@@ -1375,50 +1384,6 @@ window.goSettings = () => {
   </div>
 
   `;
-};
-window.openTheme = () => {
- document.querySelector(".box").innerHTML = `
-
-  <!-- HEADER -->
-  <div onclick="goSettings()" style="
-    margin-bottom:15px;
-    cursor:pointer;
-    opacity:0.7;
-  ">← Back</div>
-
-  <div style="font-size:18px;font-weight:600;margin-bottom:20px;">
-    Theme
-  </div>
-
-  <!-- OPTIONS -->
-  <div>
-
-    <div onclick="setTheme('dark')" style="
-      display:flex;
-      justify-content:space-between;
-      padding:14px 0;
-      border-bottom:1px solid rgba(255,255,255,0.06);
-      cursor:pointer;
-    ">
-      <div>Dark Mode</div>
-      <div id="darkCheck">✓</div>
-    </div>
-
-    <div onclick="setTheme('light')" style="
-      display:flex;
-      justify-content:space-between;
-      padding:14px 0;
-      cursor:pointer;
-    ">
-      <div>Light Mode</div>
-      <div id="lightCheck"></div>
-    </div>
-
-  </div>
-
-  `;
-  
-  updateThemeCheck();
 };
 
 window.openSecurity = () => {
@@ -1439,6 +1404,79 @@ window.openSecurity = () => {
   <div style="font-size:13px;opacity:0.7;line-height:1.6;">
     Never share your private key or wallet credentials with anyone.
     StabiX is non-custodial and cannot recover lost access.
+  </div>
+
+  `;
+};
+window.openSupport = () => {
+
+  document.querySelector(".box").innerHTML = `
+
+  <!-- HEADER -->
+  <div onclick="goSettings()" style="
+    margin-bottom:15px;
+    cursor:pointer;
+    opacity:0.7;
+  ">← Back</div>
+
+  <div style="font-size:18px;font-weight:600;margin-bottom:20px;">
+    Support
+  </div>
+
+  <div style="
+    font-size:13px;
+    opacity:0.8;
+    margin-bottom:20px;
+    line-height:1.6;
+  ">
+    Need help or facing an issue? Reach out to our support team.
+  </div>
+
+  <div onclick="window.open('https://t.me/StabiXSupport')" style="
+    padding:14px;
+    border-radius:12px;
+    background:#0b1220;
+    border:1px solid rgba(255,255,255,0.06);
+    cursor:pointer;
+    text-align:center;
+    font-weight:600;
+  ">
+    Contact on Telegram
+  </div>
+
+  `;
+};
+window.openAbout = () => {
+
+  document.querySelector(".box").innerHTML = `
+
+  <!-- HEADER -->
+  <div onclick="goSettings()" style="
+    margin-bottom:15px;
+    cursor:pointer;
+    opacity:0.7;
+  ">← Back</div>
+
+  <div style="font-size:18px;font-weight:600;margin-bottom:20px;">
+    About
+  </div>
+
+  <div style="
+    font-size:13px;
+    opacity:0.8;
+    line-height:1.6;
+  ">
+
+  <b>StabiX Pay v1.0</b><br><br>
+
+  StabiX is a non-custodial payment and vault system designed for secure asset deposits and withdrawals.<br><br>
+
+  Withdrawals are processed using Merkle-based proofs, allowing users to claim funds directly from the vault using their own wallet.<br><br>
+
+  StabiX does not hold custody of user funds and cannot access or recover assets.<br><br>
+
+  Users are fully responsible for their transactions, wallet security, and execution.
+
   </div>
 
   `;
