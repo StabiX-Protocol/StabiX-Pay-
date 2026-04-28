@@ -1376,9 +1376,8 @@ window.goSettings = () => {
 
   `;
 };
-window.openAccount = () => {
-
-  document.querySelector(".box").innerHTML = `
+window.openTheme = () => {
+ document.querySelector(".box").innerHTML = `
 
   <!-- HEADER -->
   <div onclick="goSettings()" style="
@@ -1388,30 +1387,40 @@ window.openAccount = () => {
   ">← Back</div>
 
   <div style="font-size:18px;font-weight:600;margin-bottom:20px;">
-    Account
+    Theme
   </div>
 
-  <!-- WALLET -->
-  <div style="margin-bottom:15px;">
-    <div style="font-size:12px;opacity:0.6;">Wallet</div>
-    <div style="color:#60a5fa;">${WALLET}</div>
-  </div>
-
-  <!-- USERNAME -->
+  <!-- OPTIONS -->
   <div>
-    <div style="font-size:12px;opacity:0.6;">Username</div>
-    <input id="username" placeholder="Enter username" style="width:100%;margin:10px 0;">
-    <button onclick="saveUsername()" style="
-      width:100%;
-      padding:12px;
-      border-radius:10px;
-      background:#22c55e;
-      font-weight:600;
-    ">Save</button>
+
+    <div onclick="setTheme('dark')" style="
+      display:flex;
+      justify-content:space-between;
+      padding:14px 0;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      cursor:pointer;
+    ">
+      <div>Dark Mode</div>
+      <div id="darkCheck">✓</div>
+    </div>
+
+    <div onclick="setTheme('light')" style="
+      display:flex;
+      justify-content:space-between;
+      padding:14px 0;
+      cursor:pointer;
+    ">
+      <div>Light Mode</div>
+      <div id="lightCheck"></div>
+    </div>
+
   </div>
 
   `;
+  
+  updateThemeCheck();
 };
+
 window.openSecurity = () => {
 
   document.querySelector(".box").innerHTML = `
