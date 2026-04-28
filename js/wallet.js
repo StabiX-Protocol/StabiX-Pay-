@@ -1155,9 +1155,108 @@ console.log("navigateHome error:", e);
 }
 };
 
+window.goDeposit = async () => {
+const snap = await getDoc(userRef);
+const user = snap.data();
+document.querySelector(".box").innerHTML = `
+<h2>Select Asset</h2>
+<div style="display:flex;flex-direction:column;gap:12px;margin-top:15px;">
 
+<div onclick="selectDWAsset('USDT')" style="
+background:#020617;
+border:1px solid #1e293b;
+border-radius:12px;
+padding:14px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+cursor:pointer;">
+<div style="display:flex;align-items:center;gap:10px;">
+<img src="./media/tether-usdt-logo.png" style="width:32px;height:32px;border-radius:50%;">
+<div>USDT</div>
+</div>
+<div style="font-weight:bold">
+${user.usdtBalance?.toFixed(2) || "0.00"}
+</div>
+</div>
 
+<div onclick="selectDWAsset('USDC')" style="
+background:#020617;
+border:1px solid #1e293b;
+border-radius:12px;
+padding:14px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+cursor:pointer;">
+<div style="display:flex;align-items:center;gap:10px;">
+<img src="./media/usd-coin-usdc-logo.png" style="width:32px;height:32px;border-radius:50%;">
+<div>USDC</div>
+</div>
+<div style="font-weight:bold">
+${user.balance?.toFixed(2) || "0.00"}
+</div>
+</div>
 
+<div style="margin-top:25px;">
+<div style="
+font-weight:600;
+font-size:14px;
+opacity:0.8;
+margin-bottom:10px;">
+Recent Activity
+</div>
+<div id="recentTxs"></div> 
+</div>
+`;
+(async () => {
+const q = query(
+collection(db, "transactions"),
+where("userId", "==", WALLET));
+const snap = await getDocs(q);
+let arr = [];
+snap.forEach(d => {
+const t = d.data();
+if(t.type === "deposit" || t.type === "withdraw"){
+arr.push({...t,_time: t.createdAt?.seconds || 0});
+}
+});
+arr.sort((a,b)=> b._time - a._time);
+arr = arr.slice(0,5);
+let html = "";
+arr.forEach(t => {
+const isDeposit = t.type === "deposit";
+const time = t.createdAt
+? new Date(t.createdAt.seconds * 1000).toLocaleString("en-IN", {
+day: "2-digit",
+month: "short",
+hour: "2-digit",
+minute: "2-digit"
+})
+: "";
+html += `
+<div style="
+display:flex;
+justify-content:space-between;
+padding:10px 0;
+border-bottom:1px solid rgba(255,255,255,0.05);">
+<div style="font-size:13px;">
+<div>${isDeposit ? "Deposit" : "Withdraw"}</div>
+<div style="font-size:11px;opacity:0.6;">${time}</div>
+</div>
+<div style="
+font-weight:600;
+color:${isDeposit ? "#22c55e" : "#ef4444"};">
+${isDeposit ? "+" : "-"} ${t.amount} ${t.asset || ""}
+</div>
+</div>
+`;
+});
+document.getElementById("recentTxs").innerHTML =
+html || `<div style="opacity:0.5;">No recent D/W</div>`;
+})(); 
+selectTab("deposit");
+};
 
 window.goHistory = () => {
 document.querySelector(".box").innerHTML = `
@@ -1510,128 +1609,10 @@ closeFilter();
 loadHistory();
 };
 
-
-
-
-
-// ================== PAGE 1 ==================
-// SELECT ASSET PAGE (USDT / USDC list + recent activity)
-
-window.goDeposit = async () => {
-const snap = await getDoc(userRef);
-const user = snap.data();
-
-document.querySelector(".box").innerHTML = `
-<h2>Select Asset</h2>
-<div style="display:flex;flex-direction:column;gap:12px;margin-top:15px;">
-
-<div onclick="selectDWAsset('USDT')" style="
-background:#020617;
-border:1px solid #1e293b;
-border-radius:12px;
-padding:14px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-cursor:pointer;">
-<div style="display:flex;align-items:center;gap:10px;">
-<img src="./media/tether-usdt-logo.png" style="width:32px;height:32px;border-radius:50%;">
-<div>USDT</div>
-</div>
-<div style="font-weight:bold">
-${user.usdtBalance?.toFixed(2) || "0.00"}
-</div>
-</div>
-
-<div onclick="selectDWAsset('USDC')" style="
-background:#020617;
-border:1px solid #1e293b;
-border-radius:12px;
-padding:14px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-cursor:pointer;">
-<div style="display:flex;align-items:center;gap:10px;">
-<img src="./media/usd-coin-usdc-logo.png" style="width:32px;height:32px;border-radius:50%;">
-<div>USDC</div>
-</div>
-<div style="font-weight:bold">
-${user.balance?.toFixed(2) || "0.00"}
-</div>
-</div>
-
-<div style="margin-top:25px;">
-<div style="
-font-weight:600;
-font-size:14px;
-opacity:0.8;
-margin-bottom:10px;">
-Recent Activity
-</div>
-<div id="recentTxs"></div> 
-</div>
-`;
-
-(async () => {
-const q = query(
-collection(db, "transactions"),
-where("userId", "==", WALLET));
-const snap = await getDocs(q);
-let arr = [];
-snap.forEach(d => {
-const t = d.data();
-if(t.type === "deposit" || t.type === "withdraw"){
-arr.push({...t,_time: t.createdAt?.seconds || 0});
-}
-});
-arr.sort((a,b)=> b._time - a._time);
-arr = arr.slice(0,5);
-let html = "";
-arr.forEach(t => {
-const isDeposit = t.type === "deposit";
-const time = t.createdAt
-? new Date(t.createdAt.seconds * 1000).toLocaleString("en-IN", {
-day: "2-digit",
-month: "short",
-hour: "2-digit",
-minute: "2-digit"
-})
-: "";
-html += `
-<div style="
-display:flex;
-justify-content:space-between;
-padding:10px 0;
-border-bottom:1px solid rgba(255,255,255,0.05);">
-<div style="font-size:13px;">
-<div>${isDeposit ? "Deposit" : "Withdraw"}</div>
-<div style="font-size:11px;opacity:0.6;">${time}</div>
-</div>
-<div style="
-font-weight:600;
-color:${isDeposit ? "#22c55e" : "#ef4444"};">
-${isDeposit ? "+" : "-"} ${t.amount} ${t.asset || ""}
-</div>
-</div>
-`;
-});
-document.getElementById("recentTxs").innerHTML =
-html || `<div style="opacity:0.5;">No recent D/W</div>`;
-})(); 
-selectTab("deposit");
-};
-
-
-
-// ================== PAGE 2 ==================
-// AFTER CLICKING USDT / USDC
-
+// ==================Deposit Withdraw Logic==================//
 window.selectDWAsset = (asset) => {
 window.selectedDWAsset = asset;
-
 document.querySelector(".box").innerHTML = `
-
 <div style="
 display:flex;
 flex-direction:column;
@@ -1639,7 +1620,6 @@ align-items:center;
 margin-top:20px;
 gap:10px;
 ">
-
 <img 
 src="${asset === 'USDT' 
 ? './media/tether-usdt-logo.png' 
@@ -1649,7 +1629,6 @@ width:60px;
 height:60px;
 border-radius:50%;
 ">
-
 <div style="
 font-size:20px;
 font-weight:bold;
@@ -1657,10 +1636,7 @@ font-weight:bold;
 ${asset}
 </div>
 </div>
-
-
 <div style="display:flex;gap:12px;margin-top:30px;">
-
 <button onclick="openDeposit('${asset}')" style="
 flex:1;
 padding:14px;
@@ -1670,7 +1646,6 @@ color:#022c22;
 font-weight:bold;">
 Deposit
 </button>
-
 <button onclick="openWithdrawNetwork('${asset}')" style="
 flex:1;
 padding:14px;
@@ -1680,10 +1655,7 @@ color:white;
 font-weight:bold;">
 Withdraw
 </button>
-
 </div>
-
-
 <div style="
 margin-top:25px;
 background:#0b1220;
@@ -1691,7 +1663,6 @@ border:1px solid rgba(255,255,255,0.06);
 border-radius:14px;
 padding:14px;
 ">
-
 <div style="
 font-size:14px;
 font-weight:600;
@@ -1700,7 +1671,6 @@ opacity:0.9;
 ">
 Asset Selected
 </div>
-
 <ul style="
 font-size:12px;
 opacity:0.7;
@@ -1714,9 +1684,6 @@ padding-left:16px;
 <li>Review all transaction details carefully before submission.</li>
 </ul>
 </div>
-
-
-
 <div onclick="goDeposit()" style="
 position:absolute;
 top:20px;
@@ -1734,196 +1701,158 @@ cursor:pointer;
 ">
 ←
 </div>
-
 `;
 };
 
 window.openAssetPage = function(asset){
-  window.selectedDWAsset = asset;
-  selectDWAsset(asset);
-  }
-
-
+window.selectedDWAsset = asset;
+selectDWAsset(asset);
+}
 // ================== VAULT CONFIG (COMMON) ==================
 const VAULTS = {
-  "Ethereum ERC20": "0x0201B73BA3d4a43012c84B871c7d5332E176ffcc",
-  "Arbitrum L2": "0xARB_VAULT",
-  "Polygon PoS": "0xPOLY_VAULT",
-  "Base L2": "0xBASE_VAULT",
-  "Tron TRC20": "TXYZ_TRON_VAULT"
+"Ethereum ERC20": "0x0201B73BA3d4a43012c84B871c7d5332E176ffcc",
+"Arbitrum L2": "0xARB_VAULT",
+"Polygon PoS": "0xPOLY_VAULT",
+"Base L2": "0xBASE_VAULT",
+"Tron TRC20": "TXYZ_TRON_VAULT"
 };
 const EXPLORERS = {
-  "Ethereum ERC20": "https://etherscan.io/address/",
-  "Arbitrum L2": "https://arbiscan.io/address/",
-  "Polygon PoS": "https://polygonscan.com/address/",
-  "Base L2": "https://basescan.org/address/"
+"Ethereum ERC20": "https://etherscan.io/address/",
+"Arbitrum L2": "https://arbiscan.io/address/",
+"Polygon PoS": "https://polygonscan.com/address/",
+"Base L2": "https://basescan.org/address/"
 };
-
 // ================= OPEN FUNCTIONS =================
 function networkCard(asset, name, type, speed, fee){
-  return `
-  <div onclick="selectNetwork('${asset}','${name} ${type}')"
-    style="
-      padding:14px;
-      border-radius:14px;
-      background:#0b1220;
-      border:1px solid rgba(255,255,255,0.06);
-      cursor:pointer;
-    ">
-
-    <!-- NETWORK NAME -->
-    <div style="font-weight:600;font-size:15px;">
-      ${name}
-      <span style="opacity:0.5;font-size:12px;"> ${type}</span>
-    </div>
-
-    <!-- SPEED -->
-    <div style="font-size:12px;opacity:0.6;margin-top:6px;">
-      Speed: ${speed}
-    </div>
-
-    <!-- FEE -->
-    <div style="font-size:12px;opacity:0.6;">
-      Fee: ${fee}
-    </div>
-
-  </div>
-  `;
+return `
+<div onclick="selectNetwork('${asset}','${name} ${type}')"
+style="
+padding:14px;
+border-radius:14px;
+background:#0b1220;
+border:1px solid rgba(255,255,255,0.06);
+cursor:pointer;
+">
+<!-- NETWORK NAME -->
+<div style="font-weight:600;font-size:15px;">${name}
+<span style="opacity:0.5;font-size:12px;"> ${type}</span>
+</div>
+<!-- SPEED -->
+<div style="font-size:12px;opacity:0.6;margin-top:6px;">
+Speed: ${speed}
+</div>
+<!-- FEE -->
+<div style="font-size:12px;opacity:0.6;">
+Fee: ${fee}
+</div>
+</div>
+`;
 }
-
-// ================== PAGE 3 ==================
-// SELECT NETWORK (Deposit)
-
+// ================== PAGE 3 ==================//
 window.openDeposit = function(asset){
-
-  document.querySelector(".box").innerHTML = `
-
-  <!-- HEADER -->
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    <div onclick="openAssetPage('${asset}')"style="
-      width:36px;
-      height:36px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:10px;
-      background:rgba(255,255,255,0.05);
-      cursor:pointer;
-      font-size:18px;
-    ">←</div>
-
-    <div style="font-size:18px;font-weight:600;">
-      Select Network
-    </div>
-  </div>
-
-  <!-- NETWORK LIST -->
-  <div style="display:flex;flex-direction:column;gap:12px;">
-
-    ${networkCard(asset,"Ethereum","ERC20","~2 min","$5 fee")}
-    ${networkCard(asset,"Arbitrum","L2","~10 sec","Low fee")}
-    ${networkCard(asset,"Polygon","PoS","~5 sec","Very low")}
-    ${networkCard(asset,"Base","L2","~5 sec","Low fee")}
-
-  </div>
-  `;
+document.querySelector(".box").innerHTML = `
+<!-- HEADER -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openAssetPage('${asset}')"style="
+width:36px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+cursor:pointer;
+font-size:18px;
+">←</div>
+<div style="font-size:18px;font-weight:600;">
+Select Network
+</div>
+</div>
+<!-- NETWORK LIST -->
+<div style="display:flex;flex-direction:column;gap:12px;">
+${networkCard(asset,"Ethereum","ERC20","~2 min","$5 fee")}
+${networkCard(asset,"Arbitrum","L2","~10 sec","Low fee")}
+${networkCard(asset,"Polygon","PoS","~5 sec","Very low")}
+${networkCard(asset,"Base","L2","~5 sec","Low fee")}
+</div>
+`;
 }
-
-
 // ================== PAGE 4 ==================
 // VAULT + TX HASH + AMOUNT + EOA
 window.selectNetwork = function(asset, network){
-
-  // 👉 correct vault fetch
-  const vault = VAULTS[network] || "Not available";
-
-  document.querySelector(".box").innerHTML = `
-
-  <!-- HEADER -->
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    
-    <div onclick="openDeposit('${asset}')" style="
-      width:36px;
-      height:36px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:10px;
-      background:rgba(255,255,255,0.05);
-      cursor:pointer;
-      font-size:18px;
-    ">←</div>
-
-    <div style="font-size:18px;font-weight:600;">
-      ${asset} Deposit
-    </div>
-  </div>
-
-  <!-- NETWORK -->
-  <div style="
-    background:#0b1220;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:10px;
-  ">
-    <div style="font-size:12px;opacity:0.6;">Network</div>
-    <div>${network}</div>
-  </div>
-
-  <!-- VAULT -->
-  <div style="
-    background:#0b1220;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:15px;
-  ">
-    <div style="font-size:12px;opacity:0.6;">Vault Address</div>
-
-     <a href="${EXPLORERS[network]}${vault}" target="_blank" style="
-  font-size:13px;
-  color:#60a5fa;
-  word-break:break-all;
-  text-decoration:none;">
-  ${vault}
-  </a>
-    
-  </div>
-
-  <!-- INPUT -->
-  <input id="amount" placeholder="Amount" style="width:100%;margin-bottom:10px;">
-  <input id="txHash" placeholder="Transaction Hash" style="width:100%;margin-bottom:10px;">
-  <input id="eoa" placeholder="Your Wallet Address" style="width:100%;margin-bottom:15px;">
-
-  <!-- SUBMIT -->
-  <button onclick="submitDepositFinal('${asset}','${network}')" style="
-    width:100%;
-    padding:14px;
-    border-radius:12px;
-    background:#22c55e;
-    color:black;
-    font-weight:600;
-  ">
-    Submit Deposit
-  </button>
-
+const vault = VAULTS[network] || "Not available";
+document.querySelector(".box").innerHTML = `
+<!-- HEADER -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openDeposit('${asset}')" style="
+width:36px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+cursor:pointer;
+font-size:18px;
+">←</div>
+<div style="font-size:18px;font-weight:600;">
+${asset} Deposit
+</div>
+</div>
+<!-- NETWORK -->
 <div style="
-  margin-top:15px;
-  margin-bottom:100px;
-  background:#0b1220;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.06);
-  font-size:12px;
-  opacity:0.75;
-  line-height:1.6;
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:10px;">
+<div style="font-size:12px;opacity:0.6;">Network</div>
+<div>${network}</div>
+</div>
+<!-- VAULT -->
+<div style="
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:15px;">
+<div style="font-size:12px;opacity:0.6;">Vault Address</div>
+<a href="${EXPLORERS[network]}${vault}" target="_blank" style="
+font-size:13px;
+color:#60a5fa;
+word-break:break-all;
+text-decoration:none;">
+${vault}
+</a>
+</div>
+<!-- INPUT -->
+<input id="amount" placeholder="Amount" style="width:100%;margin-bottom:10px;">
+<input id="txHash" placeholder="Transaction Hash" style="width:100%;margin-bottom:10px;">
+<input id="eoa" placeholder="Your Wallet Address" style="width:100%;margin-bottom:15px;">
+<!-- SUBMIT -->
+<button onclick="submitDepositFinal('${asset}','${network}')" style="
+width:100%;
+padding:14px;
+border-radius:12px;
+background:#22c55e;
+color:black;
+font-weight:600;
 ">
-
+Submit Deposit
+</button>
+<div style="
+margin-top:15px;
+margin-bottom:100px;
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+font-size:12px;
+opacity:0.75;
+line-height:1.6;">
 <b style="opacity:0.95;font-size:16px;font-weight:700;">
 ⚠️ Read Before Deposit ⚠️
 </b><br><br>
-
 <b style="opacity:0.9;">Deposit Instructions</b><br>
 • You must first approve and deposit funds from your EOA wallet. This action requires your private key signature to on chain vault interaction.<br>
 • Ensure you are using your own wallet (EOA). Never share your private key or wallet credentials with anyone.<br>
@@ -1949,243 +1878,198 @@ window.selectNetwork = function(asset, network){
 <b style="opacity:0.9;">Non-Custodial Notice</b><br>
 • Your funds remain on-chain and are never held in StabiX custody.<br>
 • StabiX cannot access, control, or recover your funds.<br>
-
 </div>
-
-  `;
+`;
+}
+// ================== PAGE 6 ==================//
+window.openWithdraw = function(asset, network){
+document.querySelector(".box").innerHTML = `
+<!-- HEADER -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openWithdrawNetwork('${asset}')" style="
+width:36px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+cursor:pointer;
+font-size:18px;
+">←</div>
+<div style="font-size:18px;font-weight:600;">
+${asset} Withdraw
+</div>
+</div>
+<!-- NETWORK SHOW -->
+<div style="
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:12px;">
+<div style="font-size:12px;opacity:0.6;">Network</div>
+<div style="font-size:14px;font-weight:600;">
+${network}
+</div>
+</div>
+<!-- VAULT ADDRESS -->
+<div style="
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:15px;">
+<div style="font-size:12px;opacity:0.6;">Vault Address</div>
+<div style="font-size:13px;color:#60a5fa;word-break:break-all;">
+0xYOUR_VAULT_ADDRESS
+</div>
+</div>
+<!-- FORM -->
+<div style="
+background:#0b1220;
+padding:14px;
+border-radius:14px;
+border:1px solid rgba(255,255,255,0.06);">
+<div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
+Recipient Address
+</div>
+<input id="eoa" placeholder="Enter wallet address" style="width:100%;margin-bottom:12px;">
+<div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
+Amount
+</div>
+<input id="amount" placeholder="Enter amount" style="width:100%;margin-bottom:15px;">
+<button onclick="submitWithdrawFinal('${asset}','${network}')" style="
+width:100%;
+padding:14px;
+border-radius:12px;
+background:#ef4444;
+color:white;
+font-weight:600;">
+Submit Withdraw
+</button>
+</div>
+`;
 }
 
-// ================== PAGE 6 ==================
-// WITHDRAW FORM (address + amount)
-window.openWithdraw = function(asset, network){
-
-  document.querySelector(".box").innerHTML = `
-
-  <!-- HEADER -->
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    <div onclick="openWithdrawNetwork('${asset}')" style="
-      width:36px;
-      height:36px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:10px;
-      background:rgba(255,255,255,0.05);
-      cursor:pointer;
-      font-size:18px;
-    ">←</div>
-
-    <div style="font-size:18px;font-weight:600;">
-      ${asset} Withdraw
-    </div>
-  </div>
-
-  <!-- NETWORK SHOW -->
-  <div style="
-    background:#0b1220;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:12px;
-  ">
-    <div style="font-size:12px;opacity:0.6;">Network</div>
-    <div style="font-size:14px;font-weight:600;">
-      ${network}
-    </div>
-  </div>
-
-  <!-- VAULT ADDRESS -->
-  <div style="
-    background:#0b1220;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:15px;
-  ">
-    <div style="font-size:12px;opacity:0.6;">Vault Address</div>
-    <div style="font-size:13px;color:#60a5fa;word-break:break-all;">
-      0xYOUR_VAULT_ADDRESS
-    </div>
-  </div>
-
-  <!-- FORM -->
-  <div style="
-    background:#0b1220;
-    padding:14px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,0.06);
-  ">
-
-    <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
-      Recipient Address
-    </div>
-    <input id="eoa" placeholder="Enter wallet address" style="width:100%;margin-bottom:12px;">
-
-    <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
-      Amount
-    </div>
-    <input id="amount" placeholder="Enter amount" style="width:100%;margin-bottom:15px;">
-
-    <button onclick="submitWithdrawFinal('${asset}','${network}')" style="
-      width:100%;
-      padding:14px;
-      border-radius:12px;
-      background:#ef4444;
-      color:white;
-      font-weight:600;
-    ">
-      Submit Withdraw
-    </button>
-
-  </div>
-  `;
-  }
-
 function networkCardWithdraw(asset, name, type, speed, fee){
-  return `
-  <div onclick="selectWithdrawNetwork('${asset}','${name} ${type}')"
-    style="
-      padding:14px;
-      border-radius:14px;
-      background:#0b1220;
-      border:1px solid rgba(255,255,255,0.06);
-      cursor:pointer;
-    ">
-
-    <div style="font-weight:600;font-size:15px;">
-      ${name}
-      <span style="opacity:0.5;font-size:12px;"> ${type}</span>
-    </div>
-
-    <div style="font-size:12px;opacity:0.6;margin-top:6px;">
-      Speed: ${speed}
-    </div>
-
-    <div style="font-size:12px;opacity:0.6;">
-      Fee: ${fee}
-    </div>
-
-  </div>
-  `;
+return `
+<div onclick="selectWithdrawNetwork('${asset}','${name} ${type}')"
+style="
+padding:14px;
+border-radius:14px;
+background:#0b1220;
+border:1px solid rgba(255,255,255,0.06);
+cursor:pointer;">
+<div style="font-weight:600;font-size:15px;">
+${name}
+<span style="opacity:0.5;font-size:12px;"> ${type}</span>
+</div>
+<div style="font-size:12px;opacity:0.6;margin-top:6px;">
+Speed: ${speed}
+</div>
+<div style="font-size:12px;opacity:0.6;">
+Fee: ${fee}
+</div>
+</div>
+`;
 }
   
 window.openWithdrawNetwork = function(asset){
-
-  document.querySelector(".box").innerHTML = `
-
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    
-    <div onclick="openAssetPage('${asset}')" style="
-      width:36px;height:36px;
-      display:flex;align-items:center;justify-content:center;
-      border-radius:10px;
-      background:rgba(255,255,255,0.05);
-      cursor:pointer;
-      font-size:18px;
-    ">←</div>
-
-    <div style="font-size:18px;font-weight:600;">
-      Select Network
-    </div>
-  </div>
-
-  <div style="display:flex;flex-direction:column;gap:12px;">
-    ${networkCardWithdraw(asset,"Ethereum","ERC20","~2 min","$5")}
-    ${networkCardWithdraw(asset,"Arbitrum","L2","~10 sec","Low")}
-    ${networkCardWithdraw(asset,"Polygon","PoS","~5 sec","Very low")}
-    ${networkCardWithdraw(asset,"Base","L2","~5 sec","Low")}
-  </div>
-  `;
+document.querySelector(".box").innerHTML = `
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openAssetPage('${asset}')" style="
+width:36px;height:36px;
+display:flex;align-items:center;justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+cursor:pointer;
+font-size:18px;
+">←</div>
+<div style="font-size:18px;font-weight:600;">
+Select Network
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;">
+${networkCardWithdraw(asset,"Ethereum","ERC20","~2 min","$5")}
+${networkCardWithdraw(asset,"Arbitrum","L2","~10 sec","Low")}
+${networkCardWithdraw(asset,"Polygon","PoS","~5 sec","Very low")}
+${networkCardWithdraw(asset,"Base","L2","~5 sec","Low")}
+</div>
+`;
 };
 window.selectWithdrawNetwork = function(asset, network){
-
-  const vault = VAULTS[network] || "Not available";
-
-  document.querySelector(".box").innerHTML = `
-
-  <!-- HEADER -->
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    
-    <div onclick="openWithdrawNetwork('${asset}')" style="
-      width:36px;height:36px;
-      display:flex;align-items:center;justify-content:center;
-      border-radius:10px;
-      background:rgba(255,255,255,0.05);
-      cursor:pointer;
-      font-size:18px;
-    ">←</div>
-
-    <div style="font-size:18px;font-weight:600;">
-      ${asset} Withdraw
-    </div>
-  </div>
-
-  <!-- NETWORK -->
-  <div style="
-    background:#0b1220;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:10px;
-  ">
-    <div style="font-size:12px;opacity:0.6;">Network</div>
-    <div>${network}</div>
-  </div>
-
-  <!-- VAULT -->
-  <div style="
-    background:#0b1220;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:15px;
-  ">
-    <div style="font-size:12px;opacity:0.6;">Vault Address</div>
-
-  <a href="${EXPLORERS[network]}${vault}" target="_blank" style="
-  font-size:13px;
-  color:#60a5fa;
-  word-break:break-all;
-  text-decoration:none;">
-  ${vault}
-  </a>
-    
-  </div>
-
-  <!-- INPUT -->
-  <input id="eoa" placeholder="Recipient Address" style="width:100%;margin-bottom:10px;">
-  <input id="amount" placeholder="Amount" style="width:100%;margin-bottom:15px;">
-
-  <!-- SUBMIT -->
-  <button onclick="submitWithdrawFinal('${asset}','${network}')" style="
-    width:100%;
-    padding:14px;
-    border-radius:12px;
-    background:#ef4444;
-    color:white;
-    font-weight:600;
-  ">
-    Submit Withdraw
-  </button>
-
-
+const vault = VAULTS[network] || "Not available";
+document.querySelector(".box").innerHTML = `
+<!-- HEADER -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openWithdrawNetwork('${asset}')" style="
+width:36px;height:36px;
+display:flex;align-items:center;justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+cursor:pointer;
+font-size:18px;
+">←</div>
+<div style="font-size:18px;font-weight:600;">
+${asset} Withdraw
+</div>
+</div>
+<!-- NETWORK -->
 <div style="
-  margin-top:15px;
-  margin-bottom:100px;
-  background:#0b1220;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.06);
-  font-size:12px;
-  opacity:0.75;
-  line-height:1.6;
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:10px;">
+<div style="font-size:12px;opacity:0.6;">Network</div>
+<div>${network}</div>
+</div>
+<!-- VAULT -->
+<div style="
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:15px;">
+<div style="font-size:12px;opacity:0.6;">Vault Address</div>
+<a href="${EXPLORERS[network]}${vault}" target="_blank" style="
+font-size:13px;
+color:#60a5fa;
+word-break:break-all;
+text-decoration:none;">
+${vault}
+</a>
+</div>
+<!-- INPUT -->
+<input id="eoa" placeholder="Recipient Address" style="width:100%;margin-bottom:10px;">
+<input id="amount" placeholder="Amount" style="width:100%;margin-bottom:15px;">
+<!-- SUBMIT -->
+<button onclick="submitWithdrawFinal('${asset}','${network}')" style="
+width:100%;
+padding:14px;
+border-radius:12px;
+background:#ef4444;
+color:white;
+font-weight:600;
 ">
-
+Submit Withdraw
+</button>
+<div style="
+margin-top:15px;
+margin-bottom:100px;
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+font-size:12px;
+opacity:0.75;
+line-height:1.6;
+">
 <b style="opacity:0.95;font-size:16px;font-weight:700;">
 ⚠️Read Before Withdrawal⚠️
-</b><br><br>
- 
-  <b style="opacity:0.9;">Withdrawal Instructions</b><br>
+ </b><br><br>
+ <b style="opacity:0.9;">Withdrawal Instructions</b><br>
   • Funds will be withdrawn only to the recipient address (EOA) provided above.<br>
   • Ensure the selected network matches your destination wallet. Network mismatch will result in permanent loss of funds.<br>
   • Withdrawals are non-custodial. StabiX does not directly transfer funds to your wallet.<br><br>
@@ -2202,73 +2086,58 @@ window.selectWithdrawNetwork = function(asset, network){
   • You must complete the on-chain withdrawal process after receiving your Leaf. Failure to do so will result in permanent loss.<br>
   • StabiX is not responsible for unclaimed, expired, or incorrectly executed withdrawals.<br>
   • Never share your private key, seed phrase, or wallet credentials with anyone.<br>
-</div>
-
-  
+ </div> 
   `;
-}
+  }
    
-// ================== SUBMIT DEPOSIT ==================
+// ================== SUBMIT DEPOSIT ==================//
 window.submitDepositFinal = async function(asset, network){
-
-  const amount = document.getElementById("amount").value;
-  const txHash = document.getElementById("txHash").value;
-  const eoa = document.getElementById("eoa").value;
-
-  if(!amount || !txHash || !eoa){
-    alert("Fill all fields");
-    return;
-  }
-
-  await addDoc(collection(db, "requests"), {
-    userId: WALLET,
-    type: "deposit",
-    asset,
-    network,
-    amount: Number(amount),
-    txHash,
-    eoa,
-    status: "pending",
-    createdAt: serverTimestamp()
-  });
-
-  await updateDoc(userRef, {
-    pendingRequest: true
-  });
-
-  alert("Deposit request sent");
-
-  goDeposit();
+const amount = document.getElementById("amount").value;
+const txHash = document.getElementById("txHash").value;
+const eoa = document.getElementById("eoa").value;
+if(!amount || !txHash || !eoa){
+alert("Fill all fields");
+return;}
+await addDoc(collection(db, "requests"), {
+userId: WALLET,
+type: "deposit",
+asset,
+network,
+amount: Number(amount),
+txHash,
+eoa,
+status: "pending",
+createdAt: serverTimestamp()
+});
+await updateDoc(userRef, {
+pendingRequest: true
+});
+alert("Deposit request sent");
+goDeposit();
 }
 
-// ================== SUBMIT WITHDRAW ==================
+// ================== SUBMIT WITHDRAW ==================//
 window.submitWithdrawFinal = async function(asset, network){
-
-  const amount = document.getElementById("amount").value;
-  const eoa = document.getElementById("eoa").value;
-
-  if(!amount || !eoa){
-    alert("Fill all fields");
-    return;
-  }
-  await addDoc(collection(db, "requests"), {
-    userId: WALLET,
-    type: "withdraw",
-    asset,
-    network,
-    amount: Number(amount),
-    eoa,
-    status: "pending",
-    createdAt: serverTimestamp()
-  });
-
-  await updateDoc(userRef, {
-    pendingRequest: true
-  });
-
-  alert("Withdraw request submitted. Batching in progress. You will receive Merkle proof soon.");
-
-  goDeposit();
+const amount = document.getElementById("amount").value;
+const eoa = document.getElementById("eoa").value;
+if(!amount || !eoa){
+alert("Fill all fields");
+return;}
+await addDoc(collection(db, "requests"), {
+userId: WALLET,
+type: "withdraw",
+asset,
+network,
+amount: Number(amount),
+eoa,
+status: "pending",
+createdAt: serverTimestamp()
+});
+await updateDoc(userRef, {
+pendingRequest: true
+});
+alert("Withdraw request submitted. Batching in progress. You will receive Merkle proof soon.");
+goDeposit();
 };
 
 
