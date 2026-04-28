@@ -1325,103 +1325,58 @@ selectTab("history");
 
 
 
-window.goSettings = async () => {
+window.goSettings = () => {
 
   selectTab("settings");
 
   document.querySelector(".box").innerHTML = `
 
-  <!-- HEADER -->
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-    
-    <div onclick="goHome()" style="
-      width:36px;height:36px;
-      display:flex;align-items:center;justify-content:center;
-      border-radius:10px;
-      background:rgba(255,255,255,0.05);
+  <!-- TITLE -->
+  <div style="font-size:20px;font-weight:700;margin-bottom:20px;">
+    Settings
+  </div>
+
+  <!-- LIST -->
+  <div>
+
+    <div onclick="openAccount()" style="
+      display:flex;
+      justify-content:space-between;
+      padding:14px 0;
+      border-bottom:1px solid rgba(255,255,255,0.06);
       cursor:pointer;
-      font-size:18px;
-    ">←</div>
-
-    <div style="font-size:18px;font-weight:600;">
-      Settings
-    </div>
-  </div>
-
-  <!-- ACCOUNT -->
-  <div style="
-    background:#0b1220;
-    padding:14px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:15px;
-  ">
-    <div style="font-size:13px;opacity:0.6;">Wallet</div>
-    <div style="font-size:13px;color:#60a5fa;word-break:break-all;">
-      ${WALLET}
-    </div>
-  </div>
-
-  <!-- USERNAME -->
-  <div style="
-    background:#0b1220;
-    padding:14px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:15px;
-  ">
-    <div style="font-size:13px;opacity:0.6;">Username</div>
-
-    <input id="username" placeholder="Enter username"
-      style="width:100%;margin:10px 0;">
-
-    <button onclick="saveUsername()" style="
-      width:100%;
-      padding:12px;
-      border-radius:10px;
-      background:#22c55e;
-      font-weight:600;
     ">
-      Save
-    </button>
-  </div>
-
-  <!-- SECURITY -->
-  <div style="
-    background:#0b1220;
-    padding:14px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:15px;
-  ">
-    <div style="font-size:14px;font-weight:600;margin-bottom:10px;">
-      Security
+      <div>Account</div>
+      <div style="opacity:0.5;">›</div>
     </div>
 
-    <button onclick="logout()" style="
-      width:100%;
-      padding:12px;
-      border-radius:10px;
-      background:#ef4444;
-      color:white;
-      font-weight:600;
+    <div onclick="openSecurity()" style="
+      display:flex;
+      justify-content:space-between;
+      padding:14px 0;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      cursor:pointer;
     ">
-      Logout
-    </button>
+      <div>Security & Privacy</div>
+      <div style="opacity:0.5;">›</div>
+    </div>
+
   </div>
 
-  <!-- ABOUT -->
-  <div style="
-    font-size:12px;
-    opacity:0.6;
+  <!-- LOGOUT -->
+  <div onclick="logout()" style="
+    margin-top:30px;
     text-align:center;
-    margin-top:20px;
+    color:#ef4444;
+    font-weight:600;
+    cursor:pointer;
   ">
-    StabiX v1.0 • Non-Custodial
+    Logout
   </div>
 
   `;
 };
+
 
 
 
