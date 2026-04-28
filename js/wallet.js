@@ -1474,6 +1474,85 @@ margin-bottom:18px;
 StabiX is a non-custodial payment and vault system designed to enable fast, low-cost stablecoin transactions with minimal complexity. It allows users to deposit assets on-chain while maintaining a simplified off-chain balance experience.
 The system is built to support instant transfers and microtransactions without relying on traditional custodial infrastructure, giving users full control over their funds at all times.
 </div>
+
+<div style="
+  font-size:15px;
+  font-weight:600;
+  margin-bottom:8px;
+">
+  Problem StabiX Solves
+</div>
+
+<div style="
+  font-size:13px;
+  opacity:0.8;
+  line-height:1.6;
+  margin-bottom:18px;
+">
+  Stablecoin transactions are reliable but still depend on blockchain-level execution for every transfer. This introduces delays, repeated gas costs, and multiple steps such as network selection, confirmations, and manual interaction.
+For frequent usage, microtransactions, or everyday payments, this model becomes inefficient. Users are required to pay network fees repeatedly and wait for confirmations, even for small-value transfers.
+StabiX addresses these limitations by abstracting repetitive blockchain interactions into a simplified system. Once assets are deposited on-chain, users can perform instant transfers within StabiX without paying gas fees for each action.
+This enables a smoother experience for microtransactions, high-frequency usage, and real-time payments, while still maintaining a non-custodial structure backed by on-chain verification.
+</div>
+
+<div style="
+  font-size:15px;
+  font-weight:600;
+  margin-bottom:8px;
+">
+  How StabiX Works
+</div>
+
+<div style="
+  font-size:13px;
+  opacity:0.8;
+  line-height:1.6;
+  margin-bottom:18px;
+">
+
+  StabiX combines on-chain asset custody with an off-chain execution layer to deliver instant, efficient transactions while maintaining verifiable ownership.
+
+  <br><br>
+
+  <b>1. Deposit (On-Chain Lock)</b><br>
+  Users initiate the process by sending stablecoins (such as USDT or USDC) to a designated vault address on a supported blockchain network. This transaction is executed entirely on-chain and remains fully verifiable through public blockchain explorers.
+
+  Once the transaction is confirmed, the deposited assets are effectively locked within the vault smart contract.
+
+  <br><br>
+
+  <b>2. Balance Minting (Off-Chain Representation)</b><br>
+  After successful verification of the deposit transaction, StabiX mints an equivalent balance within its system. This minted balance represents the user's claim on the locked assets.
+
+  This step eliminates the need for repeated blockchain interaction, allowing users to operate within StabiX instantly without incurring gas fees for every action.
+
+  <br><br>
+
+  <b>3. Instant Transactions (Off-Chain Execution)</b><br>
+  Once funds are minted, users can perform transfers instantly within the StabiX environment. These transactions do not require on-chain confirmations and are executed in real-time.
+
+  This makes StabiX particularly efficient for microtransactions and high-frequency usage, where traditional blockchain interactions would otherwise introduce delays and repeated costs.
+
+  <br><br>
+
+  <b>4. Withdrawal Request (Balance Burn)</b><br>
+  When a user initiates a withdrawal, the corresponding amount is permanently burned from their StabiX balance. This ensures that the off-chain representation always remains fully backed by the locked on-chain assets.
+
+  <br><br>
+
+  <b>5. Merkle-Based Claim (On-Chain Redemption)</b><br>
+  Withdrawal requests are processed in batches, where a validator aggregates requests and generates a Merkle root. Each user receives a unique proof (leaf) corresponding to their withdrawal.
+
+  Using this proof, the user can independently claim their funds directly from the vault smart contract using their own wallet.
+
+  <br><br>
+
+  <b>6. Final Settlement</b><br>
+  The withdrawal is completed entirely on-chain, ensuring that users regain full custody of their assets without reliance on intermediaries.
+
+  This architecture ensures that while StabiX enables instant and efficient transactions off-chain, the final ownership and settlement always remain verifiable and enforceable on-chain.
+</div>
+  
 `;
 };
 /* ================= Setting Navigation Finish================= */
