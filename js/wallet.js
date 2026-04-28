@@ -1346,7 +1346,7 @@ window.goSettings = () => {
       border-bottom:1px solid rgba(255,255,255,0.06);
       cursor:pointer;
     ">
-      <div>Account</div>
+      <div>Themes</div>
       <div style="opacity:0.5;">›</div>
     </div>
 
