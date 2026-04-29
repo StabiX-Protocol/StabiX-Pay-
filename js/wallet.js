@@ -1155,29 +1155,28 @@ console.log("navigateHome error:", e);
 }
 };
 
-
-window.goDeposit = () => {
-
+window.goDeposit = async () => {
+const snap = await getDoc(userRef);
+const user = snap.data();
 document.querySelector(".box").innerHTML = `
-
-<h2>Deposit and Withdraw</h2>
-
-<!-- STEP 1: ASSETS -->
-<div id="dwAssets" style="margin-top:12px;display:flex;flex-direction:column;gap:10px;">
+<h2>Select Asset</h2>
+<div style="display:flex;flex-direction:column;gap:12px;margin-top:15px;">
 
 <div onclick="selectDWAsset('USDT')" style="
 background:#020617;
 border:1px solid #1e293b;
 border-radius:12px;
-padding:12px;
+padding:14px;
 display:flex;
+justify-content:space-between;
 align-items:center;
-gap:10px;
 cursor:pointer;">
+<div style="display:flex;align-items:center;gap:10px;">
 <img src="./media/tether-usdt-logo.png" style="width:32px;height:32px;border-radius:50%;">
-<div>
-<div style="font-size:14px">USDT</div>
-<div style="font-size:11px;opacity:.6">Tap to continue</div>
+<div>USDT</div>
+</div>
+<div style="font-weight:bold">
+${user.usdtBalance?.toFixed(2) || "0.00"}
 </div>
 </div>
 
@@ -1185,43 +1184,77 @@ cursor:pointer;">
 background:#020617;
 border:1px solid #1e293b;
 border-radius:12px;
-padding:12px;
+padding:14px;
 display:flex;
+justify-content:space-between;
 align-items:center;
-gap:10px;
 cursor:pointer;">
+<div style="display:flex;align-items:center;gap:10px;">
 <img src="./media/usd-coin-usdc-logo.png" style="width:32px;height:32px;border-radius:50%;">
-<div>
-<div style="font-size:14px">USDC</div>
-<div style="font-size:11px;opacity:.6">Tap to continue</div>
+<div>USDC</div>
+</div>
+<div style="font-weight:bold">
+${user.balance?.toFixed(2) || "0.00"}
 </div>
 </div>
 
+<div style="margin-top:25px;">
+<div style="
+font-weight:600;
+font-size:14px;
+opacity:0.8;
+margin-bottom:10px;">
+Recent Activity
 </div>
-
-<!-- STEP 2: ACTION -->
-<div id="actionScreen" style="display:none;margin-top:20px;">
-
-<h3 id="selectedAssetText"></h3>
-
-<div style="display:flex;gap:10px;margin-top:10px;">
-<button onclick="openDeposit()" style="background:#22c55e;color:#022c22;font-weight:bold">
-Deposit
-</button>
-
-<button onclick="openWithdraw()" style="background:#ef4444;color:white;font-weight:bold">
-Withdraw
-</button>
+<div id="recentTxs"></div> 
 </div>
-
-</div>
-
-<!-- STEP 3: SCREENS -->
-<div id="depositBox"></div>
-<div id="withdrawBox"></div>
-
 `;
-
+(async () => {
+const q = query(
+collection(db, "transactions"),
+where("userId", "==", WALLET));
+const snap = await getDocs(q);
+let arr = [];
+snap.forEach(d => {
+const t = d.data();
+if(t.type === "deposit" || t.type === "withdraw"){
+arr.push({...t,_time: t.createdAt?.seconds || 0});
+}
+});
+arr.sort((a,b)=> b._time - a._time);
+arr = arr.slice(0,5);
+let html = "";
+arr.forEach(t => {
+const isDeposit = t.type === "deposit";
+const time = t.createdAt
+? new Date(t.createdAt.seconds * 1000).toLocaleString("en-IN", {
+day: "2-digit",
+month: "short",
+hour: "2-digit",
+minute: "2-digit"
+})
+: "";
+html += `
+<div style="
+display:flex;
+justify-content:space-between;
+padding:10px 0;
+border-bottom:1px solid rgba(255,255,255,0.05);">
+<div style="font-size:13px;">
+<div>${isDeposit ? "Deposit" : "Withdraw"}</div>
+<div style="font-size:11px;opacity:0.6;">${time}</div>
+</div>
+<div style="
+font-weight:600;
+color:${isDeposit ? "#22c55e" : "#ef4444"};">
+${isDeposit ? "+" : "-"} ${t.amount} ${t.asset || ""}
+</div>
+</div>
+`;
+});
+document.getElementById("recentTxs").innerHTML =
+html || `<div style="opacity:0.5;">No recent D/W</div>`;
+})(); 
 selectTab("deposit");
 };
 
@@ -1297,9 +1330,360 @@ setTimeout(setupHistorySearch, 100);
 selectTab("history");
 };
 
+
+
+
+
+
+
+/* ================= Setting Navigation ================= */
 window.goSettings = () => {
-alert("Settings coming soon");
+selectTab("settings");
+document.querySelector(".box").innerHTML = `
+<!-- TITLE -->
+<div style="font-size:20px;font-weight:700;margin-bottom:20px;">
+Settings
+</div>
+
+<div onclick="openSupport()" style="
+display:flex;
+justify-content:space-between;
+padding:14px 0;
+border-bottom:1px solid rgba(255,255,255,0.06);
+cursor:pointer;
+">
+<div>Support</div>
+<div style="opacity:0.5;">›</div>
+</div>
+
+<div onclick="openAbout()" style="
+display:flex;
+justify-content:space-between;
+padding:14px 0;
+border-bottom:1px solid rgba(255,255,255,0.06);
+cursor:pointer;
+">
+<div>About</div>
+<div style="opacity:0.5;">›</div>
+</div>
+<!-- LOGOUT -->
+<div onclick="logout()" style="
+margin-top:30px;
+text-align:center;
+color:#ef4444;
+font-weight:600;
+cursor:pointer;
+">
+Logout
+</div>
+`;
 };
+
+window.openSupport = () => {
+document.querySelector(".box").innerHTML = `
+<!-- HEADER -->
+<div onclick="goSettings()" style="
+margin-bottom:15px;
+cursor:pointer;
+opacity:0.7;
+">← Back</div>
+
+<div style="font-size:18px;font-weight:600;margin-bottom:20px;">
+Support
+</div>
+
+<div style="
+font-size:13px;
+opacity:0.8;
+margin-bottom:20px;
+line-height:1.6;
+">
+Need help or facing an issue? Reach out to our support team.
+</div>
+<div onclick="window.open('https://t.me/StabiXSupport')" style="
+padding:14px;
+border-radius:12px;
+background:#0b1220;
+border:1px solid rgba(255,255,255,0.06);
+cursor:pointer;
+text-align:center;
+font-weight:600;
+">
+Contact on Telegram
+</div>
+`;
+};
+
+
+window.openAbout = () => {
+document.querySelector(".box").innerHTML = `
+<!-- HEADER -->
+<div onclick="goSettings()" style="
+margin-bottom:15px;
+cursor:pointer;
+opacity:0.7;
+">← Back</div>
+
+<div style="font-size:18px;font-weight:600;margin-bottom:20px;">
+About
+</div>
+<div style="
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
+">
+What is StabiX?
+</div>
+<div style="
+font-size:13px;
+opacity:0.8;
+line-height:1.6;
+margin-bottom:18px;
+">
+StabiX is a non-custodial payment and vault system designed to enable fast, low-cost stablecoin transactions with minimal complexity. It allows users to deposit assets on-chain while maintaining a simplified off-chain balance experience.
+The system is built to support instant transfers and microtransactions without relying on traditional custodial infrastructure, giving users full control over their funds at all times.
+</div>
+
+<div style="
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
+">
+Problem StabiX Solves
+</div>
+
+<div style="
+font-size:13px;
+opacity:0.8;
+line-height:1.6;
+margin-bottom:18px;
+">
+  Stablecoin transactions are reliable but still depend on blockchain-level execution for every transfer. This introduces delays, repeated gas costs, and multiple steps such as network selection, confirmations, and manual interaction.
+For frequent usage, microtransactions, or everyday payments, this model becomes inefficient. Users are required to pay network fees repeatedly and wait for confirmations, even for small-value transfers.
+StabiX addresses these limitations by abstracting repetitive blockchain interactions into a simplified system. Once assets are deposited on-chain, users can perform instant transfers within StabiX without paying gas fees for each action.
+This enables a smoother experience for microtransactions, high-frequency usage, and real-time payments, while still maintaining a non-custodial structure backed by on-chain verification.
+</div>
+
+<div style="
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
+">
+How StabiX Works
+</div>
+
+<div style="
+font-size:13px;
+opacity:0.8;
+line-height:1.6;
+margin-bottom:18px;
+">
+StabiX combines on-chain asset custody with an off-chain execution layer to deliver instant, efficient transactions while maintaining verifiable ownership.
+
+<br><br>
+<b>1. Deposit (On-Chain Lock)</b><br>
+Users initiate the process by sending stablecoins (such as USDT or USDC) to a designated vault address on a supported blockchain network. This transaction is executed entirely on-chain and remains fully verifiable through public blockchain explorers.
+Once the transaction is confirmed, the deposited assets are effectively locked within the vault smart contract.
+
+<br><br>
+<b>2. Balance Minting (Off-Chain Representation)</b><br>
+After successful verification of the deposit transaction, StabiX mints an equivalent balance within its system. This minted balance represents the user's claim on the locked assets.
+This step eliminates the need for repeated blockchain interaction, allowing users to operate within StabiX instantly without incurring gas fees for every action.
+
+<br><br>
+<b>3. Instant Transactions (Off-Chain Execution)</b><br>
+Once funds are minted, users can perform transfers instantly within the StabiX environment. These transactions do not require on-chain confirmations and are executed in real-time.
+This makes StabiX particularly efficient for microtransactions and high-frequency usage, where traditional blockchain interactions would otherwise introduce delays and repeated costs.
+
+<br><br>
+<b>4. Withdrawal Request (Balance Burn)</b><br>
+When a user initiates a withdrawal, the corresponding amount is permanently burned from their StabiX balance. This ensures that the off-chain representation always remains fully backed by the locked on-chain assets.
+
+<br><br>
+<b>5. Merkle-Based Claim (On-Chain Redemption)</b><br>
+Withdrawal requests are processed in batches, where a validator aggregates requests and generates a Merkle root. Each user receives a unique proof (leaf) corresponding to their withdrawal.
+Using this proof, the user can independently claim their funds directly from the vault smart contract using their own wallet.
+
+<br><br>
+<b>6. Final Settlement</b><br>
+The withdrawal is completed entirely on-chain, ensuring that users regain full custody of their assets without reliance on intermediaries.
+This architecture ensures that while StabiX enables instant and efficient transactions off-chain, the final ownership and settlement always remain verifiable and enforceable on-chain.
+</div>
+
+<div style="
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
+">
+Non-Custodial Architecture
+</div>
+
+<div style="
+font-size:13px;
+opacity:0.8;
+line-height:1.6;
+margin-bottom:18px;
+">
+StabiX is designed as a non-custodial system where users retain full ownership and control over their funds at all times.
+
+<br><br>
+Unlike traditional platforms that hold and manage user balances, StabiX does not have direct access to user assets. All deposited funds are secured within on-chain vault smart contracts, and can only be accessed using valid cryptographic proofs and the user's private key.
+
+<br><br>
+<b>No Direct Control Over Funds</b><br>
+StabiX cannot move, withdraw, or freeze user funds. There is no mechanism that allows the system or its operators to access assets inside the vault.
+
+<br><br>
+<b>User-Executed Withdrawals</b><br>
+Withdrawals are not processed by StabiX on behalf of the user. Instead, users must claim their funds themselves using a valid Merkle proof (Leaf) generated after validator submission.
+
+<br><br>
+<b>Private Key Ownership</b><br>
+Only the holder of the correct private key can execute the withdrawal transaction. Without the user's private key, no entity including StabiX can access the funds.
+
+<br><br>
+<b>Trust-Minimized System</b><br>
+The architecture eliminates the need to trust a centralized custodian. Security is enforced through smart contracts and cryptographic verification rather than platform control.
+
+<br><br>
+This approach ensures that StabiX functions as an execution layer rather than a custodian, giving users full sovereignty over their assets while still benefiting from instant off-chain transactions.
+</div>
+
+<div style="
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
+">
+Withdrawal Process & User Responsibility
+</div>
+
+<div style="
+font-size:13px;
+opacity:0.8;
+line-height:1.6;
+margin-bottom:18px;
+">
+Withdrawals in StabiX follow a structured process involving balance burn, batch processing, and Merkle-based claim execution. Users must understand and correctly follow each step.
+
+<br><br>
+<b>1. Balance Burn on Withdrawal Request</b><br>
+When a withdrawal is submitted, the specified amount is permanently burned from the user’s StabiX balance. This action is irreversible and ensures that the off-chain balance remains fully backed by on-chain assets.
+
+<br><br>
+<b>2. Batch Processing & Merkle Root Generation</b><br>
+All withdrawal requests are grouped and processed in batches. A validator generates a Merkle root from these requests, and each user receives a unique proof (Leaf) corresponding to their withdrawal details.
+
+<br><br>
+<b>3. Fixed Recipient (EOA Binding)</b><br>
+The withdrawal is strictly bound to the EOA wallet address provided at the time of submission. The Merkle leaf is generated using this exact address.
+This means:
+
+<div style="margin-left:10px; line-height:1.6;">
+<div>• Funds can only be claimed by the same EOA</div>
+<div>• Changing the address later is not possible</div>
+<div>• If an incorrect address is submitted, funds cannot be recovered</div>
+</div>
+
+<br><br>
+<b>4. Claim Window (Time-Limited Execution)</b><br>
+Once the Merkle root is published, users have a limited time window (up to <b>24 hours</b>) to claim their funds using the provided Leaf.
+If the withdrawal is not executed within this period:
+
+<div style="margin-left:10px;">
+<div>• The Leaf will expire</div>
+<div>• The withdrawal becomes invalid</div>
+<div>• The burned balance will not be restored</div>
+</div>
+
+<br><br>
+<b>5. User-Executed Withdrawal</b><br>
+StabiX does not transfer funds automatically. Users must manually execute the withdrawal from the vault smart contract using their own wallet and private key.
+Only the wallet (EOA) used during submission can successfully complete this process.
+
+<br><br>
+<b>6. No System Access to Funds</b><br>
+StabiX does not have the ability to withdraw, redirect, or access user funds. The system cannot override wallet ownership or execute withdrawals on behalf of users.
+Fund access is strictly controlled by:
+
+<div style="margin-left:10px; line-height:1.6;">
+<div>• The correct EOA wallet</div>
+<div>• The valid Merkle proof (Leaf)</div>
+<div>• The user’s private key</div>
+</div>
+
+<br><br>
+<b>7. User Responsibility</b><br>
+Users are fully responsible for:
+
+<div style="margin-left:10px; line-height:1.6;">
+<div>• Entering the correct EOA wallet address</div>
+<div>• Providing accurate withdrawal amount</div>
+<div>• Monitoring notifications for Leaf availability</div>
+<div>• Executing withdrawal within the valid time window</div>
+</div>
+
+<div style="margin-top:6px;">
+  Any incorrect input or failure to complete the process may result in permanent loss of funds.
+</div>
+      
+</div>
+
+<div style="
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
+">
+Vision
+</div>
+<div style="
+font-size:13px;
+opacity:0.8;
+line-height:1.6;
+margin-bottom:18px;
+">
+StabiX is designed to bridge the gap between blockchain security and real world usability by combining on-chain asset custody with instant off-chain execution.
+
+<br><br>
+The goal is to enable a system where users can move value instantly, without being limited by network delays, repeated fees, or complex transaction flows, while still retaining full control over their assets.
+
+<br><br>
+By removing unnecessary blockchain interactions and introducing a streamlined execution layer, StabiX makes stablecoin usage more practical for everyday payments, microtransactions, and high frequency activity.
+
+<br><br>
+At its core, StabiX is not built to replace blockchains, but to enhance how users interact with them reducing friction while preserving transparency, security, and self-custody.
+
+<br><br>
+The long term vision is to create a scalable, efficient, and trust-minimized financial layer where users can operate seamlessly across networks without compromising ownership or control.
+</div>
+
+<div style="
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
+">
+Founder
+</div>
+<div style="
+font-size:13px;
+opacity:0.8;
+line-height:1.6;
+margin-bottom:18px;
+">
+<b>Sumedh Dabhade</b><br><br>
+StabiX is developed by Sumedh Dabhade, focused on building efficient and practical non-custodial financial systems.
+The project is driven by a goal to simplify blockchain interactions while preserving user ownership, transparency, and security.
+StabiX reflects an approach centered on reducing friction in digital payments without compromising the core principles of decentralization.
+</div>
+`;
+};
+/* ================= Setting Navigation Finish================= */
+
+
+
+
+
+
+
 
 window.selectTab = function(tab){
 ["home","deposit","history","settings"].forEach(t=>{
@@ -1343,37 +1727,28 @@ if(type === "type"){
 html = `
 <div class="sheet">
 <h3 style="margin:0 0 12px 0;">Transaction Type</h3>
-
 <div class="assetList">
-
 <div class="assetItem" onclick="setType('sent')">
 <span>Sent</span>
 </div>
-
 <div class="assetItem" onclick="setType('received')">
 <span>Received</span>
 </div>
-
 <div class="assetItem" onclick="setType('deposit')">
 <span>Deposit</span>
 </div>
-
 <div class="assetItem" onclick="setType('withdraw')">
 <span>Withdraw</span>
 </div>
-
 </div>
-
 <button onclick="clearTypeFilter()" 
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
 background:#1e293b;color:#e5e7eb;border:none;">
 Clear Filter
 </button>
-
 <button onclick="applyFilter('type')" class="applyBtn">
 Apply
 </button>
-
 </div>
 `;
 }
@@ -1596,6 +1971,541 @@ if(btn) btn.innerText = "Type ▼";
 closeFilter();
 loadHistory();
 };
+
+// ==================Deposit Withdraw Logic==================//
+window.selectDWAsset = (asset) => {
+window.selectedDWAsset = asset;
+document.querySelector(".box").innerHTML = `
+<div style="
+display:flex;
+flex-direction:column;
+align-items:center;
+margin-top:20px;
+gap:10px;
+">
+<img 
+src="${asset === 'USDT' 
+? './media/tether-usdt-logo.png' 
+: './media/usd-coin-usdc-logo.png'}"
+style="
+width:60px;
+height:60px;
+border-radius:50%;
+">
+<div style="
+font-size:20px;
+font-weight:bold;
+">
+${asset}
+</div>
+</div>
+<div style="display:flex;gap:12px;margin-top:30px;">
+<button onclick="openDeposit('${asset}')" style="
+flex:1;
+padding:14px;
+border-radius:12px;
+background:#22c55e;
+color:#022c22;
+font-weight:bold;">
+Deposit
+</button>
+<button onclick="openWithdrawNetwork('${asset}')" style="
+flex:1;
+padding:14px;
+border-radius:12px;
+background:#ef4444;
+color:white;
+font-weight:bold;">
+Withdraw
+</button>
+</div>
+<div style="
+margin-top:25px;
+background:#0b1220;
+border:1px solid rgba(255,255,255,0.06);
+border-radius:14px;
+padding:14px;
+">
+<div style="
+font-size:14px;
+font-weight:600;
+margin-bottom:10px;
+opacity:0.9;
+">
+Asset Selected
+</div>
+<ul style="
+font-size:12px;
+opacity:0.7;
+line-height:1.6;
+padding-left:16px;
+">
+<li>You have selected <b>${asset}</b> for your transaction.</li>
+<li>All deposits and withdrawals initiated from this page will be processed in <b>${asset}</b> only.</li>
+<li>Please ensure you choose the correct network in the next step before proceeding.</li>
+<li>Sending or requesting unsupported assets may result in permanent loss.</li>
+<li>Review all transaction details carefully before submission.</li>
+</ul>
+</div>
+<div onclick="goDeposit()" style="
+position:absolute;
+top:20px;
+left:20px;
+width:40px;
+height:40px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(6px);
+font-size:22px;
+cursor:pointer;
+">
+←
+</div>
+`;
+};
+
+window.openAssetPage = function(asset){
+window.selectedDWAsset = asset;
+selectDWAsset(asset);
+}
+// ================== VAULT CONFIG (COMMON) ==================
+const VAULTS = {
+"Ethereum ERC20": "0x0201B73BA3d4a43012c84B871c7d5332E176ffcc",
+"Arbitrum L2": "0xARB_VAULT",
+"Polygon PoS": "0xPOLY_VAULT",
+"Base L2": "0xBASE_VAULT",
+"Tron TRC20": "TXYZ_TRON_VAULT"
+};
+const EXPLORERS = {
+"Ethereum ERC20": "https://etherscan.io/address/",
+"Arbitrum L2": "https://arbiscan.io/address/",
+"Polygon PoS": "https://polygonscan.com/address/",
+"Base L2": "https://basescan.org/address/"
+};
+// ================= OPEN FUNCTIONS =================
+function networkCard(asset, name, type, speed, fee){
+return `
+<div onclick="selectNetwork('${asset}','${name} ${type}')"
+style="
+padding:14px;
+border-radius:14px;
+background:#0b1220;
+border:1px solid rgba(255,255,255,0.06);
+cursor:pointer;
+">
+<!-- NETWORK NAME -->
+<div style="font-weight:600;font-size:15px;">${name}
+<span style="opacity:0.5;font-size:12px;"> ${type}</span>
+</div>
+<!-- SPEED -->
+<div style="font-size:12px;opacity:0.6;margin-top:6px;">
+Speed: ${speed}
+</div>
+<!-- FEE -->
+<div style="font-size:12px;opacity:0.6;">
+Fee: ${fee}
+</div>
+</div>
+`;
+}
+// ================== PAGE 3 ==================//
+window.openDeposit = function(asset){
+document.querySelector(".box").innerHTML = `
+<!-- HEADER -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openAssetPage('${asset}')"style="
+width:36px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+cursor:pointer;
+font-size:18px;
+">←</div>
+<div style="font-size:18px;font-weight:600;">
+Select Network
+</div>
+</div>
+<!-- NETWORK LIST -->
+<div style="display:flex;flex-direction:column;gap:12px;">
+${networkCard(asset,"Ethereum","ERC20","~2 min","$5 fee")}
+${networkCard(asset,"Arbitrum","L2","~10 sec","Low fee")}
+${networkCard(asset,"Polygon","PoS","~5 sec","Very low")}
+${networkCard(asset,"Base","L2","~5 sec","Low fee")}
+</div>
+`;
+}
+// ================== PAGE 4 ==================
+// VAULT + TX HASH + AMOUNT + EOA
+window.selectNetwork = function(asset, network){
+const vault = VAULTS[network] || "Not available";
+document.querySelector(".box").innerHTML = `
+<!-- HEADER -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openDeposit('${asset}')" style="
+width:36px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+cursor:pointer;
+font-size:18px;
+">←</div>
+<div style="font-size:18px;font-weight:600;">
+${asset} Deposit
+</div>
+</div>
+<!-- NETWORK -->
+<div style="
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:10px;">
+<div style="font-size:12px;opacity:0.6;">Network</div>
+<div>${network}</div>
+</div>
+<!-- VAULT -->
+<div style="
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:15px;">
+<div style="font-size:12px;opacity:0.6;">Vault Address</div>
+<a href="${EXPLORERS[network]}${vault}" target="_blank" style="
+font-size:13px;
+color:#60a5fa;
+word-break:break-all;
+text-decoration:none;">
+${vault}
+</a>
+</div>
+<!-- INPUT -->
+<input id="amount" placeholder="Amount" style="width:100%;margin-bottom:10px;">
+<input id="txHash" placeholder="Transaction Hash" style="width:100%;margin-bottom:10px;">
+<input id="eoa" placeholder="Your Wallet Address" style="width:100%;margin-bottom:15px;">
+<!-- SUBMIT -->
+<button onclick="submitDepositFinal('${asset}','${network}')" style="
+width:100%;
+padding:14px;
+border-radius:12px;
+background:#22c55e;
+color:black;
+font-weight:600;
+">
+Submit Deposit
+</button>
+<div style="
+margin-top:15px;
+margin-bottom:100px;
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+font-size:12px;
+opacity:0.75;
+line-height:1.6;">
+<b style="opacity:0.95;font-size:16px;font-weight:700;">
+⚠️ Read Before Deposit ⚠️
+</b><br><br>
+<b style="opacity:0.9;">Deposit Instructions</b><br>
+• You must first approve and deposit funds from your EOA wallet. This action requires your private key signature to on chain vault interaction.<br>
+• Ensure you are using your own wallet (EOA). Never share your private key or wallet credentials with anyone.<br>
+• Only deposit supported assets (USDT / USDC) on the selected network.<br>
+• Sending assets from the wrong network or unsupported tokens will result in permanent loss of funds.<br><br>
+
+<b style="opacity:0.9;">On-Chain Deposit Process</b><br>
+• Deposit must be executed directly from your wallet to the provided vault address.<br>
+• After completing the transaction, you must submit the same wallet address (EOA), transaction hash, and exact deposited amount.<br>
+• Incorrect or mismatched details may lead to rejection or delay in processing.<br><br>
+
+<b style="opacity:0.9;">Validation & Minting</b><br>
+• Deposits are verified by validator.<br>
+• After successful verification, the equivalent amount will be minted to your StabiX account.<br>
+• Processing time may vary depending on network confirmations it's usually takes few minutes.<br><br>
+
+<b style="opacity:0.9;">Important Warnings</b><br>
+• Always use the same wallet address (EOA) that was used to perform the deposit transaction.<br>
+• Providing a different wallet address will result in failed minting and loss of credit.<br>
+• Double-check transaction hash and amount before submission.<br>
+• Do not send funds from exchanges or custodial wallets.<br><br>
+
+<b style="opacity:0.9;">Non-Custodial Notice</b><br>
+• Your funds remain on-chain and are never held in StabiX custody.<br>
+• StabiX cannot access, control, or recover your funds.<br>
+</div>
+`;
+}
+// ================== PAGE 6 ==================//
+window.openWithdraw = function(asset, network){
+document.querySelector(".box").innerHTML = `
+<!-- HEADER -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openWithdrawNetwork('${asset}')" style="
+width:36px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+cursor:pointer;
+font-size:18px;
+">←</div>
+<div style="font-size:18px;font-weight:600;">
+${asset} Withdraw
+</div>
+</div>
+<!-- NETWORK SHOW -->
+<div style="
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:12px;">
+<div style="font-size:12px;opacity:0.6;">Network</div>
+<div style="font-size:14px;font-weight:600;">
+${network}
+</div>
+</div>
+<!-- VAULT ADDRESS -->
+<div style="
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:15px;">
+<div style="font-size:12px;opacity:0.6;">Vault Address</div>
+<div style="font-size:13px;color:#60a5fa;word-break:break-all;">
+0xYOUR_VAULT_ADDRESS
+</div>
+</div>
+<!-- FORM -->
+<div style="
+background:#0b1220;
+padding:14px;
+border-radius:14px;
+border:1px solid rgba(255,255,255,0.06);">
+<div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
+Recipient Address
+</div>
+<input id="eoa" placeholder="Enter wallet address" style="width:100%;margin-bottom:12px;">
+<div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
+Amount
+</div>
+<input id="amount" placeholder="Enter amount" style="width:100%;margin-bottom:15px;">
+<button onclick="submitWithdrawFinal('${asset}','${network}')" style="
+width:100%;
+padding:14px;
+border-radius:12px;
+background:#ef4444;
+color:white;
+font-weight:600;">
+Submit Withdraw
+</button>
+</div>
+`;
+}
+
+function networkCardWithdraw(asset, name, type, speed, fee){
+return `
+<div onclick="selectWithdrawNetwork('${asset}','${name} ${type}')"
+style="
+padding:14px;
+border-radius:14px;
+background:#0b1220;
+border:1px solid rgba(255,255,255,0.06);
+cursor:pointer;">
+<div style="font-weight:600;font-size:15px;">
+${name}
+<span style="opacity:0.5;font-size:12px;"> ${type}</span>
+</div>
+<div style="font-size:12px;opacity:0.6;margin-top:6px;">
+Speed: ${speed}
+</div>
+<div style="font-size:12px;opacity:0.6;">
+Fee: ${fee}
+</div>
+</div>
+`;
+}
+  
+window.openWithdrawNetwork = function(asset){
+document.querySelector(".box").innerHTML = `
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openAssetPage('${asset}')" style="
+width:36px;height:36px;
+display:flex;align-items:center;justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+cursor:pointer;
+font-size:18px;
+">←</div>
+<div style="font-size:18px;font-weight:600;">
+Select Network
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;">
+${networkCardWithdraw(asset,"Ethereum","ERC20","~2 min","$5")}
+${networkCardWithdraw(asset,"Arbitrum","L2","~10 sec","Low")}
+${networkCardWithdraw(asset,"Polygon","PoS","~5 sec","Very low")}
+${networkCardWithdraw(asset,"Base","L2","~5 sec","Low")}
+</div>
+`;
+};
+window.selectWithdrawNetwork = function(asset, network){
+const vault = VAULTS[network] || "Not available";
+document.querySelector(".box").innerHTML = `
+<!-- HEADER -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openWithdrawNetwork('${asset}')" style="
+width:36px;height:36px;
+display:flex;align-items:center;justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+cursor:pointer;
+font-size:18px;
+">←</div>
+<div style="font-size:18px;font-weight:600;">
+${asset} Withdraw
+</div>
+</div>
+<!-- NETWORK -->
+<div style="
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:10px;">
+<div style="font-size:12px;opacity:0.6;">Network</div>
+<div>${network}</div>
+</div>
+<!-- VAULT -->
+<div style="
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:15px;">
+<div style="font-size:12px;opacity:0.6;">Vault Address</div>
+<a href="${EXPLORERS[network]}${vault}" target="_blank" style="
+font-size:13px;
+color:#60a5fa;
+word-break:break-all;
+text-decoration:none;">
+${vault}
+</a>
+</div>
+<!-- INPUT -->
+<input id="eoa" placeholder="Recipient Address" style="width:100%;margin-bottom:10px;">
+<input id="amount" placeholder="Amount" style="width:100%;margin-bottom:15px;">
+<!-- SUBMIT -->
+<button onclick="submitWithdrawFinal('${asset}','${network}')" style="
+width:100%;
+padding:14px;
+border-radius:12px;
+background:#ef4444;
+color:white;
+font-weight:600;
+">
+Submit Withdraw
+</button>
+<div style="
+margin-top:15px;
+margin-bottom:100px;
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+font-size:12px;
+opacity:0.75;
+line-height:1.6;
+">
+<b style="opacity:0.95;font-size:16px;font-weight:700;">
+⚠️Read Before Withdrawal⚠️
+ </b><br><br>
+ <b style="opacity:0.9;">Withdrawal Instructions</b><br>
+  • Funds will be withdrawn only to the recipient address (EOA) provided above.<br>
+  • Ensure the selected network matches your destination wallet. Network mismatch will result in permanent loss of funds.<br>
+  • Withdrawals are non-custodial. StabiX does not directly transfer funds to your wallet.<br><br>
+  <b style="opacity:0.9;">Merkle-Based Withdrawal Process</b><br>
+  • After validator submission, a Merkle Root is published and you will receive your unique Leaf via notification.<br>
+  • Using this Leaf, you must manually claim your funds from the vault smart contract.<br>
+  • Only the holder of the correct private key can execute the withdrawal. StabiX cannot access or control your funds.<br><br>
+  <b style="opacity:0.9;">Time & Execution Window</b><br>
+  • Withdrawal window is strictly limited to <b>20 hours</b> after Merkle Root publication.<br>
+  • Merkle Root is generated daily at <b>16:30 UTC</b>.<br>
+  • If not claimed within the valid window, your Leaf will expire and become invalid.<br><br>
+  <b style="opacity:0.9;">Important Warnings</b><br>
+  • After submitting a withdrawal request, the equivalent balance will be burn from your StabiX account.<br>
+  • You must complete the on-chain withdrawal process after receiving your Leaf. Failure to do so will result in permanent loss.<br>
+  • StabiX is not responsible for unclaimed, expired, or incorrectly executed withdrawals.<br>
+  • Never share your private key, seed phrase, or wallet credentials with anyone.<br>
+ </div> 
+  `;
+  }
+   
+// ================== SUBMIT DEPOSIT ==================//
+window.submitDepositFinal = async function(asset, network){
+const amount = document.getElementById("amount").value;
+const txHash = document.getElementById("txHash").value;
+const eoa = document.getElementById("eoa").value;
+if(!amount || !txHash || !eoa){
+alert("Fill all fields");
+return;}
+await addDoc(collection(db, "requests"), {
+userId: WALLET,
+type: "deposit",
+asset,
+network,
+amount: Number(amount),
+txHash,
+eoa,
+status: "pending",
+createdAt: serverTimestamp()
+});
+await updateDoc(userRef, {
+pendingRequest: true
+});
+alert("Deposit request sent");
+goDeposit();
+}
+
+// ================== SUBMIT WITHDRAW ==================//
+window.submitWithdrawFinal = async function(asset, network){
+const amount = document.getElementById("amount").value;
+const eoa = document.getElementById("eoa").value;
+if(!amount || !eoa){
+alert("Fill all fields");
+return;}
+await addDoc(collection(db, "requests"), {
+userId: WALLET,
+type: "withdraw",
+asset,
+network,
+amount: Number(amount),
+eoa,
+status: "pending",
+createdAt: serverTimestamp()
+});
+await updateDoc(userRef, {
+pendingRequest: true
+});
+alert("Withdraw request submitted. Batching in progress. You will receive Merkle proof soon.");
+goDeposit();
+};
+
+
+
+
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
 return `
@@ -1607,7 +2517,7 @@ return `
 <option value="USDT">USDT</option>
 </select>
 
-    <input id="vEOA" placeholder="Wallet Address (0x...)" style="
+<input id="vEOA" placeholder="Wallet Address (0x...)" style="
 width:100%;
 margin-top:8px;
 padding:10px;
