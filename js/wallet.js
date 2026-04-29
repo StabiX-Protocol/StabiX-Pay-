@@ -1326,142 +1326,129 @@ selectTab("history");
 
 /* ================= Setting Navigation ================= */
 window.goSettings = () => {
-
-  selectTab("settings");
-
-  document.querySelector(".box").innerHTML = `
-
-  <!-- TITLE -->
-  <div style="font-size:20px;font-weight:700;margin-bottom:20px;">
-    Settings
-  </div>
-
-  <!-- LIST -->
-  <div>
-    <div onclick="openSecurity()" style="
-      display:flex;
-      justify-content:space-between;
-      padding:14px 0;
-      border-bottom:1px solid rgba(255,255,255,0.06);
-      cursor:pointer;
-    ">
-      <div>Security</div>
-      <div style="opacity:0.5;">›</div>
-    </div>
-  </div>
-
-  <div onclick="openSupport()" style="
-  display:flex;
-  justify-content:space-between;
-  padding:14px 0;
-  border-bottom:1px solid rgba(255,255,255,0.06);
-  cursor:pointer;
+selectTab("settings");
+document.querySelector(".box").innerHTML = `
+<!-- TITLE -->
+<div style="font-size:20px;font-weight:700;margin-bottom:20px;">
+Settings
+</div>
+<!-- LIST -->
+<div>
+<div onclick="openSecurity()" style="
+display:flex;
+justify-content:space-between;
+padding:14px 0;
+border-bottom:1px solid rgba(255,255,255,0.06);
+cursor:pointer;
 ">
-  <div>Support</div>
-  <div style="opacity:0.5;">›</div>
+<div>Security</div>
+<div style="opacity:0.5;">›</div>
+</div>
+</div>
+
+<div onclick="openSupport()" style="
+display:flex;
+justify-content:space-between;
+padding:14px 0;
+border-bottom:1px solid rgba(255,255,255,0.06);
+cursor:pointer;
+">
+<div>Support</div>
+<div style="opacity:0.5;">›</div>
 </div>
 
 <div onclick="openAbout()" style="
-  display:flex;
-  justify-content:space-between;
-  padding:14px 0;
-  border-bottom:1px solid rgba(255,255,255,0.06);
-  cursor:pointer;
+display:flex;
+justify-content:space-between;
+padding:14px 0;
+border-bottom:1px solid rgba(255,255,255,0.06);
+cursor:pointer;
 ">
-  <div>About</div>
-  <div style="opacity:0.5;">›</div>
+<div>About</div>
+<div style="opacity:0.5;">›</div>
 </div>
-
-  <!-- LOGOUT -->
-  <div onclick="logout()" style="
-    margin-top:30px;
-    text-align:center;
-    color:#ef4444;
-    font-weight:600;
-    cursor:pointer;
-  ">
-    Logout
-  </div>
-
-  `;
+<!-- LOGOUT -->
+<div onclick="logout()" style="
+margin-top:30px;
+text-align:center;
+color:#ef4444;
+font-weight:600;
+cursor:pointer;
+">
+Logout
+</div>
+`;
 };
 
 window.openSecurity = () => {
+document.querySelector(".box").innerHTML = `
+<!-- HEADER -->
+<div onclick="goSettings()" style="
+margin-bottom:15px;
+cursor:pointer;
+opacity:0.7;
+">← Back</div>
 
-  document.querySelector(".box").innerHTML = `
+<div style="font-size:18px;font-weight:600;margin-bottom:20px;">
+Security & Privacy
+</div>
 
-  <!-- HEADER -->
-  <div onclick="goSettings()" style="
-    margin-bottom:15px;
-    cursor:pointer;
-    opacity:0.7;
-  ">← Back</div>
-
-  <div style="font-size:18px;font-weight:600;margin-bottom:20px;">
-    Security & Privacy
-  </div>
-
-  <div style="font-size:13px;opacity:0.7;line-height:1.6;">
-    Never share your private key or wallet credentials with anyone.
-    StabiX is non-custodial and cannot recover lost access.
-  </div>
-
-  `;
+<div style="font-size:13px;opacity:0.7;line-height:1.6;">
+Never share your private key or wallet credentials with anyone.
+StabiX is non-custodial and cannot recover lost access.
+</div>
+`;
 };
 window.openSupport = () => {
-  document.querySelector(".box").innerHTML = `
-  <!-- HEADER -->
-  <div onclick="goSettings()" style="
-    margin-bottom:15px;
-    cursor:pointer;
-    opacity:0.7;
-  ">← Back</div>
+document.querySelector(".box").innerHTML = `
+<!-- HEADER -->
+<div onclick="goSettings()" style="
+margin-bottom:15px;
+cursor:pointer;
+opacity:0.7;
+">← Back</div>
 
-  <div style="font-size:18px;font-weight:600;margin-bottom:20px;">
-    Support
-  </div>
-
-  <div style="
-    font-size:13px;
-    opacity:0.8;
-    margin-bottom:20px;
-    line-height:1.6;
-  ">
-    Need help or facing an issue? Reach out to our support team.
-  </div>
-<div onclick="window.open('https://t.me/StabiXSupport')" style="
-  padding:14px;
-  border-radius:12px;
-  background:#0b1220;
-  border:1px solid rgba(255,255,255,0.06);
-  cursor:pointer;
-  text-align:center;
-  font-weight:600;
-">
-  Contact on Telegram
+<div style="font-size:18px;font-weight:600;margin-bottom:20px;">
+Support
 </div>
-  
-  `;
+
+<div style="
+font-size:13px;
+opacity:0.8;
+margin-bottom:20px;
+line-height:1.6;
+">
+Need help or facing an issue? Reach out to our support team.
+</div>
+<div onclick="window.open('https://t.me/StabiXSupport')" style="
+padding:14px;
+border-radius:12px;
+background:#0b1220;
+border:1px solid rgba(255,255,255,0.06);
+cursor:pointer;
+text-align:center;
+font-weight:600;
+">
+Contact on Telegram
+</div>
+`;
 };
 window.openAbout = () => {
+document.querySelector(".box").innerHTML = `
+<!-- HEADER -->
+<div onclick="goSettings()" style="
+margin-bottom:15px;
+cursor:pointer;
+opacity:0.7;
+">← Back</div>
 
-  document.querySelector(".box").innerHTML = `
-
-  <!-- HEADER -->
-  <div onclick="goSettings()" style="
-    margin-bottom:15px;
-    cursor:pointer;
-    opacity:0.7;
-  ">← Back</div>
-
-  <div style="font-size:18px;font-weight:600;margin-bottom:20px;">
-    About
-  </div>
-
-  <div style="
-  font-size:15px;
-  font-weight:600;
-  margin-bottom:8px;
+<div style="font-size:18px;font-weight:600;margin-bottom:20px;">
+About
+</div>
+<div style="
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
 ">
 What is StabiX?
 </div>
@@ -1476,18 +1463,18 @@ The system is built to support instant transfers and microtransactions without r
 </div>
 
 <div style="
-  font-size:15px;
-  font-weight:600;
-  margin-bottom:8px;
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
 ">
-  Problem StabiX Solves
+Problem StabiX Solves
 </div>
 
 <div style="
-  font-size:13px;
-  opacity:0.8;
-  line-height:1.6;
-  margin-bottom:18px;
+font-size:13px;
+opacity:0.8;
+line-height:1.6;
+margin-bottom:18px;
 ">
   Stablecoin transactions are reliable but still depend on blockchain-level execution for every transfer. This introduces delays, repeated gas costs, and multiple steps such as network selection, confirmations, and manual interaction.
 For frequent usage, microtransactions, or everyday payments, this model becomes inefficient. Users are required to pay network fees repeatedly and wait for confirmations, even for small-value transfers.
@@ -1496,63 +1483,200 @@ This enables a smoother experience for microtransactions, high-frequency usage, 
 </div>
 
 <div style="
-  font-size:15px;
-  font-weight:600;
-  margin-bottom:8px;
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
 ">
-  How StabiX Works
+How StabiX Works
 </div>
 
 <div style="
-  font-size:13px;
-  opacity:0.8;
-  line-height:1.6;
-  margin-bottom:18px;
+font-size:13px;
+opacity:0.8;
+line-height:1.6;
+margin-bottom:18px;
 ">
+StabiX combines on-chain asset custody with an off-chain execution layer to deliver instant, efficient transactions while maintaining verifiable ownership.
 
-  StabiX combines on-chain asset custody with an off-chain execution layer to deliver instant, efficient transactions while maintaining verifiable ownership.
+<br><br>
+<b>1. Deposit (On-Chain Lock)</b><br>
+Users initiate the process by sending stablecoins (such as USDT or USDC) to a designated vault address on a supported blockchain network. This transaction is executed entirely on-chain and remains fully verifiable through public blockchain explorers.
+Once the transaction is confirmed, the deposited assets are effectively locked within the vault smart contract.
 
-  <br><br>
+<br><br>
+<b>2. Balance Minting (Off-Chain Representation)</b><br>
+After successful verification of the deposit transaction, StabiX mints an equivalent balance within its system. This minted balance represents the user's claim on the locked assets.
+This step eliminates the need for repeated blockchain interaction, allowing users to operate within StabiX instantly without incurring gas fees for every action.
 
-  <b>1. Deposit (On-Chain Lock)</b><br>
-  Users initiate the process by sending stablecoins (such as USDT or USDC) to a designated vault address on a supported blockchain network. This transaction is executed entirely on-chain and remains fully verifiable through public blockchain explorers.
+<br><br>
+<b>3. Instant Transactions (Off-Chain Execution)</b><br>
+Once funds are minted, users can perform transfers instantly within the StabiX environment. These transactions do not require on-chain confirmations and are executed in real-time.
+This makes StabiX particularly efficient for microtransactions and high-frequency usage, where traditional blockchain interactions would otherwise introduce delays and repeated costs.
 
-  Once the transaction is confirmed, the deposited assets are effectively locked within the vault smart contract.
+<br><br>
+<b>4. Withdrawal Request (Balance Burn)</b><br>
+When a user initiates a withdrawal, the corresponding amount is permanently burned from their StabiX balance. This ensures that the off-chain representation always remains fully backed by the locked on-chain assets.
 
-  <br><br>
+<br><br>
+<b>5. Merkle-Based Claim (On-Chain Redemption)</b><br>
+Withdrawal requests are processed in batches, where a validator aggregates requests and generates a Merkle root. Each user receives a unique proof (leaf) corresponding to their withdrawal.
+Using this proof, the user can independently claim their funds directly from the vault smart contract using their own wallet.
 
-  <b>2. Balance Minting (Off-Chain Representation)</b><br>
-  After successful verification of the deposit transaction, StabiX mints an equivalent balance within its system. This minted balance represents the user's claim on the locked assets.
-
-  This step eliminates the need for repeated blockchain interaction, allowing users to operate within StabiX instantly without incurring gas fees for every action.
-
-  <br><br>
-
-  <b>3. Instant Transactions (Off-Chain Execution)</b><br>
-  Once funds are minted, users can perform transfers instantly within the StabiX environment. These transactions do not require on-chain confirmations and are executed in real-time.
-
-  This makes StabiX particularly efficient for microtransactions and high-frequency usage, where traditional blockchain interactions would otherwise introduce delays and repeated costs.
-
-  <br><br>
-
-  <b>4. Withdrawal Request (Balance Burn)</b><br>
-  When a user initiates a withdrawal, the corresponding amount is permanently burned from their StabiX balance. This ensures that the off-chain representation always remains fully backed by the locked on-chain assets.
-
-  <br><br>
-
-  <b>5. Merkle-Based Claim (On-Chain Redemption)</b><br>
-  Withdrawal requests are processed in batches, where a validator aggregates requests and generates a Merkle root. Each user receives a unique proof (leaf) corresponding to their withdrawal.
-
-  Using this proof, the user can independently claim their funds directly from the vault smart contract using their own wallet.
-
-  <br><br>
-
-  <b>6. Final Settlement</b><br>
-  The withdrawal is completed entirely on-chain, ensuring that users regain full custody of their assets without reliance on intermediaries.
-
-  This architecture ensures that while StabiX enables instant and efficient transactions off-chain, the final ownership and settlement always remain verifiable and enforceable on-chain.
+<br><br>
+<b>6. Final Settlement</b><br>
+The withdrawal is completed entirely on-chain, ensuring that users regain full custody of their assets without reliance on intermediaries.
+This architecture ensures that while StabiX enables instant and efficient transactions off-chain, the final ownership and settlement always remain verifiable and enforceable on-chain.
 </div>
-  
+
+<div style="
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
+">
+Non-Custodial Architecture
+</div>
+
+<div style="
+font-size:13px;
+opacity:0.8;
+line-height:1.6;
+margin-bottom:18px;
+">
+StabiX is designed as a non-custodial system where users retain full ownership and control over their funds at all times.
+
+<br><br>
+Unlike traditional platforms that hold and manage user balances, StabiX does not have direct access to user assets. All deposited funds are secured within on-chain vault smart contracts, and can only be accessed using valid cryptographic proofs and the user's private key.
+
+<br><br>
+<b>No Direct Control Over Funds</b><br>
+StabiX cannot move, withdraw, or freeze user funds. There is no mechanism that allows the system or its operators to access assets inside the vault.
+
+<br><br>
+<b>User-Executed Withdrawals</b><br>
+Withdrawals are not processed by StabiX on behalf of the user. Instead, users must claim their funds themselves using a valid Merkle proof (Leaf) generated after validator submission.
+
+<br><br>
+<b>Private Key Ownership</b><br>
+Only the holder of the correct private key can execute the withdrawal transaction. Without the user's private key, no entity — including StabiX — can access the funds.
+
+<br><br>
+<b>Trust-Minimized System</b><br>
+The architecture eliminates the need to trust a centralized custodian. Security is enforced through smart contracts and cryptographic verification rather than platform control.
+
+<br><br>
+This approach ensures that StabiX functions as an execution layer rather than a custodian, giving users full sovereignty over their assets while still benefiting from instant off-chain transactions.
+</div>
+
+<div style="
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
+">
+Withdrawal Process & User Responsibility
+</div>
+
+<div style="
+font-size:13px;
+opacity:0.8;
+line-height:1.6;
+margin-bottom:18px;
+">
+Withdrawals in StabiX follow a structured process involving balance burn, batch processing, and Merkle-based claim execution. Users must understand and correctly follow each step.
+
+<br><br>
+<b>1. Balance Burn on Withdrawal Request</b><br>
+When a withdrawal is submitted, the specified amount is permanently burned from the user’s StabiX balance. This action is irreversible and ensures that the off-chain balance remains fully backed by on-chain assets.
+
+<br><br>
+<b>2. Batch Processing & Merkle Root Generation</b><br>
+All withdrawal requests are grouped and processed in batches. A validator generates a Merkle root from these requests, and each user receives a unique proof (Leaf) corresponding to their withdrawal details.
+
+<br><br>
+<b>3. Fixed Recipient (EOA Binding)</b><br>
+The withdrawal is strictly bound to the EOA wallet address provided at the time of submission. The Merkle leaf is generated using this exact address.
+This means:
+• Funds can only be claimed by the same EOA<br>
+• Changing the address later is not possible<br>
+• If an incorrect address is submitted, funds cannot be recovered
+
+<br><br>
+<b>4. Claim Window (Time-Limited Execution)</b><br>
+Once the Merkle root is published, users have a limited time window (up to <b>24 hours</b>) to claim their funds using the provided Leaf.
+If the withdrawal is not executed within this period:
+• The Leaf will expire<br>
+• The withdrawal becomes invalid<br>
+• The burned balance will not be restored
+
+<br><br>
+<b>5. User-Executed Withdrawal</b><br>
+StabiX does not transfer funds automatically. Users must manually execute the withdrawal from the vault smart contract using their own wallet and private key.
+Only the wallet (EOA) used during submission can successfully complete this process.
+
+<br><br>
+<b>6. No System Access to Funds</b><br>
+StabiX does not have the ability to withdraw, redirect, or access user funds. The system cannot override wallet ownership or execute withdrawals on behalf of users.
+
+Fund access is strictly controlled by:
+• The correct EOA wallet<br>
+• The valid Merkle proof (Leaf)<br>
+• The user’s private key
+
+<br><br>
+<b>7. User Responsibility</b><br>
+Users are fully responsible for:
+• Entering the correct EOA wallet address<br>
+• Providing accurate withdrawal amount<br>
+• Monitoring notifications for Leaf availability<br>
+• Executing withdrawal within the valid time window
+Any incorrect input or failure to complete the process may result in permanent loss of funds.
+</div>
+
+<div style="
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
+">
+Vision
+</div>
+<div style="
+font-size:13px;
+opacity:0.8;
+line-height:1.6;
+margin-bottom:18px;
+">
+StabiX is designed to bridge the gap between blockchain security and real-world usability by combining on-chain asset custody with instant off-chain execution.
+
+<br><br>
+The goal is to enable a system where users can move value instantly, without being limited by network delays, repeated fees, or complex transaction flows, while still retaining full control over their assets.
+
+<br><br>
+By removing unnecessary blockchain interactions and introducing a streamlined execution layer, StabiX makes stablecoin usage more practical for everyday payments, microtransactions, and high-frequency activity.
+
+<br><br>
+At its core, StabiX is not built to replace blockchains, but to enhance how users interact with them — reducing friction while preserving transparency, security, and self-custody.
+
+<br><br>
+The long-term vision is to create a scalable, efficient, and trust-minimized financial layer where users can operate seamlessly across networks without compromising ownership or control.
+</div>
+
+<div style="
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
+">
+Founder
+</div>
+<div style="
+font-size:13px;
+opacity:0.8;
+line-height:1.6;
+margin-bottom:18px;
+">
+<b>Sumedh Dabhade</b><br><br>
+StabiX is developed by Sumedh Dabhade, focused on building efficient and practical non-custodial financial systems.
+The project is driven by a goal to simplify blockchain interactions while preserving user ownership, transparency, and security.
+StabiX reflects an approach centered on reducing friction in digital payments without compromising the core principles of decentralization.
+</div>
 `;
 };
 /* ================= Setting Navigation Finish================= */
