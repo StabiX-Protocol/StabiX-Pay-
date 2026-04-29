@@ -1332,19 +1332,6 @@ document.querySelector(".box").innerHTML = `
 <div style="font-size:20px;font-weight:700;margin-bottom:20px;">
 Settings
 </div>
-<!-- LIST -->
-<div>
-<div onclick="openSecurity()" style="
-display:flex;
-justify-content:space-between;
-padding:14px 0;
-border-bottom:1px solid rgba(255,255,255,0.06);
-cursor:pointer;
-">
-<div>Security</div>
-<div style="opacity:0.5;">›</div>
-</div>
-</div>
 
 <div onclick="openSupport()" style="
 display:flex;
@@ -1380,25 +1367,6 @@ Logout
 `;
 };
 
-window.openSecurity = () => {
-document.querySelector(".box").innerHTML = `
-<!-- HEADER -->
-<div onclick="goSettings()" style="
-margin-bottom:15px;
-cursor:pointer;
-opacity:0.7;
-">← Back</div>
-
-<div style="font-size:18px;font-weight:600;margin-bottom:20px;">
-Security & Privacy
-</div>
-
-<div style="font-size:13px;opacity:0.7;line-height:1.6;">
-Never share your private key or wallet credentials with anyone.
-StabiX is non-custodial and cannot recover lost access.
-</div>
-`;
-};
 window.openSupport = () => {
 document.querySelector(".box").innerHTML = `
 <!-- HEADER -->
@@ -1433,6 +1401,8 @@ Contact on Telegram
 </div>
 `;
 };
+
+
 window.openAbout = () => {
 document.querySelector(".box").innerHTML = `
 <!-- HEADER -->
