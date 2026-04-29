@@ -1557,7 +1557,7 @@ Withdrawals are not processed by StabiX on behalf of the user. Instead, users mu
 
 <br><br>
 <b>Private Key Ownership</b><br>
-Only the holder of the correct private key can execute the withdrawal transaction. Without the user's private key, no entity — including StabiX — can access the funds.
+Only the holder of the correct private key can execute the withdrawal transaction. Without the user's private key, no entity including StabiX can access the funds.
 
 <br><br>
 <b>Trust-Minimized System</b><br>
@@ -1595,17 +1595,17 @@ All withdrawal requests are grouped and processed in batches. A validator genera
 <b>3. Fixed Recipient (EOA Binding)</b><br>
 The withdrawal is strictly bound to the EOA wallet address provided at the time of submission. The Merkle leaf is generated using this exact address.
 This means:
-• Funds can only be claimed by the same EOA<br>
-• Changing the address later is not possible<br>
-• If an incorrect address is submitted, funds cannot be recovered
+      • Funds can only be claimed by the same EOA<br>
+      • Changing the address later is not possible<br>
+      • If an incorrect address is submitted, funds cannot be recovered
 
 <br><br>
 <b>4. Claim Window (Time-Limited Execution)</b><br>
 Once the Merkle root is published, users have a limited time window (up to <b>24 hours</b>) to claim their funds using the provided Leaf.
 If the withdrawal is not executed within this period:
-• The Leaf will expire<br>
-• The withdrawal becomes invalid<br>
-• The burned balance will not be restored
+      • The Leaf will expire<br>
+      • The withdrawal becomes invalid<br>
+      • The burned balance will not be restored
 
 <br><br>
 <b>5. User-Executed Withdrawal</b><br>
@@ -1617,18 +1617,18 @@ Only the wallet (EOA) used during submission can successfully complete this proc
 StabiX does not have the ability to withdraw, redirect, or access user funds. The system cannot override wallet ownership or execute withdrawals on behalf of users.
 
 Fund access is strictly controlled by:
-• The correct EOA wallet<br>
-• The valid Merkle proof (Leaf)<br>
-• The user’s private key
+      • The correct EOA wallet<br>
+      • The valid Merkle proof (Leaf)<br>
+      • The user’s private key
 
 <br><br>
 <b>7. User Responsibility</b><br>
 Users are fully responsible for:
-• Entering the correct EOA wallet address<br>
-• Providing accurate withdrawal amount<br>
-• Monitoring notifications for Leaf availability<br>
-• Executing withdrawal within the valid time window
-Any incorrect input or failure to complete the process may result in permanent loss of funds.
+      • Entering the correct EOA wallet address<br>
+      • Providing accurate withdrawal amount<br>
+      • Monitoring notifications for Leaf availability<br>
+      • Executing withdrawal within the valid time window
+      Any incorrect input or failure to complete the process may result in permanent loss of funds.
 </div>
 
 <div style="
@@ -1644,19 +1644,19 @@ opacity:0.8;
 line-height:1.6;
 margin-bottom:18px;
 ">
-StabiX is designed to bridge the gap between blockchain security and real-world usability by combining on-chain asset custody with instant off-chain execution.
+StabiX is designed to bridge the gap between blockchain security and real world usability by combining on-chain asset custody with instant off-chain execution.
 
 <br><br>
 The goal is to enable a system where users can move value instantly, without being limited by network delays, repeated fees, or complex transaction flows, while still retaining full control over their assets.
 
 <br><br>
-By removing unnecessary blockchain interactions and introducing a streamlined execution layer, StabiX makes stablecoin usage more practical for everyday payments, microtransactions, and high-frequency activity.
+By removing unnecessary blockchain interactions and introducing a streamlined execution layer, StabiX makes stablecoin usage more practical for everyday payments, microtransactions, and high frequency activity.
 
 <br><br>
-At its core, StabiX is not built to replace blockchains, but to enhance how users interact with them — reducing friction while preserving transparency, security, and self-custody.
+At its core, StabiX is not built to replace blockchains, but to enhance how users interact with them reducing friction while preserving transparency, security, and self-custody.
 
 <br><br>
-The long-term vision is to create a scalable, efficient, and trust-minimized financial layer where users can operate seamlessly across networks without compromising ownership or control.
+The long term vision is to create a scalable, efficient, and trust-minimized financial layer where users can operate seamlessly across networks without compromising ownership or control.
 </div>
 
 <div style="
