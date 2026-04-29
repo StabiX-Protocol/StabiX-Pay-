@@ -1595,19 +1595,24 @@ All withdrawal requests are grouped and processed in batches. A validator genera
 <b>3. Fixed Recipient (EOA Binding)</b><br>
 The withdrawal is strictly bound to the EOA wallet address provided at the time of submission. The Merkle leaf is generated using this exact address.
 This means:
-      • Funds can only be claimed by the same EOA<br>
-      • Changing the address later is not possible<br>
-      • If an incorrect address is submitted, funds cannot be recovered
+
+<div style="margin-left:10px; line-height:1.6;">
+<div>• Funds can only be claimed by the same EOA</div>
+<div>• Changing the address later is not possible</div>
+<div>• If an incorrect address is submitted, funds cannot be recovered</div>
+</div>
 
 <br><br>
 <b>4. Claim Window (Time-Limited Execution)</b><br>
 Once the Merkle root is published, users have a limited time window (up to <b>24 hours</b>) to claim their funds using the provided Leaf.
 If the withdrawal is not executed within this period:
+
 <div style="margin-left:10px;">
 <div>• The Leaf will expire</div>
 <div>• The withdrawal becomes invalid</div>
 <div>• The burned balance will not be restored</div>
 </div>
+
 <br><br>
 <b>5. User-Executed Withdrawal</b><br>
 StabiX does not transfer funds automatically. Users must manually execute the withdrawal from the vault smart contract using their own wallet and private key.
@@ -1616,20 +1621,29 @@ Only the wallet (EOA) used during submission can successfully complete this proc
 <br><br>
 <b>6. No System Access to Funds</b><br>
 StabiX does not have the ability to withdraw, redirect, or access user funds. The system cannot override wallet ownership or execute withdrawals on behalf of users.
-
 Fund access is strictly controlled by:
-      • The correct EOA wallet<br>
-      • The valid Merkle proof (Leaf)<br>
-      • The user’s private key
+
+<div style="margin-left:10px; line-height:1.6;">
+<div>• The correct EOA wallet</div>
+<div>• The valid Merkle proof (Leaf)</div>
+<div>• The user’s private key</div>
+</div>
 
 <br><br>
 <b>7. User Responsibility</b><br>
 Users are fully responsible for:
-      • Entering the correct EOA wallet address<br>
-      • Providing accurate withdrawal amount<br>
-      • Monitoring notifications for Leaf availability<br>
-      • Executing withdrawal within the valid time window
-      Any incorrect input or failure to complete the process may result in permanent loss of funds.
+
+<div style="margin-left:10px; line-height:1.6;">
+<div>• Entering the correct EOA wallet address</div>
+<div>• Providing accurate withdrawal amount</div>
+<div>• Monitoring notifications for Leaf availability</div>
+<div>• Executing withdrawal within the valid time window</div>
+</div>
+
+<div style="margin-top:6px;">
+  Any incorrect input or failure to complete the process may result in permanent loss of funds.
+</div>
+      
 </div>
 
 <div style="
