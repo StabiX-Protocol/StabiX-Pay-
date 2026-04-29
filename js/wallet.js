@@ -1258,6 +1258,18 @@ html || `<div style="opacity:0.5;">No recent D/W</div>`;
 selectTab("deposit");
 };
 
+window.selectDWAsset = (asset) => {
+  window.selectedDWAsset = asset;
+
+  document.getElementById("dwAssets").style.display = "none";
+  document.getElementById("actionScreen").style.display = "block";
+
+  document.getElementById("selectedAssetText").innerText = asset;
+};
+
+
+
+
 window.goHistory = () => {
 document.querySelector(".box").innerHTML = `
 <h2>Transaction History</h2>
