@@ -1603,10 +1603,11 @@ This means:
 <b>4. Claim Window (Time-Limited Execution)</b><br>
 Once the Merkle root is published, users have a limited time window (up to <b>24 hours</b>) to claim their funds using the provided Leaf.
 If the withdrawal is not executed within this period:
-      • The Leaf will expire<br>
-      • The withdrawal becomes invalid<br>
-      • The burned balance will not be restored
-
+<div style="margin-left:10px;">
+<div>• The Leaf will expire</div>
+<div>• The withdrawal becomes invalid</div>
+<div>• The burned balance will not be restored</div>
+</div>
 <br><br>
 <b>5. User-Executed Withdrawal</b><br>
 StabiX does not transfer funds automatically. Users must manually execute the withdrawal from the vault smart contract using their own wallet and private key.
