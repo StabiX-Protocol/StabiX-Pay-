@@ -2219,10 +2219,10 @@ window.openInstantWithdraw = function(asset){
   </div>
 
   <div style="display:flex;flex-direction:column;gap:12px;">
-    ${instantNetworkCard(asset, "Ethereum", "ERC20", "~2 min", "$5 fee")}
-    ${instantNetworkCard(asset, "Arbitrum", "L2", "~10 sec", "Low fee")}
-    ${instantNetworkCard(asset, "Polygon", "PoS", "~5 sec", "Very low")}
-    ${instantNetworkCard(asset, "Base", "L2", "~5 sec", "Low fee")}
+${instantWithdrawNetworkCard(asset,"Ethereum","ERC20","eth.png")}
+${instantWithdrawNetworkCard(asset,"Arbitrum","ARB","arb.png")}
+${instantWithdrawNetworkCard(asset,"Polygon","POL","polygon.png")}
+${instantWithdrawNetworkCard(asset,"Base","BASE","base.png")}
   </div>
   `;
 };
@@ -2253,6 +2253,42 @@ function instantNetworkCard(asset, name, type, speed, fee){
   </div>
   `;
 }
+
+function instantWithdrawNetworkCard(asset, name, type, icon){
+  return `
+    <div onclick="openInstantWithdrawForm('${asset}','${name} ${type}')" style="
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px;
+      border-radius:14px;
+      background:#0b1220;
+      border:1px solid rgba(255,255,255,0.06);
+      margin-bottom:10px;
+      cursor:pointer;
+    ">
+      
+      <div style="display:flex;align-items:center;gap:12px;">
+        <img src="${icon}" style="width:28px;height:28px;border-radius:50%;">
+        
+        <div>
+          <div style="font-size:14px;font-weight:600;">
+            ${name}
+          </div>
+          <div style="font-size:11px;opacity:0.6;">
+            ${type}
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:18px;opacity:0.4;">
+        →
+      </div>
+
+    </div>
+  `;
+}
+
 window.selectInstantNetwork = function(asset, network){
 
   const wallet = WALLETS[network] || "Not available";
