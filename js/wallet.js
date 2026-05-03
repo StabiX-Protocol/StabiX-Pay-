@@ -2003,33 +2003,40 @@ ${asset}
 
     <div style="margin-bottom:20px;">
 
+  <div style="
+    font-size:13px;
+    opacity:0.6;
+    margin-bottom:12px;
+  ">
+    Select Method
+  </div>
+
   <!-- Instant -->
   <div id="instantBtn" onclick="selectMode('instant')" style="
-    padding:14px;
-    border-radius:12px;
+    padding:16px;
+    border-radius:16px;
     border:1px solid rgba(255,255,255,0.08);
-    margin-bottom:10px;
+    margin-bottom:14px;
     cursor:pointer;
   ">
-    <div style="display:flex; align-items:center; gap:8px;">
-      <div style="font-size:15px;">Instant</div>
-      <div style="font-size:11px; opacity:0.5;">(Recommended)</div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="font-size:16px;">Instant</div>
+      <div style="font-size:11px; opacity:0.45;">(Recommended)</div>
     </div>
   </div>
 
   <!-- Advanced -->
   <div id="advancedBtn" onclick="selectMode('advanced')" style="
-    padding:14px;
-    border-radius:12px;
+    padding:16px;
+    border-radius:16px;
     border:1px solid rgba(255,255,255,0.08);
     cursor:pointer;
   ">
-    <div style="display:flex; align-items:center; gap:8px;">
-      <div style="font-size:15px;">Advanced</div>
-      <div style="font-size:11px; opacity:0.5;">(Self Custody)</div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="font-size:16px;">Advanced</div>
+      <div style="font-size:11px; opacity:0.45;">(Self Custody)</div>
     </div>
   </div>
-
 </div>
   
 <div style="display:flex; gap:12px; margin-top:30px;">
