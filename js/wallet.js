@@ -2305,11 +2305,12 @@ window.selectInstantNetwork = function(asset, network){
   margin-top:10px;
   font-size:12px;
   color:#60a5fa;
-  word-break:break-all;
+  white-space:nowrap;
+  overflow-x:auto;
   line-height:1.4;
-">
+  ">
   ${wallet}
-</div>
+  </div>
 
     <button onclick="copyAddress('${wallet}')" style="
       padding:6px 10px;
