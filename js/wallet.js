@@ -2303,7 +2303,8 @@ window.selectInstantNetwork = function(asset, network){
 
     <div style="
       margin-top:10px;
-      word-break:break-all;
+      word-break:break-word;
+      overflow-wrap:break-word;
       font-size:12px;
       color:#60a5fa;
     ">
