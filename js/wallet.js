@@ -1975,6 +1975,7 @@ loadHistory();
 
 // ==================Deposit Withdraw Logic==================//
 window.selectDWAsset = (asset) => {
+window.MODE = null;
 window.selectedDWAsset = asset;
 document.querySelector(".box").innerHTML = `
 <div style="
