@@ -1,3 +1,4 @@
+window.MODE = null;
 window.primaryAsset = localStorage.getItem("primaryAsset") || "USDC";
 window.keepAssetOpen = false;
 window.scanDone = false
@@ -1999,8 +2000,40 @@ font-weight:bold;
 ${asset}
 </div>
 </div>
+
+    <div style="margin-bottom:20px;">
+
+  <!-- Instant -->
+  <div id="instantBtn" onclick="selectMode('instant')" style="
+    padding:14px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.08);
+    margin-bottom:10px;
+    cursor:pointer;
+  ">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div style="font-size:15px;">Instant</div>
+      <div style="font-size:11px; opacity:0.5;">(Recommended)</div>
+    </div>
+  </div>
+
+  <!-- Advanced -->
+  <div id="advancedBtn" onclick="selectMode('advanced')" style="
+    padding:14px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.08);
+    cursor:pointer;
+  ">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div style="font-size:15px;">Advanced</div>
+      <div style="font-size:11px; opacity:0.5;">(Self Custody)</div>
+    </div>
+  </div>
+
+</div>
+  
 <div style="display:flex;gap:12px;margin-top:30px;">
-<button onclick="openDeposit('${asset}')" style="
+<button onclick="handleDepositClick('${asset}')"> style="
 flex:1;
 padding:14px;
 border-radius:12px;
@@ -2009,7 +2042,7 @@ color:#022c22;
 font-weight:bold;">
 Deposit
 </button>
-<button onclick="openWithdrawNetwork('${asset}')" style="
+<button onclick="handleWithdrawClick('${asset}')"> style="
 flex:1;
 padding:14px;
 border-radius:12px;
@@ -2071,6 +2104,57 @@ window.openAssetPage = function(asset){
 window.selectedDWAsset = asset;
 selectDWAsset(asset);
 }
+
+window.selectMode = function(mode){
+
+  window.MODE = mode;
+
+  document.getElementById("instantBtn").style.border = "1px solid rgba(255,255,255,0.08)";
+  document.getElementById("advancedBtn").style.border = "1px solid rgba(255,255,255,0.08)";
+
+  document.getElementById(mode + "Btn").style.border = "1px solid #3b82f6";
+};
+
+
+window.handleDepositClick = function(asset){
+
+  if(!window.MODE){
+    alert("Select mode first");
+    return;
+  }
+
+  if(window.MODE === "instant"){
+    openInstantDeposit(asset);
+  }else{
+    openDeposit(asset); // OLD flow
+  }
+}
+window.handleWithdrawClick = function(asset){
+
+  if(!window.MODE){
+    alert("Select mode first");
+    return;
+  }
+
+  if(window.MODE === "instant"){
+    openInstantWithdraw(asset);
+  }else{
+    openWithdrawNetwork(asset); // OLD flow
+  }
+}
+window.openInstantDeposit = function(asset){
+  document.querySelector(".box").innerHTML = `
+    <h2>Instant Deposit (${asset})</h2>
+    <p>Fast credit system</p>
+  `;
+}
+window.openInstantWithdraw = function(asset){
+  document.querySelector(".box").innerHTML = `
+    <h2>Instant Withdraw (${asset})</h2>
+    <p>Instant payout system</p>
+  `;
+}
+
 // ================== VAULT CONFIG (COMMON) ==================
 const VAULTS = {
 "Ethereum ERC20": "0x0201B73BA3d4a43012c84B871c7d5332E176ffcc",
