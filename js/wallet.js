@@ -2305,10 +2305,8 @@ window.selectInstantNetwork = function(asset, network){
   margin-top:10px;
   font-size:12px;
   color:#60a5fa;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  width:100%;
+  word-break:break-all;
+  line-height:1.4;
 ">
   ${wallet}
 </div>
