@@ -2297,21 +2297,36 @@ window.selectInstantNetwork = function(asset, network){
   ">
     <div style="font-size:12px;opacity:0.6;">Wallet Address</div>
 
-    <div style="margin-top:10px;display:flex;justify-content:center;">
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${wallet}" />
-    </div>
-
     <div style="
-      margin-top:10px;
-      word-break:break-all;
-      font-size:12px;
-      color:#60a5fa;
-    ">
-      ${wallet}
-    </div>
+  margin-top:10px;
+  font-size:12px;
+  color:#60a5fa;
+  display:flex;
+  align-items:center;
+  gap:10px;
+">
+
+  <div style="
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    flex:1;
+  ">
+    ${wallet}
+  </div>
+  <button onclick="copyAddress('${wallet}')" style="
+    padding:6px 10px;
+    border:none;
+    border-radius:8px;
+    background:#3b82f6;
+    color:white;
+    font-size:11px;
+  ">
+    Copy
+  </button>
   </div>
 
-  <input id="amount" placeholder="Amount" style="width:100%;margin-bottom:10px;">
+  <input id="amount" type="number" inputmode="decimal" placeholder="Amount" style="width:100%;margin-bottom:10px;">
   <input id="txHash" placeholder="Transaction Hash" style="width:100%;margin-bottom:10px;">
   <input id="eoa" placeholder="Your Wallet Address" style="width:100%;margin-bottom:15px;">
 
@@ -2328,21 +2343,47 @@ window.selectInstantNetwork = function(asset, network){
 
   `;
 };
+window.copyAddress = function(addr){
+  navigator.clipboard.writeText(addr);
+  alert("Address copied");
+};
+function isValidTxHash(hash){
+  return /^0x([A-Fa-f0-9]{64})$/.test(hash);
+}
+function isValidAddress(addr){
+  return /^0x[a-fA-F0-9]{40}$/.test(addr);
+}
+
 window.submitInstantDeposit = async function(asset, network){
 
-  const amount = document.getElementById("amount").value;
-  const txHash = document.getElementById("txHash").value;
-  const eoa = document.getElementById("eoa").value;
+  const amount = document.getElementById("amount").value.trim();
+  const txHash = document.getElementById("txHash").value.trim();
+  const eoa = document.getElementById("eoa").value.trim();
 
   if(!amount || !txHash || !eoa){
-    alert("Fill all fields");
+    alert("All fields are required");
+    return;
+  }
+
+  if(Number(amount) <= 0){
+    alert("Invalid amount");
+    return;
+  }
+
+  if(!isValidTxHash(txHash)){
+    alert("Invalid transaction hash");
+    return;
+  }
+
+  if(!isValidAddress(eoa)){
+    alert("Invalid wallet address");
     return;
   }
 
   await addDoc(collection(db, "requests"), {
     userId: WALLET,
     type: "deposit",
-    mode: "instant", 
+    mode: "instant",
     asset,
     network,
     amount: Number(amount),
@@ -2356,7 +2397,8 @@ window.submitInstantDeposit = async function(asset, network){
     pendingRequest: true
   });
 
-  alert("Instant deposit request sent");
+  alert("Deposit Request Submitted\nYour funds will reflect in StabiX shortly");
+
   goDeposit();
 };
 // ================== VAULT CONFIG (COMMON) ==================
