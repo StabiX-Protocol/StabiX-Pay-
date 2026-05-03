@@ -2297,30 +2297,13 @@ window.selectInstantNetwork = function(asset, network){
   ">
     <div style="font-size:12px;opacity:0.6;">Wallet Address</div>
 
-    <div style="
-  background:#0b1220;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.06);
-  margin-bottom:15px;
-">
+    <div style="margin-top:10px;display:flex;justify-content:center;">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${wallet}" />
+    </div>
 
-  <!-- QR -->
-  <div style="display:flex; justify-content:center; margin-bottom:10px;">
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${wallet}" />
-  </div>
-
-  <!-- Address + Copy -->
-  <div style="
-    display:flex;
-    align-items:center;
-    gap:10px;
-  ">
     <div style="
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-      flex:1;
+      margin-top:10px;
+      word-break:break-all;
       font-size:12px;
       color:#60a5fa;
     ">
