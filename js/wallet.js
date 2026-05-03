@@ -2328,6 +2328,37 @@ window.selectInstantNetwork = function(asset, network){
 
   `;
 };
+window.submitInstantDeposit = async function(asset, network){
+
+  const amount = document.getElementById("amount").value;
+  const txHash = document.getElementById("txHash").value;
+  const eoa = document.getElementById("eoa").value;
+
+  if(!amount || !txHash || !eoa){
+    alert("Fill all fields");
+    return;
+  }
+
+  await addDoc(collection(db, "requests"), {
+    userId: WALLET,
+    type: "deposit",
+    mode: "instant", 
+    asset,
+    network,
+    amount: Number(amount),
+    txHash,
+    eoa,
+    status: "pending",
+    createdAt: serverTimestamp()
+  });
+
+  await updateDoc(userRef, {
+    pendingRequest: true
+  });
+
+  alert("Instant deposit request sent");
+  goDeposit();
+};
 // ================== VAULT CONFIG (COMMON) ==================
 const VAULTS = {
 "Ethereum ERC20": "0x0201B73BA3d4a43012c84B871c7d5332E176ffcc",
@@ -2719,52 +2750,66 @@ line-height:1.6;
    
 // ================== SUBMIT DEPOSIT ==================//
 window.submitDepositFinal = async function(asset, network){
-const amount = document.getElementById("amount").value;
-const txHash = document.getElementById("txHash").value;
-const eoa = document.getElementById("eoa").value;
-if(!amount || !txHash || !eoa){
-alert("Fill all fields");
-return;}
-await addDoc(collection(db, "requests"), {
-userId: WALLET,
-type: "deposit",
-asset,
-network,
-amount: Number(amount),
-txHash,
-eoa,
-status: "pending",
-createdAt: serverTimestamp()
-});
-await updateDoc(userRef, {
-pendingRequest: true
-});
-alert("Deposit request sent");
-goDeposit();
-}
+
+  const amount = document.getElementById("amount").value;
+  const txHash = document.getElementById("txHash").value;
+  const eoa = document.getElementById("eoa").value;
+
+  if(!amount || !txHash || !eoa){
+    alert("Fill all fields");
+    return;
+  }
+
+  await addDoc(collection(db, "requests"), {
+    userId: WALLET,
+    type: "deposit",
+    mode: "advanced", 
+    asset,
+    network,
+    amount: Number(amount),
+    txHash,
+    eoa,
+    status: "pending",
+    createdAt: serverTimestamp()
+  });
+
+  await updateDoc(userRef, {
+    pendingRequest: true
+  });
+
+  alert("Deposit request sent");
+  goDeposit();
+};
 
 // ================== SUBMIT WITHDRAW ==================//
 window.submitWithdrawFinal = async function(asset, network){
-const amount = document.getElementById("amount").value;
-const eoa = document.getElementById("eoa").value;
-if(!amount || !eoa){
-alert("Fill all fields");
-return;}
-await addDoc(collection(db, "requests"), {
-userId: WALLET,
-type: "withdraw",
-asset,
-network,
-amount: Number(amount),
-eoa,
-status: "pending",
-createdAt: serverTimestamp()
-});
-await updateDoc(userRef, {
-pendingRequest: true
-});
-alert("Withdraw request submitted. Batching in progress. You will receive Merkle proof soon.");
-goDeposit();
+
+  const amount = document.getElementById("amount").value;
+  const eoa = document.getElementById("eoa").value;
+
+  if(!amount || !eoa){
+    alert("Fill all fields");
+    return;
+  }
+
+  await addDoc(collection(db, "requests"), {
+    userId: WALLET,
+    type: "withdraw",
+    mode: "advanced", 
+    asset,
+    network,
+    amount: Number(amount),
+    eoa,
+    status: "pending",
+    createdAt: serverTimestamp()
+  });
+
+  await updateDoc(userRef, {
+    pendingRequest: true
+  });
+
+  alert("Withdraw request sent");
+  goDeposit();
 };
 
 
