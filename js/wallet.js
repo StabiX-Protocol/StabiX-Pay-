@@ -2120,12 +2120,23 @@ selectDWAsset(asset);
 
 window.selectMode = function(mode){
 
-  window.MODE = mode;
+  let message = "";
 
-  document.getElementById("instantBtn").style.border = "1px solid rgba(255,255,255,0.08)";
-  document.getElementById("advancedBtn").style.border = "1px solid rgba(255,255,255,0.08)";
+  if(mode === "instant"){
+    message = "In Instant mode, deposits are credited to a StabiX managed execution layer where funds are maintained within system-controlled hot wallets. User balances are represented internally within StabiX, enabling immediate settlement without repeated on-chain interactions. Withdrawals are executed directly by the StabiX backend to the specified wallet address.";
+  } else {
+    message = "In Advanced mode, all funds remain on-chain under user-controlled wallets. Deposits and withdrawals are processed through direct smart contract interactions. Withdrawals are executed via a Merkle-based distribution mechanism, where requests are batched and finalized on-chain. Users receive a Merkle proof to independently claim funds. This ensures full self-custody with no fund control by StabiX.";
+  }
 
-  document.getElementById(mode + "Btn").style.border = "1px solid #3b82f6";
+  // popup
+  if(confirm(message)){
+    window.selectedMode = mode;
+
+    document.getElementById("instantBtn").style.border = "1px solid rgba(255,255,255,0.08)";
+    document.getElementById("advancedBtn").style.border = "1px solid rgba(255,255,255,0.08)";
+
+    document.getElementById(mode + "Btn").style.border = "1px solid #3b82f6";
+  }
 };
 
 
