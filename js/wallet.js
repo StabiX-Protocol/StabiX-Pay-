@@ -2124,12 +2124,12 @@ window.selectMode = function(mode){
   let title = mode === "instant" ? "Notice" : "Self Custody Warning";
 
   let message = mode === "instant"
-    ? "In Instant mode, deposits are credited to a StabiX managed execution layer where funds are maintained within system-controlled hot wallets. User balances are handled internally, enabling fast settlement without repeated on-chain interactions. Withdrawals are executed directly by the backend."
-    : "In Advanced mode, all funds remain on-chain under your control. Deposits and withdrawals happen via smart contracts. Withdrawals use Merkle proofs and batching. You are fully responsible for your funds — StabiX does not control them.";
+    ? "In Instant mode, deposits are credited to a StabiX managed execution layer where funds are maintained within system controlled hot wallets. User balances are handled internally, enabling fast settlement without repeated on-chain interactions. Withdrawals are executed directly by the backend."
+    : "In Advanced mode, all funds remain on-chain under your control. Deposits and withdrawals happen via smart contracts. Withdrawals use Merkle proofs and batching. You are fully responsible for your funds StabiX does not control them.";
   
   
     
-  showModePopup(title, message, () => {
+  if(confirm(title + "\n\n" + message)){
     window.MODE = mode;
 
   
@@ -2141,50 +2141,6 @@ window.selectMode = function(mode){
     return;
   }
 };
-
-function showModePopup(title, message, onOk){
-  const modal = document.createElement("div");
-  modal.style = `
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.6);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:9999;
-  `;
-
-  modal.innerHTML = `
-    <div style="
-      width:90%;
-      background:#111;
-      border-radius:16px;
-      padding:20px;
-      color:white;
-    ">
-      <div style="font-size:16px; font-weight:600; margin-bottom:12px;">
-        ${title}
-      </div>
-
-      <div style="font-size:13px; opacity:0.8; line-height:1.5;">
-        ${message}
-      </div>
-
-      <div style="display:flex; justify-content:flex-end; gap:20px; margin-top:20px;">
-        <div onclick="this.closest('div').parentElement.parentElement.remove()" style="opacity:0.6; cursor:pointer;">
-          Cancel
-        </div>
-        <div onclick="(${onOk.toString()})(); this.closest('div').parentElement.parentElement.remove()" style="color:#3b82f6; cursor:pointer;">
-          OK
-        </div>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-}
 
 
 window.handleDepositClick = function(asset){
