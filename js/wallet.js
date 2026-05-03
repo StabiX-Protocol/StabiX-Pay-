@@ -2128,9 +2128,8 @@ window.selectMode = function(mode){
     message = "In Advanced mode, all funds remain on-chain under user-controlled wallets. Deposits and withdrawals are processed through direct smart contract interactions. Withdrawals are executed via a Merkle-based distribution mechanism, where requests are batched and finalized on-chain. Users receive a Merkle proof to independently claim funds. This ensures full self-custody with no fund control by StabiX.";
   }
 
-  // popup
   if(confirm(message)){
-    window.selectedMode = mode;
+    window.MODE = mode;
 
     document.getElementById("instantBtn").style.border = "1px solid rgba(255,255,255,0.08)";
     document.getElementById("advancedBtn").style.border = "1px solid rgba(255,255,255,0.08)";
@@ -2150,7 +2149,7 @@ window.handleDepositClick = function(asset){
   if(window.MODE === "instant"){
     openInstantDeposit(asset);
   }else{
-    openDeposit(asset); // OLD flow
+    openDeposit(asset); 
   }
 }
 window.handleWithdrawClick = function(asset){
@@ -2163,7 +2162,7 @@ window.handleWithdrawClick = function(asset){
   if(window.MODE === "instant"){
     openInstantWithdraw(asset);
   }else{
-    openWithdrawNetwork(asset); // OLD flow
+    openWithdrawNetwork(asset); 
   }
 }
 window.openInstantDeposit = function(asset){
