@@ -2254,47 +2254,34 @@ function instantNetworkCard(asset, name, type, speed, fee){
   `;
 }
 
-function instantWithdrawNetworkCard(asset, name, type, icon){
+function instantWithdrawNetworkCard(asset, name, type, speed, fee){
   return `
-    <div onclick="openInstantWithdrawForm('${asset}','${name} ${type}')" style="
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:14px;
-      border-radius:14px;
-      background:#0b1220;
-      border:1px solid rgba(255,255,255,0.06);
-      margin-bottom:10px;
-      cursor:pointer;
-    ">
-      
-      <div style="display:flex;align-items:center;gap:12px;">
-        <img src="${icon}" style="width:28px;height:28px;border-radius:50%;">
-        
-        <div>
-          <div style="font-size:14px;font-weight:600;">
-            ${name}
-          </div>
-          <div style="font-size:11px;opacity:0.6;">
-            ${type}
-          </div>
-        </div>
-      </div>
-
-      <div style="font-size:18px;opacity:0.4;">
-        →
-      </div>
-
+  <div onclick="openInstantWithdrawForm('${asset}', '${name} ${type}')" style="
+    padding:14px;
+    border-radius:14px;
+    background:#0b1220;
+    border:1px solid rgba(255,255,255,0.06);
+    cursor:pointer;
+  ">
+    <div style="font-weight:600;font-size:15px;">
+      ${name}
+      <span style="opacity:0.5;font-size:12px;"> ${type}</span>
     </div>
+
+    <div style="font-size:12px;opacity:0.6;margin-top:6px;">
+      Speed: ${speed}
+    </div>
+
+    <div style="font-size:12px;opacity:0.6;">
+      Fee: ${fee}
+    </div>
+  </div>
   `;
 }
 
 window.selectInstantNetwork = function(asset, network){
-
   const wallet = WALLETS[network] || "Not available";
-
   document.querySelector(".box").innerHTML = `
-
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
     <div onclick="openInstantDeposit('${asset}')" style="
       width:36px;
@@ -2389,8 +2376,10 @@ function isValidAddress(addr){
   return /^0x[a-fA-F0-9]{40}$/.test(addr);
 }
 
-window.openInstantWithdrawForm = function(asset, network){
+window.selectInstantWithdraw = function(asset, network){
+
   document.querySelector(".box").innerHTML = `
+  
   <!-- HEADER -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
     <div onclick="openInstantWithdraw('${asset}')" style="
@@ -2405,9 +2394,10 @@ window.openInstantWithdrawForm = function(asset, network){
       font-size:18px;">
       ←
     </div>
+
     <div style="font-size:18px;font-weight:600;">
       ${asset} Withdraw
-    </div
+    </div>
   </div>
 
   <!-- NETWORK -->
@@ -2416,43 +2406,37 @@ window.openInstantWithdrawForm = function(asset, network){
     padding:12px;
     border-radius:12px;
     border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:12px;">
-    
+    margin-bottom:10px;
+  ">
     <div style="font-size:12px;opacity:0.6;">Network</div>
-    <div style="font-size:14px;font-weight:600;">
-      ${network}
-    </div>
+    <div>${network}</div>
   </div>
 
-  <!-- FORM -->
+  <!-- FORM (same container as deposit) -->
   <div style="
     background:#0b1220;
-    padding:14px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,0.06);">
+    padding:12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.06);
+    margin-bottom:15px;
+  ">
 
     <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
       Your Wallet Address
     </div>
-    <input id="withdraw_to" placeholder="Enter wallet address" style="
+
+    <input id="eoa" placeholder="Enter your wallet address" style="
       width:100%;
       margin-bottom:12px;
-      padding:10px;
-      border-radius:8px;
-      border:none;
-      outline:none;
     ">
 
     <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
       Amount
     </div>
-    <input id="withdraw_amount" placeholder="Enter amount" style="
+
+    <input id="amount" placeholder="Enter amount" style="
       width:100%;
       margin-bottom:15px;
-      padding:10px;
-      border-radius:8px;
-      border:none;
-      outline:none;
     ">
 
     <button onclick="submitInstantWithdraw('${asset}','${network}')" style="
@@ -2461,7 +2445,8 @@ window.openInstantWithdrawForm = function(asset, network){
       border-radius:12px;
       background:#22c55e;
       color:white;
-      font-weight:600;">
+      font-weight:600;
+    ">
       Withdraw
     </button>
 
