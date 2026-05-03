@@ -2032,26 +2032,32 @@ ${asset}
 
 </div>
   
-<div style="display:flex;gap:12px;margin-top:30px;">
-<button onclick="handleDepositClick('${asset}')"> style="
-flex:1;
-padding:14px;
-border-radius:12px;
-background:#22c55e;
-color:#022c22;
-font-weight:bold;">
-Deposit
-</button>
-<button onclick="handleWithdrawClick('${asset}')"> style="
-flex:1;
-padding:14px;
-border-radius:12px;
-background:#ef4444;
-color:white;
-font-weight:bold;">
-Withdraw
-</button>
+<div style="display:flex; gap:12px; margin-top:30px;">
+
+  <button onclick="handleDepositClick('${asset}')" style="
+    flex:1;
+    padding:14px;
+    border-radius:12px;
+    background:#22c55e;
+    color:#022c22;
+    font-weight:bold;
+  ">
+    Deposit
+  </button>
+
+  <button onclick="handleWithdrawClick('${asset}')" style="
+    flex:1;
+    padding:14px;
+    border-radius:12px;
+    background:#ef4444;
+    color:white;
+    font-weight:bold;
+  ">
+    Withdraw
+  </button>
+
 </div>
+
 <div style="
 margin-top:25px;
 background:#0b1220;
