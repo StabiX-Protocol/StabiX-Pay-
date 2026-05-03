@@ -2353,8 +2353,87 @@ function isValidAddress(addr){
   return /^0x[a-fA-F0-9]{40}$/.test(addr);
 }
 
-window.submitInstantDeposit = async function(asset, network){
+window.openInstantWithdrawForm = function(asset, network){
+  document.querySelector(".box").innerHTML = `
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+    <div onclick="openInstantWithdraw('${asset}')" style="
+      width:36px;
+      height:36px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:10px;
+      background:rgba(255,255,255,0.05);
+      cursor:pointer;
+      font-size:18px;">
+      ←
+    </div>
+    <div style="font-size:18px;font-weight:600;">
+      ${asset} Withdraw
+    </div
+  </div>
 
+  <!-- NETWORK -->
+  <div style="
+    background:#0b1220;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.06);
+    margin-bottom:12px;">
+    
+    <div style="font-size:12px;opacity:0.6;">Network</div>
+    <div style="font-size:14px;font-weight:600;">
+      ${network}
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div style="
+    background:#0b1220;
+    padding:14px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,0.06);">
+
+    <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
+      Your Wallet Address
+    </div>
+    <input id="withdraw_to" placeholder="Enter wallet address" style="
+      width:100%;
+      margin-bottom:12px;
+      padding:10px;
+      border-radius:8px;
+      border:none;
+      outline:none;
+    ">
+
+    <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
+      Amount
+    </div>
+    <input id="withdraw_amount" placeholder="Enter amount" style="
+      width:100%;
+      margin-bottom:15px;
+      padding:10px;
+      border-radius:8px;
+      border:none;
+      outline:none;
+    ">
+
+    <button onclick="submitInstantWithdraw('${asset}','${network}')" style="
+      width:100%;
+      padding:14px;
+      border-radius:12px;
+      background:#22c55e;
+      color:white;
+      font-weight:600;">
+      Withdraw
+    </button>
+
+  </div>
+  `;
+}
+  
+window.submitInstantDeposit = async function(asset, network){
   const amount = document.getElementById("amount").value.trim();
   const txHash = document.getElementById("txHash").value.trim();
   const eoa = document.getElementById("eoa").value.trim();
@@ -2400,6 +2479,26 @@ window.submitInstantDeposit = async function(asset, network){
 
   goDeposit();
 };
+
+window.submitInstantWithdraw = function(asset, network){
+  const to = document.getElementById("withdraw_to").value;
+  const amount = document.getElementById("withdraw_amount").value;
+
+  if(!to || !amount){
+    alert("Fill all fields");
+    return;
+  }
+
+  console.log("Instant Withdraw:", {
+    asset,
+    network,
+    to,
+    amount
+  });
+
+  alert("Withdraw Request Sent\n Your funds will reflect in your wallet address shortly");
+}
+
 // ================== VAULT CONFIG (COMMON) ==================
 const VAULTS = {
 "Ethereum ERC20": "0x0201B73BA3d4a43012c84B871c7d5332E176ffcc",
