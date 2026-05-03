@@ -2118,7 +2118,7 @@ window.openAssetPage = function(asset){
 window.selectedDWAsset = asset;
 selectDWAsset(asset);
 }
-
+// ================== Instant Mode ==================
 window.selectMode = function(mode){
 
   let title = mode === "instant" ? "Notice" : "Self Custody Warning";
@@ -2129,10 +2129,8 @@ let message = mode === "instant"
   
   if(confirm(title + "\n\n" + message)){
     
-    // ✅ ONLY HERE MODE SET HOGA
     window.MODE = mode;
 
-    // UI highlight
     document.getElementById("instantBtn").style.border = "1px solid rgba(255,255,255,0.08)";
     document.getElementById("advancedBtn").style.border = "1px solid rgba(255,255,255,0.08)";
     document.getElementById(mode + "Btn").style.border = "1px solid #3b82f6";
@@ -2171,17 +2169,90 @@ window.handleWithdrawClick = function(asset){
 }
 window.openInstantDeposit = function(asset){
   document.querySelector(".box").innerHTML = `
-    <h2>Instant Deposit (${asset})</h2>
-    <p>Fast credit system</p>
+  
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+    <div onclick="openAssetPage('${asset}')" style="
+      width:36px;
+      height:36px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:10px;
+      background:rgba(255,255,255,0.05);
+      cursor:pointer;
+      font-size:18px;
+    ">←</div>
+
+    <div style="font-size:18px;font-weight:600;">
+      Select Network
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    ${instantNetworkCard(asset, "Ethereum", "ERC20", "~2 min", "$5 fee")}
+    ${instantNetworkCard(asset, "Arbitrum", "L2", "~10 sec", "Low fee")}
+    ${instantNetworkCard(asset, "Polygon", "PoS", "~5 sec", "Very low")}
+    ${instantNetworkCard(asset, "Base", "L2", "~5 sec", "Low fee")}
+  </div>
   `;
-}
+};
+
 window.openInstantWithdraw = function(asset){
   document.querySelector(".box").innerHTML = `
-    <h2>Instant Withdraw (${asset})</h2>
-    <p>Instant payout system</p>
+  
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+    <div onclick="openAssetPage('${asset}')" style="
+      width:36px;
+      height:36px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:10px;
+      background:rgba(255,255,255,0.05);
+      cursor:pointer;
+      font-size:18px;
+    ">←</div>
+
+    <div style="font-size:18px;font-weight:600;">
+      Select Network
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    ${instantNetworkCard(asset, "Ethereum", "ERC20", "~2 min", "$5 fee")}
+    ${instantNetworkCard(asset, "Arbitrum", "L2", "~10 sec", "Low fee")}
+    ${instantNetworkCard(asset, "Polygon", "PoS", "~5 sec", "Very low")}
+    ${instantNetworkCard(asset, "Base", "L2", "~5 sec", "Low fee")}
+  </div>
+  `;
+};
+function instantNetworkCard(asset, name, type, speed, fee){
+  return `
+  <div onclick="selectInstantNetwork('${asset}','${name} ${type}')"
+  style="
+    padding:14px;
+    border-radius:14px;
+    background:#0b1220;
+    border:1px solid rgba(255,255,255,0.06);
+    cursor:pointer;
+  ">
+
+    <div style="font-weight:600;font-size:15px;">
+      ${name}
+      <span style="opacity:0.5;font-size:12px;"> ${type}</span>
+    </div>
+
+    <div style="font-size:12px;opacity:0.6;margin-top:6px;">
+      Speed: ${speed}
+    </div>
+
+    <div style="font-size:12px;opacity:0.6;">
+      Fee: ${fee}
+    </div>
+
+  </div>
   `;
 }
-
 // ================== VAULT CONFIG (COMMON) ==================
 const VAULTS = {
 "Ethereum ERC20": "0x0201B73BA3d4a43012c84B871c7d5332E176ffcc",
@@ -2195,6 +2266,13 @@ const EXPLORERS = {
 "Arbitrum L2": "https://arbiscan.io/address/",
 "Polygon PoS": "https://polygonscan.com/address/",
 "Base L2": "https://basescan.org/address/"
+};
+  const WALLETS = {
+  "Ethereum ERC20": "0x0df4862baafc84a681eb6b83848494c673e2298f",
+  "Arbitrum L2": "0xHOT_ARB",
+  "Polygon PoS": "0xHOT_POLY",
+  "Base L2": "0xHOT_BASE",
+  "Tron TRC20": "TXYZ_HOT_TRON"
 };
 // ================= OPEN FUNCTIONS =================
 function networkCard(asset, name, type, speed, fee){
