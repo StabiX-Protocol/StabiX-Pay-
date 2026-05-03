@@ -2009,7 +2009,7 @@ ${asset}
     opacity:0.6;
     margin-bottom:12px;
   ">
-    Select Method
+    Select Mode
   </div>
 
   <!-- Instant -->
@@ -2121,23 +2121,69 @@ selectDWAsset(asset);
 
 window.selectMode = function(mode){
 
-  let message = "";
+  let title = mode === "instant" 
+    ? "Notice" 
+    : "Self Custody Warning";
 
-  if(mode === "instant"){
-    message = "In Instant mode, deposits are credited to a StabiX managed execution layer where funds are maintained within system-controlled hot wallets. User balances are represented internally within StabiX, enabling immediate settlement without repeated on-chain interactions. Withdrawals are executed directly by the StabiX backend to the specified wallet address.";
-  } else {
-    message = "In Advanced mode, all funds remain on-chain under user-controlled wallets. Deposits and withdrawals are processed through direct smart contract interactions. Withdrawals are executed via a Merkle-based distribution mechanism, where requests are batched and finalized on-chain. Users receive a Merkle proof to independently claim funds. This ensures full self-custody with no fund control by StabiX.";
-  }
+  let message = mode === "instant"
+    ? "In Instant mode, deposits are credited to a StabiX managed execution layer where funds are maintained within system-controlled hot wallets. User balances are handled internally, enabling fast settlement without repeated on-chain interactions. Withdrawals are executed directly by the backend."
+    : "In Advanced mode, all funds remain on-chain under your control. Deposits and withdrawals happen via smart contracts. Withdrawals use Merkle proofs and batching. You are fully responsible for your funds StabiX does not control them.";
 
-  if(confirm(message)){
+  showModePopup(title, message, () => {
+
     window.MODE = mode;
 
     document.getElementById("instantBtn").style.border = "1px solid rgba(255,255,255,0.08)";
     document.getElementById("advancedBtn").style.border = "1px solid rgba(255,255,255,0.08)";
 
     document.getElementById(mode + "Btn").style.border = "1px solid #3b82f6";
-  }
+
+  });
 };
+
+function showModePopup(title, message, onOk){
+  const modal = document.createElement("div");
+  modal.style = `
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+  `;
+
+  modal.innerHTML = `
+    <div style="
+      width:90%;
+      background:#111;
+      border-radius:16px;
+      padding:20px;
+      color:white;
+    ">
+      <div style="font-size:16px; font-weight:600; margin-bottom:12px;">
+        ${title}
+      </div>
+
+      <div style="font-size:13px; opacity:0.8; line-height:1.5;">
+        ${message}
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:20px; margin-top:20px;">
+        <div onclick="this.closest('div').parentElement.parentElement.remove()" style="opacity:0.6; cursor:pointer;">
+          Cancel
+        </div>
+        <div onclick="(${onOk.toString()})(); this.closest('div').parentElement.parentElement.remove()" style="color:#3b82f6; cursor:pointer;">
+          OK
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
 
 
 window.handleDepositClick = function(asset){
