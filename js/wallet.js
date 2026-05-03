@@ -2298,33 +2298,48 @@ window.selectInstantNetwork = function(asset, network){
     <div style="font-size:12px;opacity:0.6;">Wallet Address</div>
 
     <div style="
-  margin-top:10px;
-  font-size:12px;
-  color:#60a5fa;
-  display:flex;
-  align-items:center;
-  gap:10px;
+  background:#0b1220;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.06);
+  margin-bottom:15px;
 ">
 
+  <!-- QR -->
+  <div style="display:flex; justify-content:center; margin-bottom:10px;">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${wallet}" />
+  </div>
+
+  <!-- Address + Copy -->
   <div style="
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    flex:1;
+    display:flex;
+    align-items:center;
+    gap:10px;
   ">
-    ${wallet}
+    <div style="
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      flex:1;
+      font-size:12px;
+      color:#60a5fa;
+    ">
+      ${wallet}
+    </div>
+
+    <button onclick="copyAddress('${wallet}')" style="
+      padding:6px 10px;
+      border:none;
+      border-radius:8px;
+      background:#3b82f6;
+      color:white;
+      font-size:11px;
+    ">
+      Copy
+    </button>
   </div>
-  <button onclick="copyAddress('${wallet}')" style="
-    padding:6px 10px;
-    border:none;
-    border-radius:8px;
-    background:#3b82f6;
-    color:white;
-    font-size:11px;
-  ">
-    Copy
-  </button>
-  </div>
+
+</div>
 
   <input id="amount" type="number" inputmode="decimal" placeholder="Amount" style="width:100%;margin-bottom:10px;">
   <input id="txHash" placeholder="Transaction Hash" style="width:100%;margin-bottom:10px;">
@@ -2345,7 +2360,6 @@ window.selectInstantNetwork = function(asset, network){
 };
 window.copyAddress = function(addr){
   navigator.clipboard.writeText(addr);
-  alert("Address copied");
 };
 function isValidTxHash(hash){
   return /^0x([A-Fa-f0-9]{64})$/.test(hash);
