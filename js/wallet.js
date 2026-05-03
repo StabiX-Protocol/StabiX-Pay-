@@ -2127,9 +2127,9 @@ window.selectMode = function(mode){
     ? "In Instant mode, deposits are credited to a StabiX managed execution layer where funds are maintained within system-controlled hot wallets. User balances are handled internally, enabling fast settlement without repeated on-chain interactions. Withdrawals are executed directly by the backend."
     : "In Advanced mode, all funds remain on-chain under your control. Deposits and withdrawals happen via smart contracts. Withdrawals use Merkle proofs and batching. You are fully responsible for your funds — StabiX does not control them.";
   
-  if(confirm(title + "\n\n" + message)){
+  
     
-    
+  showModePopup(title, message, () => {
     window.MODE = mode;
 
   
