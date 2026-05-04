@@ -2256,7 +2256,7 @@ function instantNetworkCard(asset, name, type, speed, fee){
 
 function instantWithdrawNetworkCard(asset, name, type, speed, fee){
   return `
-  <div onclick="openInstantWithdrawForm('${asset}', '${name} ${type}')" style="
+  <div onclick="openInstantWithdraw('${asset}', '${name} ${type}')" style="
     padding:14px;
     border-radius:14px;
     background:#0b1220;
@@ -2377,7 +2377,6 @@ function isValidAddress(addr){
 }
 
 window.selectInstantWithdraw = function(asset, network){
-
   document.querySelector(".box").innerHTML = `
   
   <!-- HEADER -->
