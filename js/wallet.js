@@ -1974,6 +1974,23 @@ loadHistory();
 };
 
 // ==================Deposit Withdraw Logic==================//
+window.isValidAddress = function(addr, network){
+if(!addr) return false;
+// EVM 
+if(network.includes("Ethereum") || 
+network.includes("Arbitrum") || 
+network.includes("Polygon") || 
+network.includes("Base")){
+return /^0x[a-fA-F0-9]{40}$/.test(addr);
+}
+//  TRON (TRC20)
+if(network.includes("Tron")){
+return /^T[a-zA-Z0-9]{33}$/.test(addr);
+}
+return false;
+};
+
+
 window.selectDWAsset = (asset) => {
 window.MODE = null;
 window.selectedDWAsset = asset;
@@ -2372,9 +2389,7 @@ window.copyAddress = function(addr){
 function isValidTxHash(hash){
   return /^0x([A-Fa-f0-9]{64})$/.test(hash);
 }
-function isValidAddress(addr){
-  return /^0x[a-fA-F0-9]{40}$/.test(addr);
-}
+
 
 window.selectInstantWithdraw = function(asset, network){
   document.querySelector(".box").innerHTML = `
@@ -2450,9 +2465,7 @@ window.selectInstantWithdraw = function(asset, network){
   </div>
   `;
 }
-function isValidAddress(addr){
-  return /^0x[a-fA-F0-9]{40}$/.test(addr);
-}
+
   
 window.submitInstantDeposit = async function(asset, network){
   const amount = document.getElementById("amount").value.trim();
