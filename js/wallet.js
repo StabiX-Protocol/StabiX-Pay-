@@ -2424,19 +2424,17 @@ window.selectInstantWithdraw = function(asset, network){
       Your Wallet Address
     </div>
 
-    <input id="eoa" placeholder="Enter your wallet address" style="
-      width:100%;
-      margin-bottom:12px;
-    ">
+    <input id="eoa" placeholder="Enter your wallet address"
+    style="width:100%;margin-bottom:12px;"
+    maxlength="42">
 
     <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
       Amount
     </div>
 
-    <input id="amount" placeholder="Enter amount" style="
-      width:100%;
-      margin-bottom:15px;
-    ">
+    <input id="amount" type="number" inputmode="decimal"
+    placeholder="Enter amount"
+    style="width:100%;margin-bottom:15px;">
 
     <button onclick="submitInstantWithdraw('${asset}','${network}')" style="
       width:100%;
@@ -2451,6 +2449,9 @@ window.selectInstantWithdraw = function(asset, network){
 
   </div>
   `;
+}
+function isValidAddress(addr){
+  return /^0x[a-fA-F0-9]{40}$/.test(addr);
 }
   
 window.submitInstantDeposit = async function(asset, network){
@@ -2501,23 +2502,37 @@ window.submitInstantDeposit = async function(asset, network){
 };
 
 window.submitInstantWithdraw = function(asset, network){
-  const to = document.getElementById("withdraw_to").value;
-  const amount = document.getElementById("withdraw_amount").value;
+
+  const to = document.getElementById("eoa").value.trim();
+  const amount = parseFloat(document.getElementById("amount").value);
+
+  const balance = window.USER_BALANCE || 0; 
 
   if(!to || !amount){
-    alert("Fill all fields");
+    alert("Missing fields");
     return;
   }
 
-  console.log("Instant Withdraw:", {
-    asset,
-    network,
-    to,
-    amount
-  });
+  if(!isValidAddress(to)){
+    alert("Invalid wallet address");
+    return;
+  }
 
-  alert("Withdraw Request Sent\n Your funds will reflect in your wallet address shortly");
-}
+  if(amount <= 0){
+    alert("Enter valid amount");
+    return;
+  }
+
+  if(amount > balance){
+    alert("Insufficient Balance");
+    return;
+  }
+
+  console.log("Withdraw:", { asset, network, to, amount });
+
+  alert("Withdraw Request Submitted\nYour funds will reflect shortly");
+
+};
 
 // ================== VAULT CONFIG (COMMON) ==================
 const VAULTS = {
