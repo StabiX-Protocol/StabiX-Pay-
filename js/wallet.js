@@ -2516,21 +2516,23 @@ window.submitInstantDeposit = async function(asset, network){
 
 window.submitInstantWithdraw = async function(asset, network){
 
-  console.log("Withdraw button clicked");
+  const to = document.getElementById("eoa").value.trim();
+  const amount = document.getElementById("amount").value;
 
-  const toInput = document.getElementById("eoa");
-  const amountInput = document.getElementById("amount");
-
-  if(!toInput || !amountInput){
-    alert("Input fields not found");
-    return;
-  }
-
-  const to = toInput.value.trim();
-  const amount = parseFloat(amountInput.value);
+  const balance = Number(userData.balances?.[asset] || 0);
 
   if(!to || !amount){
     alert("Missing fields");
+    return;
+  }
+
+  if(Number(amount) <= 0){
+    alert("Invalid amount");
+    return;
+  }
+
+  if(Number(amount) > balance){
+    alert("Insufficient Balance");
     return;
   }
 
@@ -2539,34 +2541,26 @@ window.submitInstantWithdraw = async function(asset, network){
     return;
   }
 
-  const balance = window.USER_BALANCE || 0;
+  await addDoc(collection(db, "requests"), {
+    userId: WALLET,
+    type: "withdraw",
+    mode: "instant",
+    asset,
+    network,
+    amount: Number(amount),
+    eoa: to,
+    wallet: to,
+    status: "pending",
+    createdAt: serverTimestamp()
+  });
 
-  if(amount > balance){
-    alert("Insufficient Balance");
-    return;
-  }
+  await updateDoc(userRef, {
+    pendingRequest: true
+  });
 
-  try{
+  alert("Withdraw Request Submitted\nYour funds will reflect in your wallet shortly");
 
-    await addDoc(collection(db, "requests"), {
-      userId: WALLET,
-      type: "withdraw",
-      mode: "instant",
-      asset,
-      network,
-      amount,
-      eoa: to,
-      status: "pending",
-      createdAt: serverTimestamp()
-    });
-
-    alert("Withdraw Request Submitted\nYour funds will reflect shortly");
-
-  } catch(err){
-    console.error(err);
-    alert("Withdraw failed");
-  }
-
+  goDeposit();
 };
 
 // ================== VAULT CONFIG (COMMON) ==================
