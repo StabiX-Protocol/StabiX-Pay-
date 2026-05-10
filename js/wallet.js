@@ -2514,36 +2514,58 @@ window.submitInstantDeposit = async function(asset, network){
   goDeposit();
 };
 
-window.submitInstantWithdraw = function(asset, network){
+window.submitInstantWithdraw = async function(asset, network){
 
-  const to = document.getElementById("eoa").value.trim();
-  const amount = parseFloat(document.getElementById("amount").value);
+  console.log("Withdraw button clicked");
 
-  const balance = window.USER_BALANCE || 0; 
+  const toInput = document.getElementById("eoa");
+  const amountInput = document.getElementById("amount");
+
+  if(!toInput || !amountInput){
+    alert("Input fields not found");
+    return;
+  }
+
+  const to = toInput.value.trim();
+  const amount = parseFloat(amountInput.value);
 
   if(!to || !amount){
     alert("Missing fields");
     return;
   }
 
-  if(!isValidAddress(to)){
+  if(!isValidAddress(to, network)){
     alert("Invalid wallet address");
     return;
   }
 
-  if(amount <= 0){
-    alert("Enter valid amount");
-    return;
-  }
+  const balance = window.USER_BALANCE || 0;
 
   if(amount > balance){
     alert("Insufficient Balance");
     return;
   }
 
-  console.log("Withdraw:", { asset, network, to, amount });
+  try{
 
-  alert("Withdraw Request Submitted\nYour funds will reflect shortly");
+    await addDoc(collection(db, "requests"), {
+      userId: WALLET,
+      type: "withdraw",
+      mode: "instant",
+      asset,
+      network,
+      amount,
+      eoa: to,
+      status: "pending",
+      createdAt: serverTimestamp()
+    });
+
+    alert("Withdraw Request Submitted\nYour funds will reflect shortly");
+
+  } catch(err){
+    console.error(err);
+    alert("Withdraw failed");
+  }
 
 };
 
