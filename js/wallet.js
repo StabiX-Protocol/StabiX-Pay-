@@ -2519,25 +2519,36 @@ window.submitInstantWithdraw = async function(asset, network){
   const to = document.getElementById("eoa").value.trim();
   const amount = document.getElementById("amount").value;
 
-  const balance = Number(userData.balances?.[asset] || 0);
 
   if(!to || !amount){
     alert("Missing fields");
     return;
   }
 
+
   if(Number(amount) <= 0){
     alert("Invalid amount");
     return;
   }
 
-  if(Number(amount) > balance){
-    alert("Insufficient Balance");
+  
+  if(!isValidAddress(to, network)){
+    alert("Invalid wallet address");
     return;
   }
 
-  if(!isValidAddress(to, network)){
-    alert("Invalid wallet address");
+  let balance = 0;
+
+  if(asset === "USDT"){
+    balance = Number(window.userData?.usdtBalance || 0);
+  }
+
+  if(asset === "USDC"){
+    balance = Number(window.userData?.balance || 0);
+  }
+
+  if(Number(amount) > balance){
+    alert("Insufficient Balance");
     return;
   }
 
@@ -2548,8 +2559,8 @@ window.submitInstantWithdraw = async function(asset, network){
     asset,
     network,
     amount: Number(amount),
-    eoa: to,
     wallet: to,
+    eoa: to,
     status: "pending",
     createdAt: serverTimestamp()
   });
@@ -2558,7 +2569,9 @@ window.submitInstantWithdraw = async function(asset, network){
     pendingRequest: true
   });
 
-  alert("Withdraw Request Submitted\nYour funds will reflect in your wallet shortly");
+  alert(
+    "Withdraw Request Submitted\nYour funds will reflect in your wallet shortly"
+  );
 
   goDeposit();
 };
