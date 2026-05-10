@@ -1983,7 +1983,7 @@ network.includes("Polygon") ||
 network.includes("Base")){
 return /^0x[a-fA-F0-9]{40}$/.test(addr);
 }
-//  TRON (TRC20)
+// Non-EVM TRON (TRC20)
 if(network.includes("Tron")){
 return /^T[a-zA-Z0-9]{33}$/.test(addr);
 }
@@ -2019,68 +2019,65 @@ ${asset}
 </div>
 </div>
 
-    <div style="margin-bottom:20px;">
+<div style="margin-bottom:20px;">
+<div style="
+font-size:13px;
+opacity:0.6;
+margin-bottom:12px;
+">
+Select Mode
+</div>
 
-  <div style="
-    font-size:13px;
-    opacity:0.6;
-    margin-bottom:12px;
-  ">
-    Select Mode
-  </div>
+<!-- Instant -->
+<div id="instantBtn" onclick="selectMode('instant')" style="
+padding:16px;
+border-radius:16px;
+border:1px solid rgba(255,255,255,0.08);
+margin-bottom:14px;
+cursor:pointer;
+">
+<div style="display:flex; align-items:center; gap:10px;">
+<div style="font-size:16px;">Instant</div>
+<div style="font-size:11px; opacity:0.45;">(Recommended)</div>
+</div>
+</div>
 
-  <!-- Instant -->
-  <div id="instantBtn" onclick="selectMode('instant')" style="
-    padding:16px;
-    border-radius:16px;
-    border:1px solid rgba(255,255,255,0.08);
-    margin-bottom:14px;
-    cursor:pointer;
-  ">
-    <div style="display:flex; align-items:center; gap:10px;">
-      <div style="font-size:16px;">Instant</div>
-      <div style="font-size:11px; opacity:0.45;">(Recommended)</div>
-    </div>
-  </div>
-
-  <!-- Advanced -->
-  <div id="advancedBtn" onclick="selectMode('advanced')" style="
-    padding:16px;
-    border-radius:16px;
-    border:1px solid rgba(255,255,255,0.08);
-    cursor:pointer;
-  ">
-    <div style="display:flex; align-items:center; gap:10px;">
-      <div style="font-size:16px;">Advanced</div>
-      <div style="font-size:11px; opacity:0.45;">(Self Custody)</div>
-    </div>
-  </div>
+<!-- Advanced -->
+<div id="advancedBtn" onclick="selectMode('advanced')" style="
+padding:16px;
+border-radius:16px;
+border:1px solid rgba(255,255,255,0.08);
+cursor:pointer;
+">
+<div style="display:flex; align-items:center; gap:10px;">
+<div style="font-size:16px;">Advanced</div>
+<div style="font-size:11px; opacity:0.45;">(Self Custody)</div>
+</div>
+</div>
 </div>
   
 <div style="display:flex; gap:12px; margin-top:30px;">
+<button onclick="handleDepositClick('${asset}')" style="
+flex:1;
+padding:14px;
+border-radius:12px;
+background:#22c55e;
+color:#022c22;
+font-weight:bold;
+">
+Deposit
+</button>
 
-  <button onclick="handleDepositClick('${asset}')" style="
-    flex:1;
-    padding:14px;
-    border-radius:12px;
-    background:#22c55e;
-    color:#022c22;
-    font-weight:bold;
-  ">
-    Deposit
-  </button>
-
-  <button onclick="handleWithdrawClick('${asset}')" style="
-    flex:1;
-    padding:14px;
-    border-radius:12px;
-    background:#ef4444;
-    color:white;
-    font-weight:bold;
-  ">
-    Withdraw
-  </button>
-
+<button onclick="handleWithdrawClick('${asset}')" style="
+flex:1;
+padding:14px;
+border-radius:12px;
+background:#ef4444;
+color:white;
+font-weight:bold;
+">
+Withdraw
+</button>
 </div>
 
 <div style="
@@ -2135,448 +2132,28 @@ window.openAssetPage = function(asset){
 window.selectedDWAsset = asset;
 selectDWAsset(asset);
 }
+
+// ================== 👇Hot Wallet & Vaults Addresses(Add /Chnage Addresses)👇 ==================
 // ================== Instant Mode ==================
-window.selectMode = function(mode){
+const WALLETS = {
+USDT: {
+"Ethereum ERC20": "0x0df4862baafc84a681eb6b83848494c673e2298f",
+"Arbitrum L2": "0xUSDT_ARB",
+"Polygon PoS": "0xUSDT_POLY",
+"Base L2": "0xUSDT_BASE",
+"Tron TRC20": "TUSDT_TRON"
+},
 
-  let title = mode === "instant" ? "Notice" : "Self Custody Warning";
-
-let message = mode === "instant"
-    ? "In Instant mode, deposits are credited to a StabiX managed execution layer where funds are maintained within system-controlled hot wallets. User balances are handled internally, enabling fast settlement without repeated on-chain interactions. Withdrawals are executed directly by the backend."
-    : "In Advanced mode, all funds remain on-chain under your control. Deposits and withdrawals happen via smart contracts. Withdrawals use Merkle proofs and batching. You are fully responsible for your funds — StabiX does not control them.";
-  
-  if(confirm(title + "\n\n" + message)){
-    
-    window.MODE = mode;
-
-    document.getElementById("instantBtn").style.border = "1px solid rgba(255,255,255,0.08)";
-    document.getElementById("advancedBtn").style.border = "1px solid rgba(255,255,255,0.08)";
-    document.getElementById(mode + "Btn").style.border = "1px solid #3b82f6";
-
-  } else {
-    return;
-  }
-};
-
-
-window.handleDepositClick = function(asset){
-
-  if(!window.MODE){
-    alert("Select mode first");
-    return;
-  }
-
-  if(window.MODE === "instant"){
-    openInstantDeposit(asset);
-  }else{
-    openDeposit(asset); 
-  }
+USDC: {
+"Ethereum ERC20": "0xUSDC_ETH",
+"Arbitrum L2": "0xUSDC_ARB",
+"Polygon PoS": "0xUSDC_POLY",
+"Base L2": "0xUSDC_BASE",
+"Tron TRC20": "TUSDC_TRON"
 }
-window.handleWithdrawClick = function(asset){
-
-  if(!window.MODE){
-    alert("Select mode first");
-    return;
-  }
-
-  if(window.MODE === "instant"){
-    openInstantWithdraw(asset);
-  }else{
-    openWithdrawNetwork(asset); 
-  }
-}
-window.openInstantDeposit = function(asset){
-  document.querySelector(".box").innerHTML = `
-  
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    <div onclick="openAssetPage('${asset}')" style="
-      width:36px;
-      height:36px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:10px;
-      background:rgba(255,255,255,0.05);
-      cursor:pointer;
-      font-size:18px;
-    ">←</div>
-
-    <div style="font-size:18px;font-weight:600;">
-      Select Network
-    </div>
-  </div>
-
-  <div style="display:flex;flex-direction:column;gap:12px;">
-    ${instantNetworkCard(asset, "Ethereum", "ERC20", "~2 min", "$5 fee")}
-    ${instantNetworkCard(asset, "Arbitrum", "L2", "~10 sec", "Low fee")}
-    ${instantNetworkCard(asset, "Polygon", "PoS", "~5 sec", "Very low")}
-    ${instantNetworkCard(asset, "Base", "L2", "~5 sec", "Low fee")}
-  </div>
-  `;
 };
 
-window.openInstantWithdraw = function(asset){
-  document.querySelector(".box").innerHTML = `
-  
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    <div onclick="openAssetPage('${asset}')" style="
-      width:36px;
-      height:36px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:10px;
-      background:rgba(255,255,255,0.05);
-      cursor:pointer;
-      font-size:18px;
-    ">←</div>
-
-    <div style="font-size:18px;font-weight:600;">
-      Select Network
-    </div>
-  </div>
-
-  <div style="display:flex;flex-direction:column;gap:12px;">
-${instantWithdrawNetworkCard(asset,"Ethereum","ERC20","eth.png")}
-${instantWithdrawNetworkCard(asset,"Arbitrum","ARB","arb.png")}
-${instantWithdrawNetworkCard(asset,"Polygon","POL","polygon.png")}
-${instantWithdrawNetworkCard(asset,"Base","BASE","base.png")}
-  </div>
-  `;
-};
-function instantNetworkCard(asset, name, type, speed, fee){
-  return `
-  <div onclick="selectInstantNetwork('${asset}','${name} ${type}')"
-  style="
-    padding:14px;
-    border-radius:14px;
-    background:#0b1220;
-    border:1px solid rgba(255,255,255,0.06);
-    cursor:pointer;
-  ">
-
-    <div style="font-weight:600;font-size:15px;">
-      ${name}
-      <span style="opacity:0.5;font-size:12px;"> ${type}</span>
-    </div>
-
-    <div style="font-size:12px;opacity:0.6;margin-top:6px;">
-      Speed: ${speed}
-    </div>
-
-    <div style="font-size:12px;opacity:0.6;">
-      Fee: ${fee}
-    </div>
-
-  </div>
-  `;
-}
-
-function instantWithdrawNetworkCard(asset, name, type, speed, fee){
-  return `
-  <div onclick="selectInstantWithdraw('${asset}', '${name} ${type}')" style="
-    padding:14px;
-    border-radius:14px;
-    background:#0b1220;
-    border:1px solid rgba(255,255,255,0.06);
-    cursor:pointer;
-  ">
-    <div style="font-weight:600;font-size:15px;">
-      ${name}
-      <span style="opacity:0.5;font-size:12px;"> ${type}</span>
-    </div>
-
-    <div style="font-size:12px;opacity:0.6;margin-top:6px;">
-      Speed: ${speed}
-    </div>
-
-    <div style="font-size:12px;opacity:0.6;">
-      Fee: ${fee}
-    </div>
-  </div>
-  `;
-}
-
-window.selectInstantNetwork = function(asset, network){
-  const wallet = WALLETS[asset]?.[network] || "Not available";
-  document.querySelector(".box").innerHTML = `
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    <div onclick="openInstantDeposit('${asset}')" style="
-      width:36px;
-      height:36px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:10px;
-      background:rgba(255,255,255,0.05);
-      cursor:pointer;
-      font-size:18px;
-    ">←</div>
-
-    <div style="font-size:18px;font-weight:600;">
-      ${asset} Deposit
-    </div>
-  </div>
-
-  <div style="
-    background:#0b1220;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:10px;
-  ">
-    <div style="font-size:12px;opacity:0.6;">Network</div>
-    <div>${network}</div>
-  </div>
-
-  <div style="
-    background:#0b1220;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:15px;
-  ">
-    <div style="font-size:12px;opacity:0.6;">Wallet Address</div>
-
-    <div style="margin-top:10px;display:flex;justify-content:center;">
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${wallet}" />
-    </div>
-
-    <div style="
-  margin-top:10px;
-  font-size:12px;
-  color:#60a5fa;
-  white-space:nowrap;
-  overflow-x:auto;
-  line-height:1.4;
-  ">
-  ${wallet}
-  </div>
-
-    <button onclick="copyAddress('${wallet}')" style="
-      padding:6px 10px;
-      border:none;
-      border-radius:8px;
-      background:#3b82f6;
-      color:white;
-      font-size:11px;
-    ">
-      Copy
-    </button>
-  </div>
-
-</div>
-
-  <input id="amount" type="number" inputmode="decimal" placeholder="Amount" style="width:100%;margin-bottom:10px;">
-  <input id="txHash" placeholder="Transaction Hash" style="width:100%;margin-bottom:10px;">
-  <input id="eoa" placeholder="Your Wallet Address" style="width:100%;margin-bottom:15px;">
-
-  <button onclick="submitInstantDeposit('${asset}','${network}')" style="
-    width:100%;
-    padding:14px;
-    border-radius:12px;
-    background:#22c55e;
-    color:black;
-    font-weight:600;
-  ">
-    Submit Deposit
-  </button>
-
-  `;
-};
-window.copyAddress = function(addr){
-  navigator.clipboard.writeText(addr);
-};
-function isValidTxHash(hash){
-  return /^0x([A-Fa-f0-9]{64})$/.test(hash);
-}
-
-
-window.selectInstantWithdraw = function(asset, network){
-  document.querySelector(".box").innerHTML = `
-  
-  <!-- HEADER -->
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    <div onclick="openInstantWithdraw('${asset}')" style="
-      width:36px;
-      height:36px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:10px;
-      background:rgba(255,255,255,0.05);
-      cursor:pointer;
-      font-size:18px;">
-      ←
-    </div>
-
-    <div style="font-size:18px;font-weight:600;">
-      ${asset} Withdraw
-    </div>
-  </div>
-
-  <!-- NETWORK -->
-  <div style="
-    background:#0b1220;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:10px;
-  ">
-    <div style="font-size:12px;opacity:0.6;">Network</div>
-    <div>${network}</div>
-  </div>
-
-  <!-- FORM (same container as deposit) -->
-  <div style="
-    background:#0b1220;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:15px;
-  ">
-
-    <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
-      Your Wallet Address
-    </div>
-
-    <input id="eoa" placeholder="Enter your wallet address"
-    style="width:100%;margin-bottom:12px;"
-    maxlength="42">
-
-    <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
-      Amount
-    </div>
-
-    <input id="amount" type="number" inputmode="decimal"
-    placeholder="Enter amount"
-    style="width:100%;margin-bottom:15px;">
-
-    <button onclick="submitInstantWithdraw('${asset}','${network}')" style="
-      width:100%;
-      padding:14px;
-      border-radius:12px;
-      background:#22c55e;
-      color:white;
-      font-weight:600;
-    ">
-      Withdraw
-    </button>
-
-  </div>
-  `;
-}
-
-  
-window.submitInstantDeposit = async function(asset, network){
-  const amount = document.getElementById("amount").value.trim();
-  const txHash = document.getElementById("txHash").value.trim();
-  const eoa = document.getElementById("eoa").value.trim();
-
-  if(!amount || !txHash || !eoa){
-    alert("All fields are required");
-    return;
-  }
-
-  if(Number(amount) <= 0){
-    alert("Invalid amount");
-    return;
-  }
-
-  if(!isValidTxHash(txHash)){
-    alert("Invalid transaction hash");
-    return;
-  }
-
-  if(!isValidAddress(eoa)){
-    alert("Invalid wallet address");
-    return;
-  }
-
-  await addDoc(collection(db, "requests"), {
-    userId: WALLET,
-    type: "deposit",
-    mode: "instant",
-    asset,
-    network,
-    amount: Number(amount),
-    txHash,
-    eoa,
-    status: "pending",
-    createdAt: serverTimestamp()
-  });
-
-  await updateDoc(userRef, {
-    pendingRequest: true
-  });
-
-  alert("Deposit Request Submitted\nYour funds will reflect in StabiX shortly");
-
-  goDeposit();
-};
-
-window.submitInstantWithdraw = async function(asset, network){
-
-  const to = document.getElementById("eoa").value.trim();
-  const amount = document.getElementById("amount").value;
-
-
-  if(!to || !amount){
-    alert("Missing fields");
-    return;
-  }
-
-
-  if(Number(amount) <= 0){
-    alert("Invalid amount");
-    return;
-  }
-
-  
-  if(!isValidAddress(to, network)){
-    alert("Invalid wallet address");
-    return;
-  }
-
-  let balance = 0;
-
-  if(asset === "USDT"){
-    balance = Number(window.userData?.usdtBalance || 0);
-  }
-
-  if(asset === "USDC"){
-    balance = Number(window.userData?.balance || 0);
-  }
-
-  if(Number(amount) > balance){
-    alert("Insufficient Balance");
-    return;
-  }
-
-  await addDoc(collection(db, "requests"), {
-    userId: WALLET,
-    type: "withdraw",
-    mode: "instant",
-    asset,
-    network,
-    amount: Number(amount),
-    wallet: to,
-    eoa: to,
-    status: "pending",
-    createdAt: serverTimestamp()
-  });
-
-  await updateDoc(userRef, {
-    pendingRequest: true
-  });
-
-  alert(
-    "Withdraw Request Submitted\nYour funds will reflect in your wallet shortly"
-  );
-
-  goDeposit();
-};
-
-// ================== VAULT CONFIG (COMMON) ==================
+// ================== Advance Mode ==================
 const VAULTS = {
 USDT: {
 "Ethereum ERC20": "0xUSDT_ETH_VAULT",
@@ -2594,32 +2171,411 @@ USDC: {
 "Tron TRC20": "TUSDC_TRON_VAULT"
 }
 };
-
 const EXPLORERS = {
 "Ethereum ERC20": "https://etherscan.io/address/",
 "Arbitrum L2": "https://arbiscan.io/address/",
 "Polygon PoS": "https://polygonscan.com/address/",
 "Base L2": "https://basescan.org/address/"
 };
-  
-const WALLETS = {
-USDT: {
-"Ethereum ERC20": "0x0df4862baafc84a681eb6b83848494c673e2298f",
-"Arbitrum L2": "0xUSDT_ARB",
-"Polygon PoS": "0xUSDT_POLY",
-"Base L2": "0xUSDT_BASE",
-"Tron TRC20": "TUSDT_TRON"
-},
 
-USDC: {
-"Ethereum ERC20": "0xUSDC_ETH",
-"Arbitrum L2": "0xUSDC_ARB",
-"Polygon PoS": "0xUSDC_POLY",
-"Base L2": "0xUSDC_BASE",
-"Tron TRC20": "TUSDC_TRON"
+// ================== Instant Mode ==================
+window.selectMode = function(mode){
+let title = mode === "instant" ? "Notice" : "Self Custody Warning";
+let message = mode === "instant"
+? "In Instant mode, deposits are credited to a StabiX managed execution layer where funds are maintained within system-controlled hot wallets. User balances are handled internally, enabling fast settlement without repeated on-chain interactions. Withdrawals are executed directly by the backend."
+: "In Advanced mode, all funds remain on-chain under your control. Deposits and withdrawals happen via smart contracts. Withdrawals use Merkle proofs and batching. You are fully responsible for your funds — StabiX does not control them.";
+if(confirm(title + "\n\n" + message)){
+window.MODE = mode;
+document.getElementById("instantBtn").style.border = "1px solid rgba(255,255,255,0.08)";
+document.getElementById("advancedBtn").style.border = "1px solid rgba(255,255,255,0.08)";
+document.getElementById(mode + "Btn").style.border = "1px solid #3b82f6";
+} else {
+return;
+}
+};
+
+window.handleDepositClick = function(asset){
+if(!window.MODE){
+alert("Select mode first");
+return;
 }
 
+if(window.MODE === "instant"){
+openInstantDeposit(asset);
+}else{
+openDeposit(asset); 
+}
+}
+window.handleWithdrawClick = function(asset){
+if(!window.MODE){
+alert("Select mode first");
+return;
+}
+if(window.MODE === "instant"){
+openInstantWithdraw(asset);
+}else{
+openWithdrawNetwork(asset); 
+}
+}
+window.openInstantDeposit = function(asset){
+document.querySelector(".box").innerHTML = `
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openAssetPage('${asset}')" style="
+width:36px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+cursor:pointer;
+font-size:18px;
+">←</div>
+<div style="font-size:18px;font-weight:600;">
+Select Network
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px;">
+${instantNetworkCard(asset, "Ethereum", "ERC20", "~2 min", "$5 fee")}
+${instantNetworkCard(asset, "Arbitrum", "L2", "~10 sec", "Low fee")}
+${instantNetworkCard(asset, "Polygon", "PoS", "~5 sec", "Very low")}
+${instantNetworkCard(asset, "Base", "L2", "~5 sec", "Low fee")}
+</div>
+`;
 };
+
+window.openInstantWithdraw = function(asset){
+document.querySelector(".box").innerHTML = `
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openAssetPage('${asset}')" style="
+width:36px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+cursor:pointer;
+font-size:18px;
+">←</div>
+<div style="font-size:18px;font-weight:600;">
+Select Network
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px;">
+${instantWithdrawNetworkCard(asset,"Ethereum","ERC20","eth.png")}
+${instantWithdrawNetworkCard(asset,"Arbitrum","ARB","arb.png")}
+${instantWithdrawNetworkCard(asset,"Polygon","POL","polygon.png")}
+${instantWithdrawNetworkCard(asset,"Base","BASE","base.png")}
+</div>
+`;
+};
+function instantNetworkCard(asset, name, type, speed, fee){
+return `
+<div onclick="selectInstantNetwork('${asset}','${name} ${type}')"
+style="
+padding:14px;
+border-radius:14px;
+background:#0b1220;
+border:1px solid rgba(255,255,255,0.06);
+cursor:pointer;">
+<div style="font-weight:600;font-size:15px;">
+${name}
+<span style="opacity:0.5;font-size:12px;"> ${type}</span>
+</div>
+
+<div style="font-size:12px;opacity:0.6;margin-top:6px;">
+Speed: ${speed}
+</div>
+
+<div style="font-size:12px;opacity:0.6;">
+Fee: ${fee}
+</div>
+</div>
+`;
+}
+
+function instantWithdrawNetworkCard(asset, name, type, speed, fee){
+return `
+<div onclick="selectInstantWithdraw('${asset}', '${name} ${type}')" style="
+padding:14px;
+border-radius:14px;
+background:#0b1220;
+border:1px solid rgba(255,255,255,0.06);
+cursor:pointer;
+">
+<div style="font-weight:600;font-size:15px;">
+${name}
+<span style="opacity:0.5;font-size:12px;"> ${type}</span>
+</div>
+
+<div style="font-size:12px;opacity:0.6;margin-top:6px;">
+Speed: ${speed}
+</div>
+
+<div style="font-size:12px;opacity:0.6;">
+Fee: ${fee}
+</div>
+</div>
+`;
+}
+
+window.selectInstantNetwork = function(asset, network){
+const wallet = WALLETS[asset]?.[network] || "Not available";
+document.querySelector(".box").innerHTML = `
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openInstantDeposit('${asset}')" style="
+width:36px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+cursor:pointer;
+font-size:18px;
+">←</div>
+
+<div style="font-size:18px;font-weight:600;">
+${asset} Deposit
+</div>
+</div>
+
+<div style="
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:10px;">
+
+<div style="font-size:12px;opacity:0.6;">Network</div>
+<div>${network}</div>
+</div>
+
+<div style="
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:15px;">
+<div style="font-size:12px;opacity:0.6;">Wallet Address</div>
+<div style="margin-top:10px;display:flex;justify-content:center;">
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${wallet}" />
+</div>
+
+<div style="
+margin-top:10px;
+font-size:12px;
+color:#60a5fa;
+white-space:nowrap;
+overflow-x:auto;
+line-height:1.4;
+">
+${wallet}
+</div>
+
+<button onclick="copyAddress('${wallet}')" style="
+padding:6px 10px;
+border:none;
+border-radius:8px;
+background:#3b82f6;
+color:white;
+font-size:11px;">
+Copy
+</button>
+</div>
+</div>
+
+<input id="amount" type="number" inputmode="decimal" placeholder="Amount" style="width:100%;margin-bottom:10px;">
+<input id="txHash" placeholder="Transaction Hash" style="width:100%;margin-bottom:10px;">
+<input id="eoa" placeholder="Your Wallet Address" style="width:100%;margin-bottom:15px;">
+
+<button onclick="submitInstantDeposit('${asset}','${network}')" style="
+width:100%;
+padding:14px;
+border-radius:12px;
+background:#22c55e;
+color:black;
+font-weight:600;
+">
+Submit Deposit
+</button>
+`;
+};
+
+window.copyAddress = function(addr){
+navigator.clipboard.writeText(addr);
+};
+function isValidTxHash(hash){
+return /^0x([A-Fa-f0-9]{64})$/.test(hash);
+}
+
+
+window.selectInstantWithdraw = function(asset, network){
+document.querySelector(".box").innerHTML = `
+<!-- HEADER -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+<div onclick="openInstantWithdraw('${asset}')" style="
+width:36px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+background:rgba(255,255,255,0.05);
+cursor:pointer;
+font-size:18px;">
+←
+</div>
+
+<div style="font-size:18px;font-weight:600;">
+${asset} Withdraw
+</div>
+</div>
+
+<!-- NETWORK -->
+<div style="
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:10px;
+">
+
+<div style="font-size:12px;opacity:0.6;">Network</div>
+<div>${network}</div>
+</div>
+
+<!-- FORM (same container as deposit) -->
+<div style="
+background:#0b1220;
+padding:12px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.06);
+margin-bottom:15px; ">
+
+<div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
+Your Wallet Address
+</div>
+
+<input id="eoa" placeholder="Enter your wallet address"
+style="width:100%;margin-bottom:12px;"
+maxlength="42">
+
+<div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
+Amount
+</div>
+
+<input id="amount" type="number" inputmode="decimal"
+placeholder="Enter amount"
+style="width:100%;margin-bottom:15px;">
+
+<button onclick="submitInstantWithdraw('${asset}','${network}')" style="
+width:100%;
+padding:14px;
+border-radius:12px;
+background:#22c55e;
+color:white;
+font-weight:600;">
+Withdraw
+</button>
+</div>
+`;
+}
+
+  
+window.submitInstantDeposit = async function(asset, network){
+const amount = document.getElementById("amount").value.trim();
+const txHash = document.getElementById("txHash").value.trim();
+const eoa = document.getElementById("eoa").value.trim();
+
+if(!amount || !txHash || !eoa){
+alert("All fields are required");
+return;
+}
+if(Number(amount) <= 0){
+alert("Invalid amount");
+return;
+}
+if(!isValidTxHash(txHash)){
+alert("Invalid transaction hash");
+return;
+}
+if(!isValidAddress(eoa)){
+alert("Invalid wallet address");
+return;
+}
+await addDoc(collection(db, "requests"), {
+userId: WALLET,
+type: "deposit",
+mode: "instant",
+asset,
+network,
+amount: Number(amount),
+txHash,
+eoa,
+status: "pending",
+createdAt: serverTimestamp()
+});
+
+await updateDoc(userRef, {
+pendingRequest: true
+});
+alert("Deposit Request Submitted\nYour funds will reflect in StabiX shortly");
+goDeposit();
+};
+
+window.submitInstantWithdraw = async function(asset, network){
+const to = document.getElementById("eoa").value.trim();
+const amount = document.getElementById("amount").value;
+if(!to || !amount){
+alert("Missing fields");
+return;
+}
+if(Number(amount) <= 0){
+alert("Invalid amount");
+return;
+}
+if(!isValidAddress(to, network)){
+alert("Invalid wallet address");
+return;
+}
+  
+let balance = 0;
+if(asset === "USDT"){
+balance = Number(window.userData?.usdtBalance || 0);
+}
+if(asset === "USDC"){
+balance = Number(window.userData?.balance || 0);
+}
+if(Number(amount) > balance){
+alert("Insufficient Balance");
+return;
+}
+await addDoc(collection(db, "requests"), {
+userId: WALLET,
+type: "withdraw",
+mode: "instant",
+asset,
+network,
+amount: Number(amount),
+wallet: to,
+eoa: to,
+status: "pending",
+createdAt: serverTimestamp()
+});
+await updateDoc(userRef, {
+pendingRequest: true
+});
+alert(
+"Withdraw Request Submitted\nYour funds will reflect in your wallet shortly"
+);
+goDeposit();
+};
+
+
 // ================= OPEN FUNCTIONS =================
 function networkCard(asset, name, type, speed, fee){
 return `
@@ -2990,95 +2946,79 @@ line-height:1.6;
    
 // ================== SUBMIT DEPOSIT ==================//
 window.submitDepositFinal = async function(asset, network){
-
-  const amount = document.getElementById("amount").value;
-  const txHash = document.getElementById("txHash").value;
-  const eoa = document.getElementById("eoa").value;
-
-  if(!amount || !txHash || !eoa){
-    alert("Fill all fields");
-    return;
-  }
-
-  await addDoc(collection(db, "requests"), {
-    userId: WALLET,
-    type: "deposit",
-    mode: "advanced", 
-    asset,
-    network,
-    amount: Number(amount),
-    txHash,
-    eoa,
-    status: "pending",
-    createdAt: serverTimestamp()
-  });
-
-  await updateDoc(userRef, {
-    pendingRequest: true
-  });
-
-  alert("Deposit request sent");
-  goDeposit();
+const amount = document.getElementById("amount").value;
+const txHash = document.getElementById("txHash").value;
+const eoa = document.getElementById("eoa").value;
+if(!amount || !txHash || !eoa){
+alert("Fill all fields");
+return;
+}
+await addDoc(collection(db, "requests"), {
+userId: WALLET,
+type: "deposit",
+mode: "advanced", 
+asset,
+network,
+amount: Number(amount),
+txHash,
+eoa,
+status: "pending",
+createdAt: serverTimestamp()
+});
+await updateDoc(userRef, {
+pendingRequest: true
+});
+alert("Deposit request sent");
+goDeposit();
 };
 
 // ================== SUBMIT WITHDRAW ==================//
 window.submitWithdrawFinal = async function(asset, network){
+const amount = document.getElementById("amount").value;
+const eoa = document.getElementById("eoa").value.trim();
+if(!amount || !eoa){
+alert("Missing fields");
+return;
+}
+if(Number(amount) <= 0){
+alert("Invalid amount");
+return;
+}
+if(!isValidAddress(eoa, network)){
+alert("Invalid wallet address");
+return;
+}
 
-  const amount = document.getElementById("amount").value;
-  const eoa = document.getElementById("eoa").value.trim();
-
-  if(!amount || !eoa){
-    alert("Missing fields");
-    return;
-  }
-
-  if(Number(amount) <= 0){
-    alert("Invalid amount");
-    return;
-  }
-
-  if(!isValidAddress(eoa, network)){
-    alert("Invalid wallet address");
-    return;
-  }
-
-  let balance = 0;
-
-  if(asset === "USDT"){
-    balance = Number(window.userData?.usdtBalance || 0);
-  }
-
-  if(asset === "USDC"){
-    balance = Number(window.userData?.balance || 0);
-  }
-
-  if(Number(amount) > balance){
-    alert("Insufficient Balance");
-    return;
-  }
-
-  await addDoc(collection(db, "requests"), {
-    userId: WALLET,
-    type: "withdraw",
-    mode: "advanced",
-    asset,
-    network,
-    amount: Number(amount),
-    wallet: eoa,
-    eoa: eoa,
-    status: "pending",
-    createdAt: serverTimestamp()
-  });
-
-  await updateDoc(userRef, {
-    pendingRequest: true
-  });
-
-  alert(
-    "Withdraw Request Submitted\nYour funds will reflect in your wallet shortly"
-  );
-
-  goDeposit();
+let balance = 0;
+if(asset === "USDT"){
+balance = Number(window.userData?.usdtBalance || 0);
+}
+if(asset === "USDC"){
+balance = Number(window.userData?.balance || 0);
+}
+if(Number(amount) > balance){
+alert("Insufficient Balance");
+return;
+}
+await addDoc(collection(db, "requests"), {
+userId: WALLET,
+type: "withdraw",
+mode: "advanced",
+asset,
+network,
+amount: Number(amount),
+wallet: eoa,
+eoa: eoa,
+status: "pending",
+createdAt: serverTimestamp()
+});
+await updateDoc(userRef, {
+pendingRequest: true
+});
+alert(
+"Withdraw Request Submitted\nYour funds will reflect in your wallet shortly"
+);
+goDeposit();
 };
 
 
