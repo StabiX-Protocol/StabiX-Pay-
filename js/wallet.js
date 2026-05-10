@@ -3002,27 +3002,47 @@ window.submitDepositFinal = async function(asset, network){
 window.submitWithdrawFinal = async function(asset, network){
 
   const amount = document.getElementById("amount").value;
-  const eoa = document.getElementById("eoa").value;
+  const eoa = document.getElementById("eoa").value.trim();
 
-const balance = Number(userData.balances?.[asset] || 0);
-if(Number(amount) > balance){
-  alert("Insufficient Balance");
-  return;
-}
-  
   if(!amount || !eoa){
-    alert("Fill all fields");
+    alert("Missing fields");
+    return;
+  }
+
+  if(Number(amount) <= 0){
+    alert("Invalid amount");
+    return;
+  }
+
+  if(!isValidAddress(eoa, network)){
+    alert("Invalid wallet address");
+    return;
+  }
+
+  let balance = 0;
+
+  if(asset === "USDT"){
+    balance = Number(window.userData?.usdtBalance || 0);
+  }
+
+  if(asset === "USDC"){
+    balance = Number(window.userData?.balance || 0);
+  }
+
+  if(Number(amount) > balance){
+    alert("Insufficient Balance");
     return;
   }
 
   await addDoc(collection(db, "requests"), {
     userId: WALLET,
     type: "withdraw",
-    mode: "advanced", 
+    mode: "advanced",
     asset,
     network,
     amount: Number(amount),
-    eoa,
+    wallet: eoa,
+    eoa: eoa,
     status: "pending",
     createdAt: serverTimestamp()
   });
@@ -3031,7 +3051,10 @@ if(Number(amount) > balance){
     pendingRequest: true
   });
 
-  alert("Withdraw request sent");
+  alert(
+    "Withdraw Request Submitted\nYour funds will reflect in your wallet shortly"
+  );
+
   goDeposit();
 };
 
