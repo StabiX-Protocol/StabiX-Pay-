@@ -441,7 +441,9 @@ html += `
 <b>${r.type.toUpperCase()} ${r.amount} ${r.asset || "USDC"}</b>
 <span class="small">
 User ID: ${r.userId}<br>
-Wallet: ${r.walletAddress}<br>
+Wallet: ${r.wallet || r.eoa || "N/A"}<br>
+Network: ${r.network || "N/A"}<br>
+Mode: ${r.mode || "advanced"}<br>
 ${r.txHash ? `Tx Hash: ${r.txHash}<br>` : ""}
 Time: ${time}
 </span>
