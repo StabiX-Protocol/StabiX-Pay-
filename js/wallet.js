@@ -2578,12 +2578,23 @@ window.submitInstantWithdraw = async function(asset, network){
 
 // ================== VAULT CONFIG (COMMON) ==================
 const VAULTS = {
-"Ethereum ERC20": "0x0201B73BA3d4a43012c84B871c7d5332E176ffcc",
-"Arbitrum L2": "0xARB_VAULT",
-"Polygon PoS": "0xPOLY_VAULT",
-"Base L2": "0xBASE_VAULT",
-"Tron TRC20": "TXYZ_TRON_VAULT"
+USDT: {
+"Ethereum ERC20": "0xUSDT_ETH_VAULT",
+"Arbitrum L2": "0xUSDT_ARB_VAULT",
+"Polygon PoS": "0xUSDT_POLY_VAULT",
+"Base L2": "0xUSDT_BASE_VAULT",
+"Tron TRC20": "TUSDT_TRON_VAULT"
+},
+
+USDC: {
+"Ethereum ERC20": "0xUSDC_ETH_VAULT",
+"Arbitrum L2": "0xUSDC_ARB_VAULT",
+"Polygon PoS": "0xUSDC_POLY_VAULT",
+"Base L2": "0xUSDC_BASE_VAULT",
+"Tron TRC20": "TUSDC_TRON_VAULT"
+}
 };
+
 const EXPLORERS = {
 "Ethereum ERC20": "https://etherscan.io/address/",
 "Arbitrum L2": "https://arbiscan.io/address/",
@@ -2667,7 +2678,7 @@ ${networkCard(asset,"Base","L2","~5 sec","Low fee")}
 // ================== PAGE 4 ==================
 // VAULT + TX HASH + AMOUNT + EOA
 window.selectNetwork = function(asset, network){
-const vault = VAULTS[network] || "Not available";
+const vault = VAULTS[asset]?.[network] || "Not available";
 document.querySelector(".box").innerHTML = `
 <!-- HEADER -->
 <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
