@@ -2178,7 +2178,7 @@ const EXPLORERS = {
 "Base L2": "https://basescan.org/address/"
 };
 
-// ================== Instant Mode ==================
+// ================== Instant Mode Flow ==================
 window.selectMode = function(mode){
 let title = mode === "instant" ? "Notice" : "Self Custody Warning";
 let message = mode === "instant"
@@ -2576,33 +2576,7 @@ goDeposit();
 };
 
 
-// ================= OPEN FUNCTIONS =================
-function networkCard(asset, name, type, speed, fee){
-return `
-<div onclick="selectNetwork('${asset}','${name} ${type}')"
-style="
-padding:14px;
-border-radius:14px;
-background:#0b1220;
-border:1px solid rgba(255,255,255,0.06);
-cursor:pointer;
-">
-<!-- NETWORK NAME -->
-<div style="font-weight:600;font-size:15px;">${name}
-<span style="opacity:0.5;font-size:12px;"> ${type}</span>
-</div>
-<!-- SPEED -->
-<div style="font-size:12px;opacity:0.6;margin-top:6px;">
-Speed: ${speed}
-</div>
-<!-- FEE -->
-<div style="font-size:12px;opacity:0.6;">
-Fee: ${fee}
-</div>
-</div>
-`;
-}
-// ================== PAGE 3 ==================//
+// ================= Advance Mode Flow(Deposit Flow)=================
 window.openDeposit = function(asset){
 document.querySelector(".box").innerHTML = `
 <!-- HEADER -->
@@ -2631,8 +2605,33 @@ ${networkCard(asset,"Base","L2","~5 sec","Low fee")}
 </div>
 `;
 }
-// ================== PAGE 4 ==================
-// VAULT + TX HASH + AMOUNT + EOA
+
+function networkCard(asset, name, type, speed, fee){
+return `
+<div onclick="selectNetwork('${asset}','${name} ${type}')"
+style="
+padding:14px;
+border-radius:14px;
+background:#0b1220;
+border:1px solid rgba(255,255,255,0.06);
+cursor:pointer;
+">
+<!-- NETWORK NAME -->
+<div style="font-weight:600;font-size:15px;">${name}
+<span style="opacity:0.5;font-size:12px;"> ${type}</span>
+</div>
+<!-- SPEED -->
+<div style="font-size:12px;opacity:0.6;margin-top:6px;">
+Speed: ${speed}
+</div>
+<!-- FEE -->
+<div style="font-size:12px;opacity:0.6;">
+Fee: ${fee}
+</div>
+</div>
+`;
+}
+
 window.selectNetwork = function(asset, network){
 const vault = VAULTS[asset]?.[network] || "Not available";
 document.querySelector(".box").innerHTML = `
@@ -2735,7 +2734,7 @@ line-height:1.6;">
 </div>
 `;
 }
-// ================== PAGE 6 ==================//
+// ================== Advance Mode (Withdraw Flow)==================//
 window.openWithdraw = function(asset, network){
 document.querySelector(".box").innerHTML = `
 <!-- HEADER -->
@@ -2944,7 +2943,7 @@ line-height:1.6;
   `;
   }
    
-// ================== SUBMIT DEPOSIT ==================//
+// ================== SUBMIT DEPOSIT(Advance Mode)==================//
 window.submitDepositFinal = async function(asset, network){
 const amount = document.getElementById("amount").value;
 const txHash = document.getElementById("txHash").value;
@@ -2972,7 +2971,7 @@ alert("Deposit request sent");
 goDeposit();
 };
 
-// ================== SUBMIT WITHDRAW ==================//
+// ================== SUBMIT WITHDRAW (Advance Mode)==================//
 window.submitWithdrawFinal = async function(asset, network){
 const amount = document.getElementById("amount").value;
 const eoa = document.getElementById("eoa").value.trim();
@@ -3020,9 +3019,6 @@ alert(
 );
 goDeposit();
 };
-
-
-
 
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
