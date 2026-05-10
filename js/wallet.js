@@ -2297,7 +2297,7 @@ function instantWithdrawNetworkCard(asset, name, type, speed, fee){
 }
 
 window.selectInstantNetwork = function(asset, network){
-  const wallet = WALLETS[network] || "Not available";
+  const wallet = WALLETS[asset]?.[network] || "Not available";
   document.querySelector(".box").innerHTML = `
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
     <div onclick="openInstantDeposit('${asset}')" style="
@@ -2590,12 +2590,24 @@ const EXPLORERS = {
 "Polygon PoS": "https://polygonscan.com/address/",
 "Base L2": "https://basescan.org/address/"
 };
-  const WALLETS = {
-  "Ethereum ERC20": "0x0df4862baafc84a681eb6b83848494c673e2298f",
-  "Arbitrum L2": "0xHOT_ARB",
-  "Polygon PoS": "0xHOT_POLY",
-  "Base L2": "0xHOT_BASE",
-  "Tron TRC20": "TXYZ_HOT_TRON"
+  
+const WALLETS = {
+USDT: {
+"Ethereum ERC20": "0x0df4862baafc84a681eb6b83848494c673e2298f",
+"Arbitrum L2": "0xUSDT_ARB",
+"Polygon PoS": "0xUSDT_POLY",
+"Base L2": "0xUSDT_BASE",
+"Tron TRC20": "TUSDT_TRON"
+},
+
+USDC: {
+"Ethereum ERC20": "0xUSDC_ETH",
+"Arbitrum L2": "0xUSDC_ARB",
+"Polygon PoS": "0xUSDC_POLY",
+"Base L2": "0xUSDC_BASE",
+"Tron TRC20": "TUSDC_TRON"
+}
+
 };
 // ================= OPEN FUNCTIONS =================
 function networkCard(asset, name, type, speed, fee){
