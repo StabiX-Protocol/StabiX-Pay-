@@ -2997,6 +2997,12 @@ window.submitWithdrawFinal = async function(asset, network){
   const amount = document.getElementById("amount").value;
   const eoa = document.getElementById("eoa").value;
 
+const balance = Number(userData.balances?.[asset] || 0);
+if(Number(amount) > balance){
+  alert("Insufficient Balance");
+  return;
+}
+  
   if(!amount || !eoa){
     alert("Fill all fields");
     return;
