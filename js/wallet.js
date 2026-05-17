@@ -1425,256 +1425,74 @@ cursor:pointer;
 opacity:0.7;
 ">← Back</div>
 
-<div style="font-size:18px;font-weight:600;margin-bottom:20px;">
-About
-</div>
 <div style="
-font-size:15px;
-font-weight:600;
-margin-bottom:8px;
+background:#0b1220;
+padding:16px;
+border-radius:16px;
+border:1px solid rgba(255,255,255,0.06);
+line-height:1.7;
 ">
-What is StabiX?
-</div>
+
 <div style="
-font-size:13px;
-opacity:0.8;
-line-height:1.6;
+font-size:20px;
+font-weight:700;
+margin-bottom:12px;
+">
+About StabiX
+</div>
+
+<div style="
+font-size:14px;
+opacity:0.9;
 margin-bottom:18px;
 ">
-StabiX is a non-custodial payment and vault system designed to enable fast, low-cost stablecoin transactions with minimal complexity. It allows users to deposit assets on-chain while maintaining a simplified off-chain balance experience.
-The system is built to support instant transfers and microtransactions without relying on traditional custodial infrastructure, giving users full control over their funds at all times.
+StabiX is a stablecoin payment and transfer protocol built to simplify blockchain transactions and remove the complexity that normally comes with crypto payments. Unlike traditional blockchain transfers that often require wallet popups, gas fees, network switching, confirmations, and long settlement times, StabiX combines custodial, non-custodial, and off-chain settlement systems to make transactions faster, smoother, and easier to use. The protocol supports both instant transfers and advanced vault based transaction flows across multiple blockchain networks, allowing users to send and receive stablecoins with minimal friction while still interacting with blockchain backed infrastructure. StabiX is designed for fast digital payments, simplified stablecoin usage, reduced transaction delays, and a more practical user experience without unnecessary blockchain complexity. Protocol transactions are free for users, and the system is built with security focused transaction handling, vault architecture, request validation flows,merkle roots and blockchain verification mechanisms.
 </div>
 
 <div style="
-font-size:15px;
-font-weight:600;
-margin-bottom:8px;
-">
-Problem StabiX Solves
-</div>
-
-<div style="
-font-size:13px;
-opacity:0.8;
-line-height:1.6;
+font-size:14px;
 margin-bottom:18px;
 ">
-  Stablecoin transactions are reliable but still depend on blockchain-level execution for every transfer. This introduces delays, repeated gas costs, and multiple steps such as network selection, confirmations, and manual interaction.
-For frequent usage, microtransactions, or everyday payments, this model becomes inefficient. Users are required to pay network fees repeatedly and wait for confirmations, even for small-value transfers.
-StabiX addresses these limitations by abstracting repetitive blockchain interactions into a simplified system. Once assets are deposited on-chain, users can perform instant transfers within StabiX without paying gas fees for each action.
-This enables a smoother experience for microtransactions, high-frequency usage, and real-time payments, while still maintaining a non-custodial structure backed by on-chain verification.
+Detailed technical architecture, protocol systems, and infrastructure information are available in the official StabiX Whitepaper.
 </div>
 
-<div style="
-font-size:15px;
-font-weight:600;
-margin-bottom:8px;
-">
-How StabiX Works
-</div>
-
-<div style="
+<a href="https://your-whitepaper-link.com" target="_blank" style="
+display:inline-block;
+padding:10px 14px;
+border-radius:10px;
+background:#3b82f6;
+color:white;
+text-decoration:none;
 font-size:13px;
-opacity:0.8;
-line-height:1.6;
+font-weight:600;
 margin-bottom:18px;
 ">
-StabiX combines on-chain asset custody with an off-chain execution layer to deliver instant, efficient transactions while maintaining verifiable ownership.
-
-<br><br>
-<b>1. Deposit (On-Chain Lock)</b><br>
-Users initiate the process by sending stablecoins (such as USDT or USDC) to a designated vault address on a supported blockchain network. This transaction is executed entirely on-chain and remains fully verifiable through public blockchain explorers.
-Once the transaction is confirmed, the deposited assets are effectively locked within the vault smart contract.
-
-<br><br>
-<b>2. Balance Minting (Off-Chain Representation)</b><br>
-After successful verification of the deposit transaction, StabiX mints an equivalent balance within its system. This minted balance represents the user's claim on the locked assets.
-This step eliminates the need for repeated blockchain interaction, allowing users to operate within StabiX instantly without incurring gas fees for every action.
-
-<br><br>
-<b>3. Instant Transactions (Off-Chain Execution)</b><br>
-Once funds are minted, users can perform transfers instantly within the StabiX environment. These transactions do not require on-chain confirmations and are executed in real-time.
-This makes StabiX particularly efficient for microtransactions and high-frequency usage, where traditional blockchain interactions would otherwise introduce delays and repeated costs.
-
-<br><br>
-<b>4. Withdrawal Request (Balance Burn)</b><br>
-When a user initiates a withdrawal, the corresponding amount is permanently burned from their StabiX balance. This ensures that the off-chain representation always remains fully backed by the locked on-chain assets.
-
-<br><br>
-<b>5. Merkle-Based Claim (On-Chain Redemption)</b><br>
-Withdrawal requests are processed in batches, where a validator aggregates requests and generates a Merkle root. Each user receives a unique proof (leaf) corresponding to their withdrawal.
-Using this proof, the user can independently claim their funds directly from the vault smart contract using their own wallet.
-
-<br><br>
-<b>6. Final Settlement</b><br>
-The withdrawal is completed entirely on-chain, ensuring that users regain full custody of their assets without reliance on intermediaries.
-This architecture ensures that while StabiX enables instant and efficient transactions off-chain, the final ownership and settlement always remain verifiable and enforceable on-chain.
-</div>
+View Whitepaper
+</a>
 
 <div style="
-font-size:15px;
-font-weight:600;
-margin-bottom:8px;
-">
-Non-Custodial Architecture
-</div>
-
-<div style="
+border-top:1px solid rgba(255,255,255,0.06);
+padding-top:14px;
 font-size:13px;
-opacity:0.8;
-line-height:1.6;
-margin-bottom:18px;
+line-height:1.7;
+opacity:0.78;
 ">
-StabiX is designed as a non-custodial system where users retain full ownership and control over their funds at all times.
 
-<br><br>
-Unlike traditional platforms that hold and manage user balances, StabiX does not have direct access to user assets. All deposited funds are secured within on-chain vault smart contracts, and can only be accessed using valid cryptographic proofs and the user's private key.
+<b style="font-size:15px;opacity:1;">Founder</b><br><br>
 
-<br><br>
-<b>No Direct Control Over Funds</b><br>
-StabiX cannot move, withdraw, or freeze user funds. There is no mechanism that allows the system or its operators to access assets inside the vault.
+StabiX is founded and developed by <b>Sumedh Dabhade</b>, focused on building faster, simpler, and more practical stablecoin payment infrastructure by reducing blockchain complexity, transaction friction, wallet popup dependency, gas fee overhead, and settlement delays while keeping digital payments more accessible for everyday users.<br><br>
 
-<br><br>
-<b>User-Executed Withdrawals</b><br>
-Withdrawals are not processed by StabiX on behalf of the user. Instead, users must claim their funds themselves using a valid Merkle proof (Leaf) generated after validator submission.
-
-<br><br>
-<b>Private Key Ownership</b><br>
-Only the holder of the correct private key can execute the withdrawal transaction. Without the user's private key, no entity including StabiX can access the funds.
-
-<br><br>
-<b>Trust-Minimized System</b><br>
-The architecture eliminates the need to trust a centralized custodian. Security is enforced through smart contracts and cryptographic verification rather than platform control.
-
-<br><br>
-This approach ensures that StabiX functions as an execution layer rather than a custodian, giving users full sovereignty over their assets while still benefiting from instant off-chain transactions.
-</div>
-
-<div style="
-font-size:15px;
+<a href="https://x.com/SumedhDabhade10" target="_blank" style="
+color:#60a5fa;
+text-decoration:none;
 font-weight:600;
-margin-bottom:8px;
 ">
-Withdrawal Process & User Responsibility
+@SumedhDabhade10
+</a>
+
 </div>
 
-<div style="
-font-size:13px;
-opacity:0.8;
-line-height:1.6;
-margin-bottom:18px;
-">
-Withdrawals in StabiX follow a structured process involving balance burn, batch processing, and Merkle-based claim execution. Users must understand and correctly follow each step.
 
-<br><br>
-<b>1. Balance Burn on Withdrawal Request</b><br>
-When a withdrawal is submitted, the specified amount is permanently burned from the user’s StabiX balance. This action is irreversible and ensures that the off-chain balance remains fully backed by on-chain assets.
-
-<br><br>
-<b>2. Batch Processing & Merkle Root Generation</b><br>
-All withdrawal requests are grouped and processed in batches. A validator generates a Merkle root from these requests, and each user receives a unique proof (Leaf) corresponding to their withdrawal details.
-
-<br><br>
-<b>3. Fixed Recipient (EOA Binding)</b><br>
-The withdrawal is strictly bound to the EOA wallet address provided at the time of submission. The Merkle leaf is generated using this exact address.
-This means:
-
-<div style="margin-left:10px; line-height:1.6;">
-<div>• Funds can only be claimed by the same EOA</div>
-<div>• Changing the address later is not possible</div>
-<div>• If an incorrect address is submitted, funds cannot be recovered</div>
-</div>
-
-<br><br>
-<b>4. Claim Window (Time-Limited Execution)</b><br>
-Once the Merkle root is published, users have a limited time window (up to <b>24 hours</b>) to claim their funds using the provided Leaf.
-If the withdrawal is not executed within this period:
-
-<div style="margin-left:10px;">
-<div>• The Leaf will expire</div>
-<div>• The withdrawal becomes invalid</div>
-<div>• The burned balance will not be restored</div>
-</div>
-
-<br><br>
-<b>5. User-Executed Withdrawal</b><br>
-StabiX does not transfer funds automatically. Users must manually execute the withdrawal from the vault smart contract using their own wallet and private key.
-Only the wallet (EOA) used during submission can successfully complete this process.
-
-<br><br>
-<b>6. No System Access to Funds</b><br>
-StabiX does not have the ability to withdraw, redirect, or access user funds. The system cannot override wallet ownership or execute withdrawals on behalf of users.
-Fund access is strictly controlled by:
-
-<div style="margin-left:10px; line-height:1.6;">
-<div>• The correct EOA wallet</div>
-<div>• The valid Merkle proof (Leaf)</div>
-<div>• The user’s private key</div>
-</div>
-
-<br><br>
-<b>7. User Responsibility</b><br>
-Users are fully responsible for:
-
-<div style="margin-left:10px; line-height:1.6;">
-<div>• Entering the correct EOA wallet address</div>
-<div>• Providing accurate withdrawal amount</div>
-<div>• Monitoring notifications for Leaf availability</div>
-<div>• Executing withdrawal within the valid time window</div>
-</div>
-
-<div style="margin-top:6px;">
-  Any incorrect input or failure to complete the process may result in permanent loss of funds.
-</div>
-      
-</div>
-
-<div style="
-font-size:15px;
-font-weight:600;
-margin-bottom:8px;
-">
-Vision
-</div>
-<div style="
-font-size:13px;
-opacity:0.8;
-line-height:1.6;
-margin-bottom:18px;
-">
-StabiX is designed to bridge the gap between blockchain security and real world usability by combining on-chain asset custody with instant off-chain execution.
-
-<br><br>
-The goal is to enable a system where users can move value instantly, without being limited by network delays, repeated fees, or complex transaction flows, while still retaining full control over their assets.
-
-<br><br>
-By removing unnecessary blockchain interactions and introducing a streamlined execution layer, StabiX makes stablecoin usage more practical for everyday payments, microtransactions, and high frequency activity.
-
-<br><br>
-At its core, StabiX is not built to replace blockchains, but to enhance how users interact with them reducing friction while preserving transparency, security, and self-custody.
-
-<br><br>
-The long term vision is to create a scalable, efficient, and trust-minimized financial layer where users can operate seamlessly across networks without compromising ownership or control.
-</div>
-
-<div style="
-font-size:15px;
-font-weight:600;
-margin-bottom:8px;
-">
-Founder
-</div>
-<div style="
-font-size:13px;
-opacity:0.8;
-line-height:1.6;
-margin-bottom:18px;
-">
-<b>Sumedh Dabhade</b><br><br>
-StabiX is developed by Sumedh Dabhade, focused on building efficient and practical non-custodial financial systems.
-The project is driven by a goal to simplify blockchain interactions while preserving user ownership, transparency, and security.
-StabiX reflects an approach centered on reducing friction in digital payments without compromising the core principles of decentralization.
-</div>
 `;
 };
 /* ================= Setting Navigation Finish================= */
