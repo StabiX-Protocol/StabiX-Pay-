@@ -985,12 +985,18 @@ appDiv(html);
 window.listenNotifications = function(){
 const q = query(
 collection(db, "notifications"),
-where("to", "==", WALLET),
-where("read", "==", false),
-where("type", "==", "validator")
+where("to", "==", WALLET)
 );
 onSnapshot(q, (snap) => {
-const count = snap.size;
+const now = Date.now();
+const count = snap.docs.filter(docSnap => {
+const d = docSnap.data();
+if(!d.time) return false;
+if(d.read) return false;
+const t = d.time.seconds * 1000;
+const unreadLimit = 7 * 24 * 60 * 60 * 1000;
+return (now - t) < unreadLimit;
+}).length;
 updateNotif(count);
 });
 };
