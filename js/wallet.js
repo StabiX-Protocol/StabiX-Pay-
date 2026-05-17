@@ -1480,7 +1480,7 @@ opacity:0.78;
 
 <b style="font-size:15px;opacity:1;">Founder</b><br><br>
 
-StabiX is founded and developed by <b>Sumedh Dabhade</b>, focused on building faster, simpler, and more practical stablecoin payment infrastructure by reducing blockchain complexity, transaction friction, wallet popup dependency, gas fee overhead, and settlement delays while keeping digital payments more accessible for everyday users.<br><br>
+StabiX is developed by <b style="color:#22c55e;">Sumedh Dabhade</b>, focused on building faster, simpler, and more practical stablecoin payment infrastructure by reducing blockchain complexity, transaction friction, wallet popup dependency, gas fee overhead, and settlement delays while keeping digital payments more accessible for everyday users.<br><br>
 
 <a href="https://x.com/SumedhDabhade10" target="_blank" style="
 color:#60a5fa;
