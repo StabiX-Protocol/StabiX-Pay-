@@ -1266,16 +1266,11 @@ selectTab("deposit");
 };
 
 window.selectDWAsset = (asset) => {
-  window.selectedDWAsset = asset;
-
-  document.getElementById("dwAssets").style.display = "none";
-  document.getElementById("actionScreen").style.display = "block";
-
-  document.getElementById("selectedAssetText").innerText = asset;
+window.selectedDWAsset = asset;
+document.getElementById("dwAssets").style.display = "none";
+document.getElementById("actionScreen").style.display = "block";
+document.getElementById("selectedAssetText").innerText = asset;
 };
-
-
-
 
 window.goHistory = () => {
 document.querySelector(".box").innerHTML = `
@@ -1336,12 +1331,6 @@ loadHistoryByDate();
 setTimeout(setupHistorySearch, 100);
 selectTab("history");
 };
-
-
-
-
-
-
 
 /* ================= Setting Navigation ================= */
 window.goSettings = () => {
@@ -1498,17 +1487,9 @@ font-weight:600;
 
 </div>
 
-
 `;
 };
 /* ================= Setting Navigation Finish================= */
-
-
-
-
-
-
-
 
 window.selectTab = function(tab){
 ["home","deposit","history","settings"].forEach(t=>{
@@ -1813,7 +1794,6 @@ return /^T[a-zA-Z0-9]{33}$/.test(addr);
 }
 return false;
 };
-
 
 window.selectDWAsset = (asset) => {
 window.MODE = null;
