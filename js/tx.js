@@ -35,7 +35,7 @@ let failed = false;
 try{
 document.getElementById("sendPopup")?.remove();
 await runTransaction(db, async(tx)=>{
-  const str = await generateSTR();
+const str = await generateSTR();
 const fromSnap = await tx.get(userRef);
 const toRef = doc(db,"users",toWallet);
 const toSnap = await tx.get(toRef);
@@ -65,7 +65,7 @@ type:"sent",
 amount,
 asset,
 counterparty:toWallet,
-  str: str,
+str: str,
 createdAt:serverTimestamp()
 });
 tx.set(doc(collection(db,"transactions")),{
@@ -74,7 +74,7 @@ type:"received",
 amount,
 asset,
 counterparty:WALLET,
-  str: str,
+str: str,
 createdAt:serverTimestamp()
 });
 });
@@ -557,6 +557,7 @@ tx.set(doc(collection(db,"transactions")),{
 userId: r.userId,
 type: r.type,
 amount: r.amount,
+str: r.str,
 asset: asset,
 counterparty: null,
 eoa: r.eoa || null,
