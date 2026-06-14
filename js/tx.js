@@ -477,6 +477,7 @@ User ID: ${r.userId}<br>
 Wallet: ${r.wallet || r.eoa || "N/A"}<br>
 Network: ${r.network || "N/A"}<br>
 Mode: ${r.mode || "advanced"}<br>
+STR: ${r.str || "N/A"}<br>
 ${r.txHash ? `Tx Hash: ${r.txHash}<br>` : ""}
 Time: ${time}
 </span>
