@@ -331,6 +331,15 @@ color:#9ca3af;">
 ${t.createdAt?.toDate().toLocaleString() || "-"}
 </div>
 
+<div style="
+margin-top:8px;
+font-size:12px;
+color:#60a5fa;
+font-weight:600;
+word-break:break-all;">
+STR: ${t.str || "-"}
+</div>
+
 </div>
 
 <div style="margin:20px 0;height:1px;background:rgba(255,255,255,0.08);"></div>
