@@ -1,3 +1,22 @@
+async function generateSTR(){
+
+  const systemRef = doc(db, "settings", "system");
+
+  return await runTransaction(db, async (tx)=>{
+
+    const snap = await tx.get(systemRef);
+
+    const nextSTR = snap.data().nextSTR || 1;
+
+    tx.update(systemRef,{
+      nextSTR: nextSTR + 1
+    });
+
+    return "STR" + String(nextSTR).padStart(12,"0");
+
+  });
+
+}
 /* ================= SEND USDC/USDT ================= */
 window.sendUSDC = async ()=>{
 const asset = window.primaryAsset;
@@ -16,6 +35,7 @@ let failed = false;
 try{
 document.getElementById("sendPopup")?.remove();
 await runTransaction(db, async(tx)=>{
+  const str = await generateSTR();
 const fromSnap = await tx.get(userRef);
 const toRef = doc(db,"users",toWallet);
 const toSnap = await tx.get(toRef);
@@ -45,6 +65,7 @@ type:"sent",
 amount,
 asset,
 counterparty:toWallet,
+  str: str,
 createdAt:serverTimestamp()
 });
 tx.set(doc(collection(db,"transactions")),{
@@ -53,6 +74,7 @@ type:"received",
 amount,
 asset,
 counterparty:WALLET,
+  str: str,
 createdAt:serverTimestamp()
 });
 });
