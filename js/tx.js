@@ -628,7 +628,7 @@ const done = document.getElementById("txDoneBtn")
 popup.style.display="flex"
 msgBox.innerText = msg
   strBox.innerText = window.currentSTR
-  ? `STR: ${window.currentSTR}`
+  ? `STR ID : ${window.currentSTR}`
   : "";
 done.style.display="none"
 const timeBox = document.getElementById("txTime")
