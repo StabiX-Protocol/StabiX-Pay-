@@ -17,6 +17,7 @@ async function generateSTR(){
   });
 
 }
+window.generateSTR = generateSTR;
 /* ================= SEND USDC/USDT ================= */
 window.sendUSDC = async ()=>{
 const asset = window.primaryAsset;
