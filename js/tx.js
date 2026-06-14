@@ -337,7 +337,7 @@ font-size:12px;
 color:#60a5fa;
 font-weight:600;
 word-break:break-all;">
-STR: ${t.str || "-"}
+STR ID : ${t.str || "-"}
 </div>
 
 </div>
