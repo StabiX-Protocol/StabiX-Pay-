@@ -314,8 +314,20 @@ ${t.amount} ${t.asset || "USDT"}
 margin-top:6px;
 font-size:15px;
 font-weight:600;
-color:${t.type === "deposit" ? "#22c55e" : "#ef4444"};">
-${t.type === "deposit" ? "Received" : "Withdraw"}
+color:${
+  t.type === "deposit" || t.type === "received"
+    ? "#22c55e"
+    : "#ef4444"
+};">
+${t.type === "deposit"
+ ? "Deposit"
+ : t.type === "withdraw"
+ ? "Withdraw"
+ : t.type === "received"
+ ? "Received"
+ : t.type === "sent"
+ ? "Sent"
+ : t.type}
 </div>
 
 <div style="
