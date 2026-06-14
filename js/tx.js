@@ -618,6 +618,7 @@ if(!window.isSender) return;
 const popup = document.getElementById("txPopup")
 const title = document.getElementById("txTitle")
 const msgBox = document.getElementById("txMsg")
+const strBox = document.getElementById("txSTR")
 const tick = document.getElementById("tick")
 const cross1 = document.getElementById("crossLine1")
 const cross2 = document.getElementById("crossLine2")
