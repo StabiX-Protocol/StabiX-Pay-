@@ -36,6 +36,7 @@ try{
 document.getElementById("sendPopup")?.remove();
 await runTransaction(db, async(tx)=>{
 const str = await generateSTR();
+window.currentSTR = str;
 const fromSnap = await tx.get(userRef);
 const toRef = doc(db,"users",toWallet);
 const toSnap = await tx.get(toRef);
