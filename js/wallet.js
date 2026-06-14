@@ -2293,7 +2293,7 @@ Withdraw
 window.submitInstantDeposit = async function(asset, network){
 const amount = document.getElementById("amount").value.trim();
 const txHash = document.getElementById("txHash").value.trim();
-const str = await generateSTR();
+const str = await window.generateSTR();
 const eoa = document.getElementById("eoa").value.trim();
 
 if(!amount || !txHash || !eoa){
@@ -2336,7 +2336,7 @@ goDeposit();
 window.submitInstantWithdraw = async function(asset, network){
 const to = document.getElementById("eoa").value.trim();
 const amount = document.getElementById("amount").value;
-const str = await generateSTR();
+const str = await window.generateSTR();
 if(!to || !amount){
 alert("Missing fields");
 return;
@@ -2756,7 +2756,7 @@ window.submitDepositFinal = async function(asset, network){
 const amount = document.getElementById("amount").value;
 const txHash = document.getElementById("txHash").value;
 const eoa = document.getElementById("eoa").value;
-const str = await generateSTR();
+const str = await window.generateSTR();
 if(!amount || !txHash || !eoa){
 alert("Fill all fields");
 return;
@@ -2785,7 +2785,7 @@ goDeposit();
 window.submitWithdrawFinal = async function(asset, network){
 const amount = document.getElementById("amount").value;
 const eoa = document.getElementById("eoa").value.trim();
-const str = await generateSTR();
+const str = await window.generateSTR();
 if(!amount || !eoa){
 alert("Missing fields");
 return;
