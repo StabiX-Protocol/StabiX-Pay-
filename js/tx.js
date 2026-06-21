@@ -12,8 +12,9 @@ async function generateSTR(){
       nextSTR: nextSTR + 1
     });
 
-    return "STR" + String(nextSTR).padStart(12,"0");
+    const random = Math.floor(1000000000 + Math.random() * 9000000000);
 
+    return "STR" + "10" + random.toString();
   });
 
 }
