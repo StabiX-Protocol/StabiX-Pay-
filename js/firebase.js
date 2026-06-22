@@ -1,3 +1,4 @@
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 
 import {
@@ -29,6 +30,7 @@ appId: "1:351361221507:web:ebaf0d15e86d4b184c6cb6"
 
 const appFB = initializeApp(firebaseConfig);
 window.db = getFirestore(appFB);
+window.rtdb = getDatabase(appFB);
 enableIndexedDbPersistence(db).catch(()=>{});
 
 window.doc = doc;
