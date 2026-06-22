@@ -900,7 +900,11 @@ if(!snap.exists()){
 alert("Session expired");
 return;
 }
-renderApp(); 
+const user = snap.data();
+document.getElementById("usdcBalance").innerText =
+user.balance || 0;
+document.getElementById("usdtBalance").innerText =
+user.usdtBalance || 0;
 }catch(e){
 alert("Refresh failed");
 }
