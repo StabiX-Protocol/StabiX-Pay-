@@ -19,7 +19,6 @@ import {
   query,
   where,
   orderBy,
-  onSnapshot,
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 /* ================= USERNAME CHANGE (30 DAYS) ================= */
@@ -986,12 +985,12 @@ html += `</div>`;
 appDiv(html);
 };
 
-window.listenNotifications = function(){
+window.listenNotifications = async function(){
 const q = query(
 collection(db, "notifications"),
 where("to", "==", WALLET)
 );
-onSnapshot(q, (snap) => {
+const snap = await getDocs(q);
 const now = Date.now();
 const count = snap.docs.filter(docSnap => {
 const d = docSnap.data();
@@ -1002,7 +1001,7 @@ const unreadLimit = 7 * 24 * 60 * 60 * 1000;
 return (now - t) < unreadLimit;
 }).length;
 updateNotif(count);
-});
+};
 };
 
 function updateNotif(count){
