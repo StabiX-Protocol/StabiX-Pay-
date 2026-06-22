@@ -1002,7 +1002,6 @@ return (now - t) < unreadLimit;
 }).length;
 updateNotif(count);
 };
-};
 
 function updateNotif(count){
 const el = document.getElementById("notifCount");
