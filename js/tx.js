@@ -19,6 +19,38 @@ async function generateSTR(){
 
 }
 window.generateSTR = generateSTR;
+
+import {
+  ref,
+  push,
+  set,
+  get
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+
+async function updateLiveFeed(txData){
+
+  const liveRef = ref(window.rtdb, "liveFeed");
+  const statsRef = ref(window.rtdb, "stats");
+
+  await push(liveRef, {
+    str: txData.str,
+    amount: txData.amount,
+    asset: txData.asset,
+    time: new Date().toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit"
+    })
+  });
+
+  const statsSnap = await get(statsRef);
+  const stats = statsSnap.exists() ? statsSnap.val() : {};
+
+  await set(statsRef,{
+    totalTx: (stats.totalTx || 0) + 1,
+    totalVolume: (stats.totalVolume || 0) + Number(txData.amount || 0)
+  });
+
+}
 /* ================= SEND USDC/USDT ================= */
 window.sendUSDC = async ()=>{
 const asset = window.primaryAsset;
@@ -84,7 +116,12 @@ createdAt:serverTimestamp()
 if(!failed){
 if(window.isSender){
 showTxPopup(`Sent ${amount} ${asset} to ${toWallet}`, "success");
-}
+} 
+  await updateLiveFeed({
+  str: window.currentSTR,
+  amount,
+  asset
+});
 renderApp();
 window.isSender = false;
 }
@@ -468,6 +505,11 @@ counterparty: null,
 eoa: eoa,
 createdAt: new Date()
 });
+ await updateLiveFeed({
+  str: "MANUAL",
+  amount,
+  asset
+});
 alert(asset + " updated")
 }
 
@@ -588,6 +630,11 @@ counterparty: null,
 eoa: r.eoa || null,
 createdAt: serverTimestamp()
 });
+});
+await updateLiveFeed({
+  str: r.str,
+  amount: r.amount,
+  asset: asset
 });
 alert("Request approved");
 loadRequests();
