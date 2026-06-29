@@ -1678,13 +1678,6 @@ StabiX reflects an approach centered on reducing friction in digital payments wi
 };
 /* ================= Setting Navigation Finish================= */
 
-
-
-
-
-
-
-
 window.selectTab = function(tab){
 ["home","deposit","history","settings"].forEach(t=>{
 const el = document.getElementById("tab-"+t);
@@ -2073,17 +2066,17 @@ selectDWAsset(asset);
 }
 // ================== VAULT CONFIG (COMMON) ==================
 const VAULTS = {
-"Ethereum ERC20": "0x0201B73BA3d4a43012c84B871c7d5332E176ffcc",
-"Arbitrum L2": "0xARB_VAULT",
-"Polygon PoS": "0xPOLY_VAULT",
-"Base L2": "0xBASE_VAULT",
-"Tron TRC20": "TXYZ_TRON_VAULT"
+"Ethereum (Sepolia)": "0x4F43855026a64afCf594d16fDF0713D262C81ee3",
+"Arbitrum (Sepolia)": "0xARB_VAULT",
+"Polygon (Amoy)": "0xPOLY_VAULT",
+"Base (Sepolia)": "0xBASE_VAULT",
+"Tron (Nile Testnet)": "TXYZ_TRON_VAULT"
 };
 const EXPLORERS = {
-"Ethereum ERC20": "https://etherscan.io/address/",
-"Arbitrum L2": "https://arbiscan.io/address/",
-"Polygon PoS": "https://polygonscan.com/address/",
-"Base L2": "https://basescan.org/address/"
+"Ethereum Sepolia": "https://etherscan.io/address/",
+"Arbitrum Sepolia": "https://arbiscan.io/address/",
+"Polygon Amoy": "https://polygonscan.com/address/",
+"Base Sepolia": "https://basescan.org/address/"
 };
 // ================= OPEN FUNCTIONS =================
 function networkCard(asset, name, type, speed, fee){
@@ -2133,10 +2126,10 @@ Select Network
 </div>
 <!-- NETWORK LIST -->
 <div style="display:flex;flex-direction:column;gap:12px;">
-${networkCard(asset,"Ethereum","ERC20","~2 min","$5 fee")}
-${networkCard(asset,"Arbitrum","L2","~10 sec","Low fee")}
-${networkCard(asset,"Polygon","PoS","~5 sec","Very low")}
-${networkCard(asset,"Base","L2","~5 sec","Low fee")}
+${networkCard(asset,"Ethereum","Sepolia","~2 min","$5 fee")}
+${networkCard(asset,"Arbitrum","Sepolia","~10 sec","Low fee")}
+${networkCard(asset,"Polygon","Amoy","~5 sec","Very low")}
+${networkCard(asset,"Base","Sepolia","~5 sec","Low fee")}
 </div>
 `;
 }
@@ -2354,10 +2347,10 @@ Select Network
 </div>
 </div>
 <div style="display:flex;flex-direction:column;gap:12px;">
-${networkCardWithdraw(asset,"Ethereum","ERC20","~2 min","$5")}
-${networkCardWithdraw(asset,"Arbitrum","L2","~10 sec","Low")}
-${networkCardWithdraw(asset,"Polygon","PoS","~5 sec","Very low")}
-${networkCardWithdraw(asset,"Base","L2","~5 sec","Low")}
+${networkCardWithdraw(asset,"Ethereum","Sepolia","~2 min","$5")}
+${networkCardWithdraw(asset,"Arbitrum","Sepolia","~10 sec","Low")}
+${networkCardWithdraw(asset,"Polygon","Amoy","~5 sec","Very low")}
+${networkCardWithdraw(asset,"Base","Sepolia","~5 sec","Low")}
 </div>
 `;
 };
@@ -2502,9 +2495,6 @@ pendingRequest: true
 alert("Withdraw request submitted. Batching in progress. You will receive Merkle proof soon.");
 goDeposit();
 };
-
-
-
 
  /* ================= VALIDATOR PANEL ================= */
 function validatorPanel(){
