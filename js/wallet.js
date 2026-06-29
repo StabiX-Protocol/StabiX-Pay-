@@ -2282,7 +2282,7 @@ style="width:100%;margin-bottom:15px;">
 width:100%;
 padding:14px;
 border-radius:12px;
-background:#22c55e;
+background:#ef4444;
 color:white;
 font-weight:600;">
 Withdraw
@@ -2687,22 +2687,6 @@ border:1px solid rgba(255,255,255,0.06);
 margin-bottom:10px;">
 <div style="font-size:12px;opacity:0.6;">Network</div>
 <div>${network}</div>
-</div>
-<!-- VAULT -->
-<div style="
-background:#0b1220;
-padding:12px;
-border-radius:12px;
-border:1px solid rgba(255,255,255,0.06);
-margin-bottom:15px;">
-<div style="font-size:12px;opacity:0.6;">Vault Address</div>
-<a href="${EXPLORERS[network]}${vault}" target="_blank" style="
-font-size:13px;
-color:#60a5fa;
-word-break:break-all;
-text-decoration:none;">
-${vault}
-</a>
 </div>
 <!-- INPUT -->
 <input id="eoa" placeholder="Recipient Address" style="width:100%;margin-bottom:10px;">
