@@ -1943,45 +1943,45 @@ selectDWAsset(asset);
 // ================== Instant Mode ==================
 const WALLETS = {
 USDT: {
-"Ethereum ERC20": "0x0df4862baafc84a681eb6b83848494c673e2298f",
-"Arbitrum L2": "0xUSDT_ARB",
-"Polygon PoS": "0xUSDT_POLY",
-"Base L2": "0xUSDT_BASE",
-"Tron TRC20": "TUSDT_TRON"
+"Ethereum (Testnet)": "0x0df4862baafc84a681eb6b83848494c673e2298f",
+"Arbitrum (Testnet)": "0xUSDT_ARB",
+"Polygon (Testnet)": "0xUSDT_POLY",
+"Base (Testnet)": "0xUSDT_BASE",
+"Tron (Testnet)": "TUSDT_TRON"
 },
 
 USDC: {
-"Ethereum ERC20": "0xUSDC_ETH",
-"Arbitrum L2": "0xUSDC_ARB",
-"Polygon PoS": "0xUSDC_POLY",
-"Base L2": "0xUSDC_BASE",
-"Tron TRC20": "TUSDC_TRON"
+"Ethereum (Testnet)": "0xUSDC_ETH",
+"Arbitrum (Testnet)": "0xUSDC_ARB",
+"Polygon (Testnet)": "0xUSDC_POLY",
+"Base (Testnet)": "0xUSDC_BASE",
+"Tron (Testnet)": "TUSDC_TRON"
 }
 };
 
 // ================== Advance Mode ==================
 const VAULTS = {
 USDT: {
-"Ethereum ERC20": "0xUSDT_ETH_VAULT",
-"Arbitrum L2": "0xUSDT_ARB_VAULT",
-"Polygon PoS": "0xUSDT_POLY_VAULT",
-"Base L2": "0xUSDT_BASE_VAULT",
-"Tron TRC20": "TUSDT_TRON_VAULT"
+"Ethereum (Testnet)": "0xUSDT_ETH_VAULT",
+"Arbitrum (Testnet)": "0xUSDT_ARB_VAULT",
+"Polygon (Testnet)": "0xUSDT_POLY_VAULT",
+"Base (Testnet)": "0xUSDT_BASE_VAULT",
+"Tron (Testnet)": "TUSDT_TRON_VAULT"
 },
 
 USDC: {
-"Ethereum ERC20": "0xUSDC_ETH_VAULT",
-"Arbitrum L2": "0xUSDC_ARB_VAULT",
-"Polygon PoS": "0xUSDC_POLY_VAULT",
-"Base L2": "0xUSDC_BASE_VAULT",
-"Tron TRC20": "TUSDC_TRON_VAULT"
+"Ethereum (Testnet)": "0xUSDC_ETH_VAULT",
+"Arbitrum (Testnet)": "0xUSDC_ARB_VAULT",
+"Polygon (Testnet)": "0xUSDC_POLY_VAULT",
+"Base (Testnet)": "0xUSDC_BASE_VAULT",
+"Tron (Testnet)": "TUSDC_TRON_VAULT"
 }
 };
 const EXPLORERS = {
-"Ethereum ERC20": "https://etherscan.io/address/",
-"Arbitrum L2": "https://arbiscan.io/address/",
-"Polygon PoS": "https://polygonscan.com/address/",
-"Base L2": "https://basescan.org/address/"
+"Ethereum (Testnet)": "https://etherscan.io/address/",
+"Arbitrum (Testnet)": "https://arbiscan.io/address/",
+"Polygon (Testnet)": "https://polygonscan.com/address/",
+"Base (Testnet)": "https://basescan.org/address/"
 };
 
 // ================== Instant Mode Flow ==================
@@ -2043,10 +2043,10 @@ Select Network
 </div>
 
 <div style="display:flex;flex-direction:column;gap:12px;">
-${instantNetworkCard(asset, "Ethereum", "ERC20", "~2 min", "$5 fee")}
-${instantNetworkCard(asset, "Arbitrum", "L2", "~10 sec", "Low fee")}
-${instantNetworkCard(asset, "Polygon", "PoS", "~5 sec", "Very low")}
-${instantNetworkCard(asset, "Base", "L2", "~5 sec", "Low fee")}
+${instantNetworkCard(asset, "Ethereum", "(Testnet)", "~2 min", "$5 fee")}
+${instantNetworkCard(asset, "Arbitrum", "(Testnet)", "~10 sec", "Low fee")}
+${instantNetworkCard(asset, "Polygon", "(Testnet)", "~5 sec", "Very low")}
+${instantNetworkCard(asset, "Base", "(Testnet)", "~5 sec", "Low fee")}
 </div>
 `;
 };
@@ -2071,10 +2071,10 @@ Select Network
 </div>
 
 <div style="display:flex;flex-direction:column;gap:12px;">
-${instantWithdrawNetworkCard(asset,"Ethereum","ERC20","eth.png")}
-${instantWithdrawNetworkCard(asset,"Arbitrum","ARB","arb.png")}
-${instantWithdrawNetworkCard(asset,"Polygon","POL","polygon.png")}
-${instantWithdrawNetworkCard(asset,"Base","BASE","base.png")}
+${instantWithdrawNetworkCard(asset,"Ethereum","(Testnet)","eth.png")}
+${instantWithdrawNetworkCard(asset,"Arbitrum","(Testnet)","arb.png")}
+${instantWithdrawNetworkCard(asset,"Polygon","(Testnet)","polygon.png")}
+${instantWithdrawNetworkCard(asset,"Base","(Testnet)","base.png")}
 </div>
 `;
 };
@@ -2408,10 +2408,10 @@ Select Network
 </div>
 <!-- NETWORK LIST -->
 <div style="display:flex;flex-direction:column;gap:12px;">
-${networkCard(asset,"Ethereum","ERC20","~2 min","$5 fee")}
-${networkCard(asset,"Arbitrum","L2","~10 sec","Low fee")}
-${networkCard(asset,"Polygon","PoS","~5 sec","Very low")}
-${networkCard(asset,"Base","L2","~5 sec","Low fee")}
+${networkCard(asset,"Ethereum","(Testnet)","~2 min","$5 fee")}
+${networkCard(asset,"Arbitrum","(Testnet)","~10 sec","Low fee")}
+${networkCard(asset,"Polygon","(Testnet)","~5 sec","Very low")}
+${networkCard(asset,"Base","(Testnet)","~5 sec","Low fee")}
 </div>
 `;
 }
@@ -2654,10 +2654,10 @@ Select Network
 </div>
 </div>
 <div style="display:flex;flex-direction:column;gap:12px;">
-${networkCardWithdraw(asset,"Ethereum","ERC20","~2 min","$5")}
-${networkCardWithdraw(asset,"Arbitrum","L2","~10 sec","Low")}
-${networkCardWithdraw(asset,"Polygon","PoS","~5 sec","Very low")}
-${networkCardWithdraw(asset,"Base","L2","~5 sec","Low")}
+${networkCardWithdraw(asset,"Ethereum","(Testnet)","~2 min","$5")}
+${networkCardWithdraw(asset,"Arbitrum","(Testnet)","~10 sec","Low")}
+${networkCardWithdraw(asset,"Polygon","(Testnet)","~5 sec","Very low")}
+${networkCardWithdraw(asset,"Base","(Testnet)","~5 sec","Low")}
 </div>
 `;
 };
