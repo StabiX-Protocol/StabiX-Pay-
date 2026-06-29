@@ -1962,7 +1962,7 @@ USDC: {
 // ================== Advance Mode ==================
 const VAULTS = {
 USDT: {
-"Ethereum (Testnet)": "0xUSDT_ETH_VAULT",
+"Ethereum (Testnet)": "0x4F43855026a64afCf594d16fDF0713D262C81ee3",
 "Arbitrum (Testnet)": "0xUSDT_ARB_VAULT",
 "Polygon (Testnet)": "0xUSDT_POLY_VAULT",
 "Base (Testnet)": "0xUSDT_BASE_VAULT",
