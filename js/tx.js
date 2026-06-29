@@ -499,6 +499,7 @@ usdtBalance: balance
 await addDoc(collection(db,"transactions"),{
 userId: userId,
 type: type, 
+mode: "manual",
 amount: amount,
 asset: asset,
 counterparty: null,
@@ -627,6 +628,7 @@ status:"approved"
 tx.set(doc(collection(db,"transactions")),{
 userId: r.userId,
 type: r.type,
+mode: r.mode || "instant",
 amount: r.amount,
 str: r.str,
 asset: asset,
