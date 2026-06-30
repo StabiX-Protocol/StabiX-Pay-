@@ -2206,7 +2206,7 @@ background:#22c55e;
 color:black;
 font-weight:600;
 ">
-Submit Deposit
+Deposit
 </button>
 `;
 };
@@ -2501,7 +2501,7 @@ background:#22c55e;
 color:black;
 font-weight:600;
 ">
-Submit Deposit
+Deposit
 </button>
 <div style="
 margin-top:15px;
@@ -2609,7 +2609,7 @@ border-radius:12px;
 background:#ef4444;
 color:white;
 font-weight:600;">
-Submit Withdraw
+Withdraw
 </button>
 </div>
 `;
@@ -2700,7 +2700,7 @@ background:#ef4444;
 color:white;
 font-weight:600;
 ">
-Submit Withdraw
+Withdraw
 </button>
 <div style="
 margin-top:15px;
