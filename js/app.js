@@ -123,17 +123,45 @@ function renderUsernameSetup(){
     `);
 }
 
-window.saveUsername = async ()=>{
-  if(!uname.value.trim()) return alert("Enter username");
+window.saveUsername = async () => {
+  const username = document.getElementById("uname").value.trim().toLowerCase();
+  const password = document.getElementById("signupPwd").value.trim();
+  const confirm = document.getElementById("confirmPwd").value.trim();
 
-  await setDoc(userRef,{
-    username: uname.value.trim(),
+  if (!username || !password || !confirm) {
+    return alert("Fill all fields");
+  }
+
+  if (password.length < 6) {
+    return alert("Password must be at least 6 digits");
+  }
+
+  if (password !== confirm) {
+    return alert("Passwords do not match");
+  }
+
+  const q = query(
+    collection(db, "users"),
+    where("username", "==", username)
+  );
+
+  const existing = await getDocs(q);
+
+  if (!existing.empty) {
+    return alert("Username already taken");
+  }
+
+  await setDoc(userRef, {
+    username,
+    password,
     stbxId: WALLET,
     walletAddress: WALLET,
+    googleUID: localStorage.getItem("stbx_google_uid") || "",
     eoaAddress: "",
     balance: 0,
     usdtBalance: 0,
     pendingRequest: false,
+    lastUsernameChange: serverTimestamp(),
     createdAt: serverTimestamp()
   });
 
