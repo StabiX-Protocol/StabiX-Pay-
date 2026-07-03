@@ -9,15 +9,15 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-if (!getCurrentUserId()) {
-  setCurrentUserId(generateSTBX());
+const googleUID = localStorage.getItem("stbx_google_uid");
+
+if (!googleUID) {
+  renderSetup();
+  throw "";
 }
 
-/* ================= IDENTITY ================= */
-if (!getCurrentUserId()) {
-  const newUID = generateSTBX();
-  setCurrentUserId(newUID);
-}
+window.WALLET = googleUID;
+window.userRef = doc(db, "users", WALLET);
 
 window.WALLET = getCurrentUserId();
 window.userRef = doc(db, "users", WALLET);
