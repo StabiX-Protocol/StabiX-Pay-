@@ -38,7 +38,6 @@ appDiv(`
 <button onclick="googleLogin()">Continue with Google</button>
 </div>
 `);
-}
 selectTab("home");
 }
 
