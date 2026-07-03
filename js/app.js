@@ -13,15 +13,15 @@ if (!getCurrentUserId()) {
   setCurrentUserId(generateSTBX());
 }
 
-/* ================= TELEGRAM ================= */
-const tg = window.Telegram.WebApp;
-tg.ready(); tg.expand();
-const tgUser = tg.initDataUnsafe?.user;
-if(!tgUser?.id){ document.getElementById("app").innerHTML="Telegram user not found"; throw ""; }
 /* ================= IDENTITY ================= */
-window.WALLET = "TG_" + tgUser.id;
-window.userRef = doc(db,"users",WALLET);
-window.validatorRef = doc(db,"validators",String(tgUser.id));
+if (!getCurrentUserId()) {
+  const newUID = generateSTBX();
+  setCurrentUserId(newUID);
+}
+
+window.WALLET = getCurrentUserId();
+window.userRef = doc(db, "users", WALLET);
+window.validatorRef = doc(db, "validators", WALLET);
 /* ================= INIT ================= */
 async function init(){
 const snap = await getDoc(userRef);
