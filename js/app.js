@@ -12,13 +12,22 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const googleUID = localStorage.getItem("stbx_google_uid");
+const stbxUID = getCurrentUserId();
 
 if (!googleUID) {
   renderSetup();
   throw "";
 }
 
-window.WALLET = googleUID;
+if (!stbxUID) {
+  localStorage.clear();
+  renderSetup();
+  throw "";
+}
+
+window.WALLET = stbxUID;
+
+
 window.userRef = doc(db, "users", WALLET);
 window.validatorRef = doc(db,"validators",WALLET);
 /* ================= INIT ================= */
