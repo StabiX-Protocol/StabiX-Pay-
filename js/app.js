@@ -46,7 +46,6 @@ function renderSetup(){
   appDiv(`
     <div class="auth-page">
 
-      <div class="auth-close">✕</div>
 
       <div class="auth-logo">
         <h1>StabiX</h1>
