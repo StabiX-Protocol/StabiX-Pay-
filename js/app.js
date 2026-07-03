@@ -2,28 +2,21 @@ import "./firebase.js"
 import "./wallet.js"
 import "./tx.js"
 import "./auth.js"
-window.appDiv = function(h){document.getElementById("app").innerHTML = h;}
 import {
   doc,
   getDoc,
   setDoc,
   updateDoc,
-  serverTimestamp
+  serverTimestamp,
+  collection,
+  query,
+  where,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
+window.appDiv = function(h){document.getElementById("app").innerHTML = h;}
 const googleUID = localStorage.getItem("stbx_google_uid");
 const stbxUID = getCurrentUserId();
-
-if (!googleUID) {
-  renderSetup();
-  throw "";
-}
-
-if (!stbxUID) {
-  localStorage.clear();
-  renderSetup();
-  throw "";
-}
 
 window.WALLET = stbxUID;
 
@@ -185,6 +178,7 @@ async function manualLogin() {
 
   location.reload();
 }
+window.manualLogin = manualLogin;
 
 window.goHome = function(){
 const send = document.getElementById("sendScreen");
