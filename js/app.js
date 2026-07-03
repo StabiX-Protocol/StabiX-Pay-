@@ -66,7 +66,7 @@ window.saveUsername = async ()=>{
 
   await setDoc(userRef,{
     username: uname.value.trim(),
-    stbxId: generateSTBX(),
+    stbxId: WALLET,
     walletAddress: WALLET,
     eoaAddress: "",
     balance: 0,
