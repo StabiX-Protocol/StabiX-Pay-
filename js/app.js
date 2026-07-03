@@ -8,6 +8,11 @@ import {
   updateDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+if (!getCurrentUserId()) {
+  setCurrentUserId(generateSTBX());
+}
+
 /* ================= TELEGRAM ================= */
 const tg = window.Telegram.WebApp;
 tg.ready(); tg.expand();
