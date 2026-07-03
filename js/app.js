@@ -1,6 +1,7 @@
 import "./firebase.js"
 import "./wallet.js"
 import "./tx.js"
+import "./auth.js"
 window.appDiv = function(h){document.getElementById("app").innerHTML = h;}
 import {
   doc,
