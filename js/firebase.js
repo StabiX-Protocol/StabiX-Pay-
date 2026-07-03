@@ -30,6 +30,7 @@ databaseURL: "https://stabix-backend-v1-default-rtdb.asia-southeast1.firebasedat
 };
 
 const appFB = initializeApp(firebaseConfig);
+window.appFB = appFB;
 window.db = getFirestore(appFB);
 window.rtdb = getDatabase(appFB);
 enableIndexedDbPersistence(db).catch(()=>{});
