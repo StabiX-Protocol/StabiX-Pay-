@@ -16,20 +16,20 @@ const stbxUID = getCurrentUserId();
 
 if (!googleUID) {
   renderSetup();
-  throw "";
+  return;
 }
 
 if (!stbxUID) {
   localStorage.clear();
   renderSetup();
-  throw "";
+  return;
 }
 
 window.WALLET = stbxUID;
 
 
-window.userRef = doc(db, "users", WALLET);
-window.validatorRef = doc(db,"validators",WALLET);
+window.userRef = doc(db,"users", window.WALLET);
+window.validatorRef = doc(db,"validators", window.WALLET);
 /* ================= INIT ================= */
 async function init(){
   const snap = await getDoc(userRef);
