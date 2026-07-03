@@ -207,5 +207,13 @@ if(amount) amount.style.display = "none";
 if(confirm) confirm.style.display = "none";
 };
 /* ================= UTIL ================= */
+async function init() {
+  const snap = await getDoc(userRef);
 
-init();
+  if (!snap.exists()) {
+    renderSignup();
+    return;
+  }
+
+  renderApp();
+}
