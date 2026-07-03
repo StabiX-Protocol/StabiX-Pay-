@@ -560,14 +560,14 @@ let html = "";
 snap.forEach(d=>{
 const u = d.data();
 const username = u.username ? u.username : "No username";
-const tgWallet = u.walletAddress ? u.walletAddress : d.id;
+const stbxId = u.walletAddress ? u.walletAddress : d.id;
 const eoa = u.eoaAddress ? u.eoaAddress : "Not added";
   
 html += `
 <div class="tx">
 <b>${username}</b><br>
 <span class="small">
-TG: ${tgWallet}
+StabiX ID: ${stbxId}
 </span><br>
 <span class="small">
 EOA: ${eoa}
