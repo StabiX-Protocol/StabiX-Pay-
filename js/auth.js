@@ -23,7 +23,9 @@ window.googleLogin = async () => {
     }
 
     location.reload();
+
   } catch (e) {
+    console.log("Google Login Error:", e);
     alert(e.message);
   }
 };
