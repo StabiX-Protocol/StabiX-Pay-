@@ -30,17 +30,6 @@ window.WALLET = stbxUID;
 
 window.userRef = doc(db,"users", window.WALLET);
 window.validatorRef = doc(db,"validators", window.WALLET);
-/* ================= INIT ================= */
-async function init() {
-  const snap = await getDoc(userRef);
-
-  if (!snap.exists()) {
-    renderSignup();
-    return;
-  }
-
-  renderApp();
-}
 /* ================= SETUP ================= */
 function renderSetup(){
   appDiv(`
@@ -167,16 +156,20 @@ window.saveUsername = async () => {
   renderApp();
 };
 
-window.manualLogin = async function () {
+async function manualLogin() {
   const stbxId = document.getElementById("loginStbx").value.trim();
   const password = document.getElementById("loginPwd").value.trim();
 
-  if (!stbxId || !password) return alert("Fill all fields");
+  if (!stbxId || !password) {
+    return alert("Fill all fields");
+  }
 
   const loginRef = doc(db, "users", stbxId);
   const snap = await getDoc(loginRef);
 
-  if (!snap.exists()) return alert("Account not found");
+  if (!snap.exists()) {
+    return alert("Account not found");
+  }
 
   const user = snap.data();
 
@@ -191,7 +184,7 @@ window.manualLogin = async function () {
   }
 
   location.reload();
-};
+}
 
 window.goHome = function(){
 const send = document.getElementById("sendScreen");
@@ -201,6 +194,23 @@ if(send) send.style.display = "none";
 if(amount) amount.style.display = "none";
 if(confirm) confirm.style.display = "none";
 };
-/* ================= UTIL ================= */
 
+/* ================= INIT ================= */
+async function init() {
+  if (!stbxUID && !googleUID) {
+    renderSetup();
+    return;
+  }
+
+  if (stbxUID) {
+    const snap = await getDoc(doc(db, "users", stbxUID));
+
+    if (!snap.exists()) {
+      renderSignup();
+      return;
+    }
+  }
+
+  renderApp();
+}
 init();
