@@ -167,7 +167,7 @@ window.saveUsername = async () => {
   renderApp();
 };
 
-window.manualLogin = async () => {
+async function manualLogin() {
   const stbxId = loginStbx.value.trim();
   const password = loginPwd.value.trim();
 
@@ -195,7 +195,9 @@ window.manualLogin = async () => {
   }
 
   location.reload();
-};
+}
+
+window.manualLogin = manualLogin;
 
 window.goHome = function(){
 const send = document.getElementById("sendScreen");
