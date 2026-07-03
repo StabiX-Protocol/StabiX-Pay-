@@ -25,8 +25,8 @@ async function init(){
   const snap = await getDoc(userRef);
 
   if(!snap.exists()){
-    renderSetup();
-    return;
+  renderUsernameSetup();
+  return;
   }
 
   renderApp();
@@ -42,6 +42,31 @@ appDiv(`
 selectTab("home");
 }
 
+function renderUsernameSetup(){
+  appDiv(`
+    <div class="box">
+      <h3>Create Username</h3>
+      <input id="uname" placeholder="Choose username">
+      <button onclick="saveUsername()">Create Account</button>
+    `);
+}
+
+window.saveUsername = async ()=>{
+  if(!uname.value.trim()) return alert("Enter username");
+
+  await setDoc(userRef,{
+    username: uname.value.trim(),
+    stbxId: generateSTBX(),
+    walletAddress: WALLET,
+    eoaAddress: "",
+    balance: 0,
+    usdtBalance: 0,
+    pendingRequest: false,
+    createdAt: serverTimestamp()
+  });
+
+  renderApp();
+};
 
 window.goHome = function(){
 const send = document.getElementById("sendScreen");
