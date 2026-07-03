@@ -42,52 +42,6 @@ appDiv(`
 selectTab("home");
 }
 
-/* ================= LOGIN ================= */
-function renderLogin(){
-appDiv(`
-<div class="box">
-<h3>Login</h3>
-<input id="pwd" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Password">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-<button style="width:70%" onclick="window.login()">Login</button>
-<span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Forgot?</span>
-</div>
-</div>
-`);
-document.getElementById("bottomNav").style.display = "none";
-}
-
-window.login = async ()=>{
-const snap = await getDoc(userRef);
-if(snap.data().password !== pwd.value.trim()) return alert("Wrong password");
-renderApp();
-};
-/* ================= FORGOT PASSWORD ================= */
-window.forgotPassword = async ()=>{
-const otp = Math.floor(100000 + Math.random()*900000).toString();
-await updateDoc(userRef,{ otp });
-alert("Your OTP: " + otp);
-renderOTP();
-};
-
-function renderOTP(){
-appDiv(`
-<div class="box">
-<h3>Reset Password</h3>
-<input id="otp" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="OTP">
-<input id="npwd" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="New Password">
-<button onclick="verifyOTP()">Reset</button>
-<span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Resend</span>
-</div>
-`);
-}
-
-window.verifyOTP = async ()=>{
-const snap = await getDoc(userRef);
-if(snap.data().otp !== otp.value.trim()) return alert("Invalid OTP");
-await updateDoc(userRef,{ password: npwd.value.trim(), otp:"" });
-renderLogin();
-};
 
 window.goHome = function(){
 const send = document.getElementById("sendScreen");
