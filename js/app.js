@@ -140,6 +140,36 @@ window.saveUsername = async ()=>{
   renderApp();
 };
 
+window.manualLogin = async () => {
+  const stbxId = loginStbx.value.trim();
+  const password = loginPwd.value.trim();
+
+  if (!stbxId || !password) {
+    return alert("Fill all fields");
+  }
+
+  const loginRef = doc(db, "users", stbxId);
+  const snap = await getDoc(loginRef);
+
+  if (!snap.exists()) {
+    return alert("Account not found");
+  }
+
+  const user = snap.data();
+
+  if (user.password !== password) {
+    return alert("Wrong password");
+  }
+
+  localStorage.setItem("stbx_uid", stbxId);
+
+  if (user.googleUID) {
+    localStorage.setItem("stbx_google_uid", user.googleUID);
+  }
+
+  location.reload();
+};
+
 window.goHome = function(){
 const send = document.getElementById("sendScreen");
 const amount = document.getElementById("amountScreen");
