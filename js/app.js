@@ -43,13 +43,40 @@ async function init(){
 }
 /* ================= SETUP ================= */
 function renderSetup(){
-appDiv(`
-<div class="box">
-<h3>Welcome to StabiX</h3>
-<button onclick="googleLogin()">Continue with Google</button>
-</div>
-`);
-selectTab("home");
+  appDiv(`
+    <div class="auth-page">
+
+      <div class="auth-close">✕</div>
+
+      <div class="auth-logo">
+        <h1>StabiX</h1>
+        <p>Pay Stablecoins Instant Without Gas</p>
+      </div>
+
+      <div class="auth-box">
+        <h2>Log in</h2>
+
+        <input id="loginStbx" placeholder="StabiX ID" />
+        <input id="loginPwd" type="password" placeholder="Password" />
+
+        <button onclick="manualLogin()">Log In</button>
+
+        <div class="divider">or</div>
+
+        <button class="google-btn" onclick="googleLogin()">
+          Continue with Google
+        </button>
+
+        <div class="auth-links">
+          <span onclick="renderSignup()">Create Account</span>
+          <span onclick="forgotPassword()">Forgot Password?</span>
+        </div>
+      </div>
+
+    </div>
+  `);
+
+  selectTab("home");
 }
 
 function renderUsernameSetup(){
