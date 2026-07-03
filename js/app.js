@@ -16,13 +16,13 @@ const stbxUID = getCurrentUserId();
 
 if (!googleUID) {
   renderSetup();
-  return;
+  throw "";
 }
 
 if (!stbxUID) {
   localStorage.clear();
   renderSetup();
-  return;
+  throw "";
 }
 
 window.WALLET = stbxUID;
