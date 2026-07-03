@@ -217,3 +217,5 @@ async function init() {
 
   renderApp();
 }
+
+init();
