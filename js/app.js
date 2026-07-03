@@ -21,7 +21,7 @@ if (!getCurrentUserId()) {
 
 window.WALLET = getCurrentUserId();
 window.userRef = doc(db, "users", WALLET);
-window.validatorRef = doc(db, "validators", WALLET);
+window.validatorRef = doc(db,"validators",WALLET);
 /* ================= INIT ================= */
 async function init(){
 const snap = await getDoc(userRef);
@@ -82,7 +82,7 @@ renderApp();
 window.forgotPassword = async ()=>{
 const otp = Math.floor(100000 + Math.random()*900000).toString();
 await updateDoc(userRef,{ otp });
-tg.showPopup({ title:"OTP", message:"Your OTP: "+otp, buttons:[{type:"ok"}] });
+alert("Your OTP: " + otp);
 renderOTP();
 };
 
