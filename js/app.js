@@ -79,6 +79,41 @@ function renderSetup(){
   selectTab("home");
 }
 
+function renderSignup(){
+  appDiv(`
+    <div class="auth-page">
+
+      <div class="auth-close" onclick="renderSetup()">✕</div>
+
+      <div class="auth-logo">
+        <h1>StabiX</h1>
+        <p>Stablecoins, Simplified.</p>
+      </div>
+
+      <div class="auth-box">
+        <h2>Create Account</h2>
+
+        <input id="uname" placeholder="Username" />
+        <input id="signupPwd" type="password" placeholder="Password" />
+        <input id="confirmPwd" type="password" placeholder="Confirm Password" />
+
+        <button onclick="saveUsername()">Create Account</button>
+
+        <div class="divider">or</div>
+
+        <button class="google-btn" onclick="googleLogin()">
+          Continue with Google
+        </button>
+
+        <div class="auth-links">
+          <span onclick="renderSetup()">Already have an account?</span>
+        </div>
+      </div>
+
+    </div>
+  `);
+}
+
 function renderUsernameSetup(){
   appDiv(`
     <div class="box">
