@@ -1,6 +1,7 @@
 import "./firebase.js"
 import "./wallet.js"
 import "./tx.js"
+window.appDiv = function(h){document.getElementById("app").innerHTML = h;}
 import {
   doc,
   getDoc,
@@ -97,6 +98,5 @@ if(amount) amount.style.display = "none";
 if(confirm) confirm.style.display = "none";
 };
 /* ================= UTIL ================= */
-window.appDiv = function(h){document.getElementById("app").innerHTML = h;}
 
 init();
