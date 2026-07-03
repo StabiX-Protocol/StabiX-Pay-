@@ -34,12 +34,11 @@ renderLogin();
 function renderSetup(){
 appDiv(`
 <div class="box">
-<h3>Create Account</h3>
-<input id="uname" placeholder="Username">
-<input id="pwd" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Password">
-<button onclick="saveProfile()">Create</button>
+<h3>Welcome to StabiX</h3>
+<button onclick="googleLogin()">Continue with Google</button>
 </div>
 `);
+}
 selectTab("home");
 }
 
