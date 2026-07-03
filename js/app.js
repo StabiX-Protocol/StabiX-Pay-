@@ -167,20 +167,16 @@ window.saveUsername = async () => {
   renderApp();
 };
 
-async function manualLogin() {
-  const stbxId = loginStbx.value.trim();
-  const password = loginPwd.value.trim();
+window.manualLogin = async function () {
+  const stbxId = document.getElementById("loginStbx").value.trim();
+  const password = document.getElementById("loginPwd").value.trim();
 
-  if (!stbxId || !password) {
-    return alert("Fill all fields");
-  }
+  if (!stbxId || !password) return alert("Fill all fields");
 
   const loginRef = doc(db, "users", stbxId);
   const snap = await getDoc(loginRef);
 
-  if (!snap.exists()) {
-    return alert("Account not found");
-  }
+  if (!snap.exists()) return alert("Account not found");
 
   const user = snap.data();
 
@@ -195,9 +191,7 @@ async function manualLogin() {
   }
 
   location.reload();
-}
-
-window.manualLogin = manualLogin;
+};
 
 window.goHome = function(){
 const send = document.getElementById("sendScreen");
