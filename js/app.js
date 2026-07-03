@@ -31,12 +31,12 @@ window.WALLET = stbxUID;
 window.userRef = doc(db,"users", window.WALLET);
 window.validatorRef = doc(db,"validators", window.WALLET);
 /* ================= INIT ================= */
-async function init(){
+async function init() {
   const snap = await getDoc(userRef);
 
-  if(!snap.exists()){
-  renderUsernameSetup();
-  return;
+  if (!snap.exists()) {
+    renderSignup();
+    return;
   }
 
   renderApp();
@@ -207,15 +207,5 @@ if(amount) amount.style.display = "none";
 if(confirm) confirm.style.display = "none";
 };
 /* ================= UTIL ================= */
-async function init() {
-  const snap = await getDoc(userRef);
-
-  if (!snap.exists()) {
-    renderSignup();
-    return;
-  }
-
-  renderApp();
-}
 
 init();
