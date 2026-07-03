@@ -603,9 +603,9 @@ if(!toWallet){
 alert("Enter wallet ID")
 return
 }
-const tgPattern = /^TG_\d{6,}$/
-if(!tgPattern.test(toWallet)){
-alert("Enter valid TG ID (example: TG_123456789)")
+const stbxPattern = /^STBX\d{10}$/;
+if (!stbxPattern.test(toWallet)) {
+alert("Enter valid StabiX UID (example: STBX123456789)")
 return
 }
 if(toWallet === WALLET){
