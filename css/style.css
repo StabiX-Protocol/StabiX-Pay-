@@ -762,12 +762,14 @@ white-space:nowrap;
 }
 
 .auth-page{
+  width:100%;
   min-height:100vh;
   background:var(--bg);
   color:var(--text);
   padding:28px 22px;
   display:flex;
   flex-direction:column;
+  overflow-x:hidden;
 }
 
 .auth-close{
@@ -777,9 +779,11 @@ white-space:nowrap;
 }
 
 .auth-logo h1{
-  font-size:56px;
+  font-size: clamp(48px, 12vw, 72px);
   font-weight:800;
   margin:0;
+  line-height:1;
+  word-break:break-word;
 }
 
 .auth-logo p{
@@ -799,6 +803,7 @@ white-space:nowrap;
 
 .auth-box input{
   width:100%;
+  max-width:100%;
   height:58px;
   border:none;
   border-radius:18px;
@@ -848,10 +853,18 @@ white-space:nowrap;
 .auth-links{
   display:flex;
   justify-content:space-between;
+  align-items:center;
   margin-top:22px;
+  gap:16px;
 }
 
-.auth-links span{
+.auth-links a{
   font-size:16px;
-  color:var(--primary);
+  color:var(--text);
+  text-decoration:none;
+  font-weight:600;
+}
+
+.auth-links a:hover{
+  opacity:.7;
 }
