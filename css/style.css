@@ -871,7 +871,7 @@ white-space:nowrap;
   gap:16px;
 }
 
-.auth-links a{
+.auth-links span{
   font-size:16px;
   color:var(--text);
   text-decoration:none;
