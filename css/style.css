@@ -1,3 +1,22 @@
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
+
+html{
+  width:100%;
+  overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
+}
+
+body{
+  width:100%;
+  margin:0;
+  padding:0;
+  overflow-x:hidden;
+}
+
 body{
   background:#0f172a;
   color:#e5e7eb;
@@ -763,6 +782,7 @@ white-space:nowrap;
 
 .auth-page{
   width:100%;
+  max-width:100vw;
   min-height:100vh;
   background:var(--bg);
   color:var(--text);
@@ -814,6 +834,7 @@ white-space:nowrap;
   font-size:19px;
   margin-bottom:16px;
   color:var(--text);
+  display:block;
 }
 
 .auth-box button{
@@ -824,6 +845,7 @@ white-space:nowrap;
   margin-top:6px;
   font-size:20px;
   font-weight:700;
+  display:block;
 }
 
 .auth-box button:first-of-type{
