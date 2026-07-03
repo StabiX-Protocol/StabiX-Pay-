@@ -61,7 +61,7 @@ appDiv(`
     </div>
     <div id="profileHidden" class="profileHidden">
     <div class="small">
-    TG ID<br>
+    Stabix UID<br>
     ${WALLET}
     </div>
 
