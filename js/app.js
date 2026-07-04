@@ -18,11 +18,12 @@ window.appDiv = function(h){document.getElementById("app").innerHTML = h;}
 const googleUID = localStorage.getItem("stbx_google_uid");
 const stbxUID = getCurrentUserId();
 
-window.WALLET = stbxUID;
+window.WALLET = stbxUID || null;
 
-
-window.userRef = doc(db,"users", window.WALLET);
-window.validatorRef = doc(db,"validators", window.WALLET);
+if (window.WALLET) {
+  window.userRef = doc(db, "users", window.WALLET);
+  window.validatorRef = doc(db, "validators", window.WALLET);
+}
 /* ================= SETUP ================= */
 function renderSetup(){
   appDiv(`
@@ -191,18 +192,16 @@ if(confirm) confirm.style.display = "none";
 
 /* ================= INIT ================= */
 async function init() {
-  if (!stbxUID && !googleUID) {
+  if (!window.WALLET) {
     renderSetup();
     return;
   }
 
-  if (stbxUID) {
-    const snap = await getDoc(doc(db, "users", stbxUID));
+  const snap = await getDoc(userRef);
 
-    if (!snap.exists()) {
-      renderSignup();
-      return;
-    }
+  if (!snap.exists()) {
+    renderSetup();
+    return;
   }
 
   renderApp();
