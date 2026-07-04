@@ -133,11 +133,19 @@ window.saveUsername = async () => {
     return alert("Username already taken");
   }
 
+  const newStbxId = generateSTBX();
+
+window.WALLET = newStbxId;
+window.userRef = doc(db, "users", newStbxId);
+window.validatorRef = doc(db, "validators", newStbxId);
+
+localStorage.setItem("stbx_uid", newStbxId);
+  
   await setDoc(userRef, {
     username,
     password,
-    stbxId: WALLET,
-    walletAddress: WALLET,
+    stbxId: newStbxId,
+    walletAddress: newStbxId,
     googleUID: localStorage.getItem("stbx_google_uid") || "",
     eoaAddress: "",
     balance: 0,
