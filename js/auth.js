@@ -33,14 +33,18 @@ const snap = await getDocs(q);
 
 if (!snap.empty) {
   const existingUser = snap.docs[0];
+
   localStorage.setItem("stbx_uid", existingUser.id);
   localStorage.setItem("stbx_google_uid", user.uid);
-} else {
-  localStorage.setItem("stbx_google_uid", user.uid);
+
+  location.reload();
+  return;
 }
 
-location.reload();
-
+localStorage.setItem("stbx_google_uid", user.uid);
+renderSignup();
+return;
+    
   } catch (e) {
     console.log("Google Login Error:", e);
     alert(e.message);
