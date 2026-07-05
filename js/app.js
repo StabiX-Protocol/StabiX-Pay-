@@ -74,7 +74,7 @@ function renderSignup(){
 
       <div class="auth-logo">
         <h1>StabiX</h1>
-        <p>Stablecoins, Simplified.</p>
+        <p>Pay Stablecoins Instant Without Gas</p>
       </div>
 
       <div class="auth-box">
@@ -107,7 +107,7 @@ function renderUsernameSetup(){
       </div>
 
       <div class="auth-box">
-        <h2>Set Username & Password</h2>
+        <h2>Sign In</h2>
 
         <input id="uname" placeholder="Choose Username" />
         <input id="signupPwd" type="password" placeholder="Password" />
