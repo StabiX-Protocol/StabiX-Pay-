@@ -50,9 +50,9 @@ function renderSetup(){
         </button>
 
         <div class="auth-links">
-          <button class="auth-link-btn" onclick="renderSignup()">Create Account</button>
-<button class="auth-link-btn" onclick="forgotPassword()">Forgot Password?</button>
-        </div>
+  <span class="auth-link" onclick="renderSignup()">Create Account</span>
+  <span class="auth-link" onclick="forgotPassword()">Forgot Password?</span>
+</div>
       </div>
 
     </div>
