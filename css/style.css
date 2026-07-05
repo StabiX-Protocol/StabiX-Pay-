@@ -866,25 +866,25 @@ white-space:nowrap;
    display:flex;
    justify-content:center;
    align-items:center;
-   gap:10px;
+   gap:14px;
    margin-top:14px;
 }
 
 .auth-link-btn{
-   flex:none;
-   width:auto;
-   min-width:auto;
    background:transparent;
    border:none;
+   width:auto;
+   min-width:auto;
+   flex:none;
    padding:0;
    margin:0;
-   font-size:10px;
-   font-weight:400;
+   font-size:13px;
+   font-weight:500;
    color:var(--text-secondary);
    cursor:pointer;
-   line-height:1.2;
    white-space:nowrap;
    opacity:.85;
+   line-height:1.2;
 }
 
 .auth-link-btn:hover{
