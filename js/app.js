@@ -83,10 +83,6 @@ function renderSignup(){
         <button class="google-btn" onclick="googleLogin()">
           Continue with Google
         </button>
-
-        <div class="auth-links">
-          <span onclick="renderSetup()">Already have an account?</span>
-        </div>
       </div>
 
     </div>
@@ -103,7 +99,7 @@ function renderUsernameSetup(){
 
       <div class="auth-logo">
         <h1>StabiX</h1>
-        <p>Stablecoins, Simplified.</p>
+        <p>Pay Stablecoins Instant Without Gas</p>
       </div>
 
       <div class="auth-box">
