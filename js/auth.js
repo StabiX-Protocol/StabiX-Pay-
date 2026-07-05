@@ -42,7 +42,7 @@ if (!snap.empty) {
 }
 
 localStorage.setItem("stbx_google_uid", user.uid);
-renderSignup();
+renderUsernameSetup();
 return;
     
   } catch (e) {
