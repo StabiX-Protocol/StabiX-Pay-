@@ -865,22 +865,30 @@ white-space:nowrap;
 .auth-links{
   display:flex;
   justify-content:space-between;
-  gap:12px;
-  margin-top:20px;
+  align-items:center;
+  gap:10px;
+  margin-top:18px;
 }
 
 .auth-link-btn{
-  flex:1;
+  flex:unset;
   background:none;
   border:none;
-  font-size:16px;
+  padding:6px 4px;
+  font-size:15px;
   font-weight:600;
-  color:var(--text-color);
+  color:var(--sub);
   cursor:pointer;
-  padding:10px 0;
-  text-align:center;
+  width:auto;
+  height:auto;
+  border-radius:0;
+  white-space:nowrap;
 }
 
 .auth-link-btn:active{
   opacity:.7;
+}
+
+.auth-link-btn:hover{
+  color:var(--text);
 }
