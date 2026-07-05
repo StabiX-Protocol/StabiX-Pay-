@@ -864,15 +864,18 @@ white-space:nowrap;
 
 .auth-links{
   display:flex;
-  justify-content:space-between;
+  justify-content:center;
   align-items:center;
-  margin-top:14px;
-  font-size:14px;
+  gap:28px;
+  margin-top:18px;
 }
 
 .auth-link{
   cursor:pointer;
   color:var(--text-color);
   font-weight:500;
+  font-size:15px;
   user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
 }
