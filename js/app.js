@@ -100,6 +100,7 @@ function renderSignup(){
     </div>
   `);
 }
+window.renderSignup = renderSignup;
 
 function renderUsernameSetup(){
   appDiv(`
@@ -193,6 +194,10 @@ async function manualLogin() {
   location.reload();
 }
 window.manualLogin = manualLogin;
+
+window.forgotPassword = function () {
+  alert("Reset flow coming soon");
+};
 
 window.goHome = function(){
 const send = document.getElementById("sendScreen");
