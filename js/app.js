@@ -97,12 +97,30 @@ window.renderSignup = renderSignup;
 
 function renderUsernameSetup(){
   appDiv(`
-    <div class="box">
-      <h3>Create Username</h3>
-      <input id="uname" placeholder="Choose username">
-      <button onclick="saveUsername()">Create Account</button>
-    `);
+    <div class="auth-page">
+
+      <div class="auth-close" onclick="renderSetup()">×</div>
+
+      <div class="auth-logo">
+        <h1>StabiX</h1>
+        <p>Stablecoins, Simplified.</p>
+      </div>
+
+      <div class="auth-box">
+        <h2>Set Username & Password</h2>
+
+        <input id="uname" placeholder="Choose Username" />
+        <input id="signupPwd" type="password" placeholder="Password" />
+        <input id="confirmPwd" type="password" placeholder="Confirm Password" />
+
+        <button onclick="saveUsername()">Create Account</button>
+      </div>
+
+    </div>
+  `);
 }
+
+window.renderUsernameSetup = renderUsernameSetup;
 
 window.saveUsername = async () => {
   const username = document.getElementById("uname").value.trim().toLowerCase();
