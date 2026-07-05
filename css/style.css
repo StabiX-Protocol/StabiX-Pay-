@@ -863,31 +863,16 @@ white-space:nowrap;
 }
 
 .auth-links{
-   display:flex;
-   justify-content:center;
-   align-items:center;
-   gap:4px;
-   margin-top:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:14px;
+  font-size:14px;
 }
 
-.auth-link-btn{
-   background:transparent;
-   border:none;
-   width:auto;
-   min-width:auto;
-   flex:none;
-   padding:0;
-   margin:0;
-   font-size:5px;
-   font-weight:500;
-   color:var(--text-secondary);
-   cursor:pointer;
-   white-space:nowrap;
-   opacity:.4;
-   line-height:1.2;
-}
-
-.auth-link-btn:hover{
-   opacity:1;
-   color:var(--primary);
+.auth-link{
+  cursor:pointer;
+  color:var(--text-color);
+  font-weight:500;
+  user-select:none;
 }
