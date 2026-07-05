@@ -92,6 +92,7 @@ function renderSignup(){
     </div>
   `);
 }
+window.renderUsernameSetup = renderUsernameSetup;
 window.renderSignup = renderSignup;
 
 function renderUsernameSetup(){
