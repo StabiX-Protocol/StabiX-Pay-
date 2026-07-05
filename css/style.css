@@ -866,7 +866,7 @@ white-space:nowrap;
    display:flex;
    justify-content:center;
    align-items:center;
-   gap:14px;
+   gap:4px;
    margin-top:14px;
 }
 
@@ -878,12 +878,12 @@ white-space:nowrap;
    flex:none;
    padding:0;
    margin:0;
-   font-size:13px;
+   font-size:5px;
    font-weight:500;
    color:var(--text-secondary);
    cursor:pointer;
    white-space:nowrap;
-   opacity:.85;
+   opacity:.4;
    line-height:1.2;
 }
 
