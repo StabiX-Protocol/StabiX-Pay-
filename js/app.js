@@ -80,14 +80,6 @@ function renderSignup(){
       <div class="auth-box">
         <h2>Create Account</h2>
 
-        <input id="uname" placeholder="Username" />
-        <input id="signupPwd" type="password" placeholder="Password" />
-        <input id="confirmPwd" type="password" placeholder="Confirm Password" />
-
-        <button onclick="saveUsername()">Create Account</button>
-
-        <div class="divider">or</div>
-
         <button class="google-btn" onclick="googleLogin()">
           Continue with Google
         </button>
