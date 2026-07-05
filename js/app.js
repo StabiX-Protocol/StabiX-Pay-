@@ -70,7 +70,7 @@ function renderSignup(){
   appDiv(`
     <div class="auth-page">
 
-      <div class="auth-close" onclick="renderSetup()">✕</div>
+     <div class="auth-close" onclick="renderSetup()">×</div>
 
       <div class="auth-logo">
         <h1>StabiX</h1>
@@ -88,6 +88,7 @@ function renderSignup(){
     </div>
   `);
 }
+window.renderSetup = renderSetup;
 window.renderUsernameSetup = renderUsernameSetup;
 window.renderSignup = renderSignup;
 
