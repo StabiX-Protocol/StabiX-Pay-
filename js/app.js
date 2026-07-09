@@ -96,7 +96,7 @@ function renderUsernameSetup(){
   appDiv(`
     <div class="auth-page">
 
-      <div class="auth-close" onclick="renderSetup()">×</div>
+      <div class="auth-close" onclick="renderSignup()">×</div>
 
       <div class="auth-logo">
         <h1>StabiX</h1>
