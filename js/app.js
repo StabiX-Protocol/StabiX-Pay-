@@ -145,6 +145,40 @@ function renderResetPassword() {
 }
 window.renderResetPassword = renderResetPassword;
 
+window.updatePassword = async () => {
+  const password = document.getElementById("newPwd").value.trim();
+  const confirm = document.getElementById("confirmNewPwd").value.trim();
+
+  if (!password || !confirm) {
+    return alert("Fill all fields");
+  }
+
+  if (password.length < 6) {
+    return alert("Password must be at least 6 characters");
+  }
+
+  if (password !== confirm) {
+    return alert("Passwords do not match");
+  }
+
+  const stbxId = localStorage.getItem("reset_uid");
+
+  if (!stbxId) {
+    return alert("Reset session expired.");
+  }
+
+  await updateDoc(doc(db, "users", stbxId), {
+    password
+  });
+
+  localStorage.removeItem("reset_uid");
+
+  alert("Password updated successfully.");
+
+  renderSetup();
+};
+
+
 window.saveUsername = async () => {
   const username = document.getElementById("uname").value.trim().toLowerCase();
   const password = document.getElementById("signupPwd").value.trim();
