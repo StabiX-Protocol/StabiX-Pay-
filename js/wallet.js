@@ -1961,27 +1961,17 @@ USDC: {
 
 // ================== Advance Mode ==================
 const VAULTS = {
-USDT: {
-"Ethereum (Testnet)": "0xUSDT_ETH_VAULT",
-"Arbitrum (Testnet)": "0xUSDT_ARB_VAULT",
-"Polygon (Testnet)": "0xUSDT_POLY_VAULT",
-"Base (Testnet)": "0xUSDT_BASE_VAULT",
-"Tron (Testnet)": "TUSDT_TRON_VAULT"
-},
-
-USDC: {
-"Ethereum (Testnet)": "0x4F43855026a64afCf594d16fDF0713D262C81ee3",
-"Arbitrum (Testnet)": "0xUSDC_ARB_VAULT",
-"Polygon (Testnet)": "0xUSDC_POLY_VAULT",
-"Base (Testnet)": "0xUSDC_BASE_VAULT",
-"Tron (Testnet)": "TUSDC_TRON_VAULT"
-}
+"Ethereum (Sepolia)": "0x4F43855026a64afCf594d16fDF0713D262C81ee3",
+"Arbitrum (Sepolia)": "0xARB_VAULT",
+"Polygon (Amoy)": "0xPOLY_VAULT",
+"Base (Sepolia)": "0xBASE_VAULT",
+"Tron (Nile Testnet)": "TXYZ_TRON_VAULT"
 };
 const EXPLORERS = {
-"Ethereum (Testnet)": "https://etherscan.io/address/",
-"Arbitrum (Testnet)": "https://arbiscan.io/address/",
-"Polygon (Testnet)": "https://polygonscan.com/address/",
-"Base (Testnet)": "https://basescan.org/address/"
+"Ethereum Sepolia": "https://etherscan.io/address/",
+"Arbitrum Sepolia": "https://arbiscan.io/address/",
+"Polygon Amoy": "https://polygonscan.com/address/",
+"Base Sepolia": "https://basescan.org/address/"
 };
 
 // ================== Instant Mode Flow ==================
@@ -2043,10 +2033,10 @@ Select Network
 </div>
 
 <div style="display:flex;flex-direction:column;gap:12px;">
-${instantNetworkCard(asset, "Ethereum", "(Testnet)", "~2 min", "$5 fee")}
-${instantNetworkCard(asset, "Arbitrum", "(Testnet)", "~10 sec", "Low fee")}
-${instantNetworkCard(asset, "Polygon", "(Testnet)", "~5 sec", "Very low")}
-${instantNetworkCard(asset, "Base", "(Testnet)", "~5 sec", "Low fee")}
+${networkCard(asset,"Ethereum","Sepolia","~2 min","$5 fee")}
+${networkCard(asset,"Arbitrum","Sepolia","~10 sec","Low fee")}
+${networkCard(asset,"Polygon","Amoy","~5 sec","Very low")}
+${networkCard(asset,"Base","Sepolia","~5 sec","Low fee")}
 </div>
 `;
 };
@@ -2654,10 +2644,10 @@ Select Network
 </div>
 </div>
 <div style="display:flex;flex-direction:column;gap:12px;">
-${networkCardWithdraw(asset,"Ethereum","(Testnet)","~2 min","$5")}
-${networkCardWithdraw(asset,"Arbitrum","(Testnet)","~10 sec","Low")}
-${networkCardWithdraw(asset,"Polygon","(Testnet)","~5 sec","Very low")}
-${networkCardWithdraw(asset,"Base","(Testnet)","~5 sec","Low")}
+${networkCardWithdraw(asset,"Ethereum","Sepolia","~2 min","$5")}
+${networkCardWithdraw(asset,"Arbitrum","Sepolia","~10 sec","Low")}
+${networkCardWithdraw(asset,"Polygon","Amoy","~5 sec","Very low")}
+${networkCardWithdraw(asset,"Base","Sepolia","~5 sec","Low")}
 </div>
 `;
 };
