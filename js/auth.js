@@ -51,6 +51,32 @@ return;
   }
 };
 
+window.googleResetLogin = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    const q = query(
+      collection(db, "users"),
+      where("googleUID", "==", user.uid)
+    );
+
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      alert("No account found with this Google account.");
+      return;
+    }
+
+    localStorage.setItem("reset_uid", snap.docs[0].id);
+
+    renderResetPassword();
+
+  } catch (e) {
+    alert(e.message);
+  }
+};
+
 window.googleLogout = async () => {
   await signOut(auth);
   localStorage.clear();
