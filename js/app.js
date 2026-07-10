@@ -116,7 +116,6 @@ function renderUsernameSetup(){
     </div>
   `);
 }
-
 window.renderUsernameSetup = renderUsernameSetup;
 
 window.saveUsername = async () => {
@@ -203,9 +202,29 @@ async function manualLogin() {
 }
 window.manualLogin = manualLogin;
 
-window.forgotPassword = function () {
-  alert("Reset flow coming soon");
-};
+function forgotPassword() {
+  appDiv(`
+    <div class="auth-page">
+
+      <div class="auth-close" onclick="renderSetup()">×</div>
+
+      <div class="auth-logo">
+        <h1>StabiX</h1>
+        <p>Pay Stablecoins Instant Without Gas</p>
+      </div>
+
+      <div class="auth-box">
+        <h2>Reset Password</h2>
+
+        <button class="google-btn" onclick="googleResetLogin()">
+          Continue with Google
+        </button>
+      </div>
+
+    </div>
+  `);
+}
+window.forgotPassword = forgotPassword;
 
 window.goHome = function(){
 const send = document.getElementById("sendScreen");
