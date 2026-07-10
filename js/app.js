@@ -1,104 +1,292 @@
 import "./firebase.js"
 import "./wallet.js"
 import "./tx.js"
+import "./auth.js"
 import {
   doc,
   getDoc,
   setDoc,
   updateDoc,
-  serverTimestamp
+  serverTimestamp,
+  collection,
+  query,
+  where,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-/* ================= TELEGRAM ================= */
-const tg = window.Telegram.WebApp;
-tg.ready(); tg.expand();
-const tgUser = tg.initDataUnsafe?.user;
-if(!tgUser?.id){ document.getElementById("app").innerHTML="Telegram user not found"; throw ""; }
-/* ================= IDENTITY ================= */
-window.WALLET = "TG_" + tgUser.id;
-window.userRef = doc(db,"users",WALLET);
-window.validatorRef = doc(db,"validators",String(tgUser.id));
-/* ================= INIT ================= */
-async function init(){
-const snap = await getDoc(userRef);
-if(!snap.exists() || !snap.data()?.password){
-renderSetup(); return;
-}
-renderLogin();
+
+window.appDiv = function(h){document.getElementById("app").innerHTML = h;}
+const googleUID = localStorage.getItem("stbx_google_uid");
+const stbxUID = getCurrentUserId();
+
+window.WALLET = stbxUID || null;
+
+if (window.WALLET) {
+  window.userRef = doc(db, "users", window.WALLET);
+  window.validatorRef = doc(db, "validators", window.WALLET);
 }
 /* ================= SETUP ================= */
 function renderSetup(){
-appDiv(`
-<div class="box">
-<h3>Create Account</h3>
-<input id="uname" placeholder="Username">
-<input id="pwd" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Password">
-<button onclick="saveProfile()">Create</button>
+  appDiv(`
+    <div class="auth-page">
+
+
+      <div class="auth-logo">
+        <h1>StabiX</h1>
+        <p>Pay Stablecoins Instant Without Gas</p>
+      </div>
+
+      <div class="auth-box">
+        <h2>Log in</h2>
+
+        <input id="loginStbx" placeholder="StabiX ID" />
+        <input id="loginPwd" type="password" placeholder="Password" />
+
+        <button onclick="manualLogin()">Log In</button>
+
+        <div class="divider">or</div>
+
+        <button class="google-btn" onclick="googleLogin()">
+    <img src="media/google-logo.png" class="google-icon" alt="Google">
+    <span>Continue with Google</span>
+</button>
+
+        <div class="auth-links">
+  <span class="auth-link" onclick="renderSignup();">
+    Create Account
+  </span>
+
+  <span class="auth-link" onclick="forgotPassword();">
+    Forgot Password?
+  </span>
 </div>
-`);
-selectTab("home");
+      </div>
+
+    </div>
+  `);
+
+  selectTab("home");
 }
 
-window.saveProfile = async ()=>{
-if(!uname.value.trim() || !pwd.value.trim()) return alert("Fill all fields");
-await setDoc(userRef,{
-username: uname.value.trim(),
-password: pwd.value.trim(),
-walletAddress: WALLET,
-eoaAddress: "",
-balance: 0,
-usdtBalance: 0,
-pendingRequest:false,
-lastUsernameChange: serverTimestamp(),
-createdAt: serverTimestamp()
-});
-renderApp();
-};
-/* ================= LOGIN ================= */
-function renderLogin(){
-appDiv(`
-<div class="box">
-<h3>Login</h3>
-<input id="pwd" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Password">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-<button style="width:70%" onclick="window.login()">Login</button>
-<span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Forgot?</span>
-</div>
-</div>
-`);
-document.getElementById("bottomNav").style.display = "none";
+function renderSignup(){
+  appDiv(`
+    <div class="auth-page">
+
+     <div class="auth-close" onclick="renderSetup()">×</div>
+
+      <div class="auth-logo">
+        <h1>StabiX</h1>
+        <p>Pay Stablecoins Instant Without Gas</p>
+      </div>
+
+      <div class="auth-box">
+        <h2>Create Account</h2>
+
+        <button class="google-btn" onclick="googleLogin()">
+    <img src="media/google-logo.png" class="google-icon" alt="Google">
+    <span>Continue with Google</span>
+</button>
+
+    </div>
+  `);
 }
+window.renderSetup = renderSetup;
+window.renderUsernameSetup = renderUsernameSetup;
+window.renderSignup = renderSignup;
 
-window.login = async ()=>{
-const snap = await getDoc(userRef);
-if(snap.data().password !== pwd.value.trim()) return alert("Wrong password");
-renderApp();
-};
-/* ================= FORGOT PASSWORD ================= */
-window.forgotPassword = async ()=>{
-const otp = Math.floor(100000 + Math.random()*900000).toString();
-await updateDoc(userRef,{ otp });
-tg.showPopup({ title:"OTP", message:"Your OTP: "+otp, buttons:[{type:"ok"}] });
-renderOTP();
-};
+function renderUsernameSetup(){
+  appDiv(`
+    <div class="auth-page">
 
-function renderOTP(){
-appDiv(`
-<div class="box">
-<h3>Reset Password</h3>
-<input id="otp" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="OTP">
-<input id="npwd" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="New Password">
-<button onclick="verifyOTP()">Reset</button>
-<span style="font-size:12px;color:#60a5fa;cursor:pointer" onclick="forgotPassword()">Resend</span>
-</div>
-`);
+      <div class="auth-close" onclick="renderSignup()">×</div>
+
+      <div class="auth-logo">
+        <h1>StabiX</h1>
+        <p>Pay Stablecoins Instant Without Gas</p>
+      </div>
+
+      <div class="auth-box">
+        <h2>Sign In</h2>
+
+        <input id="uname" placeholder="Choose Username" />
+        <input id="signupPwd" type="password" placeholder="Password" />
+        <input id="confirmPwd" type="password" placeholder="Confirm Password" />
+
+        <button onclick="saveUsername()">Create Account</button>
+      </div>
+
+    </div>
+  `);
 }
+window.renderUsernameSetup = renderUsernameSetup;
 
-window.verifyOTP = async ()=>{
-const snap = await getDoc(userRef);
-if(snap.data().otp !== otp.value.trim()) return alert("Invalid OTP");
-await updateDoc(userRef,{ password: npwd.value.trim(), otp:"" });
-renderLogin();
+function renderResetPassword() {
+  appDiv(`
+    <div class="auth-page">
+
+      <div class="auth-close" onclick="renderSetup()">×</div>
+
+      <div class="auth-logo">
+        <h1>StabiX</h1>
+        <p>Pay Stablecoins Instant Without Gas</p>
+      </div>
+
+      <div class="auth-box">
+        <h2>New Password</h2>
+
+        <input id="newPwd" type="password" placeholder="New Password">
+        <input id="confirmNewPwd" type="password" placeholder="Confirm Password">
+
+        <button onclick="updatePassword()">
+          Update Password
+        </button>
+      </div>
+
+    </div>
+  `);
+}
+window.renderResetPassword = renderResetPassword;
+
+window.updatePassword = async () => {
+  const password = document.getElementById("newPwd").value.trim();
+  const confirm = document.getElementById("confirmNewPwd").value.trim();
+
+  if (!password || !confirm) {
+    return alert("Fill all fields");
+  }
+
+  if (password.length < 6) {
+    return alert("Password must be at least 6 characters");
+  }
+
+  if (password !== confirm) {
+    return alert("Passwords do not match");
+  }
+
+  const stbxId = localStorage.getItem("reset_uid");
+
+  if (!stbxId) {
+    return alert("Reset session expired.");
+  }
+
+  await updateDoc(doc(db, "users", stbxId), {
+    password
+  });
+
+  localStorage.removeItem("reset_uid");
+
+  alert("Password updated successfully.");
+
+  renderSetup();
 };
+
+
+window.saveUsername = async () => {
+  const username = document.getElementById("uname").value.trim().toLowerCase();
+  const password = document.getElementById("signupPwd").value.trim();
+  const confirm = document.getElementById("confirmPwd").value.trim();
+
+  if (!username || !password || !confirm) {
+    return alert("Fill all fields");
+  }
+
+  if (password.length < 6) {
+    return alert("Password must be at least 6 digits");
+  }
+
+  if (password !== confirm) {
+    return alert("Passwords do not match");
+  }
+
+  const q = query(
+    collection(db, "users"),
+    where("username", "==", username)
+  );
+
+  const existing = await getDocs(q);
+
+  if (!existing.empty) {
+    return alert("Username already taken");
+  }
+
+  const newStbxId = generateSTBX();
+
+window.WALLET = newStbxId;
+window.userRef = doc(db, "users", newStbxId);
+window.validatorRef = doc(db, "validators", newStbxId);
+
+localStorage.setItem("stbx_uid", newStbxId);
+  
+  await setDoc(userRef, {
+    username,
+    password,
+    stbxId: newStbxId,
+    walletAddress: newStbxId,
+    googleUID: localStorage.getItem("stbx_google_uid") || "",
+    eoaAddress: "",
+    balance: 0,
+    usdtBalance: 0,
+    pendingRequest: false,
+    lastUsernameChange: serverTimestamp(),
+    createdAt: serverTimestamp()
+  });
+
+  renderApp();
+};
+
+async function manualLogin() {
+  const stbxId = document.getElementById("loginStbx").value.trim();
+  const password = document.getElementById("loginPwd").value.trim();
+
+  if (!stbxId || !password) {
+    return alert("Fill all fields");
+  }
+
+  const loginRef = doc(db, "users", stbxId);
+  const snap = await getDoc(loginRef);
+
+  if (!snap.exists()) {
+    return alert("Account not found");
+  }
+
+  const user = snap.data();
+
+  if (user.password !== password) {
+    return alert("Wrong password");
+  }
+
+  localStorage.setItem("stbx_uid", stbxId);
+
+  if (user.googleUID) {
+    localStorage.setItem("stbx_google_uid", user.googleUID);
+  }
+
+  location.reload();
+}
+window.manualLogin = manualLogin;
+
+function forgotPassword() {
+  appDiv(`
+    <div class="auth-page">
+
+      <div class="auth-close" onclick="renderSetup()">×</div>
+
+      <div class="auth-logo">
+        <h1>StabiX</h1>
+        <p>Pay Stablecoins Instant Without Gas</p>
+      </div>
+
+      <div class="auth-box">
+        <h2>Reset Password</h2>
+
+        <button class="google-btn" onclick="googleResetLogin()">
+          Continue with Google
+        </button>
+      </div>
+
+    </div>
+  `);
+}
+window.forgotPassword = forgotPassword;
 
 window.goHome = function(){
 const send = document.getElementById("sendScreen");
@@ -108,7 +296,21 @@ if(send) send.style.display = "none";
 if(amount) amount.style.display = "none";
 if(confirm) confirm.style.display = "none";
 };
-/* ================= UTIL ================= */
-window.appDiv = function(h){document.getElementById("app").innerHTML = h;}
 
+/* ================= INIT ================= */
+async function init() {
+  if (!window.WALLET) {
+    renderSetup();
+    return;
+  }
+
+  const snap = await getDoc(userRef);
+
+  if (!snap.exists()) {
+    renderSetup();
+    return;
+  }
+
+  renderApp();
+}
 init();

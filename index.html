@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>StabiX</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -37,7 +37,18 @@ Transaction Successful
 </div>
 
 <div id="txMsg" style="font-size:16px;"></div>
+
+<div id="txSTR"
+style="
+margin-top:8px;
+font-size:13px;
+font-weight:600;
+color:#60a5fa;
+">
+</div>
+
 <div id="txTime" class="small" style="margin-top:6px;"></div>
+
 <button id="txDoneBtn"
 style="margin-top:16px;background:#22c55e;color:#022c22;"
 onclick="closeTxPopup(); window.goHome();">
@@ -301,8 +312,9 @@ box-shadow:0 8px 30px rgba(0,0,0,0.6);
 </div>
 
   
-
+<script src="./js/identity.js"></script>
 <script type="module" src="./js/app.js"></script>
+<script src="./js/auth.js"></script>
   
  <!-- ===== Error Tool===== -->
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>

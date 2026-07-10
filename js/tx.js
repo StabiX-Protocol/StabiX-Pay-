@@ -1,3 +1,56 @@
+async function generateSTR(){
+
+  const systemRef = doc(db, "settings", "system");
+
+  return await runTransaction(db, async (tx)=>{
+
+    const snap = await tx.get(systemRef);
+
+    const nextSTR = snap.data().nextSTR || 1;
+
+    tx.update(systemRef,{
+      nextSTR: nextSTR + 1
+    });
+
+    const random = Math.floor(1000000000 + Math.random() * 9000000000);
+
+    return "STR" + "10" + random.toString();
+  });
+
+}
+window.generateSTR = generateSTR;
+
+import {
+  ref,
+  push,
+  set,
+  get
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+
+async function updateLiveFeed(txData){
+
+  const liveRef = ref(window.rtdb, "liveFeed");
+  const statsRef = ref(window.rtdb, "stats");
+
+  await push(liveRef, {
+    str: txData.str,
+    amount: txData.amount,
+    asset: txData.asset,
+    time: new Date().toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit"
+    })
+  });
+
+  const statsSnap = await get(statsRef);
+  const stats = statsSnap.exists() ? statsSnap.val() : {};
+
+  await set(statsRef,{
+    totalTx: (stats.totalTx || 0) + 1,
+    totalVolume: (stats.totalVolume || 0) + Number(txData.amount || 0)
+  });
+
+}
 /* ================= SEND USDC/USDT ================= */
 window.sendUSDC = async ()=>{
 const asset = window.primaryAsset;
@@ -16,6 +69,8 @@ let failed = false;
 try{
 document.getElementById("sendPopup")?.remove();
 await runTransaction(db, async(tx)=>{
+const str = await generateSTR();
+window.currentSTR = str;
 const fromSnap = await tx.get(userRef);
 const toRef = doc(db,"users",toWallet);
 const toSnap = await tx.get(toRef);
@@ -45,6 +100,7 @@ type:"sent",
 amount,
 asset,
 counterparty:toWallet,
+str: str,
 createdAt:serverTimestamp()
 });
 tx.set(doc(collection(db,"transactions")),{
@@ -53,13 +109,19 @@ type:"received",
 amount,
 asset,
 counterparty:WALLET,
+str: str,
 createdAt:serverTimestamp()
 });
 });
 if(!failed){
 if(window.isSender){
 showTxPopup(`Sent ${amount} ${asset} to ${toWallet}`, "success");
-}
+} 
+  await updateLiveFeed({
+  str: window.currentSTR,
+  amount,
+  asset
+});
 renderApp();
 window.isSender = false;
 }
@@ -290,8 +352,20 @@ ${t.amount} ${t.asset || "USDT"}
 margin-top:6px;
 font-size:15px;
 font-weight:600;
-color:${t.type === "deposit" ? "#22c55e" : "#ef4444"};">
-${t.type === "deposit" ? "Received" : "Withdraw"}
+color:${
+  t.type === "deposit" || t.type === "received"
+    ? "#22c55e"
+    : "#ef4444"
+};">
+${t.type === "deposit"
+ ? "Deposit"
+ : t.type === "withdraw"
+ ? "Withdraw"
+ : t.type === "received"
+ ? "Received"
+ : t.type === "sent"
+ ? "Sent"
+ : t.type}
 </div>
 
 <div style="
@@ -307,6 +381,15 @@ margin-top:6px;
 font-size:12px;
 color:#9ca3af;">
 ${t.createdAt?.toDate().toLocaleString() || "-"}
+</div>
+
+<div style="
+margin-top:8px;
+font-size:12px;
+color:#60a5fa;
+font-weight:600;
+word-break:break-all;">
+STR ID : ${t.str || "-"}
 </div>
 
 </div>
@@ -416,11 +499,17 @@ usdtBalance: balance
 await addDoc(collection(db,"transactions"),{
 userId: userId,
 type: type, 
+mode: "manual",
 amount: amount,
 asset: asset,
 counterparty: null,
 eoa: eoa,
 createdAt: new Date()
+});
+ await updateLiveFeed({
+  str: "MANUAL",
+  amount,
+  asset
 });
 alert(asset + " updated")
 }
@@ -441,7 +530,10 @@ html += `
 <b>${r.type.toUpperCase()} ${r.amount} ${r.asset || "USDC"}</b>
 <span class="small">
 User ID: ${r.userId}<br>
-Wallet: ${r.walletAddress}<br>
+Wallet: ${r.wallet || r.eoa || "N/A"}<br>
+Network: ${r.network || "N/A"}<br>
+Mode: ${r.mode || "advanced"}<br>
+STR: ${r.str || "N/A"}<br>
 ${r.txHash ? `Tx Hash: ${r.txHash}<br>` : ""}
 Time: ${time}
 </span>
@@ -468,14 +560,14 @@ let html = "";
 snap.forEach(d=>{
 const u = d.data();
 const username = u.username ? u.username : "No username";
-const tgWallet = u.walletAddress ? u.walletAddress : d.id;
+const stbxId = u.walletAddress ? u.walletAddress : d.id;
 const eoa = u.eoaAddress ? u.eoaAddress : "Not added";
   
 html += `
 <div class="tx">
 <b>${username}</b><br>
 <span class="small">
-TG: ${tgWallet}
+StabiX ID: ${stbxId}
 </span><br>
 <span class="small">
 EOA: ${eoa}
@@ -494,14 +586,18 @@ listDiv.innerHTML =
 
 window.approveReq = async (reqId)=>{
 const reqRef = doc(db,"requests",reqId);
+let reqData;
+let assetType;
 await runTransaction(db, async(tx)=>{
 const reqSnap = await tx.get(reqRef);
 if(!reqSnap.exists()) throw "Request not found";
 const r = reqSnap.data();
+reqData = r;
 const userRefX = doc(db,"users",r.userId);
 const userSnap = await tx.get(userRefX);
 if(!userSnap.exists()) throw "User not found";
 const asset = r.asset || "USDC";
+assetType = asset;
 let bal = 0;
 if(asset === "USDC"){
 bal = userSnap.data().balance || 0;
@@ -532,12 +628,19 @@ status:"approved"
 tx.set(doc(collection(db,"transactions")),{
 userId: r.userId,
 type: r.type,
+mode: r.mode || "instant",
 amount: r.amount,
+str: r.str,
 asset: asset,
 counterparty: null,
 eoa: r.eoa || null,
 createdAt: serverTimestamp()
 });
+});
+await updateLiveFeed({
+  str: reqData.str,
+  amount: reqData.amount,
+  asset: assetType
 });
 alert("Request approved");
 loadRequests();
@@ -584,6 +687,7 @@ if(!window.isSender) return;
 const popup = document.getElementById("txPopup")
 const title = document.getElementById("txTitle")
 const msgBox = document.getElementById("txMsg")
+const strBox = document.getElementById("txSTR")
 const tick = document.getElementById("tick")
 const cross1 = document.getElementById("crossLine1")
 const cross2 = document.getElementById("crossLine2")
@@ -591,6 +695,9 @@ const ring = document.querySelector(".circle-progress")
 const done = document.getElementById("txDoneBtn")
 popup.style.display="flex"
 msgBox.innerText = msg
+  strBox.innerText = window.currentSTR
+  ? `STR ID : ${window.currentSTR}`
+  : "";
 done.style.display="none"
 const timeBox = document.getElementById("txTime")
 if(type==="success"){
