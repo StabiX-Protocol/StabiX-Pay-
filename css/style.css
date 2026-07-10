@@ -882,14 +882,11 @@ white-space:nowrap;
 }
 
 .google-btn span{
-    display:flex;
-    align-items:center;
-    line-height:1;
-    margin:0;
+    margin-left:12px;
 }
 
 .google-icon{
     width:30px;
     height:30px;
+  transform:translateX(-4px) translateY(4px);
 }
-
