@@ -889,4 +889,5 @@ white-space:nowrap;
 .google-icon{
     width:24px;
     height:24px;
+  transform:translateX(-4px) translateY(2px);
 }
