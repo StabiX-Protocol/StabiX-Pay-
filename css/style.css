@@ -882,22 +882,11 @@ white-space:nowrap;
 }
 
 
-.google-btn{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:12px;
-}
-
 .google-btn span{
-    margin-left:0;
-    font-weight:600;
-    color:#111;
+    margin-left:12px;
 }
 
 .google-icon{
-    width:22px;
-    height:22px;
-    object-fit:contain;
-    flex-shrink:0;
+    width:24px;
+    height:24px;
 }
