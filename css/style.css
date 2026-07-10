@@ -835,9 +835,9 @@ white-space:nowrap;
   display:block;
 }
 
-.auth-box button:first-of-type{
-  background:var(--primary);
-  color:#fff;
+.auth-box > button:not(.google-btn){
+    background:var(--primary);
+    color:#fff;
 }
 
 .google-btn{
