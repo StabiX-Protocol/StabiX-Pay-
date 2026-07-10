@@ -880,26 +880,29 @@ white-space:nowrap;
   -webkit-user-select:none;
   -webkit-touch-callout:none;
 }
+
+
 .google-btn{
     width:100%;
     height:58px;
     background:#fff;
-    border:1px solid #ddd;
+    border:1px solid #dcdcdc;
     border-radius:18px;
+    color:#222;
+    font-size:18px;
+    font-weight:600;
+    cursor:pointer;
 
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:12px;
+}
 
-    font-size:18px;
-    font-weight:600;
-    color:#111;
+.google-btn span{
+    margin-left:12px;
 }
 
 .google-icon{
-    width:22px;
-    height:22px;
-    object-fit:contain;
-    flex-shrink:0;
+    width:24px;
+    height:24px;
 }
