@@ -844,10 +844,6 @@ white-space:nowrap;
   background:transparent;
   border:1px solid var(--border) !important;
   color:var(--text) !important;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
 }
 
 .divider{
@@ -885,13 +881,12 @@ white-space:nowrap;
   -webkit-touch-callout:none;
 }
 
-
 .google-btn span{
-    margin-left:0;
+    margin-left:12px;
 }
 
 .google-icon{
-    width:24px;
-    height:24px;
-    display:block;
+    width:30px;
+    height:30px;
 }
+
