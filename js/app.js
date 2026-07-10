@@ -46,8 +46,9 @@ function renderSetup(){
         <div class="divider">or</div>
 
         <button class="google-btn" onclick="googleLogin()">
-          Continue with Google
-        </button>
+    <img src="media/google-logo.png" class="google-icon" alt="Google">
+    <span>Continue with Google</span>
+</button>
 
         <div class="auth-links">
   <span class="auth-link" onclick="renderSignup();">
@@ -81,9 +82,9 @@ function renderSignup(){
         <h2>Create Account</h2>
 
         <button class="google-btn" onclick="googleLogin()">
-          Continue with Google
-        </button>
-      </div>
+    <img src="media/google-logo.png" class="google-icon" alt="Google">
+    <span>Continue with Google</span>
+</button>
 
     </div>
   `);
