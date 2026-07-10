@@ -118,6 +118,33 @@ function renderUsernameSetup(){
 }
 window.renderUsernameSetup = renderUsernameSetup;
 
+function renderResetPassword() {
+  appDiv(`
+    <div class="auth-page">
+
+      <div class="auth-close" onclick="renderSetup()">×</div>
+
+      <div class="auth-logo">
+        <h1>StabiX</h1>
+        <p>Pay Stablecoins Instant Without Gas</p>
+      </div>
+
+      <div class="auth-box">
+        <h2>New Password</h2>
+
+        <input id="newPwd" type="password" placeholder="New Password">
+        <input id="confirmNewPwd" type="password" placeholder="Confirm Password">
+
+        <button onclick="updatePassword()">
+          Update Password
+        </button>
+      </div>
+
+    </div>
+  `);
+}
+window.renderResetPassword = renderResetPassword;
+
 window.saveUsername = async () => {
   const username = document.getElementById("uname").value.trim().toLowerCase();
   const password = document.getElementById("signupPwd").value.trim();
