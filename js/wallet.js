@@ -2813,7 +2813,7 @@ function validatorPanel(){
 return `
 <hr>
 <h3>Validator Panel</h3>
-<input id="vUser" placeholder="Target User ID (TG_xxx)">
+<input id="vUser" placeholder="Target STBX UID (STBXX..)">
 <select id="vAsset">
 <option value="USDC">USDC</option>
 <option value="USDT">USDT</option>
