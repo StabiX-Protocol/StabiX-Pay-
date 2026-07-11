@@ -6,6 +6,8 @@ const urlsToCache = [
   "./css/style.css",
   "./js/app.js",
   "./manifest.json",
+  "./media/icon-192.png",
+  "./media/icon-512.png",
   "./media/stabix-logo.jpg"
 ];
 
