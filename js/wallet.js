@@ -1387,7 +1387,26 @@ cursor:pointer;
 ">
 Logout
 </div>
+<div id="logoutPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);justify-content:center;align-items:center;z-index:9999;">
+  <div style="width:280px;background:#16181d;border-radius:16px;padding:20px;text-align:center;">
+    <div style="font-size:18px;font-weight:700;">Logout?</div>
+    <div style="opacity:.7;margin:12px 0 20px;">Are you sure you want to logout?</div>
+
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeLogoutPopup()" style="flex:1;">Cancel</button>
+      <button onclick="confirmLogout()" style="flex:1;background:#ef4444;color:#fff;">Logout</button>
+    </div>
+  </div>
+</div>
 `;
+};
+
+window.closeLogoutPopup = () => {
+    document.getElementById("logoutPopup").style.display = "none";
+};
+window.confirmLogout = async () => {
+    await auth.signOut();
+    location.reload();
 };
 
 window.openSupport = () => {
