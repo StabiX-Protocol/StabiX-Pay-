@@ -63,31 +63,69 @@ appDiv(`
     
     <div id="profileHidden" class="profileHidden">
 
-    <div style="margin-top:3px;font-size:15px;font-weight:600;color:var(--tg-theme-text-color,#ffffff);">
-    ${WALLET}
-</div>
-</div>
+  <div style="margin-bottom:14px;">
 
-<div style="margin-top:14px;">
-
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span style="opacity:.6;font-size:11px;color: var(--tg-theme-hint-color, #8f97ad);">Linked Wallet Address</span>
-
-        <span
-            onclick="editEOA()"
-            style="font-size:12px;font-weight:600;color: var(--tg-theme-link-color, #5b8cff);;cursor:pointer;">
-            ${user.eoaAddress ? "Change" : "Add"}
-        </span>
+    <div style="
+      font-size:11px;
+      color:var(--tg-theme-hint-color,#8f97ad);
+      margin-bottom:4px;
+    ">
+      StabiX UID
     </div>
 
-    <div style="margin-top:5px;font-size:13px;line-height:1.5;word-break:break-all;color:var(--tg-theme-text-color,#ffffff);">
-    ${user.eoaAddress ? user.eoaAddress : "Not linked"}
-</div>
+    <div style="
+      font-size:15px;
+      font-weight:700;
+      color:var(--tg-theme-text-color,#ffffff);
+      letter-spacing:.3px;
+    ">
+      ${WALLET}
+    </div>
+
+  </div>
+
+  <div>
+
+    <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:4px;
+    ">
+
+      <span style="
+        font-size:11px;
+        color:var(--tg-theme-hint-color,#8f97ad);
+      ">
+        Linked Wallet Address
+      </span>
+
+      <span
+        onclick="editEOA()"
+        style="
+          font-size:12px;
+          font-weight:600;
+          color:var(--tg-theme-link-color,#5b8cff);
+          cursor:pointer;
+        "
+      >
+        ${user.eoaAddress ? "Change" : "Add"}
+      </span>
+
+    </div>
+
+    <div style="
+      font-size:13px;
+      line-height:1.5;
+      color:var(--tg-theme-text-color,#ffffff);
+      word-break:break-all;
+    ">
+      ${user.eoaAddress || "Not linked"}
+    </div>
+
+  </div>
 
 </div>
-
-</div>
-
 
     <div class="balanceBig">
     ${window.getPrimaryBalance()} ${window.primaryAsset}
