@@ -59,17 +59,32 @@ appDiv(`
     ${user.username}
     <span class="arrow">▼</span>
     </div>
-    <div id="profileHidden" class="profileHidden">
-    <div class="small">
-    Stabix UID
-    ${WALLET}
-    </div>
 
-    <div class="small" style="margin-top:10px">
-    EOA Wallet
-    ${user.eoaAddress ? user.eoaAddress : "Not added"}
-    </div>
-    </div>
+    
+    <div id="profileHidden" class="profileHidden">
+
+  <div style="font-size:11px;color:#7d8598;letter-spacing:.5px;">
+    StabiX ID
+  </div>
+
+  <div style="font-size:15px;font-weight:600;margin-top:3px;">
+    ${WALLET}
+  </div>
+
+  <div style="font-size:11px;color:#7d8598;letter-spacing:.5px;margin-top:12px;">
+    Linked Wallet Address
+  </div>
+
+  <div style="font-size:14px;font-weight:500;word-break:break-all;margin-top:3px;">
+    ${
+      user.eoaAddress
+      ? user.eoaAddress.slice(0,10) + "..." + user.eoaAddress.slice(-8)
+      : "Not linked"
+    }
+  </div>
+
+</div>
+
 
     <div class="balanceBig">
     ${window.getPrimaryBalance()} ${window.primaryAsset}
