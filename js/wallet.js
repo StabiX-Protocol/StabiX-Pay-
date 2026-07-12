@@ -1408,8 +1408,14 @@ window.closeLogoutPopup = () => {
     document.getElementById("logoutPopup").style.display = "none";
 };
 window.confirmLogout = async () => {
+    document.getElementById("logoutPopup").style.display = "none";
+
     await auth.signOut();
-    location.reload();
+
+    localStorage.removeItem("stbx_google_uid");
+    window.WALLET = null;
+
+    renderSetup();
 };
 
 window.openSupport = () => {
