@@ -61,12 +61,12 @@ appDiv(`
     </div>
     <div id="profileHidden" class="profileHidden">
     <div class="small">
-    Stabix UID<br>
+    Stabix UID
     ${WALLET}
     </div>
 
     <div class="small" style="margin-top:10px">
-    EOA Wallet<br>
+    EOA Wallet
     ${user.eoaAddress ? user.eoaAddress : "Not added"}
     </div>
     </div>
