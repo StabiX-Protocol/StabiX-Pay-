@@ -63,25 +63,30 @@ appDiv(`
     
     <div id="profileHidden" class="profileHidden">
 
-  <div style="font-size:11px;color:#7d8598;letter-spacing:.5px;">
-    StabiX ID
-  </div>
+  <div class="small">
+    <div style="opacity:.6;font-size:11px;">StabiX ID</div>
+    <div style="margin-top:3px;font-size:15px;font-weight:600;">
+        ${WALLET}
+    </div>
+</div>
 
-  <div style="font-size:15px;font-weight:600;margin-top:3px;">
-    ${WALLET}
-  </div>
+<div style="margin-top:14px;">
 
-  <div style="font-size:11px;color:#7d8598;letter-spacing:.5px;margin-top:12px;">
-    Linked Wallet Address
-  </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="opacity:.6;font-size:11px;">Linked Wallet Address</span>
 
-  <div style="font-size:14px;font-weight:500;word-break:break-all;margin-top:3px;">
-    ${
-      user.eoaAddress
-      ? user.eoaAddress.slice(0,10) + "..." + user.eoaAddress.slice(-8)
-      : "Not linked"
-    }
-  </div>
+        <span
+            onclick="editEOA()"
+            style="font-size:12px;font-weight:600;color:#4d8dff;cursor:pointer;">
+            ${user.eoaAddress ? "Change" : "Add"}
+        </span>
+    </div>
+
+    <div style="margin-top:5px;font-size:13px;line-height:1.5;word-break:break-all;">
+        ${user.eoaAddress ? user.eoaAddress : "Not linked"}
+    </div>
+
+</div>
 
 </div>
 
