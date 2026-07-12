@@ -2953,6 +2953,5 @@ renderApp();
 await updateDoc(userRef,{
 eoaAddress: addr.trim()
 });
-alert("EOA wallet locked successfully");
 renderApp();
 };
