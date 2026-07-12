@@ -2938,7 +2938,6 @@ if (!isEVM && !isTron) {
     alert("Please enter a valid wallet address.");
     return;
 }
-const newAddr = addr.trim();
 
 if (current && current.toLowerCase() === newAddr.toLowerCase()) {
     alert("This wallet address is already linked.");
