@@ -125,7 +125,7 @@ appDiv(`
     Only Send Your Assets To This QR Code.
     </p>
     <div style="margin-top:20px;font-weight:bold">
-    Wallet ID
+    StabiX UID
     </div>
     <div class="addrBox">
     <span id="walletAddr"></span>
