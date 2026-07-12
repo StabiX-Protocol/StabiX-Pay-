@@ -118,10 +118,10 @@ appDiv(`
     <div class="sendHeader">
     <button onclick="closeReceive()" class="backBtn">←</button>
     <h2 id="receiveTitle" style="display:flex;align-items:center;gap:8px;">
-  <span>Receive</span>
-  <img id="receiveAssetImg"
-       src="./media/usd-coin-usdc-logo.png"
-       style="width:20px;height:20px;border-radius:50%;">
+    <span id="receiveText">Receive USDC</span>
+    <img id="receiveAssetImg"
+         src="./media/usd-coin-usdc-logo.png"
+         style="width:20px;height:20px;border-radius:50%;">
 </h2>
     </div>
     <div class="sendBody" style="text-align:center">
@@ -557,6 +557,14 @@ box.style.display = "block"
 }
 window.showReceive = ()=>{
 const wallet = WALLET
+  const asset = window.primaryAsset;
+
+document.getElementById("receiveText").innerText = "Receive " + asset;
+
+document.getElementById("receiveAssetImg").src =
+  asset === "USDT"
+    ? "./media/tether-usdt-logo.png"
+    : "./media/usd-coin-usdc-logo.png";
 const qrData = JSON.stringify({
 type: "stabix",
 id: wallet,
