@@ -63,11 +63,16 @@ appDiv(`
     
     <div id="profileHidden" class="profileHidden">
 
-  <div class="small">
-    <div style="opacity:.6;font-size:11px;color: var(--tg-theme-hint-color, #8f97ad);">StabiX ID</div>
-    <div style="margin-top:3px;font-size:15px;color: var(--tg-theme-text-color, #ffffff);font-weight:600;">
-        ${WALLET}
-    </div>
+  <div style="
+    margin-top:3px;
+    font-size:15px;
+    font-weight:700;
+    color:var(--tg-theme-text-color,#ffffff);
+    opacity:1;
+    letter-spacing:0.3px;
+">
+    ${WALLET}
+</div>
 </div>
 
 <div style="margin-top:14px;">
@@ -82,9 +87,16 @@ appDiv(`
         </span>
     </div>
 
-    <div style="margin-top:5px;font-size:13px;color: var(--tg-theme-text-color, #ffffff);line-height:1.5;word-break:break-all;">
-        ${user.eoaAddress ? user.eoaAddress : "Not linked"}
-    </div>
+    <div style="
+    margin-top:5px;
+    font-size:13px;
+    line-height:1.5;
+    word-break:break-all;
+    color:var(--tg-theme-text-color,#ffffff);
+    opacity:1;
+">
+    ${user.eoaAddress ? user.eoaAddress : "Not linked"}
+</div>
 
 </div>
 
