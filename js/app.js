@@ -32,7 +32,7 @@ function renderSetup(){
 
       <div class="auth-logo">
         <h1>StabiX</h1>
-        <p>Pay Stablecoins Instant Without Gas</p>
+        <p>Pay Stablecoins Instant,Free & Secure</p>
       </div>
 
       <div class="auth-box">
