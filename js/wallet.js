@@ -117,7 +117,12 @@ appDiv(`
     <div id="receiveScreen" style="display:none">
     <div class="sendHeader">
     <button onclick="closeReceive()" class="backBtn">←</button>
-    <h2>Receive ${window.primaryAsset}</h2>
+    <h2 id="receiveTitle" style="display:flex;align-items:center;gap:8px;">
+  <span>Receive</span>
+  <img id="receiveAssetImg"
+       src="./media/usd-coin-usdc-logo.png"
+       style="width:20px;height:20px;border-radius:50%;">
+</h2>
     </div>
     <div class="sendBody" style="text-align:center">
     <div class="qrWrap"><img id="qrImg"></div>
@@ -125,7 +130,7 @@ appDiv(`
     Only Send Your Assets To This QR Code.
     </p>
     <div style="margin-top:20px;font-weight:bold">
-    Wallet ID
+    StabiX UID
     </div>
     <div class="addrBox">
     <span id="walletAddr"></span>
