@@ -1400,6 +1400,9 @@ Logout
 </div>
 `;
 };
+window.logout = () => {
+    document.getElementById("logoutPopup").style.display = "flex";
+};
 
 window.closeLogoutPopup = () => {
     document.getElementById("logoutPopup").style.display = "none";
