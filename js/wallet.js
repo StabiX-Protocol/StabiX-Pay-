@@ -63,14 +63,7 @@ appDiv(`
     
     <div id="profileHidden" class="profileHidden">
 
-  <div style="
-    margin-top:3px;
-    font-size:15px;
-    font-weight:700;
-    color:var(--tg-theme-text-color,#ffffff);
-    opacity:1;
-    letter-spacing:0.3px;
-">
+    <div style="margin-top:3px;font-size:15px;font-weight:600;color:var(--tg-theme-text-color,#ffffff);">
     ${WALLET}
 </div>
 </div>
@@ -87,14 +80,7 @@ appDiv(`
         </span>
     </div>
 
-    <div style="
-    margin-top:5px;
-    font-size:13px;
-    line-height:1.5;
-    word-break:break-all;
-    color:var(--tg-theme-text-color,#ffffff);
-    opacity:1;
-">
+    <div style="margin-top:5px;font-size:13px;line-height:1.5;word-break:break-all;color:var(--tg-theme-text-color,#ffffff);">
     ${user.eoaAddress ? user.eoaAddress : "Not linked"}
 </div>
 
