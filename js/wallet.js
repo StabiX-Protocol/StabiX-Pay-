@@ -64,8 +64,8 @@ appDiv(`
     <div id="profileHidden" class="profileHidden">
 
   <div class="small">
-    <div style="opacity:.6;font-size:11px;">StabiX ID</div>
-    <div style="margin-top:3px;font-size:15px;font-weight:600;">
+    <div style="opacity:.6;font-size:11px;color: var(--tg-theme-hint-color, #8f97ad);">StabiX ID</div>
+    <div style="margin-top:3px;font-size:15px;color: var(--tg-theme-text-color, #ffffff);font-weight:600;">
         ${WALLET}
     </div>
 </div>
@@ -73,16 +73,16 @@ appDiv(`
 <div style="margin-top:14px;">
 
     <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span style="opacity:.6;font-size:11px;">Linked Wallet Address</span>
+        <span style="opacity:.6;font-size:11px;color: var(--tg-theme-hint-color, #8f97ad);">Linked Wallet Address</span>
 
         <span
             onclick="editEOA()"
-            style="font-size:12px;font-weight:600;color:#4d8dff;cursor:pointer;">
+            style="font-size:12px;font-weight:600;color: var(--tg-theme-link-color, #5b8cff);;cursor:pointer;">
             ${user.eoaAddress ? "Change" : "Add"}
         </span>
     </div>
 
-    <div style="margin-top:5px;font-size:13px;line-height:1.5;word-break:break-all;">
+    <div style="margin-top:5px;font-size:13px;color: var(--tg-theme-text-color, #ffffff);line-height:1.5;word-break:break-all;">
         ${user.eoaAddress ? user.eoaAddress : "Not linked"}
     </div>
 
@@ -2929,14 +2929,28 @@ const addr = prompt(
 current || ""
 );
 if(!addr) return;
-if(addr.length < 20){
-alert("Invalid wallet address");
-return;
+const newAddr = addr.trim();
+
+const isEVM = /^0x[a-fA-F0-9]{40}$/.test(newAddr);
+const isTron = /^T[A-Za-z1-9]{33}$/.test(newAddr);
+
+if (!isEVM && !isTron) {
+    alert("Please enter a valid wallet address.");
+    return;
 }
-if (current) {
-alert("EOA wallet already locked");
-return;
+const newAddr = addr.trim();
+
+if (current && current.toLowerCase() === newAddr.toLowerCase()) {
+    alert("This wallet address is already linked.");
+    return;
 }
+
+await updateDoc(userRef, {
+    eoaAddress: newAddr
+});
+
+alert(current ? "Wallet address updated successfully." : "Wallet address linked successfully.");
+renderApp();
 await updateDoc(userRef,{
 eoaAddress: addr.trim()
 });
