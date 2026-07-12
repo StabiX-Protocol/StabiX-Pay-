@@ -279,8 +279,8 @@ function forgotPassword() {
         <h2>Reset Password</h2>
 
         <button class="google-btn" onclick="googleResetLogin()">
-          Continue with Google
-        </button>
+          <img src="media/google-logo.png" class="google-icon" alt="Google">
+          <span>Continue with Google</span>
       </div>
 
     </div>
