@@ -1,4 +1,4 @@
-const CACHE_NAME = "stabix-v1";
+const CACHE_NAME = "stabix-v1.0.01";
 
 const urlsToCache = [
   "./",
