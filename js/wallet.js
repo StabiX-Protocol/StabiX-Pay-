@@ -1474,6 +1474,11 @@ window.confirmLogout = async () => {
 
     window.WALLET = null;
 
+    const nav = document.getElementById("bottomNav");
+    if (nav) nav.style.display = "none";
+
+    appDiv("");
+
     renderSetup();
 };
 
