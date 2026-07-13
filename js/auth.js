@@ -31,18 +31,19 @@ const q = query(
 
 const snap = await getDocs(q);
 
-if (!snap.empty) {
-  const existingUser = snap.docs[0];
+if (snap.empty) {
+    await auth.signOut();
 
-  localStorage.setItem("stbx_uid", existingUser.id);
-  localStorage.setItem("stbx_google_uid", user.uid);
-
-  location.reload();
-  return;
+    alert("No StabiX account found with this Google account.\n\nPlease create an account first.");
+    return;
 }
 
+const existingUser = snap.docs[0];
+
+localStorage.setItem("stbx_uid", existingUser.id);
 localStorage.setItem("stbx_google_uid", user.uid);
-renderUsernameSetup();
+
+location.reload();
 return;
     
   } catch (e) {
