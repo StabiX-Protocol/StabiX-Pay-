@@ -1468,7 +1468,10 @@ window.confirmLogout = async () => {
 
     await auth.signOut();
 
+    localStorage.removeItem("stbx_uid");
     localStorage.removeItem("stbx_google_uid");
+    localStorage.removeItem("primaryAsset");
+
     window.WALLET = null;
 
     renderSetup();
