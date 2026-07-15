@@ -3039,3 +3039,84 @@ eoaAddress: addr.trim()
 });
 renderApp();
 };
+
+  // ================= Change Username=================
+window.changeUsername = async () => {
+
+    const snap = await getDoc(userRef);
+    const data = snap.data() || {};
+
+    const current = data.username || "";
+
+    if (data.lastUsernameChange) {
+
+        const last = data.lastUsernameChange.toDate
+            ? data.lastUsernameChange.toDate().getTime()
+            : new Date(data.lastUsernameChange).getTime();
+
+        const limit = 14 * 24 * 60 * 60 * 1000;
+
+        if (Date.now() - last < limit) {
+
+            const left = Math.ceil(
+                (limit - (Date.now() - last)) / 86400000
+            );
+
+            alert(
+                "Username can only be changed once every 14 days.\n\nRemaining: " +
+                left +
+                " day(s)."
+            );
+
+            return;
+        }
+    }
+
+    const username = prompt(
+        "Enter your new username",
+        current
+    );
+
+    if (!username) return;
+
+    const newName = username.trim();
+
+    if (newName === current) {
+        alert("This is already your current username.");
+        return;
+    }
+
+    if (!/^[A-Za-z0-9_]{3,20}$/.test(newName)) {
+        alert(
+            "Username must be 3-20 characters and contain only letters, numbers and underscore (_)."
+        );
+        return;
+    }
+
+    const check = query(
+        collection(db, "users"),
+        where("username", "==", newName)
+    );
+
+    const result = await getDocs(check);
+
+    if (!result.empty) {
+
+        const own = result.docs.find(doc => doc.id === userRef.id);
+
+        if (!own) {
+            alert("Username already taken.");
+            return;
+        }
+    }
+
+    await updateDoc(userRef, {
+        username: newName,
+        lastUsernameChange: serverTimestamp()
+    });
+
+    alert("Username updated successfully.");
+
+    renderApp();
+
+};
