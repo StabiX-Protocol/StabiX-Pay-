@@ -113,7 +113,6 @@ appDiv(`
       </span>
 
     </div>
-
     <div style="
       font-size:13px;
       line-height:1.5;
@@ -124,7 +123,7 @@ appDiv(`
     </div>
 
   </div>
-     
+  <br>
      <div>
     <div style="
         display:flex;
