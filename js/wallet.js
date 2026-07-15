@@ -988,7 +988,7 @@ document.getElementById("bottomNav").style.display = "flex";
 scanDone = false;
 };
 
-/* ================= Refresh ================= */
+/* ================= Refresh ================= 
 let refreshCount = 0;
 window.softRefresh = async function(){
 if(refreshCount >= 1){
@@ -1015,6 +1015,30 @@ user.usdtBalance || 0;
 }catch(e){
 alert("Refresh failed");
 }
+};
+*/
+let refreshBusy = false;
+window.softRefresh = function () {
+if (refreshBusy) return;
+refreshBusy = true;
+const btn = document.querySelector(".refreshIcon");
+const box = document.querySelector(".box");
+if (btn) {
+btn.style.transition = "transform .45s ease";
+btn.style.transform = "rotate(360deg)";
+}
+if (box) {
+box.style.opacity = "0.65";
+setTimeout(() => {
+box.style.opacity = "1";
+}, 220);
+}
+setTimeout(() => {
+if (btn) {
+btn.style.transform = "rotate(0deg)";
+}
+refreshBusy = false;
+}, 450);
 };
 /* ================= Notifications ================= */
 window.openNotifications = async () => {
