@@ -124,7 +124,47 @@ appDiv(`
     </div>
 
   </div>
+     
+     <div>
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:4px;
+    ">
 
+        <span style="
+            font-size:11px;
+            color:var(--tg-theme-hint-color,#8f97ad);
+        ">
+            Username
+        </span>
+
+        <span
+            onclick="changeUsername()"
+            style="
+                font-size:12px;
+                font-weight:600;
+                color:var(--tg-theme-link-color,#5b8cff);
+                cursor:pointer;
+            "
+        >
+            Change
+        </span>
+
+    </div>
+
+    <div style="
+        font-size:15px;
+        font-weight:700;
+        color:var(--tg-theme-text-color,#ffffff);
+        letter-spacing:.3px;
+        word-break:break-word;
+    ">
+        ${user.username || "Not set"}
+    </div>
+
+</div>
 </div>
 
     <div class="balanceBig">
