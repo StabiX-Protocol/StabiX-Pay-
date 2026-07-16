@@ -115,6 +115,7 @@ type="number"
 inputmode="decimal"
 placeholder="0"
 class="amountInput"
+oninput="if(this.value.startsWith('.')) this.value='0'+this.value"
 />
 <button class="nextBtn" onclick="handleNext()">
 Next
