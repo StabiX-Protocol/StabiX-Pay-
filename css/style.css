@@ -400,11 +400,24 @@ box-shadow:0 4px 12px rgba(37,99,235,.18);
 }
 
 .sendHint{
-margin-top:18px;
-text-align:center;
+margin-top:20px;
+padding:16px 18px;
+background:#111827;
+border:1px solid #1f2937;
+border-radius:14px;
+}
+
+.hintTitle{
+font-size:14px;
+font-weight:700;
+color:#ffffff;
+margin-bottom:10px;
+}
+
+.hintLine{
 font-size:13px;
-line-height:1.6;
-color:#8b95a7;
+color:#9ca3af;
+line-height:1.7;
 }
 
 .backBtn{
