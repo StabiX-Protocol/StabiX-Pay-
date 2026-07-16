@@ -441,10 +441,6 @@ appDiv(`
     </div>
     </div>
 
-    
-     
-    
-    
     <div id="dwSection" style="display:none;">
     <hr>
     <h3>Deposit / Withdraw</h3>
@@ -738,6 +734,21 @@ document.getElementById("amountScreen").style.display="flex"
 alert("Error checking user")
 }
 }
+
+const amt = document.getElementById("sendAmt");
+amt.addEventListener("input", function () {
+let v = this.value.replace(/[^0-9.]/g, "");
+if (v.startsWith(".")) v = "0" + v;
+const parts = v.split(".");
+if (parts.length > 2) {
+v = parts[0] + "." + parts.slice(1).join("");
+}
+if (!v.includes(".")) {
+v = String(Number(v || 0));
+if (v === "NaN") v = "";
+}
+this.value = v;
+});
 
 window.handleNext = async () => {
 const amount = Number(document.getElementById("sendAmt").value)
