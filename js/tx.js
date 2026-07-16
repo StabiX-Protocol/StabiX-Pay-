@@ -117,10 +117,10 @@ if(!failed){
 if(window.isSender){
 showTxPopup(`Sent ${amount} ${asset} to ${toWallet}`, "success");
 } 
-  await updateLiveFeed({
-  str: window.currentSTR,
-  amount,
-  asset
+await updateLiveFeed({
+str: window.currentSTR,
+amount,
+asset
 });
 renderApp();
 window.isSender = false;
@@ -506,10 +506,10 @@ counterparty: null,
 eoa: eoa,
 createdAt: new Date()
 });
- await updateLiveFeed({
-  str: "MANUAL",
-  amount,
-  asset
+await updateLiveFeed({
+str: "MANUAL",
+amount,
+asset
 });
 alert(asset + " updated")
 }
@@ -614,12 +614,14 @@ bal = bal - r.amount;
 if(asset === "USDC"){
 tx.update(userRefX,{
 balance: bal,
-pendingRequest:false
+pendingRequest:false,
+needsRefresh:true
 });
 }else{
 tx.update(userRefX,{
 usdtBalance: bal,
-pendingRequest:false
+pendingRequest:false,
+needsRefresh:true
 });
 }
 tx.update(reqRef,{
@@ -638,9 +640,9 @@ createdAt: serverTimestamp()
 });
 });
 await updateLiveFeed({
-  str: reqData.str,
-  amount: reqData.amount,
-  asset: assetType
+str: reqData.str,
+amount: reqData.amount,
+asset: assetType
 });
 alert("Request approved");
 loadRequests();
@@ -650,7 +652,8 @@ window.rejectReq = async (reqId)=>{
 const reqRef = doc(db,"requests",reqId);
 const snap = await getDoc(reqRef);
 await updateDoc(doc(db,"users", snap.data().userId),{
-pendingRequest:false  
+pendingRequest:false,
+needsRefresh:true
 });
 await updateDoc(reqRef,{ status:"rejected" });
 alert("Rejected");
