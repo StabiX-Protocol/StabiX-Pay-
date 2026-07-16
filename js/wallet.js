@@ -987,59 +987,26 @@ document.getElementById("previewScreen").style.display = "none";
 document.getElementById("bottomNav").style.display = "flex";
 scanDone = false;
 };
-
-/* ================= Refresh ================= 
-let refreshCount = 0;
-window.softRefresh = async function(){
-if(refreshCount >= 1){
-const el = document.querySelector(".box");
-if(el){
-el.style.opacity = "0.5";
-setTimeout(()=> el.style.opacity = "1", 300);
-}
-console.log("Fake refresh (no DB read)");
-return;
-}
-refreshCount++; 
-try{
-const snap = await getDoc(userRef);
-if(!snap.exists()){
-alert("Session expired");
-return;
-}
-const user = snap.data();
-document.getElementById("usdcBalance").innerText =
-user.balance || 0;
-document.getElementById("usdtBalance").innerText =
-user.usdtBalance || 0;
-}catch(e){
-alert("Refresh failed");
-}
-};
-*/
-let refreshBusy = false;
-window.softRefresh = function () {
-if (refreshBusy) return;
-refreshBusy = true;
-const btn = document.querySelector(".refreshIcon");
+/*==================Refresh=============*/
+window.softRefresh = async function () {
 const box = document.querySelector(".box");
-if (btn) {
-btn.style.transition = "transform .45s ease";
-btn.style.transform = "rotate(360deg)";
-}
 if (box) {
-box.style.opacity = "0.65";
+box.style.transition = "opacity .15s ease";
+box.style.opacity = ".65";
 setTimeout(() => {
 box.style.opacity = "1";
-}, 220);
+}, 150);
 }
-setTimeout(() => {
-if (btn) {
-btn.style.transform = "rotate(0deg)";
+const snap = await getDoc(userRef);
+const data = snap.data() || {};
+if (data.needsRefresh === true) {
+await renderApp();
+await updateDoc(userRef,{
+needsRefresh:false
+});
 }
-refreshBusy = false;
-}, 450);
 };
+
 /* ================= Notifications ================= */
 window.openNotifications = async () => {
 document.getElementById("bottomNav").style.display = "none";
