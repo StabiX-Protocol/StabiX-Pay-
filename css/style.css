@@ -460,6 +460,25 @@ opacity:.6;
 }
 
 }
+.amountInput{
+    width:100%;
+    height:72px;
+    padding:0 22px;
+    border:2px solid #2d5cff;
+    border-radius:18px;
+    background:#161b2d;
+    color:#fff;
+    font-size:38px;
+    font-weight:700;
+    outline:none;
+    box-sizing:border-box;
+}
+
+.amountInput::placeholder{
+    color:#7f8aa3;
+    font-size:24px;
+    font-weight:500;
+}
 
 /* ===== Recieve UI===== */
 #receiveScreen{
