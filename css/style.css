@@ -480,6 +480,68 @@ opacity:.6;
     font-weight:500;
 }
 
+/* ===== Confirm Screen===== */
+
+.confirmAmount{
+    margin:40px 0 28px;
+    font-size:60px;
+    font-weight:700;
+    text-align:center;
+    color:var(--tg-theme-text-color,#fff);
+}
+
+.confirmDivider{
+    border:none;
+    border-top:1px solid rgba(120,140,180,.25);
+    margin:0 0 26px;
+}
+
+.confirmRow{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    padding:14px 0;
+}
+
+.confirmLabel{
+    font-size:15px;
+    color:var(--tg-theme-hint-color,#8f97ad);
+    white-space:nowrap;
+}
+
+.confirmValue{
+    font-size:15px;
+    font-weight:600;
+    color:var(--tg-theme-text-color,#fff);
+    text-align:right;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.mono{
+    font-family:monospace;
+}
+
+.confirmHint{
+    margin:22px 0 26px;
+    font-size:13px;
+    line-height:1.6;
+    color:var(--tg-theme-hint-color,#8f97ad);
+}
+
+.confirmBtn{
+    width:100%;
+    height:56px;
+    border:none;
+    border-radius:16px;
+    background:#22c55e;
+    color:#fff;
+    font-size:18px;
+    font-weight:700;
+}
+
 /* ===== Recieve UI===== */
 #receiveScreen{
   position: fixed;
