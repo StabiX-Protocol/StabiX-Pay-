@@ -128,23 +128,28 @@ Next
 <button onclick="backToAmount()" class="backBtn">←</button>
 </div>
 <div class="sendBody">
-<h1 id="confirmAmount" style="font-size:56px;text-align:center;">
+<h1 id="confirmAmount" class="confirmAmount">
 -0 USDC
 </h1>
-<hr>
-<p>Transaction Fee</p>
-<p id="feeText">0</p>
-<p>From</p>
-<p id="confirmFrom"></p>
-<p>To</p>
-<p id="confirmTo"></p>
-<div style="margin-top:30px;display:flex;gap:10px">
-<button onclick="sendUSDC()" 
-style="width:80%;margin:20px auto;padding:14px;background:#22c55e;color:#fff;border:none;border-radius:12px;display:block;">
+<hr class="confirmDivider">
+<div class="confirmRow">
+<span class="confirmLabel">Transaction Fee</span>
+<span id="feeText" class="confirmValue">0</span>
+</div>
+<div class="confirmRow">
+<span class="confirmLabel">From</span>
+<span id="confirmFrom" class="confirmValue mono"></span>
+</div>
+<div class="confirmRow">
+<span class="confirmLabel">To</span>
+<span id="confirmTo" class="confirmValue mono"></span>
+</div>
+<div class="confirmHint">
+Verify the recipient before confirming. This transaction cannot be reversed.
+</div>
+<button class="confirmBtn" onclick="sendUSDC()">
 Confirm
 </button>
-</button>
-</div>
 </div>
 </div>
              
