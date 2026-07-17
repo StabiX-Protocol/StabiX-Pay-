@@ -544,7 +544,7 @@ appDiv(`
     </h2>
     </div>
     <div class="sendBody">
-    <h1 class="sendTitle">Receiving Scanned StabiX UID</h1>
+    <h1 class="sendTitle">Receiving StabiX UID</h1>
     <div class="addressBox">
     <input id="previewId" readonly />
     </div>
