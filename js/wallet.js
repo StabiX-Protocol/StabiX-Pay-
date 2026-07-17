@@ -544,17 +544,25 @@ appDiv(`
     </h2>
     </div>
     <div class="sendBody">
-    <h1 class="sendTitle">Receiving address</h1>
-    <p class="sendSub">Scanned wallet ID</p>
+    <h1 class="sendTitle">Receiving Address</h1>
     <div class="addressBox">
     <input id="previewId" readonly />
     </div>
     <button class="nextBtn" onclick="confirmReceiver()">
     Confirm
     </button>
+    <div class="sendHint">
+    <div class="hintTitle">
+    Instructions
+    </div>
+    <div class="hintLine">
+    • Verify Recipient Scanned StabiX UID before confirming.
+    </div>
+    <div class="hintLine">
+    • Once Confirmed, Proceed To Enter The Transfer Amount.
     </div>
     </div>
-    </div>  
+    </div>
 `);
 document.getElementById("bottomNav").style.display = "flex";
 selectTab("home");
