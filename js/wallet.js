@@ -44,13 +44,12 @@ const dd = String(now.getDate()).padStart(2,"0");
 const today = `${yyyy}-${mm}-${dd}`;
 appDiv(`
     <div class="box">
-    <div class="refreshIcon" onclick="softRefresh()">↻</div>
     <div class="walletHeader">
 
     <div class="notifBell" onclick="openNotifications()">
     <svg viewBox="0 0 24 24" fill="none">
-    <path d="M12 3C9.8 3 8 4.8 8 7V9.5C8 10.3 7.7 11 7.2 11.6L6 13.2C5.4 14 5.9 15 6.9 15H17.1C18.1 15 18.6 14 18 13.2L16.8 11.6C16.3 11 16 10.3 16 9.5V7C16 4.8 14.2 3 12 3Z" stroke="white" stroke-width="1.8"/>
-    <path d="M10 18C10.3 18.9 11.1 19.5 12 19.5C12.9 19.5 13.7 18.9 14 18" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M12 3C9.8 3 8 4.8 8 7V9.5C8 10.3 7.7 11 7.2 11.6L6 13.2C5.4 14 5.9 15 6.9 15H17.1C18.1 15 18.6 14 18 13.2L16.8 11.6C16.3 11 16 10.3 16 9.5V7C16 4.8 14.2 3 12 3Z" stroke="currentColor" stroke-width="1.8"/>
+    <path d="M10 18C10.3 18.9 11.1 19.5 12 19.5C12.9 19.5 13.7 18.9 14 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
     </svg>
     <span id="notifCount" class="notifCount"></span>
     </div>
@@ -67,7 +66,7 @@ appDiv(`
 
     <div style="
       font-size:11px;
-      color:var(--tg-theme-hint-color,#8f97ad);
+      color:var(--subtext);
       margin-bottom:4px;
     ">
       StabiX UID
@@ -76,7 +75,7 @@ appDiv(`
     <div style="
       font-size:15px;
       font-weight:700;
-      color:var(--tg-theme-text-color,#ffffff);
+      color:var(--text);
       letter-spacing:.3px;
     ">
       ${WALLET}
@@ -95,7 +94,7 @@ appDiv(`
 
       <span style="
         font-size:11px;
-        color:var(--tg-theme-hint-color,#8f97ad);
+        color:var(--subtext);
       ">
         Linked Wallet Address
       </span>
@@ -105,7 +104,7 @@ appDiv(`
         style="
           font-size:12px;
           font-weight:600;
-          color:var(--tg-theme-link-color,#5b8cff);
+          color:var(--primary);
           cursor:pointer;
         "
       >
@@ -116,7 +115,7 @@ appDiv(`
     <div style="
       font-size:13px;
       line-height:1.5;
-      color:var(--tg-theme-text-color,#ffffff);
+      color:var(--text);
       word-break:break-all;
     ">
       ${user.eoaAddress || "Not linked"}
@@ -134,7 +133,7 @@ appDiv(`
 
         <span style="
             font-size:11px;
-            color:var(--tg-theme-hint-color,#8f97ad);
+            color:var(--subtext);
         ">
             Username
         </span>
@@ -144,7 +143,7 @@ appDiv(`
             style="
                 font-size:12px;
                 font-weight:600;
-                color:var(--tg-theme-link-color,#5b8cff);
+                color:var(--primary);
                 cursor:pointer;
             "
         >
@@ -156,7 +155,7 @@ appDiv(`
     <div style="
         font-size:15px;
         font-weight:700;
-        color:var(--tg-theme-text-color,#ffffff);
+        color:var(--text);
         letter-spacing:.3px;
         word-break:break-word;
     ">
@@ -174,7 +173,7 @@ appDiv(`
     <div class="walletAction" onclick="openSend()">
     <div class="walletActionIcon">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-    <path d="M12 19V5M12 5L6 11M12 5L18 11" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    <path d="M12 19V5M12 5L6 11M12 5L18 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
     </svg>
     </div>
     <div class="walletActionLabel">Send</div>
@@ -183,7 +182,7 @@ appDiv(`
     <div class="walletAction" onclick="showReceive()">
     <div class="walletActionIcon">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-    <path d="M12 5V19M12 19L6 13M12 19L18 13" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    <path d="M12 5V19M12 19L6 13M12 19L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
     </svg>
     </div>
     <div class="walletActionLabel">Receive</div>
@@ -192,14 +191,14 @@ appDiv(`
     <div class="walletAction" onclick="openScanner()">
     <div class="walletActionIcon">
     <svg viewBox="0 0 24 24" fill="none">
-    <path d="M5 9V6.5C5 6.2 5.2 6 5.5 6H8" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-    <path d="M16 6H18.5C18.8 6 19 6.2 19 6.5V9" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-    <path d="M5 15V17.5C5 17.8 5.2 18 5.5 18H8" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-    <path d="M16 18H18.5C18.8 18 19 17.8 19 17.5V15" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-    <rect x="8" y="8" width="2.2" height="2.2" rx="0.5" fill="white"/>
-    <rect x="13.8" y="8" width="2.2" height="2.2" rx="0.5" fill="white"/>
-    <rect x="8" y="13.8" width="2.2" height="2.2" rx="0.5" fill="white"/>
-    <rect x="13.8" y="13.8" width="2.2" height="2.2" rx="0.5" fill="white"/>
+    <path d="M5 9V6.5C5 6.2 5.2 6 5.5 6H8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M16 6H18.5C18.8 6 19 6.2 19 6.5V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M5 15V17.5C5 17.8 5.2 18 5.5 18H8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M16 18H18.5C18.8 18 19 17.8 19 17.5V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="8" y="8" width="2.2" height="2.2" rx="0.5" fill="currentColor"/>
+    <rect x="13.8" y="8" width="2.2" height="2.2" rx="0.5" fill="currentColor"/>
+    <rect x="8" y="13.8" width="2.2" height="2.2" rx="0.5" fill="currentColor"/>
+    <rect x="13.8" y="13.8" width="2.2" height="2.2" rx="0.5" fill="currentColor"/>
     </svg>
     </div>
     <div class="walletActionLabel">Scan</div>
