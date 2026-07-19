@@ -481,11 +481,11 @@ box-shadow:0 5px 14px rgba(37,99,235,.18);
 }
 
 .sendHint{
-margin-top:22px;
-padding:18px;
+margin-top:20px;
+padding:16px 18px;
 background:var(--surface);
 border:1px solid var(--border);
-border-radius:18px;
+border-radius:14px;
 box-shadow:var(--shadow);
 transition:.2s;
 }
