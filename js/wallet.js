@@ -223,7 +223,7 @@ appDiv(`
     <p class="small" style="margin-top:10px">
     Only Send Your Assets To This QR Code.
     </p>
-    <div style="margin-top:20px;font-weight:bold">
+    <div style="margin-top:20px;font-weight:bold;color:var(--subtext)">
     StabiX UID
     </div>
     <div class="addrBox">
