@@ -893,12 +893,12 @@ font-weight:500;
     font-size:60px;
     font-weight:700;
     text-align:center;
-    color:var(--tg-theme-text-color,#fff);
+    color:var(--text);
 }
 
 .confirmDivider{
     border:none;
-    border-top:1px solid rgba(120,140,180,.25);
+    border-top:1px solid var(--border);
     margin:0 0 26px;
 }
 
@@ -912,14 +912,14 @@ font-weight:500;
 
 .confirmLabel{
     font-size:15px;
-    color:var(--tg-theme-hint-color,#8f97ad);
+    color:var(--subtext);
     white-space:nowrap;
 }
 
 .confirmValue{
     font-size:15px;
     font-weight:600;
-    color:var(--tg-theme-text-color,#fff);
+    color:var(--text);
     text-align:right;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -934,7 +934,7 @@ font-weight:500;
     margin:22px 0 26px;
     font-size:13px;
     line-height:1.6;
-    color:var(--tg-theme-hint-color,#8f97ad);
+    color:var(--subtext);
 }
 
 .confirmBtn{
@@ -942,8 +942,8 @@ font-weight:500;
     height:56px;
     border:none;
     border-radius:16px;
-    background:#22c55e;
-    color:#fff;
+    background:var(--success);
+    color:var(--text);
     font-size:18px;
     font-weight:700;
 }
