@@ -288,7 +288,7 @@ appDiv(`
     </div>
                  <!-- USDC -->
     <div style="
-    background:#020617;
+    background:var(--surface);
     border:1px solid var(--border);
     border-radius:12px;
     padding:12px;
