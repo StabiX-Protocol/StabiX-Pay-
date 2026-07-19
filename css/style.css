@@ -1808,4 +1808,169 @@ display:block;
 .animate-slideIn {
     animation: slideIn 0.4s ease-out;
         }
-    
+
+
+/* ========== PREMIUM SVG ICON STYLING ========== */
+
+.premium-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px auto;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+    border: 1.5px solid rgba(37, 99, 235, 0.2);
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-card:hover .premium-icon {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%);
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+}
+
+.premium-icon svg {
+    width: 32px;
+    height: 32px;
+    stroke: var(--primary);
+    color: var(--primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-card:hover .premium-icon svg {
+    stroke: var(--primary-hover);
+    color: var(--primary-hover);
+    filter: drop-shadow(0 4px 12px rgba(37, 99, 235, 0.2));
+}
+
+/* ========== ICON ANIMATION ON CARD HOVER ========== */
+
+@keyframes iconFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.premium-card:hover .premium-icon {
+    animation: iconFloat 0.6s ease-in-out;
+}
+
+/* ========== ADDITIONAL ICON STYLES ========== */
+
+/* Pulse effect on icon */
+@keyframes pulse-icon {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.premium-icon.pulse svg {
+    animation: pulse-icon 2s ease-in-out infinite;
+}
+
+/* Rotate effect */
+@keyframes rotate-icon {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.premium-icon.rotate svg {
+    animation: rotate-icon 4s linear infinite;
+}
+
+/* Success icon style */
+.premium-icon.success {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+.premium-icon.success svg {
+    stroke: var(--success);
+    color: var(--success);
+}
+
+.premium-card:hover .premium-icon.success {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
+    border-color: var(--success);
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.15);
+}
+
+/* Warning icon style */
+.premium-icon.warning {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.premium-icon.warning svg {
+    stroke: var(--warning);
+    color: var(--warning);
+}
+
+.premium-card:hover .premium-icon.warning {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
+    border-color: var(--warning);
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.15);
+}
+
+/* Danger icon style */
+.premium-icon.danger {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.premium-icon.danger svg {
+    stroke: var(--danger);
+    color: var(--danger);
+}
+
+.premium-card:hover .premium-icon.danger {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%);
+    border-color: var(--danger);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.15);
+}
+
+/* ========== SVG STROKE WIDTH CONTROL ========== */
+
+.premium-icon svg {
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Responsive icon sizing */
+@media (max-width: 480px) {
+    .premium-icon {
+        width: 52px;
+        height: 52px;
+    }
+
+    .premium-icon svg {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+@media (max-width: 360px) {
+    .premium-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .premium-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
