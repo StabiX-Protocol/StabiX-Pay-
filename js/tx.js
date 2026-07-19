@@ -218,7 +218,7 @@ const id = t.id || t.txId || "";
 const isCredit = t.type === "received" || t.type === "deposit";
 const symbol = t.asset === "USDT" ? "USDT" : "USDC";
 const amount = `${isCredit ? "+" : "-"} ${t.amount} ${symbol}`;
-const color = isCredit ? "#22c55e" : "#ef4444";
+const color = isCredit ? "var(--success)" : "var(--danger)";
 const dateStr = t.createdAt.toDate().toLocaleString("en-IN", {
 day: "2-digit",
 month: "short",
@@ -241,7 +241,7 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 padding:12px 0;
-border-bottom:1px solid rgba(203,213,245,0.3);
+border-bottom:1px solid var(--border);
 cursor:pointer;
 ">
 
@@ -254,9 +254,9 @@ style="
 width:34px;
 height:34px;
 border-radius:50%;
-background:#020617;
+background:var(--surface);
 padding:4px;
-border:1px solid #1e293b;
+border:1px solid var(--border);
 "/>
 <div>
 <div style="font-weight:600;font-size:14px">
@@ -275,8 +275,8 @@ font-size:11px;
 padding:3px 8px;
 border-radius:999px;
 display:inline-block;
-background:rgba(34,197,94,0.1);
-color:${isCredit ? "#22c55e" : "#ef4444"};">
+background:color-mix(in srgb, var(--success) 10%, transparent);
+color:${isCredit ? "var(--success)" : "var(--danger)"};">
 ${label}
 </div>
 
@@ -332,7 +332,7 @@ left:16px;
 width:36px;
 height:36px;
 border-radius:10px;
-background:#111827;
+background:var(--surface);
 display:flex;
 align-items:center;
 justify-content:center;
@@ -354,8 +354,8 @@ font-size:15px;
 font-weight:600;
 color:${
   t.type === "deposit" || t.type === "received"
-    ? "#22c55e"
-    : "#ef4444"
+    ? "var(--success)"
+    : "var(--danger)"
 };">
 ${t.type === "deposit"
  ? "Deposit"
@@ -371,7 +371,7 @@ ${t.type === "deposit"
 <div style="
 margin-top:8px;
 font-size:14px;
-color:#22c55e;
+color:var(--success);
 font-weight:600;">
 ✔ Completed
 </div>
@@ -379,14 +379,14 @@ font-weight:600;">
 <div style="
 margin-top:6px;
 font-size:12px;
-color:#9ca3af;">
+color:var(--subtext);">
 ${t.createdAt?.toDate().toLocaleString() || "-"}
 </div>
 
 <div style="
 margin-top:8px;
 font-size:12px;
-color:#60a5fa;
+color:var(--primary);
 font-weight:600;
 word-break:break-all;">
 STR ID : ${t.str || "-"}
@@ -394,23 +394,23 @@ STR ID : ${t.str || "-"}
 
 </div>
 
-<div style="margin:20px 0;height:1px;background:rgba(255,255,255,0.08);"></div>
+<div style="margin:20px 0;height:1px;background:var(--border);"></div>
 
 <div style="
-background:rgba(255,255,255,0.02);
-border:1px solid rgba(255,255,255,0.08);
+background:var(--surface);
+border:1px solid var(--border);
 border-radius:16px;
 padding:16px;">
     
 <div style="margin-bottom:14px;">
-<div style="color:#9ca3af;font-size:12px;">From</div>
+<div style="color:var(--subtext);font-size:12px;">From</div>
 <div style="font-weight:600;font-size:14px;word-break:break-all;">
 ${from}
 </div>
 </div>
 
 <div>
-<div style="color:#9ca3af;font-size:12px;">To</div>
+<div style="color:var(--subtext);font-size:12px;">To</div>
 <div style="font-weight:600;font-size:14px;word-break:break-all;">
 ${to}
 </div>
@@ -724,10 +724,10 @@ cross2.offsetHeight
   
 if(type==="failed"){
 title.innerText="Transaction Failed"
-title.style.color="#ef4444"
-ring.style.stroke="#ef4444"
-done.style.background="#ef4444"
-done.style.color="white"
+title.style.color="var(--danger)"
+ring.style.stroke="var(--danger)"
+done.style.background="var(--danger)"
+done.style.color="var(--text)"
 cross1.style.display="block"
 cross2.style.display="block"
 cross1.style.animation="tickDraw .35s ease forwards"
@@ -736,10 +736,10 @@ cross2.style.animation="tickDraw .35s ease forwards"
   
 else{
 title.innerText="Transaction Successful"
-title.style.color="#22c55e"
-ring.style.stroke="#22c55e"
-done.style.background="#22c55e"
-done.style.color="#022c22"
+title.style.color="var(--success)"
+ring.style.stroke="var(--success)"
+done.style.background="var(--success)"
+done.style.color="var(--bg)"
 tick.style.display="block"
 tick.style.animation="tickDraw .35s ease forwards"
 }
