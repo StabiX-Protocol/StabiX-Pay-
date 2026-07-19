@@ -32,7 +32,7 @@ function renderSetup(){
 
       <div class="auth-logo">
         <h1>StabiX</h1>
-        <p>Pay Stablecoins Instant Without Gas</p>
+        <p>Pay Stablecoins Instant, Free & Secure</p>
       </div>
 
       <div class="auth-box">
@@ -75,7 +75,7 @@ function renderSignup(){
 
       <div class="auth-logo">
         <h1>StabiX</h1>
-        <p>Pay Stablecoins Instant Without Gas</p>
+        <p>Pay Stablecoins Instant, Free & Secure</p>
       </div>
 
       <div class="auth-box">
@@ -101,7 +101,7 @@ function renderUsernameSetup(){
 
       <div class="auth-logo">
         <h1>StabiX</h1>
-        <p>Pay Stablecoins Instant Without Gas</p>
+        <p>Pay Stablecoins Instant, Free & Secure</p>
       </div>
 
       <div class="auth-box">
@@ -127,7 +127,7 @@ function renderResetPassword() {
 
       <div class="auth-logo">
         <h1>StabiX</h1>
-        <p>Pay Stablecoins Instant Without Gas</p>
+        <p>Pay Stablecoins Instant, Free & Secure</p>
       </div>
 
       <div class="auth-box">
@@ -272,15 +272,15 @@ function forgotPassword() {
 
       <div class="auth-logo">
         <h1>StabiX</h1>
-        <p>Pay Stablecoins Instant Without Gas</p>
+        <p>Pay Stablecoins Instant, Free & Secure</p>
       </div>
 
       <div class="auth-box">
         <h2>Reset Password</h2>
 
         <button class="google-btn" onclick="googleResetLogin()">
-          Continue with Google
-        </button>
+          <img src="media/google-logo.png" class="google-icon" alt="Google">
+          <span>Continue with Google</span>
       </div>
 
     </div>

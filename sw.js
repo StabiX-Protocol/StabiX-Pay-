@@ -1,4 +1,4 @@
-const CACHE_NAME = "stabix-v1";
+const CACHE_NAME = "stabix-v1.0.01";
 
 const urlsToCache = [
   "./",
@@ -18,6 +18,15 @@ self.addEventListener("install", event => {
 });
 
 self.addEventListener("fetch", event => {
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request, { cache: "no-store" }).catch(() =>
+        caches.match("./index.html")
+      )
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request);

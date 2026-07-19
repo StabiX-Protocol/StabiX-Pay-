@@ -4,9 +4,11 @@
 <title>StabiX</title>
 <link rel="manifest" href="manifest.json">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="stylesheet" href="css/style.css">
 <meta name="theme-color" content="#0B1020">
+<link rel="icon" type="image/png" sizes="32x32" href="./media/icon-192.png">
+<link rel="shortcut icon" href="./media/icon-192.png">
+<link rel="apple-touch-icon" href="./media/icon-192.png">
 </head>
 <body>
 <div id="app">Loading…</div>
@@ -73,17 +75,26 @@ style="width:20px;height:20px;border-radius:50%;">
 </h2>
 </div>
 <div class="sendBody">
-<h1 class="sendTitle">Receiving Wallet ID</h1>
+<h1 class="sendTitle">StabiX UID</h1>
 <div class="addressBox">
 <input
 id="sendTo"
-placeholder="Enter Wallet ID (TG_xxx)"
+placeholder="Enter StabiX UID (STBXxxx)"
 autocomplete="off"
 />
 </div>
 <button class="nextBtn" onclick="goAmount()">
 Next
 </button>
+</div>
+<div class="sendHint">
+<div class="hintTitle">Transfer Guidelines</div>
+<div class="hintLine">
+• Enter the recipient's valid StabiX UID.
+</div>
+<div class="hintLine">
+• Verify the UID before proceeding.
+</div>
 </div>
 </div>
     <!-- ===== Amount Screen===== -->
@@ -102,10 +113,11 @@ style="width:20px;height:20px;border-radius:50%;">
 <h1 class="sendTitle">Enter Amount</h1>
 <input
 id="sendAmt"
-type="number"
+type="text"
 inputmode="decimal"
 placeholder="0"
 class="amountInput"
+oninput="if(this.value.startsWith('.')) this.value='0'+this.value"
 />
 <button class="nextBtn" onclick="handleNext()">
 Next
@@ -118,28 +130,32 @@ Next
 <button onclick="backToAmount()" class="backBtn">←</button>
 </div>
 <div class="sendBody">
-<h1 id="confirmAmount" style="font-size:56px;text-align:center;">
+<h1 id="confirmAmount" class="confirmAmount">
 -0 USDC
 </h1>
+<hr class="confirmDivider">
+<div class="confirmRow">
+<span class="confirmLabel">Transaction Fee</span>
+<span id="feeText" class="confirmValue">0</span>
+</div>
 <hr>
-<p>Transaction Fee</p>
-<p id="feeText">0</p>
-<p>From</p>
-<p id="confirmFrom"></p>
-<p>To</p>
-<p id="confirmTo"></p>
-<div style="margin-top:30px;display:flex;gap:10px">
-<button onclick="sendUSDC()" 
-style="width:80%;margin:20px auto;padding:14px;background:#22c55e;color:#fff;border:none;border-radius:12px;display:block;">
+<div class="confirmRow">
+<span class="confirmLabel">From</span>
+<span id="confirmFrom" class="confirmValue mono"></span>
+</div>
+<hr>
+<div class="confirmRow">
+<span class="confirmLabel">To</span>
+<span id="confirmTo" class="confirmValue mono"></span>
+</div>
+<button class="confirmBtn" onclick="sendUSDC()">
 Confirm
 </button>
-</button>
-</div>
 </div>
 </div>
              
  <!-- ===== QR Code===== -->
- <script src="https://unpkg.com/html5-qrcode"></script> 
+<script src="https://unpkg.com/html5-qrcode"></script> 
 
 <div id="scannerOverlay" style="
 display:none;
@@ -148,7 +164,7 @@ top:0;
 left:0;
 width:100vw;
 height:100vh;
-background:black;
+background:var(--card);
 z-index:99999;
 ">
 
@@ -181,7 +197,7 @@ position:absolute;
 top:15px;
 left:15px;
 background:rgba(0,0,0,0.7);
-color:#fff;
+color:var(--text);
 border:none;
 font-size:18px;
 width:40px;
@@ -195,7 +211,7 @@ position:absolute;
 top:15px;
 right:15px;
 background:rgba(0,0,0,0.7);
-color:#fff;
+color:var(--text);
 border:none;
 font-size:18px;
 width:40px;
@@ -203,7 +219,7 @@ height:40px;
 border-radius:50%;
 z-index:100000;
 ">
-<svg width="26" height="26" viewBox="0 0 24 24" fill="white"
+<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"
 style="transform:translate(-5px, -5px);">
 <path d="M6 2h12v3H6V2zm3 5h6c1.1 0 2 .9 2 2v11c0 1.1-.9 2-2 2H9c-1.1 0-2-.9-2-2V9c0-1.1.9-2 2-2zm3 3a1.5 1.5 0 100 3 1.5 1.5 0 000-3z"/>
 </svg>
@@ -214,8 +230,8 @@ position:fixed;
 bottom:100px;
 left:50%;
 transform:translateX(-50%);
-background:#e5e7eb;
-color:#111;
+background:var(--text);
+color:var(--bg);
 border:none;
 height:48px;
 padding:0 20px;
@@ -237,9 +253,9 @@ white-space:nowrap;
 transform:translateY(15px);  
 ">
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="display:block;">
-<rect x="3" y="5" width="18" height="14" rx="2" stroke="#555" stroke-width="1.5"/>
-<circle cx="8" cy="10" r="2" fill="#555"/>
-<path d="M21 16L16 11L5 19" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+<circle cx="8" cy="10" r="2" fill="currentColor"/>
+<path d="M21 16L16 11L5 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 <span>Upload From Gallery</span>
 </span>
@@ -260,20 +276,20 @@ transform:translateX(-50%);
 width:92%;
 max-width:420px;
 height:70px;
-background:rgba(2,6,23,0.9);
+background:color-mix(in srgb, var(--bg) 90%, transparent);
 backdrop-filter:blur(12px);
 border-radius:22px;
 display:none;
 justify-content:space-around;
 align-items:center;
 z-index:999;
-box-shadow:0 8px 30px rgba(0,0,0,0.6);
+box-shadow:0 8px 30px rgba(0,0,0,0.3);
 ">
 <div id="tab-home" onclick="navigateHome()" style="flex:1;text-align:center;cursor:pointer">
 <div class="nav-icon">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-<path d="M3 10L12 3L21 10" stroke="white" stroke-width="2" stroke-linecap="round"/>
-<path d="M5 10V20H19V10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+<path d="M3 10L12 3L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+<path d="M5 10V20H19V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
 </svg>
 </div>
 <div class="nav-text">Home</div>
@@ -282,10 +298,10 @@ box-shadow:0 8px 30px rgba(0,0,0,0.6);
 <div id="tab-deposit" onclick="goDeposit();selectTab('deposit')" style="flex:1;text-align:center;cursor:pointer">
 <div class="nav-icon">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-<path d="M7 8V14" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round"/>
-<path d="M4 11L7 14L10 11" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M17 14V8" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round"/>
-<path d="M14 11L17 8L20 11" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M7 8V14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+<path d="M4 11L7 14L10 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17 14V8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+<path d="M14 11L17 8L20 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 </div>
 
@@ -294,8 +310,8 @@ box-shadow:0 8px 30px rgba(0,0,0,0.6);
 <div id="tab-history" onclick="goHistory();selectTab('history')" style="flex:1;text-align:center;cursor:pointer">
 <div class="nav-icon">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-<circle cx="12" cy="12" r="10" stroke="white" stroke-width="2"/>
-<path d="M12 7V12L15 14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+<path d="M12 7V12L15 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
 </svg>
 </div>
 <div class="nav-text">History</div>
@@ -304,9 +320,9 @@ box-shadow:0 8px 30px rgba(0,0,0,0.6);
 <div id="tab-settings" onclick="goSettings();selectTab('settings')" style="flex:1;text-align:center;cursor:pointer">
 <div class="nav-icon">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-<line x1="5" y1="7" x2="19" y2="7" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
-<line x1="5" y1="12" x2="19" y2="12" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
-<line x1="5" y1="17" x2="19" y2="17" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="5" y1="7" x2="19" y2="7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="5" y1="17" x2="19" y2="17" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
 </svg>
 </div>
 <div class="nav-text">Settings</div>
@@ -317,7 +333,8 @@ box-shadow:0 8px 30px rgba(0,0,0,0.6);
 <script src="./js/identity.js"></script>
 <script type="module" src="./js/app.js"></script>
 <script src="./js/auth.js"></script>
-
+  
+<!--
 <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -325,6 +342,7 @@ if ("serviceWorker" in navigator) {
   });
 }
 </script>
+--> 
   
  <!-- ===== Error Tool===== -->
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>

@@ -44,13 +44,12 @@ const dd = String(now.getDate()).padStart(2,"0");
 const today = `${yyyy}-${mm}-${dd}`;
 appDiv(`
     <div class="box">
-    <div class="refreshIcon" onclick="softRefresh()">↻</div>
     <div class="walletHeader">
 
     <div class="notifBell" onclick="openNotifications()">
     <svg viewBox="0 0 24 24" fill="none">
-    <path d="M12 3C9.8 3 8 4.8 8 7V9.5C8 10.3 7.7 11 7.2 11.6L6 13.2C5.4 14 5.9 15 6.9 15H17.1C18.1 15 18.6 14 18 13.2L16.8 11.6C16.3 11 16 10.3 16 9.5V7C16 4.8 14.2 3 12 3Z" stroke="white" stroke-width="1.8"/>
-    <path d="M10 18C10.3 18.9 11.1 19.5 12 19.5C12.9 19.5 13.7 18.9 14 18" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M12 3C9.8 3 8 4.8 8 7V9.5C8 10.3 7.7 11 7.2 11.6L6 13.2C5.4 14 5.9 15 6.9 15H17.1C18.1 15 18.6 14 18 13.2L16.8 11.6C16.3 11 16 10.3 16 9.5V7C16 4.8 14.2 3 12 3Z" stroke="currentColor" stroke-width="1.8"/>
+    <path d="M10 18C10.3 18.9 11.1 19.5 12 19.5C12.9 19.5 13.7 18.9 14 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
     </svg>
     <span id="notifCount" class="notifCount"></span>
     </div>
@@ -59,17 +58,112 @@ appDiv(`
     ${user.username}
     <span class="arrow">▼</span>
     </div>
+
+    
     <div id="profileHidden" class="profileHidden">
-    <div class="small">
-    Stabix UID<br>
-    ${WALLET}
+
+  <div style="margin-bottom:14px;">
+
+    <div style="
+      font-size:11px;
+      color:var(--subtext);
+      margin-bottom:4px;
+    ">
+      StabiX UID
     </div>
 
-    <div class="small" style="margin-top:10px">
-    EOA Wallet<br>
-    ${user.eoaAddress ? user.eoaAddress : "Not added"}
+    <div style="
+      font-size:15px;
+      font-weight:700;
+      color:var(--text);
+      letter-spacing:.3px;
+    ">
+      ${WALLET}
     </div>
+
+  </div>
+
+  <div>
+
+    <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:4px;
+    ">
+
+      <span style="
+        font-size:11px;
+        color:var(--subtext);
+      ">
+        Linked Wallet Address
+      </span>
+
+      <span
+        onclick="editEOA()"
+        style="
+          font-size:12px;
+          font-weight:600;
+          color:var(--primary);
+          cursor:pointer;
+        "
+      >
+        ${user.eoaAddress ? "Change" : "Add"}
+      </span>
+
     </div>
+    <div style="
+      font-size:13px;
+      line-height:1.5;
+      color:var(--text);
+      word-break:break-all;
+    ">
+      ${user.eoaAddress || "Not linked"}
+    </div>
+
+  </div>
+  <br>
+     <div>
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:4px;
+    ">
+
+        <span style="
+            font-size:11px;
+            color:var(--subtext);
+        ">
+            Username
+        </span>
+
+        <span
+            onclick="changeUsername()"
+            style="
+                font-size:12px;
+                font-weight:600;
+                color:var(--primary);
+                cursor:pointer;
+            "
+        >
+            Change
+        </span>
+
+    </div>
+
+    <div style="
+        font-size:15px;
+        font-weight:700;
+        color:var(--text);
+        letter-spacing:.3px;
+        word-break:break-word;
+    ">
+        ${user.username || "Not set"}
+    </div>
+
+</div>
+</div>
 
     <div class="balanceBig">
     ${window.getPrimaryBalance()} ${window.primaryAsset}
@@ -79,7 +173,7 @@ appDiv(`
     <div class="walletAction" onclick="openSend()">
     <div class="walletActionIcon">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-    <path d="M12 19V5M12 5L6 11M12 5L18 11" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    <path d="M12 19V5M12 5L6 11M12 5L18 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
     </svg>
     </div>
     <div class="walletActionLabel">Send</div>
@@ -88,7 +182,7 @@ appDiv(`
     <div class="walletAction" onclick="showReceive()">
     <div class="walletActionIcon">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-    <path d="M12 5V19M12 19L6 13M12 19L18 13" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    <path d="M12 5V19M12 19L6 13M12 19L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
     </svg>
     </div>
     <div class="walletActionLabel">Receive</div>
@@ -97,14 +191,14 @@ appDiv(`
     <div class="walletAction" onclick="openScanner()">
     <div class="walletActionIcon">
     <svg viewBox="0 0 24 24" fill="none">
-    <path d="M5 9V6.5C5 6.2 5.2 6 5.5 6H8" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-    <path d="M16 6H18.5C18.8 6 19 6.2 19 6.5V9" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-    <path d="M5 15V17.5C5 17.8 5.2 18 5.5 18H8" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-    <path d="M16 18H18.5C18.8 18 19 17.8 19 17.5V15" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-    <rect x="8" y="8" width="2.2" height="2.2" rx="0.5" fill="white"/>
-    <rect x="13.8" y="8" width="2.2" height="2.2" rx="0.5" fill="white"/>
-    <rect x="8" y="13.8" width="2.2" height="2.2" rx="0.5" fill="white"/>
-    <rect x="13.8" y="13.8" width="2.2" height="2.2" rx="0.5" fill="white"/>
+    <path d="M5 9V6.5C5 6.2 5.2 6 5.5 6H8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M16 6H18.5C18.8 6 19 6.2 19 6.5V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M5 15V17.5C5 17.8 5.2 18 5.5 18H8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M16 18H18.5C18.8 18 19 17.8 19 17.5V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="8" y="8" width="2.2" height="2.2" rx="0.5" fill="currentColor"/>
+    <rect x="13.8" y="8" width="2.2" height="2.2" rx="0.5" fill="currentColor"/>
+    <rect x="8" y="13.8" width="2.2" height="2.2" rx="0.5" fill="currentColor"/>
+    <rect x="13.8" y="13.8" width="2.2" height="2.2" rx="0.5" fill="currentColor"/>
     </svg>
     </div>
     <div class="walletActionLabel">Scan</div>
@@ -117,22 +211,27 @@ appDiv(`
     <div id="receiveScreen" style="display:none">
     <div class="sendHeader">
     <button onclick="closeReceive()" class="backBtn">←</button>
-    <h2>Receive ${window.primaryAsset}</h2>
+    <h2 id="receiveTitle" style="display:flex;align-items:center;gap:8px;">
+    <span id="receiveText">Receive USDC</span>
+    <img id="receiveAssetImg"
+         src="./media/usd-coin-usdc-logo.png"
+         style="width:20px;height:20px;border-radius:50%;">
+</h2>
     </div>
     <div class="sendBody" style="text-align:center">
     <div class="qrWrap"><img id="qrImg"></div>
     <p class="small" style="margin-top:10px">
     Only Send Your Assets To This QR Code.
     </p>
-    <div style="margin-top:20px;font-weight:bold">
-    Wallet ID
+    <div style="margin-top:20px;font-weight:bold;color:var(--subtext)">
+    StabiX UID
     </div>
     <div class="addrBox">
     <span id="walletAddr"></span>
     <span onclick="copyWallet()" class="copyIcon">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <rect x="9" y="9" width="13" height="13" rx="2" stroke="#fff" stroke-width="2"/>
-    <rect x="2" y="2" width="13" height="13" rx="2" stroke="#fff" stroke-width="2"/>
+    <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/>
+    <rect x="2" y="2" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/>
     </svg>
     </span>
     </div>
@@ -151,7 +250,7 @@ appDiv(`
     width:28px;
     height:28px;
     border-radius:50%;
-    background:#1e293b;
+    background:var(--surface);
     display:flex;
     align-items:center;
     justify-content:center;
@@ -167,8 +266,8 @@ appDiv(`
     margin-top:10px;">
                 <!-- USDT -->
     <div style="
-    background:#020617;
-    border:1px solid #1e293b;
+    background:var(--bg);
+    border:1px solid var(--border);
     border-radius:12px;
     padding:12px;
     display:flex;
@@ -189,8 +288,8 @@ appDiv(`
     </div>
                  <!-- USDC -->
     <div style="
-    background:#020617;
-    border:1px solid #1e293b;
+    background:var(--bg);
+    border:1px solid var(--border);
     border-radius:12px;
     padding:12px;
     display:flex;
@@ -218,7 +317,7 @@ appDiv(`
     left:0;
     width:100%;
     height:100%;
-    background:#020617;
+    background:var(--bg);
     z-index:999;
     padding:20px;
     box-sizing:border-box;
@@ -236,8 +335,8 @@ appDiv(`
 
               <!-- USDT -->
     <div onclick="confirmPrimary('USDT')" style="
-    background:#020617;
-    border:1px solid #1e293b;
+    background:var(--bg);
+    border:1px solid var(--border);
     border-radius:12px;
     padding:12px;
     display:flex;
@@ -253,7 +352,7 @@ appDiv(`
     ${window.primaryAsset === "USDT" ? `
     <div style="
     font-size:12px;
-    color:#22c55e;
+    color:var(--success);
     font-weight:600;
     margin-top:2px;
     ">Primary</div>
@@ -266,8 +365,8 @@ appDiv(`
     
             <!-- USDC -->
     <div onclick="confirmPrimary('USDC')" style="
-    background:#020617;
-    border:1px solid #1e293b;
+    background:var(--bg);
+    border:1px solid var(--border);
     border-radius:12px;
     padding:12px;
     display:flex;
@@ -282,7 +381,7 @@ appDiv(`
     ${window.primaryAsset === "USDC" ? `
     <div style="
     font-size:12px;
-    color:#22c55e;
+    color:var(--success);
     font-weight:600;
     margin-top:2px;
     ">Primary</div>
@@ -302,14 +401,14 @@ appDiv(`
     left:0;
     width:100%;
     height:100%;
-    background:rgba(0,0,0,0.7);
+    background:rgba(0,0,0,0.5);
     z-index:1000;
     align-items:center;
     justify-content:center;">
 
     <div style="
-    background:#020617;
-    border:1px solid #1e293b;
+    background:var(--bg);
+    border:1px solid var(--border);
     border-radius:12px;
     padding:20px;
     width:80%;
@@ -322,10 +421,10 @@ appDiv(`
     <button onclick="applyPrimary()" style="
     flex:1;
     padding:10px;
-    background:#22c55e;
+    background:var(--success);
     border:none;
     border-radius:8px;
-    color:white;
+    color:var(--text);
     ">Yes</button>
 
     <button onclick="closeConfirm()" style="
@@ -334,17 +433,13 @@ appDiv(`
     background:#ef4444;
     border:none;
     border-radius:8px;
-    color:white;
+    color:var(--text);
     ">No</button>
     </div>
     </div>
     </div>
     </div>
 
-    
-     
-    
-    
     <div id="dwSection" style="display:none;">
     <hr>
     <h3>Deposit / Withdraw</h3>
@@ -352,10 +447,10 @@ appDiv(`
     display:flex;
     gap:10px;
     margin-top:10px;">
-    <button onclick="openDeposit()" style="background:#22c55e;color:#022c22;font-weight:bold">
+    <button onclick="openDeposit()" style="background:var(--success);color:var(--bg);font-weight:bold">
     Deposit
     </button>
-    <button onclick="openWithdraw()" style="background:#ef4444;color:white;font-weight:bold">
+    <button onclick="openWithdraw()" style="background:var(--danger);color:var(--text);font-weight:bold">
     Withdraw
     </button>
     </div>
@@ -363,7 +458,7 @@ appDiv(`
     display:none;
     margin-top:10px;
     padding:10px;
-    background:#020617;
+    background:var(--bg);
     border:1px solid #1e293b;
     border-radius:12px;">
     <select id="networkSelect" onchange="showVault()">
@@ -374,7 +469,7 @@ appDiv(`
     <div class="small">Vault Address:</div>
     <div style="display:flex;align-items:center;gap:8px;width:100%">
     <span style="
-    color:#60a5fa;
+    color:var(--primary);
     font-size:12px;
     word-break:break-all;
     flex:1;">
@@ -388,7 +483,7 @@ appDiv(`
     Copy
     </button>
     </div>
-    <button onclick="showDepositForm()" style="background:#22c55e;color:#022c22;font-weight:bold">
+    <button onclick="showDepositForm()" style="background:var(--success);color:var(--bg);font-weight:bold">
     Submit Deposit Proof 
     </button>
     <div id="depositForm" style="display:none;margin-top:10px">
@@ -401,8 +496,8 @@ appDiv(`
     <div id="withdrawBox" style="display:none;margin-top:10px">
     <div class="small">Withdraw Address:</div>
     <div style="
-    background:#020617;
-    border:1px solid #1e293b;
+    background:var(--bg);
+    border:1px solid var(--border);
     padding:10px;
     border-radius:8px;
     margin-top:6px;
@@ -432,7 +527,7 @@ appDiv(`
     left:0;
     width:100vw;
     height:100vh;
-    background:#000;
+    background:var(--bg);
     z-index:9999;
     overflow:auto;">
     <div style="width:100%; max-width:380px; margin:0 auto;">
@@ -448,17 +543,25 @@ appDiv(`
     </h2>
     </div>
     <div class="sendBody">
-    <h1 class="sendTitle">Receiving address</h1>
-    <p class="sendSub">Scanned wallet ID</p>
+    <h1 class="sendTitle">Receiving StabiX UID</h1>
     <div class="addressBox">
     <input id="previewId" readonly />
     </div>
     <button class="nextBtn" onclick="confirmReceiver()">
     Confirm
     </button>
+    <div class="sendHint">
+    <div class="hintTitle">
+    Instructions
+    </div>
+    <div class="hintLine">
+    • Verify Recipient Scanned StabiX UID before confirming.
+    </div>
+    <div class="hintLine">
+    • Once Confirmed, Proceed To Enter The Transfer Amount.
     </div>
     </div>
-    </div>  
+    </div>
 `);
 document.getElementById("bottomNav").style.display = "flex";
 selectTab("home");
@@ -552,6 +655,14 @@ box.style.display = "block"
 }
 window.showReceive = ()=>{
 const wallet = WALLET
+  const asset = window.primaryAsset;
+
+document.getElementById("receiveText").innerText = "Receive " + asset;
+
+document.getElementById("receiveAssetImg").src =
+  asset === "USDT"
+    ? "./media/tether-usdt-logo.png"
+    : "./media/usd-coin-usdc-logo.png";
 const qrData = JSON.stringify({
 type: "stabix",
 id: wallet,
@@ -630,6 +741,21 @@ document.getElementById("amountScreen").style.display="flex"
 alert("Error checking user")
 }
 }
+
+const amt = document.getElementById("sendAmt");
+amt.addEventListener("input", function () {
+let v = this.value.replace(/[^0-9.]/g, "");
+if (v.startsWith(".")) v = "0" + v;
+const parts = v.split(".");
+if (parts.length > 2) {
+v = parts[0] + "." + parts.slice(1).join("");
+}
+if (!v.includes(".")) {
+v = String(Number(v || 0));
+if (v === "NaN") v = "";
+}
+this.value = v;
+});
 
 window.handleNext = async () => {
 const amount = Number(document.getElementById("sendAmt").value)
@@ -879,35 +1005,6 @@ document.getElementById("previewScreen").style.display = "none";
 document.getElementById("bottomNav").style.display = "flex";
 scanDone = false;
 };
-
-/* ================= Refresh ================= */
-let refreshCount = 0;
-window.softRefresh = async function(){
-if(refreshCount >= 1){
-const el = document.querySelector(".box");
-if(el){
-el.style.opacity = "0.5";
-setTimeout(()=> el.style.opacity = "1", 300);
-}
-console.log("Fake refresh (no DB read)");
-return;
-}
-refreshCount++; 
-try{
-const snap = await getDoc(userRef);
-if(!snap.exists()){
-alert("Session expired");
-return;
-}
-const user = snap.data();
-document.getElementById("usdcBalance").innerText =
-user.balance || 0;
-document.getElementById("usdtBalance").innerText =
-user.usdtBalance || 0;
-}catch(e){
-alert("Refresh failed");
-}
-};
 /* ================= Notifications ================= */
 window.openNotifications = async () => {
 document.getElementById("bottomNav").style.display = "none";
@@ -933,7 +1030,7 @@ return (now - t) < unreadLimit;
 }
 });
 let html = `
-<div style="background:#000;min-height:100vh;padding:16px">
+<div style="background:var(--bg);min-height:100vh;padding:16px">
 <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
 <span onclick="renderApp()" style="cursor:pointer;font-size:20px">←</span>
 <span style="font-weight:bold;font-size:18px">Notifications</span>
@@ -954,13 +1051,13 @@ margin-top:18px;
 margin-bottom:6px;
 font-size:17px;
 font-weight:700;
-color:#60a5fa;
+color:var(--primary);
 letter-spacing:0.3px;">
 ${currentDate}
 </div>
 <div style="
 height:1px;
-background:rgba(255,255,255,0.06);
+background:var(--border);
 margin-bottom:10px;">
 </div>
 `;
@@ -969,7 +1066,7 @@ lastDate = currentDate;
   
 html += `
 <div onclick="openNotifDetail('${docSnap.id}')"
-style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;${!d.read ? 'background:rgba(96,165,250,0.08);border-left:3px solid #60a5fa;padding-left:10px;' : ''}">
+style="padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;${!d.read ? 'background:color-mix(in srgb, var(--primary) 8%, transparent);border-left:3px solid var(--primary);padding-left:10px;' : ''}">
 <div style="font-weight:600;font-size:15px;margin-bottom:4px">
 <span style="${!d.read ? 'font-weight:700' : 'font-weight:600'}">
 ${d.title || "Notification"}
@@ -1072,7 +1169,7 @@ if(!snap.exists()) return;
 const d = snap.data();
 let html = `
 <div style="
-background:#000;
+background:var(--bg);
 min-height:100vh;
 padding:16px;">
 <div style="
@@ -1092,10 +1189,10 @@ Notification
 </span>
 </div>
 <div style="
-background:#020617;
+background:var(--surface);
 border-radius:16px;
 padding:16px;
-border:1px solid rgba(255,255,255,0.05);">
+border:1px solid var(--border);">
 <div style="
 font-size:17px;
 font-weight:bold;
@@ -1172,8 +1269,8 @@ document.querySelector(".box").innerHTML = `
 <div style="display:flex;flex-direction:column;gap:12px;margin-top:15px;">
 
 <div onclick="selectDWAsset('USDT')" style="
-background:#020617;
-border:1px solid #1e293b;
+background:var(--surface);
+border:1px solid var(--border);
 border-radius:12px;
 padding:14px;
 display:flex;
@@ -1190,8 +1287,8 @@ ${user.usdtBalance?.toFixed(2) || "0.00"}
 </div>
 
 <div onclick="selectDWAsset('USDC')" style="
-background:#020617;
-border:1px solid #1e293b;
+background:var(--surface);
+border:1px solid var(--border);
 border-radius:12px;
 padding:14px;
 display:flex;
@@ -1248,14 +1345,14 @@ html += `
 display:flex;
 justify-content:space-between;
 padding:10px 0;
-border-bottom:1px solid rgba(255,255,255,0.05);">
+border-bottom:1px solid var(--border);">
 <div style="font-size:13px;">
 <div>${isDeposit ? "Deposit" : "Withdraw"}</div>
 <div style="font-size:11px;opacity:0.6;">${time}</div>
 </div>
 <div style="
 font-weight:600;
-color:${isDeposit ? "#22c55e" : "#ef4444"};">
+color:${isDeposit ? "var(--success)" : "var(--danger)"};">
 ${isDeposit ? "+" : "-"} ${t.amount} ${t.asset || ""}
 </div>
 </div>
@@ -1290,14 +1387,14 @@ style="
 width:100%;
 padding:12px 14px 12px 38px;
 border-radius:10px;
-border:1px solid #1e293b;
-background:#020617;
-color:#e5e7eb;
+border:1px solid var(--border);
+background:var(--surface);
+color:var(--text);
 font-size:14px;
 box-sizing:border-box;
 outline:none;
-"onfocus="this.style.border='1px solid #2563eb'"
-onblur="this.style.border='1px solid #1e293b'"
+"onfocus="this.style.border='1px solid var(--primary)'"
+onblur="this.style.border='1px solid var(--border)'"
 >
 <svg viewBox="0 0 24 24" fill="none" style="
 position:absolute;
@@ -1309,8 +1406,8 @@ height:16px;
 opacity:0.6;
 pointer-events:none;
 ">
-<circle cx="11" cy="11" r="7" stroke="white" stroke-width="2"/>
-<path d="M20 20L17 17" stroke="white" stroke-width="2" stroke-linecap="round"/>
+<circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+<path d="M20 20L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
 </svg>
 </div>
 </div>
@@ -1343,11 +1440,24 @@ document.querySelector(".box").innerHTML = `
 Settings
 </div>
 
+<div onclick="openTheme()" style="
+display:flex;
+justify-content:space-between;
+padding:14px 0;
+border-bottom:1px solid var(--border);
+cursor:pointer;
+">
+<div>
+<div>Theme</div>
+</div>
+<div style="opacity:.5;">></div>
+</div>
+
 <div onclick="openSupport()" style="
 display:flex;
 justify-content:space-between;
 padding:14px 0;
-border-bottom:1px solid rgba(255,255,255,0.06);
+border-bottom:1px solid var(--border);
 cursor:pointer;
 ">
 <div>Support</div>
@@ -1358,7 +1468,7 @@ cursor:pointer;
 display:flex;
 justify-content:space-between;
 padding:14px 0;
-border-bottom:1px solid rgba(255,255,255,0.06);
+border-bottom:1px solid var(--border);
 cursor:pointer;
 ">
 <div>About</div>
@@ -1368,13 +1478,152 @@ cursor:pointer;
 <div onclick="logout()" style="
 margin-top:30px;
 text-align:center;
-color:#ef4444;
+color:var(--danger);
 font-weight:600;
 cursor:pointer;
 ">
 Logout
 </div>
+<div id="logoutPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);justify-content:center;align-items:center;z-index:9999;">
+  <div style="width:280px;background:var(--surface);border-radius:16px;padding:20px;text-align:center;">
+    <div style="font-size:18px;font-weight:700;">Logout?</div>
+    <div style="opacity:.7;margin:12px 0 20px;">Are you sure you want to logout?</div>
+
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeLogoutPopup()" style="flex:1;">Cancel</button>
+      <button onclick="confirmLogout()" style="flex:1;background:var(--danger);color:var(--text);">Logout</button>
+    </div>
+  </div>
+</div>
 `;
+};
+
+window.openTheme = () => {
+document.querySelector(".box").innerHTML = `
+
+<div onclick="goSettings()" style="
+font-size:18px;
+opacity:.7;
+margin-bottom:24px;
+cursor:pointer;
+">
+← Back
+</div>
+
+<div style="
+font-size:20px;
+font-weight:700;
+margin-bottom:28px;
+">
+Theme
+</div>
+
+<div style="
+color:var(--subtext);
+margin-bottom:24px;
+">
+Choose your preferred appearance.
+</div>
+
+<div onclick="changeTheme('system')" style="
+display:flex;
+justify-content:space-between;
+padding:16px 0;
+border-bottom:1px solid var(--border);
+cursor:pointer;
+">
+<div> System Default</div>
+<div id="systemTick" class="radio"></div>
+</div>
+
+<div onclick="changeTheme('light')" style="
+display:flex;
+justify-content:space-between;
+padding:16px 0;
+border-bottom:1px solid var(--border);
+cursor:pointer;
+">
+<div> Light</div>
+<div id="lightTick" class="radio"></div>
+</div>
+
+<div onclick="changeTheme('dark')" style="
+display:flex;
+justify-content:space-between;
+padding:16px 0;
+border-bottom:1px solid var(--border);
+cursor:pointer;
+">
+<div> Dark</div>
+<div id="darkTick" class="radio"></div>
+</div>
+`;
+refreshThemeTicks();
+};
+
+window.refreshThemeTicks = () => {
+const mode = localStorage.getItem("theme") || "system";
+const s = document.getElementById("systemTick");
+const l = document.getElementById("lightTick");
+const d = document.getElementById("darkTick");
+[s,l,d].forEach(el=>{
+if(el) el.classList.remove("active");
+});
+if(mode==="system" && s) s.classList.add("active");
+if(mode==="light" && l) l.classList.add("active");
+if(mode==="dark" && d) d.classList.add("active");
+};
+
+window.changeTheme = (mode) => {
+localStorage.setItem("theme",mode);
+if(mode==="system"){
+document.documentElement.removeAttribute("data-theme");
+}else{
+document.documentElement.setAttribute("data-theme",mode);
+}
+goSettings();
+setTimeout(()=>{
+const t=document.getElementById("themeSubtitle");
+if(t){
+t.innerText=
+mode==="system" ? "System Default" :
+mode==="light" ? "Light" :
+"Dark";
+}
+},10);
+};
+
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+if((localStorage.getItem("theme") || "system") === "system"){
+changeTheme("system");
+}
+
+});
+
+window.logout = () => {
+    document.getElementById("logoutPopup").style.display = "flex";
+};
+
+window.closeLogoutPopup = () => {
+    document.getElementById("logoutPopup").style.display = "none";
+};
+window.confirmLogout = async () => {
+    document.getElementById("logoutPopup").style.display = "none";
+
+    await auth.signOut();
+
+    localStorage.removeItem("stbx_uid");
+    localStorage.removeItem("stbx_google_uid");
+    localStorage.removeItem("primaryAsset");
+
+    window.WALLET = null;
+
+    const nav = document.getElementById("bottomNav");
+    if (nav) nav.style.display = "none";
+
+    appDiv("");
+
+    renderSetup();
 };
 
 window.openSupport = () => {
@@ -1401,8 +1650,8 @@ Need help or facing an issue? Reach out to our support team.
 <div onclick="window.open('https://t.me/StabiXSupport')" style="
 padding:14px;
 border-radius:12px;
-background:#0b1220;
-border:1px solid rgba(255,255,255,0.06);
+background:var(--surface);
+border:1px solid var(--border);
 cursor:pointer;
 text-align:center;
 font-weight:600;
@@ -1423,10 +1672,10 @@ opacity:0.7;
 ">← Back</div>
 
 <div style="
-background:#0b1220;
+background:var(--surface);
 padding:16px;
 border-radius:16px;
-border:1px solid rgba(255,255,255,0.06);
+border:1px solid var(--border);
 line-height:1.7;
 ">
 
@@ -1457,8 +1706,8 @@ Detailed technical architecture, protocol systems, and infrastructure informatio
 display:inline-block;
 padding:10px 14px;
 border-radius:10px;
-background:#3b82f6;
-color:white;
+background:var(--primary);
+color:var(--text);
 text-decoration:none;
 font-size:13px;
 font-weight:600;
@@ -1468,7 +1717,7 @@ View Whitepaper
 </a>
 
 <div style="
-border-top:1px solid rgba(255,255,255,0.06);
+border-top:1px solid var(--border);
 padding-top:14px;
 font-size:13px;
 line-height:1.7;
@@ -1477,10 +1726,10 @@ opacity:0.78;
 
 <b style="font-size:15px;opacity:1;">Founder</b><br><br>
 
-StabiX is developed by <b style="color:#22c55e;">Sumedh Dabhade</b>, focused on building faster, simpler, and more practical stablecoin payment infrastructure by reducing blockchain complexity, transaction friction, wallet popup dependency, gas fee overhead, and settlement delays while keeping digital payments more accessible for everyday users.<br><br>
+StabiX is developed by <b style="color:var(--success);">Sumedh Dabhade</b>, focused on building faster, simpler, and more practical stablecoin payment infrastructure by reducing blockchain complexity, transaction friction, wallet popup dependency, gas fee overhead, and settlement delays while keeping digital payments more accessible for everyday users.<br><br>
 
 <a href="https://x.com/SumedhDabhade10" target="_blank" style="
-color:#60a5fa;
+color:var(--primary);
 text-decoration:none;
 font-weight:600;
 ">
@@ -1521,7 +1770,7 @@ html = `
 </div>
 <button onclick="clearAmountFilter()" 
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
-background:#1e293b;color:#e5e7eb;border:none;">
+background:var(--surface);color:var(--text);border:none;">
 Clear Filter
 </button>
 <button onclick="applyFilter('amount')" class="applyBtn">
@@ -1551,7 +1800,7 @@ html = `
 </div>
 <button onclick="clearTypeFilter()" 
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
-background:#1e293b;color:#e5e7eb;border:none;">
+background:var(--surface);color:var(--text);border:none;">
 Clear Filter
 </button>
 <button onclick="applyFilter('type')" class="applyBtn">
@@ -1578,7 +1827,7 @@ html = `
 
 <button onclick="clearAssetFilter()" 
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
-background:#1e293b;color:#e5e7eb;border:none;">
+background:var(--surface);color:var(--text);border:none;">
 Clear Filter
 </button>
 
@@ -1597,7 +1846,7 @@ html = `
 <input type="date" id="filterDate" value="${today}" max="${today}" />
 
 <div style="margin-top:12px; width:100%;">
-<button onclick="enableRange()" style="width:100%;padding:12px;border-radius:10px;background:#1e293b;color:white;border:none;">
+<button onclick="enableRange()" style="width:100%;padding:12px;border-radius:10px;background:var(--surface);color:var(--text);border:none;">
 Custom Date 
 </button>
 </div>
@@ -1610,7 +1859,7 @@ Custom Date
 
 <button onclick="clearDateFilter()" 
 style="margin-top:10px;width:100%;padding:12px;border-radius:12px;
-background:#1e293b;color:#e5e7eb;border:none;">
+background:var(--surface);color:var(--text);border:none;">
 Clear Filter
 </button>
 
@@ -1838,7 +2087,7 @@ Select Mode
 <div id="instantBtn" onclick="selectMode('instant')" style="
 padding:16px;
 border-radius:16px;
-border:1px solid rgba(255,255,255,0.08);
+border:1px solid var(--border);
 margin-bottom:14px;
 cursor:pointer;
 ">
@@ -1852,7 +2101,7 @@ cursor:pointer;
 <div id="advancedBtn" onclick="selectMode('advanced')" style="
 padding:16px;
 border-radius:16px;
-border:1px solid rgba(255,255,255,0.08);
+border:1px solid var(--border);
 cursor:pointer;
 ">
 <div style="display:flex; align-items:center; gap:10px;">
@@ -1867,8 +2116,8 @@ cursor:pointer;
 flex:1;
 padding:14px;
 border-radius:12px;
-background:#22c55e;
-color:#022c22;
+background:var(--success);
+color:var(--bg);
 font-weight:bold;
 ">
 Deposit
@@ -1878,8 +2127,8 @@ Deposit
 flex:1;
 padding:14px;
 border-radius:12px;
-background:#ef4444;
-color:white;
+background:var(--danger);
+color:var(--text);
 font-weight:bold;
 ">
 Withdraw
@@ -1888,8 +2137,8 @@ Withdraw
 
 <div style="
 margin-top:25px;
-background:#0b1220;
-border:1px solid rgba(255,255,255,0.06);
+background:var(--surface);
+border:1px solid var(--border);
 border-radius:14px;
 padding:14px;
 ">
@@ -1924,7 +2173,7 @@ display:flex;
 align-items:center;
 justify-content:center;
 border-radius:10px;
-background:rgba(255,255,255,0.05);
+background:var(--surface);
 backdrop-filter:blur(6px);
 font-size:22px;
 cursor:pointer;
@@ -2023,7 +2272,7 @@ display:flex;
 align-items:center;
 justify-content:center;
 border-radius:10px;
-background:rgba(255,255,255,0.05);
+background:var(--surface);
 cursor:pointer;
 font-size:18px;
 ">←</div>
@@ -2051,7 +2300,7 @@ display:flex;
 align-items:center;
 justify-content:center;
 border-radius:10px;
-background:rgba(255,255,255,0.05);
+background:var(--surface);
 cursor:pointer;
 font-size:18px;
 ">←</div>
@@ -2074,8 +2323,8 @@ return `
 style="
 padding:14px;
 border-radius:14px;
-background:#0b1220;
-border:1px solid rgba(255,255,255,0.06);
+background:var(--surface);
+border:1px solid var(--border);
 cursor:pointer;">
 <div style="font-weight:600;font-size:15px;">
 ${name}
@@ -2098,8 +2347,8 @@ return `
 <div onclick="selectInstantWithdraw('${asset}', '${name} ${type}')" style="
 padding:14px;
 border-radius:14px;
-background:#0b1220;
-border:1px solid rgba(255,255,255,0.06);
+background:var(--surface);
+border:1px solid var(--border);
 cursor:pointer;
 ">
 <div style="font-weight:600;font-size:15px;">
@@ -2129,7 +2378,7 @@ display:flex;
 align-items:center;
 justify-content:center;
 border-radius:10px;
-background:rgba(255,255,255,0.05);
+background:var(--surface);
 cursor:pointer;
 font-size:18px;
 ">←</div>
@@ -2140,10 +2389,10 @@ ${asset} Deposit
 </div>
 
 <div style="
-background:#0b1220;
+background:var(--surface);
 padding:12px;
 border-radius:12px;
-border:1px solid rgba(255,255,255,0.06);
+border:1px solid var(--border);
 margin-bottom:10px;">
 
 <div style="font-size:12px;opacity:0.6;">Network</div>
@@ -2151,10 +2400,10 @@ margin-bottom:10px;">
 </div>
 
 <div style="
-background:#0b1220;
+background:var(--surface);
 padding:12px;
 border-radius:12px;
-border:1px solid rgba(255,255,255,0.06);
+border:1px solid var(--border);
 margin-bottom:15px;">
 <div style="font-size:12px;opacity:0.6;">Wallet Address</div>
 <div style="margin-top:10px;display:flex;justify-content:center;">
@@ -2164,7 +2413,7 @@ margin-bottom:15px;">
 <div style="
 margin-top:10px;
 font-size:12px;
-color:#60a5fa;
+color:var(--primary);
 white-space:nowrap;
 overflow-x:auto;
 line-height:1.4;
@@ -2176,8 +2425,8 @@ ${wallet}
 padding:6px 10px;
 border:none;
 border-radius:8px;
-background:#3b82f6;
-color:white;
+background:var(--primary);
+color:var(--text);
 font-size:11px;">
 Copy
 </button>
@@ -2192,8 +2441,8 @@ Copy
 width:100%;
 padding:14px;
 border-radius:12px;
-background:#22c55e;
-color:black;
+background:var(--success);
+color:var(--bg);
 font-weight:600;
 ">
 Deposit
@@ -2220,7 +2469,7 @@ display:flex;
 align-items:center;
 justify-content:center;
 border-radius:10px;
-background:rgba(255,255,255,0.05);
+background:var(--surface);
 cursor:pointer;
 font-size:18px;">
 ←
@@ -2233,10 +2482,10 @@ ${asset} Withdraw
 
 <!-- NETWORK -->
 <div style="
-background:#0b1220;
+background:var(--surface);
 padding:12px;
 border-radius:12px;
-border:1px solid rgba(255,255,255,0.06);
+border:1px solid var(--border);
 margin-bottom:10px;
 ">
 
@@ -2246,10 +2495,10 @@ margin-bottom:10px;
 
 <!-- FORM (same container as deposit) -->
 <div style="
-background:#0b1220;
+background:var(--surface);
 padding:12px;
 border-radius:12px;
-border:1px solid rgba(255,255,255,0.06);
+border:1px solid var(--border);
 margin-bottom:15px; ">
 
 <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
@@ -2272,8 +2521,8 @@ style="width:100%;margin-bottom:15px;">
 width:100%;
 padding:14px;
 border-radius:12px;
-background:#ef4444;
-color:white;
+background:var(--danger);
+color:var(--text);
 font-weight:600;">
 Withdraw
 </button>
@@ -2388,7 +2637,7 @@ display:flex;
 align-items:center;
 justify-content:center;
 border-radius:10px;
-background:rgba(255,255,255,0.05);
+background:var(--surface);
 cursor:pointer;
 font-size:18px;
 ">←</div>
@@ -2412,8 +2661,8 @@ return `
 style="
 padding:14px;
 border-radius:14px;
-background:#0b1220;
-border:1px solid rgba(255,255,255,0.06);
+background:var(--surface);
+border:1px solid var(--border);
 cursor:pointer;
 ">
 <!-- NETWORK NAME -->
@@ -2444,7 +2693,7 @@ display:flex;
 align-items:center;
 justify-content:center;
 border-radius:10px;
-background:rgba(255,255,255,0.05);
+background:var(--surface);
 cursor:pointer;
 font-size:18px;
 ">←</div>
@@ -2454,25 +2703,25 @@ ${asset} Deposit
 </div>
 <!-- NETWORK -->
 <div style="
-background:#0b1220;
+background:var(--surface);
 padding:12px;
 border-radius:12px;
-border:1px solid rgba(255,255,255,0.06);
+border:1px solid var(--border);
 margin-bottom:10px;">
 <div style="font-size:12px;opacity:0.6;">Network</div>
 <div>${network}</div>
 </div>
 <!-- VAULT -->
 <div style="
-background:#0b1220;
+background:var(--surface);
 padding:12px;
 border-radius:12px;
-border:1px solid rgba(255,255,255,0.06);
+border:1px solid var(--border);
 margin-bottom:15px;">
 <div style="font-size:12px;opacity:0.6;">Vault Address</div>
 <a href="${EXPLORERS[network]}${vault}" target="_blank" style="
 font-size:13px;
-color:#60a5fa;
+color:var(--primary);
 word-break:break-all;
 text-decoration:none;">
 ${vault}
@@ -2487,8 +2736,8 @@ ${vault}
 width:100%;
 padding:14px;
 border-radius:12px;
-background:#22c55e;
-color:black;
+background:var(--success);
+color:var(--bg);
 font-weight:600;
 ">
 Deposit
@@ -2499,7 +2748,7 @@ margin-bottom:100px;
 background:#0b1220;
 padding:12px;
 border-radius:12px;
-border:1px solid rgba(255,255,255,0.06);
+border:1px solid var(--border);
 font-size:12px;
 opacity:0.75;
 line-height:1.6;">
@@ -2546,7 +2795,7 @@ display:flex;
 align-items:center;
 justify-content:center;
 border-radius:10px;
-background:rgba(255,255,255,0.05);
+background:var(--surface);
 cursor:pointer;
 font-size:18px;
 ">←</div>
@@ -2556,10 +2805,10 @@ ${asset} Withdraw
 </div>
 <!-- NETWORK SHOW -->
 <div style="
-background:#0b1220;
+background:var(--surface);
 padding:12px;
 border-radius:12px;
-border:1px solid rgba(255,255,255,0.06);
+border:1px solid var(--border);
 margin-bottom:12px;">
 <div style="font-size:12px;opacity:0.6;">Network</div>
 <div style="font-size:14px;font-weight:600;">
@@ -2571,19 +2820,19 @@ ${network}
 background:#0b1220;
 padding:12px;
 border-radius:12px;
-border:1px solid rgba(255,255,255,0.06);
+border:1px solid var(--border);
 margin-bottom:15px;">
 <div style="font-size:12px;opacity:0.6;">Vault Address</div>
-<div style="font-size:13px;color:#60a5fa;word-break:break-all;">
+<div style="font-size:13px;color:var(--primary);word-break:break-all;">
 0xYOUR_VAULT_ADDRESS
 </div>
 </div>
 <!-- FORM -->
 <div style="
-background:#0b1220;
+background:var(--surface);
 padding:14px;
 border-radius:14px;
-border:1px solid rgba(255,255,255,0.06);">
+border:1px solid var(--border);">
 <div style="font-size:12px;opacity:0.6;margin-bottom:6px;">
 Recipient Address
 </div>
@@ -2596,8 +2845,8 @@ Amount
 width:100%;
 padding:14px;
 border-radius:12px;
-background:#ef4444;
-color:white;
+background:var(--danger);
+color:var(--text);
 font-weight:600;">
 Withdraw
 </button>
@@ -2611,8 +2860,8 @@ return `
 style="
 padding:14px;
 border-radius:14px;
-background:#0b1220;
-border:1px solid rgba(255,255,255,0.06);
+background:var(--surface);
+border:1px solid var(--border);
 cursor:pointer;">
 <div style="font-weight:600;font-size:15px;">
 ${name}
@@ -2635,7 +2884,7 @@ document.querySelector(".box").innerHTML = `
 width:36px;height:36px;
 display:flex;align-items:center;justify-content:center;
 border-radius:10px;
-background:rgba(255,255,255,0.05);
+background:var(--surface);
 cursor:pointer;
 font-size:18px;
 ">←</div>
@@ -2660,7 +2909,7 @@ document.querySelector(".box").innerHTML = `
 width:36px;height:36px;
 display:flex;align-items:center;justify-content:center;
 border-radius:10px;
-background:rgba(255,255,255,0.05);
+background:var(--surface);
 cursor:pointer;
 font-size:18px;
 ">←</div>
@@ -2670,10 +2919,10 @@ ${asset} Withdraw
 </div>
 <!-- NETWORK -->
 <div style="
-background:#0b1220;
+background:var(--surface);
 padding:12px;
 border-radius:12px;
-border:1px solid rgba(255,255,255,0.06);
+border:1px solid var(--border);
 margin-bottom:10px;">
 <div style="font-size:12px;opacity:0.6;">Network</div>
 <div>${network}</div>
@@ -2686,8 +2935,8 @@ margin-bottom:10px;">
 width:100%;
 padding:14px;
 border-radius:12px;
-background:#ef4444;
-color:white;
+background:var(--danger);
+color:var(--text);
 font-weight:600;
 ">
 Withdraw
@@ -2695,10 +2944,10 @@ Withdraw
 <div style="
 margin-top:15px;
 margin-bottom:100px;
-background:#0b1220;
+background:var(--surface);
 padding:12px;
 border-radius:12px;
-border:1px solid rgba(255,255,255,0.06);
+border:1px solid var(--border);
 font-size:12px;
 opacity:0.75;
 line-height:1.6;
@@ -2813,7 +3062,7 @@ function validatorPanel(){
 return `
 <hr>
 <h3>Validator Panel</h3>
-<input id="vUser" placeholder="Target User ID (TG_xxx)">
+<input id="vUser" placeholder="Target STBX UID (STBXX..)">
 <select id="vAsset">
 <option value="USDC">USDC</option>
 <option value="USDT">USDT</option>
@@ -2824,9 +3073,9 @@ width:100%;
 margin-top:8px;
 padding:10px;
 border-radius:8px;
-border:1px solid #1e293b;
-background:#020617;
-color:#e5e7eb;
+border:1px solid var(--border);
+background:var(--surface);
+color:var(--text);
 ">
 
 <select id="vType">
@@ -2853,7 +3102,7 @@ color:#e5e7eb;
 <input id="vTitle" placeholder="Title (e.g. Merkle Root Updated)">
 <input id="vBody" placeholder="Message (details)">
 <button onclick="sendValidatorNotification()" 
-style="background:#60a5fa;color:#020617;font-weight:bold">
+style="background:var(--primary);color:var(--bg);font-weight:bold">
 Send Notification
 </button>
 `;
@@ -2868,17 +3117,110 @@ const addr = prompt(
 current || ""
 );
 if(!addr) return;
-if(addr.length < 20){
-alert("Invalid wallet address");
-return;
+const newAddr = addr.trim();
+
+const isEVM = /^0x[a-fA-F0-9]{40}$/.test(newAddr);
+const isTron = /^T[A-Za-z1-9]{33}$/.test(newAddr);
+
+if (!isEVM && !isTron) {
+    alert("Please enter a valid wallet address.");
+    return;
 }
-if (current) {
-alert("EOA wallet already locked");
-return;
+
+if (current && current.toLowerCase() === newAddr.toLowerCase()) {
+    alert("This wallet address is already linked.");
+    return;
 }
+
+await updateDoc(userRef, {
+    eoaAddress: newAddr
+});
+
+alert(current ? "Wallet address updated successfully." : "Wallet address linked successfully.");
+renderApp();
 await updateDoc(userRef,{
 eoaAddress: addr.trim()
 });
-alert("EOA wallet locked successfully");
 renderApp();
+};
+
+  // ================= Change Username=================
+window.changeUsername = async () => {
+
+    const snap = await getDoc(userRef);
+    const data = snap.data() || {};
+
+    const current = data.username || "";
+
+    if (data.lastUsernameChange) {
+
+        const last = data.lastUsernameChange.toDate
+            ? data.lastUsernameChange.toDate().getTime()
+            : new Date(data.lastUsernameChange).getTime();
+
+        const limit = 14 * 24 * 60 * 60 * 1000;
+
+        if (Date.now() - last < limit) {
+
+            const left = Math.ceil(
+                (limit - (Date.now() - last)) / 86400000
+            );
+
+            alert(
+                "Username can only be changed once every 14 days.\n\nRemaining: " +
+                left +
+                " day(s)."
+            );
+
+            return;
+        }
+    }
+
+    const username = prompt(
+        "Enter your new username",
+        current
+    );
+
+    if (!username) return;
+
+    const newName = username.trim();
+
+    if (newName === current) {
+        alert("This is already your current username.");
+        return;
+    }
+
+    if (!/^[A-Za-z0-9_]{3,20}$/.test(newName)) {
+        alert(
+            "Username must be 3-20 characters and contain only letters, numbers and underscore (_)."
+        );
+        return;
+    }
+
+    const check = query(
+        collection(db, "users"),
+        where("username", "==", newName)
+    );
+
+    const result = await getDocs(check);
+
+    if (!result.empty) {
+
+        const own = result.docs.find(doc => doc.id === userRef.id);
+
+        if (!own) {
+            alert("Username already taken.");
+            return;
+        }
+    }
+
+    await updateDoc(userRef, {
+        username: newName,
+        lastUsernameChange: serverTimestamp()
+    });
+
+    alert("Username updated successfully.");
+
+    renderApp();
+
 };
