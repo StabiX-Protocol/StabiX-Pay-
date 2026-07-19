@@ -100,6 +100,7 @@ appDiv(`
     </div>
 </div>
 `);
+document.getElementById("bottomNav").style.display = "none";
 };
 
 // Documentation function (if using enhanced version)
