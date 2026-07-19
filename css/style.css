@@ -235,22 +235,6 @@ stroke-dashoffset:0;
 }
 
 /* =====  WALLET STYLE HEADER ===== */
-.refreshIcon{
-font-size:16px;
-cursor:pointer;
-opacity:.8;
-margin-left:auto;
-color:var(--subtext);
-transition:.2s;
-}
-
-.refreshIcon:hover,
-.refreshIcon:active{
-opacity:1;
-color:var(--primary);
-transform:rotate(90deg);
-}
-
 .walletHeader{
 display:flex;
 flex-direction:column;
@@ -665,7 +649,7 @@ font-weight:500;
   left:0;
   width:100%;
   height:100%;
-  background:#0f172a;
+  background:var(--bg);
   z-index:9999;
   display:none;
   flex-direction:column;
@@ -696,7 +680,7 @@ font-weight:500;
 
 #walletAddr{
   font-size:14px;
-  color:#fff;
+  color:var(--text);
   word-break:break-all;
 }
 
@@ -704,6 +688,7 @@ font-weight:500;
   display:flex;
   align-items:center;
   opacity:0.7;
+  color:var(--text);
 }
 
 #qr-reader video {
@@ -756,7 +741,7 @@ font-weight:500;
   width:100%;
   height:100%;
 
-  background:#000; 
+  background:var(--bg);
   z-index:9999;
 
   display:none;
@@ -772,7 +757,7 @@ font-weight:500;
   padding:14px;
   border-radius:12px;
   border:none;
-  background:#1e293b;
+  background:var(--surface);
   color:white;
   font-size:16px;
   text-align:left;
@@ -784,8 +769,8 @@ font-weight:500;
   padding:16px;
   border:none;
   border-radius:12px;
-  background:#2563eb;
-  color:white;
+  background:var(--primary);
+  color:var(--text);
   font-size:16px;
 }
 
@@ -796,7 +781,7 @@ font-weight:500;
 }
 
 #previewScreen .sendSub{
-  color:#8a8a8a;
+  color:var(--subtext);
   margin-bottom:20px;
 }
 .walletHeader{
