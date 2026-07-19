@@ -1005,26 +1005,6 @@ document.getElementById("previewScreen").style.display = "none";
 document.getElementById("bottomNav").style.display = "flex";
 scanDone = false;
 };
-/*==================Refresh=============*/
-window.softRefresh = async function () {
-const box = document.querySelector(".box");
-if (box) {
-box.style.transition = "opacity .15s ease";
-box.style.opacity = ".65";
-setTimeout(() => {
-box.style.opacity = "1";
-}, 150);
-}
-const snap = await getDoc(userRef);
-const data = snap.data() || {};
-if (data.needsRefresh === true) {
-await renderApp();
-await updateDoc(userRef,{
-needsRefresh:false
-});
-}
-};
-
 /* ================= Notifications ================= */
 window.openNotifications = async () => {
 document.getElementById("bottomNav").style.display = "none";
