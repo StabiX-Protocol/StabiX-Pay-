@@ -164,7 +164,7 @@ top:0;
 left:0;
 width:100vw;
 height:100vh;
-background:black;
+background:var(--bg);
 z-index:99999;
 ">
 
@@ -197,7 +197,7 @@ position:absolute;
 top:15px;
 left:15px;
 background:rgba(0,0,0,0.7);
-color:#fff;
+color:var(--text);
 border:none;
 font-size:18px;
 width:40px;
@@ -211,7 +211,7 @@ position:absolute;
 top:15px;
 right:15px;
 background:rgba(0,0,0,0.7);
-color:#fff;
+color:var(--text);
 border:none;
 font-size:18px;
 width:40px;
@@ -219,7 +219,7 @@ height:40px;
 border-radius:50%;
 z-index:100000;
 ">
-<svg width="26" height="26" viewBox="0 0 24 24" fill="white"
+<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"
 style="transform:translate(-5px, -5px);">
 <path d="M6 2h12v3H6V2zm3 5h6c1.1 0 2 .9 2 2v11c0 1.1-.9 2-2 2H9c-1.1 0-2-.9-2-2V9c0-1.1.9-2 2-2zm3 3a1.5 1.5 0 100 3 1.5 1.5 0 000-3z"/>
 </svg>
@@ -230,8 +230,8 @@ position:fixed;
 bottom:100px;
 left:50%;
 transform:translateX(-50%);
-background:#e5e7eb;
-color:#111;
+background:var(--text);
+color:var(--bg);
 border:none;
 height:48px;
 padding:0 20px;
@@ -253,9 +253,9 @@ white-space:nowrap;
 transform:translateY(15px);  
 ">
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="display:block;">
-<rect x="3" y="5" width="18" height="14" rx="2" stroke="#555" stroke-width="1.5"/>
-<circle cx="8" cy="10" r="2" fill="#555"/>
-<path d="M21 16L16 11L5 19" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+<circle cx="8" cy="10" r="2" fill="currentColor"/>
+<path d="M21 16L16 11L5 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 <span>Upload From Gallery</span>
 </span>
@@ -276,20 +276,20 @@ transform:translateX(-50%);
 width:92%;
 max-width:420px;
 height:70px;
-background:rgba(2,6,23,0.9);
+background:color-mix(in srgb, var(--bg) 90%, transparent);
 backdrop-filter:blur(12px);
 border-radius:22px;
 display:none;
 justify-content:space-around;
 align-items:center;
 z-index:999;
-box-shadow:0 8px 30px rgba(0,0,0,0.6);
+box-shadow:0 8px 30px rgba(0,0,0,0.3);
 ">
 <div id="tab-home" onclick="navigateHome()" style="flex:1;text-align:center;cursor:pointer">
 <div class="nav-icon">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-<path d="M3 10L12 3L21 10" stroke="white" stroke-width="2" stroke-linecap="round"/>
-<path d="M5 10V20H19V10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+<path d="M3 10L12 3L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+<path d="M5 10V20H19V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
 </svg>
 </div>
 <div class="nav-text">Home</div>
@@ -298,10 +298,10 @@ box-shadow:0 8px 30px rgba(0,0,0,0.6);
 <div id="tab-deposit" onclick="goDeposit();selectTab('deposit')" style="flex:1;text-align:center;cursor:pointer">
 <div class="nav-icon">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-<path d="M7 8V14" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round"/>
-<path d="M4 11L7 14L10 11" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M17 14V8" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round"/>
-<path d="M14 11L17 8L20 11" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M7 8V14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+<path d="M4 11L7 14L10 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17 14V8" stroke="#e5e7eb" stroke="currentColor" stroke-linecap="round"/>
+<path d="M14 11L17 8L20 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 </div>
 
@@ -310,8 +310,8 @@ box-shadow:0 8px 30px rgba(0,0,0,0.6);
 <div id="tab-history" onclick="goHistory();selectTab('history')" style="flex:1;text-align:center;cursor:pointer">
 <div class="nav-icon">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-<circle cx="12" cy="12" r="10" stroke="white" stroke-width="2"/>
-<path d="M12 7V12L15 14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+<path d="M12 7V12L15 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
 </svg>
 </div>
 <div class="nav-text">History</div>
@@ -320,9 +320,9 @@ box-shadow:0 8px 30px rgba(0,0,0,0.6);
 <div id="tab-settings" onclick="goSettings();selectTab('settings')" style="flex:1;text-align:center;cursor:pointer">
 <div class="nav-icon">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-<line x1="5" y1="7" x2="19" y2="7" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
-<line x1="5" y1="12" x2="19" y2="12" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
-<line x1="5" y1="17" x2="19" y2="17" stroke="#e5e7eb" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="5" y1="7" x2="19" y2="7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="5" y1="17" x2="19" y2="17" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
 </svg>
 </div>
 <div class="nav-text">Settings</div>
