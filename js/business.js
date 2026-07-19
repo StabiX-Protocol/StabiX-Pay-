@@ -107,3 +107,116 @@ window.viewDocumentation = function() {
     alert('Documentation coming soon!');
     // Add your documentation link here
 };
+
+window.openBusinessRegistration = function () {
+appDiv(`
+
+<div class="business-page">
+
+    <div class="topBar">
+        <div class="backBtn" onclick="openBusiness()">←</div>
+        <div class="pageTitle">Business Registration</div>
+        <div style="width:40px;"></div>
+    </div>
+
+    <div class="businessForm">
+
+        <h2>Register Business</h2>
+
+        <p class="businessSub">
+            Complete the details below to apply for a Business Account.
+        </p>
+
+        <div class="inputGroup">
+            <label>Business Name</label>
+            <input
+                id="businessName"
+                type="text"
+                placeholder="Enter business name">
+        </div>
+
+        <div class="inputGroup">
+            <label>Category</label>
+
+            <select id="businessCategory">
+
+                <option value="">Select Category</option>
+
+                <option>Gaming</option>
+
+                <option>E-Commerce</option>
+
+                <option>Creator</option>
+
+                <option>SaaS</option>
+
+                <option>Finance</option>
+
+                <option>Other</option>
+
+            </select>
+        </div>
+
+        <div class="inputGroup">
+            <label>Website / Social Link</label>
+
+            <input
+                id="businessWebsite"
+                type="text"
+                placeholder="https://">
+        </div>
+
+        <div class="inputGroup">
+            <label>Business Email</label>
+
+            <input
+                id="businessEmail"
+                type="email"
+                placeholder="name@example.com">
+        </div>
+
+        <div class="inputGroup">
+            <label>Country</label>
+
+            <input
+                id="businessCountry"
+                type="text"
+                placeholder="Country">
+        </div>
+
+        <div class="inputGroup">
+            <label>Description</label>
+
+            <textarea
+                id="businessDescription"
+                rows="5"
+                placeholder="Tell us about your business"></textarea>
+        </div>
+
+        <div class="termsBox">
+
+            <input
+                type="checkbox"
+                id="businessTerms">
+
+            <label for="businessTerms">
+                I agree to the Business Terms.
+            </label>
+
+        </div>
+
+        <button
+            class="createBusinessBtn"
+            onclick="businessReview()">
+
+            Continue
+
+        </button>
+
+    </div>
+
+</div>
+
+`);
+
+}
