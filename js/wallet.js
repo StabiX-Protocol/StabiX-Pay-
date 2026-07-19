@@ -1449,13 +1449,7 @@ cursor:pointer;
 ">
 <div>
 <div>Theme</div>
-<div id="themeSubtitle" style="
-font-size:13px;
-color:var(--subtext);
-margin-top:3px;
-">
-System Default
-</div>
+
 </div>
 <div style="opacity:.5;">></div>
 </div>
