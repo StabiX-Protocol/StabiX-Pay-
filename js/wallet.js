@@ -1600,6 +1600,13 @@ mode==="light" ? "Light" :
 },10);
 };
 
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+if((localStorage.getItem("theme") || "system") === "system"){
+changeTheme("system");
+}
+
+});
+
 window.logout = () => {
     document.getElementById("logoutPopup").style.display = "flex";
 };
