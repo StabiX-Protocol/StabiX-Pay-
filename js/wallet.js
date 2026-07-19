@@ -1573,12 +1573,31 @@ const mode = localStorage.getItem("theme") || "system";
 const s = document.getElementById("systemTick");
 const l = document.getElementById("lightTick");
 const d = document.getElementById("darkTick");
-if(s) s.innerHTML = "";
-if(l) l.innerHTML = "";
-if(d) d.innerHTML = "";
-if(mode==="system" && s) s.innerHTML="✓";
-if(mode==="light" && l) l.innerHTML="✓";
-if(mode==="dark" && d) d.innerHTML="✓";
+[s,l,d].forEach(el=>{
+if(el) el.classList.remove("active");
+});
+if(mode==="system" && s) s.classList.add("active");
+if(mode==="light" && l) l.classList.add("active");
+if(mode==="dark" && d) d.classList.add("active");
+};
+
+window.changeTheme = (mode) => {
+localStorage.setItem("theme",mode);
+if(mode==="system"){
+document.documentElement.removeAttribute("data-theme");
+}else{
+document.documentElement.setAttribute("data-theme",mode);
+}
+goSettings();
+setTimeout(()=>{
+const t=document.getElementById("themeSubtitle");
+if(t){
+t.innerText=
+mode==="system" ? "System Default" :
+mode==="light" ? "Light" :
+"Dark";
+}
+},10);
 };
 
 window.logout = () => {
