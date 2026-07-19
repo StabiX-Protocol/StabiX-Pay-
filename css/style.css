@@ -1257,3 +1257,32 @@ background:var(--primary);
 border-radius:50%;
 display:block;
 }
+
+.business-fab{
+width:58px;
+height:58px;
+margin:auto;
+margin-top:-34px;
+border-radius:50%;
+background:var(--primary);
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:var(--shadow);
+border:4px solid var(--surface);
+transition:.2s;
+}
+
+.business-fab:active{
+transform:scale(.96);
+}
+
+#tab-business{
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+#tab-business .nav-text{
+margin-top:6px;
+}
