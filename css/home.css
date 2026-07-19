@@ -155,6 +155,84 @@ transition:.2s;
 transform:scale(.98);
 }
 
+/* ========== BOTTOM NAV ========== */
+#bottomNav{
+position:fixed;
+left:50%;
+bottom:10px;
+transform:translateX(-50%);
+width:92%;
+max-width:420px;
+height:70px;
+display:flex;
+justify-content:space-around;
+align-items:center;
+padding:0 12px;
+gap:4px;
+background:color-mix(in srgb,var(--bg) 90%,transparent);
+backdrop-filter:blur(12px);
+border-radius:22px;
+z-index:999;
+box-shadow:var(--shadow);
+animation:slideUp .4s ease-out;
+}
+
+/* ========== BUTTON SPACING ========== */
+#tab-home,
+#tab-deposit,
+#tab-history,
+#tab-settings{
+flex:.95 !important;
+max-width:70px;
+}
+
+#tab-business{
+flex:0 !important;
+width:auto !important;
+}
+
+/* ========== ANIMATION ========== */
+@keyframes slideUp{
+from{
+opacity:0;
+transform:translate(-50%,20px);
+}
+to{
+opacity:1;
+transform:translate(-50%,0);
+}
+}
+
+/* ========== MOBILE ========== */
+@media (max-width:480px){
+#bottomNav{
+width:95%;
+bottom:8px;
+}
+    
+.nav-text{
+font-size:10px;
+}
+
+.nav-icon{
+font-size:20px;
+margin-bottom:2px;
+}
+
+.business-fab{
+width:56px;
+height:56px;
+}
+}
+
+body{
+padding-bottom:100px;
+}
+
+#bottomNav + *{
+margin-bottom:20px;
+}
+
 /* ===== Bottom Navigation Active Colour===== */
 .nav-icon{
 font-size:21px;
