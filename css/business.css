@@ -41,3 +41,23 @@ width:0;
 #tab-business .nav-text{
 display:none;
 }
+
+/* ========== BUSINESS PAGE ========== */
+.business-page {
+min-height: 100vh;
+background: linear-gradient(135deg, var(--bg) 0%, rgba(37, 99, 235, 0.03) 100%);
+display: flex;
+flex-direction: column;
+animation: pageLoad 0.5s ease-out;
+}
+
+@keyframes pageLoad {
+from {
+opacity: 0;
+transform: translateY(20px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
