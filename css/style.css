@@ -867,22 +867,148 @@ color:var(--primary);
 }
 
 .nav-item-active{
-background:rgba(59,130,246,.12);
-border:1px solid rgba(59,130,246,.18);
+background:color-mix(in srgb,var(--primary) 12%,transparent);
+border:1px solid color-mix(in srgb,var(--primary) 18%,transparent);
 border-radius:16px;
 padding:8px 0;
-box-shadow:0 8px 22px rgba(59,130,246,.14);
+box-shadow:var(--shadow);
 transition:.22s;
 }
 
 .nav-item{
 border-radius:16px;
 transition:.22s;
+flex:1;
+text-align:center;
+cursor:pointer;
+padding:8px 4px;
 }
 
 .nav-item:active{
 transform:scale(.96);
 }
+
+/* ========== BUSINESS FAB ========== */
+.business-fab{
+width:58px;
+height:58px;
+border-radius:50%;
+background:var(--primary);
+display:flex;
+align-items:center;
+justify-content:center;
+border:4px solid var(--surface);
+box-shadow:var(--shadow);
+
+position:absolute;
+left:50%;
+bottom:6px;
+transform:translateX(-50%);
+z-index:1001;
+
+transition:.22s;
+cursor:pointer;
+}
+
+.business-fab:hover{
+transform:translateX(-50%) scale(1.08);
+}
+
+.business-fab:active{
+transform:translateX(-50%) scale(.96);
+}
+
+/* ========== BUSINESS TAB ========== */
+#tab-business{
+position:relative;
+display:flex;
+flex-direction:column;
+align-items:center;
+flex:0;
+width:0;
+}
+
+#tab-business .nav-text{
+display:none;
+}
+
+/* ========== BOTTOM NAV ========== */
+#bottomNav{
+position:fixed;
+left:50%;
+bottom:10px;
+transform:translateX(-50%);
+width:92%;
+max-width:420px;
+height:70px;
+display:flex;
+justify-content:space-around;
+align-items:center;
+padding:0 12px;
+gap:4px;
+background:color-mix(in srgb,var(--bg) 90%,transparent);
+backdrop-filter:blur(12px);
+border-radius:22px;
+z-index:999;
+box-shadow:var(--shadow);
+animation:slideUp .4s ease-out;
+}
+
+/* ========== BUTTON SPACING ========== */
+#tab-home,
+#tab-deposit,
+#tab-history,
+#tab-settings{
+flex:.95 !important;
+max-width:70px;
+}
+
+#tab-business{
+flex:0 !important;
+width:auto !important;
+}
+
+/* ========== ANIMATION ========== */
+@keyframes slideUp{
+from{
+opacity:0;
+transform:translate(-50%,20px);
+}
+to{
+opacity:1;
+transform:translate(-50%,0);
+}
+}
+/* ========== MOBILE ========== */
+@media (max-width:480px){
+#bottomNav{
+width:95%;
+bottom:8px;
+}
+    
+.nav-text{
+font-size:10px;
+}
+
+.nav-icon{
+font-size:20px;
+margin-bottom:2px;
+}
+
+.business-fab{
+width:56px;
+height:56px;
+}
+}
+
+body{
+padding-bottom:100px;
+}
+
+#bottomNav + *{
+margin-bottom:20px;
+}
+
 /* ===== Amount Filter button===== */
 .fbtn{
 background:var(--surface);
@@ -1256,33 +1382,4 @@ height:10px;
 background:var(--primary);
 border-radius:50%;
 display:block;
-}
-
-.business-fab{
-width:58px;
-height:58px;
-margin:auto;
-margin-top:-34px;
-border-radius:50%;
-background:var(--primary);
-display:flex;
-align-items:center;
-justify-content:center;
-box-shadow:var(--shadow);
-border:4px solid var(--surface);
-transition:.2s;
-}
-
-.business-fab:active{
-transform:scale(.96);
-}
-
-#tab-business{
-display:flex;
-flex-direction:column;
-align-items:center;
-}
-
-#tab-business .nav-text{
-margin-top:6px;
 }
