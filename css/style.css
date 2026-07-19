@@ -408,7 +408,8 @@ margin-bottom:24px;
 .addressBox{
 display:flex;
 gap:12px;
-align-items:center
+align-items:center;
+color:var(--text);
 }
 
 .addressBox input{
