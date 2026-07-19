@@ -1440,6 +1440,26 @@ document.querySelector(".box").innerHTML = `
 Settings
 </div>
 
+<div onclick="openTheme()" style="
+display:flex;
+justify-content:space-between;
+padding:14px 0;
+border-bottom:1px solid var(--border);
+cursor:pointer;
+">
+<div>
+<div>Theme</div>
+<div id="themeSubtitle" style="
+font-size:13px;
+color:var(--subtext);
+margin-top:3px;
+">
+System Default
+</div>
+</div>
+<div style="opacity:.5;">></div>
+</div>
+
 <div onclick="openSupport()" style="
 display:flex;
 justify-content:space-between;
@@ -1484,6 +1504,83 @@ Logout
 </div>
 `;
 };
+
+window.openTheme = () => {
+document.querySelector(".box").innerHTML = `
+
+<div onclick="goSettings()" style="
+font-size:18px;
+opacity:.7;
+margin-bottom:24px;
+cursor:pointer;
+">
+← Back
+</div>
+
+<div style="
+font-size:20px;
+font-weight:700;
+margin-bottom:28px;
+">
+Theme
+</div>
+
+<div style="
+color:var(--subtext);
+margin-bottom:24px;
+">
+Choose your preferred appearance.
+</div>
+
+<div onclick="changeTheme('system')" style="
+display:flex;
+justify-content:space-between;
+padding:16px 0;
+border-bottom:1px solid var(--border);
+cursor:pointer;
+">
+<div> System Default</div>
+<div id="systemTick" class="radio"></div>
+</div>
+
+<div onclick="changeTheme('light')" style="
+display:flex;
+justify-content:space-between;
+padding:16px 0;
+border-bottom:1px solid var(--border);
+cursor:pointer;
+">
+<div>☀️ Light</div>
+<div id="lightTick" class="radio"></div>
+</div>
+
+<div onclick="changeTheme('dark')" style="
+display:flex;
+justify-content:space-between;
+padding:16px 0;
+border-bottom:1px solid var(--border);
+cursor:pointer;
+">
+<div>🌙 Dark</div>
+<div id="darkTick" class="radio"></div>
+</div>
+`;
+refreshThemeTicks();
+};
+
+window.refreshThemeTicks = () => {
+const mode = localStorage.getItem("theme") || "system";
+const s = document.getElementById("systemTick");
+const l = document.getElementById("lightTick");
+const d = document.getElementById("darkTick");
+if(s) s.innerHTML = "";
+if(l) l.innerHTML = "";
+if(d) d.innerHTML = "";
+if(mode==="system" && s) s.innerHTML="✓";
+if(mode==="light" && l) l.innerHTML="✓";
+if(mode==="dark" && d) d.innerHTML="✓";
+};
+
 window.logout = () => {
     document.getElementById("logoutPopup").style.display = "flex";
 };
