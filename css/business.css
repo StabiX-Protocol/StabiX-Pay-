@@ -1,0 +1,43 @@
+/* ========== BUSINESS FAB ========== */
+.business-fab{
+width:58px;
+height:58px;
+border-radius:50%;
+background:var(--primary);
+display:flex;
+align-items:center;
+justify-content:center;
+border:4px solid var(--surface);
+box-shadow:var(--shadow);
+
+position:absolute;
+left:50%;
+bottom:6px;
+transform:translateX(-50%);
+z-index:1001;
+
+transition:.22s;
+cursor:pointer;
+}
+
+.business-fab:hover{
+transform:translateX(-50%) scale(1.08);
+}
+
+.business-fab:active{
+transform:translateX(-50%) scale(.96);
+}
+
+/* ========== BUSINESS TAB ========== */
+#tab-business{
+position:relative;
+display:flex;
+flex-direction:column;
+align-items:center;
+flex:0;
+width:0;
+}
+
+#tab-business .nav-text{
+display:none;
+}
