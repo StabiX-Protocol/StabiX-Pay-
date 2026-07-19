@@ -1,6 +1,7 @@
 import "./firebase.js"
 import "./wallet.js"
 import "./tx.js"
+import "./business.js";
 import "./auth.js"
 import {
   doc,
