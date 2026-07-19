@@ -1449,7 +1449,6 @@ cursor:pointer;
 ">
 <div>
 <div>Theme</div>
-
 </div>
 <div style="opacity:.5;">></div>
 </div>
@@ -1544,7 +1543,7 @@ padding:16px 0;
 border-bottom:1px solid var(--border);
 cursor:pointer;
 ">
-<div>☀️ Light</div>
+<div> Light</div>
 <div id="lightTick" class="radio"></div>
 </div>
 
@@ -1555,7 +1554,7 @@ padding:16px 0;
 border-bottom:1px solid var(--border);
 cursor:pointer;
 ">
-<div>🌙 Dark</div>
+<div> Dark</div>
 <div id="darkTick" class="radio"></div>
 </div>
 `;
