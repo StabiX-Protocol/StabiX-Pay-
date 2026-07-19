@@ -1974,3 +1974,441 @@ display:block;
     }
 }
 
+/* ========== BUSINESS FORM - PREMIUM STYLING ========== */
+
+.businessForm {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 24px 20px 60px 20px;
+    animation: formLoad 0.5s ease-out;
+}
+
+@keyframes formLoad {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== FORM HEADER ========== */
+
+.formHeader {
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.businessForm h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+
+.businessSub {
+    font-size: 14px;
+    color: var(--subtext);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ========== INPUT GROUP ========== */
+
+.inputGroup {
+    margin-bottom: 20px;
+}
+
+.inputGroup label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+
+/* ========== PREMIUM INPUT STYLING ========== */
+
+.premiumInput {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 14px;
+    border: 1.5px solid var(--border);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.02) 0%, rgba(37, 99, 235, 0.01) 100%);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+}
+
+.premiumInput::placeholder {
+    color: var(--subtext);
+    opacity: 0.6;
+}
+
+.premiumInput:focus {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%);
+    box-shadow: 
+        0 4px 12px rgba(37, 99, 235, 0.15),
+        inset 0 0 0 1px var(--primary);
+}
+
+.premiumInput:hover:not(:focus) {
+    border-color: rgba(37, 99, 235, 0.3);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.04) 0%, rgba(37, 99, 235, 0.02) 100%);
+}
+
+/* ========== INPUT WRAPPER (WITH ICON) ========== */
+
+.inputWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.inputWrapper .premiumInput {
+    padding-right: 44px;
+}
+
+.inputIcon {
+    position: absolute;
+    right: 14px;
+    font-size: 18px;
+    opacity: 0.6;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.premiumInput:focus + .inputIcon {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* ========== PREMIUM SELECT STYLING ========== */
+
+.premiumSelect {
+    width: 100%;
+    padding: 14px 40px 14px 16px;
+    font-size: 14px;
+    border: 1.5px solid var(--border);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.02) 0%, rgba(37, 99, 235, 0.01) 100%);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: inherit;
+    box-sizing: border-box;
+    cursor: pointer;
+    appearance: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+}
+
+.premiumSelect option {
+    background: var(--surface);
+    color: var(--text);
+}
+
+.premiumSelect:focus {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%);
+    box-shadow: 
+        0 4px 12px rgba(37, 99, 235, 0.15),
+        inset 0 0 0 1px var(--primary);
+}
+
+.premiumSelect:hover:not(:focus) {
+    border-color: rgba(37, 99, 235, 0.3);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.04) 0%, rgba(37, 99, 235, 0.02) 100%);
+}
+
+/* ========== SELECT WRAPPER ========== */
+
+.selectWrapper {
+    position: relative;
+}
+
+.selectIcon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--primary);
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* ========== PREMIUM TEXTAREA ========== */
+
+.premiumTextarea {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 14px;
+    border: 1.5px solid var(--border);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.02) 0%, rgba(37, 99, 235, 0.01) 100%);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: inherit;
+    box-sizing: border-box;
+    resize: vertical;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+}
+
+.premiumTextarea::placeholder {
+    color: var(--subtext);
+    opacity: 0.6;
+}
+
+.premiumTextarea:focus {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%);
+    box-shadow: 
+        0 4px 12px rgba(37, 99, 235, 0.15),
+        inset 0 0 0 1px var(--primary);
+}
+
+.premiumTextarea:hover:not(:focus) {
+    border-color: rgba(37, 99, 235, 0.3);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.04) 0%, rgba(37, 99, 235, 0.02) 100%);
+}
+
+/* ========== TEXTAREA WRAPPER ========== */
+
+.textareaWrapper {
+    position: relative;
+}
+
+.charCount {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 11px;
+    color: var(--subtext);
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* ========== PREMIUM CHECKBOX ========== */
+
+.premiumCheckbox {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    cursor: pointer;
+    appearance: none;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    transition: all 0.3s ease;
+    vertical-align: middle;
+}
+
+.premiumCheckbox:hover {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+}
+
+.premiumCheckbox:checked {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.premiumCheckbox:checked::after {
+    content: '✓';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.premiumCheckbox:focus {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ========== TERMS BOX ========== */
+
+.termsBox {
+    display: flex;
+    align-items: flex-start;
+    margin: 28px 0;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.termsLabel {
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    line-height: 1.6;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* ========== INFO BOX ========== */
+
+.infoBox {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+/* ========== BUTTON ========== */
+
+.createBusinessBtn {
+    width: 100%;
+    padding: 16px 32px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.createBusinessBtn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 70%
+    );
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    }
+    100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+    }
+}
+
+/* ========== BUTTON STATES ========== */
+
+.createBusinessBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 32px rgba(37, 99, 235, 0.3),
+        0 20px 60px rgba(37, 99, 235, 0.15);
+}
+
+.createBusinessBtn:active {
+    transform: translateY(0px);
+    box-shadow: 
+        0 4px 12px rgba(37, 99, 235, 0.2),
+        0 8px 24px rgba(37, 99, 235, 0.1);
+}
+
+.createBusinessBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+@media (max-width: 480px) {
+    .businessForm {
+        padding: 16px;
+    }
+
+    .businessForm h2 {
+        font-size: 24px;
+    }
+
+    .premiumInput,
+    .premiumSelect,
+    .premiumTextarea {
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+
+    .createBusinessBtn {
+        padding: 14px 24px;
+        font-size: 14px;
+    }
+
+    .termsBox {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 360px) {
+    .businessForm h2 {
+        font-size: 20px;
+    }
+
+    .inputGroup label {
+        font-size: 12px;
+    }
+
+    .premiumInput,
+    .premiumSelect,
+    .premiumTextarea {
+        font-size: 13px;
+    }
+}
+
+/* ========== UTILITY CLASSES ========== */
+
+.input-error {
+    border-color: var(--danger) !important;
+}
+
+.input-success {
+    border-color: var(--success) !important;
+}
+
+/* ========== ANIMATIONS ========== */
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.inputGroup {
+    animation: slideIn 0.4s ease-out forwards;
+}
+
+.inputGroup:nth-child(1) { animation-delay: 0.1s; }
+.inputGroup:nth-child(2) { animation-delay: 0.15s; }
+.inputGroup:nth-child(3) { animation-delay: 0.2s; }
+.inputGroup:nth-child(4) { animation-delay: 0.25s; }
+.inputGroup:nth-child(5) { animation-delay: 0.3s; }
+.inputGroup:nth-child(6) { animation-delay: 0.35s; }
+    
