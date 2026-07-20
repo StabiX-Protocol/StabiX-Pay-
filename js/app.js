@@ -1,20 +1,8 @@
-import "./firebase.js";
-import "./auth.js";
-import "./identity.js";
+import "./firebase.js"
 import "./home.js";
-import "./notification.js";
-import "./qr.js";
-import "./send.js";
-import "./navigation/homenav.js";
-import "./navigation/deposit.js";
-import "./navigation/history.js";
-import "./navigation/selecttab.js";
-import "./navigation/setting.js";
-import "./DW/Mode/dwnav.js";
-import "./DW/Mode/network.js";
-import "./Validator/Validatorpanel.js";
-import "./Business/business.js";
-import "../tx.js";
+import "./tx.js"
+import "./business.js";
+import "./auth.js"
 import {
   doc,
   getDoc,
