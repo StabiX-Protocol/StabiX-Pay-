@@ -1,15 +1,3 @@
-window.MODE = null;
-window.primaryAsset = localStorage.getItem("primaryAsset") || "USDC";
-window.keepAssetOpen = false;
-window.scanDone = false
-window.scanTargetId = null
-window.filters = {
-type:null,
-asset:null,
-amount:null,
-date:null
-};
-window.isScanFlow = false;
 import {
   doc,
   getDoc,
@@ -22,6 +10,18 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
+window.MODE = null;
+window.primaryAsset = localStorage.getItem("primaryAsset") || "USDC";
+window.keepAssetOpen = false;
+window.scanDone = false
+window.scanTargetId = null
+window.filters = {
+type:null,
+asset:null,
+amount:null,
+date:null
+};
+window.isScanFlow = false;
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
 const user = (await getDoc(userRef)).data();
