@@ -66,6 +66,7 @@ function renderSetup(){
   `);
 
   selectTab("home");
+  document.getElementById("bottomNav").style.display = "none";
 }
 
 function renderSignup(){
