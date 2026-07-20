@@ -562,3 +562,114 @@ if(window.keepAssetOpen){
   window.keepAssetOpen = false;
   openAssetSelector();
 }
+
+       // RECEIVE POPUP
+try{
+const q = query(
+collection(db,"transactions"),
+where("userId","==",WALLET),
+orderBy("createdAt","desc")
+);
+const snap = await getDocs(q);
+if(!snap.empty){
+const docSnap = snap.docs[0];
+const t = docSnap.data();
+if(t.type === "received"){
+const key = "rx_" + docSnap.id;
+if(!sessionStorage.getItem(key)){
+showTxPopup(`Received ${t.amount} ${t.asset || "USDC"} from ${t.counterparty}`);
+sessionStorage.setItem(key,"1");
+}
+}
+}
+}catch(e){
+console.log("Receive popup error", e);
+}
+}
+
+ /*=============Open Selector ========*/
+window.openAssetSelector = function(){
+document.getElementById("assetSelector").style.display = "block";
+document.getElementById("bottomNav").style.display = "none";
+}
+window.closeAssetSelector = function(){
+document.getElementById("assetSelector").style.display = "none";
+document.getElementById("bottomNav").style.display = "flex";
+}
+
+window.selectedAsset = null;
+window.confirmPrimary = function(asset){
+if(asset === window.primaryAsset){
+return;
+}
+  
+window.selectedAsset = asset;
+document.getElementById("confirmText").innerText =
+"Set " + asset + " as primary?";
+document.getElementById("confirmBox").style.display = "flex";
+}
+
+window.closeConfirm = function(){
+document.getElementById("confirmBox").style.display = "none";
+}
+
+window.applyPrimary = function(){
+window.primaryAsset = window.selectedAsset;
+localStorage.setItem("primaryAsset", window.primaryAsset);
+document.getElementById("confirmBox").style.display = "none";
+window.keepAssetOpen = true;
+renderApp();
+openAssetSelector();
+}
+
+ /*=============Primary Balance ========*/
+window.getPrimaryBalance = function(){
+if(window.primaryAsset === "USDC"){
+return (window.userData.balance || 0).toFixed(2);
+}
+if(window.primaryAsset === "USDT"){
+return (window.userData.usdtBalance || 0).toFixed(2);
+}
+};
+window.setPrimary = function(asset){
+window.primaryAsset = asset;
+localStorage.setItem("primaryAsset", asset);
+renderApp();
+};
+ /*=============UI Interface Of Balance Name ========*/
+window.toggleProfile = ()=>{
+const box = document.getElementById("profileHidden")
+if(box.style.display === "block"){
+box.style.display = "none"
+}else{
+box.style.display = "block"
+}
+}
+window.showReceive = ()=>{
+const wallet = WALLET
+  const asset = window.primaryAsset;
+
+document.getElementById("receiveText").innerText = "Receive " + asset;
+
+document.getElementById("receiveAssetImg").src =
+  asset === "USDT"
+    ? "./media/tether-usdt-logo.png"
+    : "./media/usd-coin-usdc-logo.png";
+const qrData = JSON.stringify({
+type: "stabix",
+id: wallet,
+})
+const qr = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(qrData)
+document.getElementById("qrImg").src = qr
+document.getElementById("walletAddr").innerText = wallet
+document.getElementById("receiveScreen").style.display = "flex"
+document.getElementById("sendScreen").style.display = "none"
+document.getElementById("amountScreen").style.display = "none"
+document.getElementById("confirmScreen").style.display = "none"
+}
+window.closeReceive = ()=>{
+document.getElementById("receiveScreen").style.display = "none"
+}
+window.copyWallet = ()=>{
+navigator.clipboard.writeText(WALLET)
+}
