@@ -673,3 +673,120 @@ document.getElementById("receiveScreen").style.display = "none"
 window.copyWallet = ()=>{
 navigator.clipboard.writeText(WALLET)
 }
+
+  // ================= EOA WALLET =================
+window.editEOA = async ()=>{
+const snap = await getDoc(userRef);
+const current = snap.data()?.eoaAddress;
+const addr = prompt(
+"Enter your EOA Wallet Address",
+current || ""
+);
+if(!addr) return;
+const newAddr = addr.trim();
+
+const isEVM = /^0x[a-fA-F0-9]{40}$/.test(newAddr);
+const isTron = /^T[A-Za-z1-9]{33}$/.test(newAddr);
+
+if (!isEVM && !isTron) {
+    alert("Please enter a valid wallet address.");
+    return;
+}
+
+if (current && current.toLowerCase() === newAddr.toLowerCase()) {
+    alert("This wallet address is already linked.");
+    return;
+}
+
+await updateDoc(userRef, {
+    eoaAddress: newAddr
+});
+
+alert(current ? "Wallet address updated successfully." : "Wallet address linked successfully.");
+renderApp();
+await updateDoc(userRef,{
+eoaAddress: addr.trim()
+});
+renderApp();
+};
+
+  // ================= Change Username=================
+window.changeUsername = async () => {
+
+    const snap = await getDoc(userRef);
+    const data = snap.data() || {};
+
+    const current = data.username || "";
+
+    if (data.lastUsernameChange) {
+
+        const last = data.lastUsernameChange.toDate
+            ? data.lastUsernameChange.toDate().getTime()
+            : new Date(data.lastUsernameChange).getTime();
+
+        const limit = 14 * 24 * 60 * 60 * 1000;
+
+        if (Date.now() - last < limit) {
+
+            const left = Math.ceil(
+                (limit - (Date.now() - last)) / 86400000
+            );
+
+            alert(
+                "Username can only be changed once every 14 days.\n\nRemaining: " +
+                left +
+                " day(s)."
+            );
+
+            return;
+        }
+    }
+
+    const username = prompt(
+        "Enter your new username",
+        current
+    );
+
+    if (!username) return;
+
+    const newName = username.trim();
+
+    if (newName === current) {
+        alert("This is already your current username.");
+        return;
+    }
+
+    if (!/^[A-Za-z0-9_]{3,20}$/.test(newName)) {
+        alert(
+            "Username must be 3-20 characters and contain only letters, numbers and underscore (_)."
+        );
+        return;
+    }
+
+    const check = query(
+        collection(db, "users"),
+        where("username", "==", newName)
+    );
+
+    const result = await getDocs(check);
+
+    if (!result.empty) {
+
+        const own = result.docs.find(doc => doc.id === userRef.id);
+
+        if (!own) {
+            alert("Username already taken.");
+            return;
+        }
+    }
+
+    await updateDoc(userRef, {
+        username: newName,
+        lastUsernameChange: serverTimestamp()
+    });
+
+    alert("Username updated successfully.");
+
+    renderApp();
+
+};
