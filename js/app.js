@@ -1,8 +1,18 @@
 import "./firebase.js"
-import "./home.js";
 import "./tx.js"
-import "./business.js";
 import "./auth.js"
+import "./App/send.js";
+import "./App/notification.js";
+import "./App/qr.js";
+
+import "./App/navigation/homenav.js";
+import "./App/navigation/deposit.js";
+
+import "./App/DW/Mode/dwnav.js";
+
+import "./App/Validator/Validatorpanel.js";
+
+import "./App/Business/business.js";
 import {
   doc,
   getDoc,
