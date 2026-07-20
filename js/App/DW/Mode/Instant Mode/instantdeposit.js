@@ -140,3 +140,46 @@ navigator.clipboard.writeText(addr);
 function isValidTxHash(hash){
 return /^0x([A-Fa-f0-9]{64})$/.test(hash);
 }
+
+window.submitInstantDeposit = async function(asset, network){
+const amount = document.getElementById("amount").value.trim();
+const txHash = document.getElementById("txHash").value.trim();
+const str = await window.generateSTR();
+const eoa = document.getElementById("eoa").value.trim();
+
+if(!amount || !txHash || !eoa){
+alert("All fields are required");
+return;
+}
+if(Number(amount) <= 0){
+alert("Invalid amount");
+return;
+}
+if(!isValidTxHash(txHash)){
+alert("Invalid transaction hash");
+return;
+}
+if(!isValidAddress(eoa)){
+alert("Invalid wallet address");
+return;
+}
+await addDoc(collection(db, "requests"), {
+userId: WALLET,
+type: "deposit",
+mode: "instant",
+asset,
+network,
+amount: Number(amount),
+txHash,
+eoa,
+str: str,
+status: "pending",
+createdAt: serverTimestamp()
+});
+
+await updateDoc(userRef, {
+pendingRequest: true
+});
+alert("Deposit Request Submitted\nYour funds will reflect in StabiX shortly");
+goDeposit();
+};
