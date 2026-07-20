@@ -21,17 +21,6 @@ import {
   orderBy,
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-/* ================= USERNAME CHANGE (30 DAYS) ================= */
-window.changeUsername = async ()=>{
-const snap = await getDoc(userRef);
-const last = snap.data().lastUsernameChange?.toDate();
-if(last && ((Date.now()-last)/(1000*60*60*24)) < 30)
-return alert("Username can be changed once every 30 days");
-const name = prompt("New username");
-if(!name?.trim()) return;
-await updateDoc(userRef,{ username:name.trim(), lastUsernameChange:serverTimestamp() });
-renderApp();
-};
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
 const user = (await getDoc(userRef)).data();
