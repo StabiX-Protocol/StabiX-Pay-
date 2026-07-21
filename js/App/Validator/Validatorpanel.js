@@ -1,4 +1,11 @@
- /* ================= VALIDATOR PANEL ================= */
+import "./Validatoradjust.js";
+import "./approvereq.js";
+import "./rejectreq.js";
+import "./loadrequest.js";
+import "./loadusers.js";
+import "./checkbalance.js";
+
+/* ================= VALIDATOR PANEL ================= */
 window.validatorPanel = function () {
 return `
 <hr>
