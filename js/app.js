@@ -9,6 +9,8 @@ import "./App/qr.js";
 
 import "./App/navigation/homenav.js";
 import "./App/navigation/deposit.js";
+import "./App/navigation/history.js";
+import "./App/navigation/setting.js";
 
 import "./App/DW/dwnav.js";
 import "./App/DW/network.js";
