@@ -167,7 +167,7 @@ height:70px;
 display:flex;
 justify-content:space-around;
 align-items:center;
-/*padding:0 12px;*/
+padding:0 12px;
 gap:4px;
 background:color-mix(in srgb,var(--bg) 90%,transparent);
 backdrop-filter:blur(12px);
@@ -175,8 +175,6 @@ border-radius:22px;
 z-index:999;
 box-shadow:var(--shadow);
 animation:slideUp .4s ease-out;
-box-sizing: border-box;
-padding: 0 15px;
 }
 
 /* ========== BUTTON SPACING ========== */
