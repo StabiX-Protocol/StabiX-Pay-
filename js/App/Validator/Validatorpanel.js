@@ -1,5 +1,5 @@
  /* ================= VALIDATOR PANEL ================= */
-function validatorPanel(){
+window.validatorPanel = function () {
 return `
 <hr>
 <h3>Validator Panel</h3>
