@@ -1,5 +1,5 @@
 /* ================= HISTORY RENDER ================= */
-function renderHistoryFromSnap(snap, emptyText) {
+window.renderHistoryFromSnap = function(snap, emptyText) {
 let groups = {};
 snap.forEach(docSnap => {const t = docSnap.data();
 
