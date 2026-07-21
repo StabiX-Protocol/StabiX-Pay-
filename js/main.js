@@ -1,5 +1,5 @@
 import "./firebase.js"
-import "./tx.js"
+import "./Tx/tx.js";
 import "./auth.js"
 import "./App/home.js";
 import "./App/navigation/selecttab.js";
