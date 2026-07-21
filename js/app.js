@@ -2,6 +2,7 @@ import "./firebase.js"
 import "./tx.js"
 import "./auth.js"
 import "./App/home.js";
+import "./App/navigation/selecttab.js";
 import "./App/send.js";
 import "./App/notification.js";
 import "./App/qr.js";
