@@ -16,13 +16,14 @@ background:var(--card);
 border:1px solid var(--border);
 border-radius:22px;
 padding:20px;
-width:100%;
+width:calc(100% - 24px); 
 max-width:390px;
 margin:16px auto;
 min-height:calc(100vh - 32px);
 padding-bottom:100px;
 box-shadow:var(--shadow);
 transition:.25s;
+position:relative;
 }
 
 input,
