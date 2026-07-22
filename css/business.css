@@ -144,40 +144,23 @@ animation: fadeInScale 0.6s ease-out 0.2s backwards;
 }
 
 /*Second Page*/
-/* ========== CREATE BUSINESS BUTTON ========== */
-/*.createBusinessBtn {
-margin: 0 24px 40px 24px;
-padding: 16px 32px;
-font-size: 15px;
-font-weight: 700;
-letter-spacing: 0.5px;
-border: none;
-border-radius: 14px;
-cursor: pointer;
-position: relative;
-overflow: hidden;
-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);*/
-    
+/* ========== CREATE BUSINESS BUTTON ========== */ 
 .createBusinessBtn{
-  display:block;
-  width:calc(100% - 48px);
-  max-width:320px;
-
-  margin:0 auto 40px;
-  padding:14px 24px;
-
-  font-size:15px;
-  font-weight:700;
-  letter-spacing:.5px;
-
-  border:none;
-  border-radius:14px;
-  cursor:pointer;
-  position:relative;
-  overflow:hidden;
-  transition:all .3s cubic-bezier(.4,0,.2,1);
+display:block;
+width:calc(100% - 48px);
+max-width:320px;
+margin:0 auto 40px;
+padding:14px 24px;
+font-size:15px;
+font-weight:700;
+letter-spacing:.5px;
+border:none;
+border-radius:14px;
+cursor:pointer;
+position:relative;
+overflow:hidden;
+transition:all .3s cubic-bezier(.4,0,.2,1);
 }
-
 background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
 color: #ffffff;
 box-shadow: 
@@ -964,7 +947,6 @@ animation: slideIn 0.4s ease-out forwards;
 .inputGroup:nth-child(4) { animation-delay: 0.25s; }
 .inputGroup:nth-child(5) { animation-delay: 0.3s; }
 .inputGroup:nth-child(6) { animation-delay: 0.35s; }
-
 
 
 /* ========== BUSINESS FAB ========== */
