@@ -91,18 +91,18 @@ width: 100%;
 
 <!-- Secondary Button -->
 <div style="display:flex;justify-content:center;padding:0 16px 40px;">
-<button class="createBusinessBtn btn-secondary" onclick="viewDocumentation()" style="
-background: linear-gradient(135deg, rgba(59,130,246,.1) 0%, rgba(59,130,246,.05) 100%);
-color: var(--primary);
-border: 1.5px solid var(--primary);
-box-shadow: 0 4px 12px rgba(37,99,235,.1);
+<button
+class="createBusinessBtn btn-secondary"
+onclick="viewDocumentation()"
+style="
+background:linear-gradient(135deg,rgba(59,130,246,.1) 0%,rgba(59,130,246,.05) 100%);
+color:var(--primary);
+border:1.5px solid var(--primary);
+box-shadow:0 4px 12px rgba(37,99,235,.1);
 max-width:320px;
 width:100%;
-margin:0 auto;">
-background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
-color: var(--primary);
-border: 1.5px solid var(--primary);
-box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);">
+margin:0 auto;
+">
 View Documentation
 </button>
 </div>
