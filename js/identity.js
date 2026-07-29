@@ -23,3 +23,9 @@ window.initializeGoogleLogin = function (callback) {
 
 };
 
+window.startGoogleLogin = function () {
+
+  google.accounts.id.prompt();
+
+};
+
