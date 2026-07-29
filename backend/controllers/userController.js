@@ -1,90 +1,111 @@
 const pool = require("../config/db");
 
+const getProfile = async (req, res) => {
+try {
+const { stbx_uid } = req.params;
+
+const result = await pool.query(
+`SELECT
+stbx_uid,
+username,
+eoa_address,
+created_at,
+last_username_change
+FROM users
+WHERE stbx_uid = $1
+`,
+[stbx_uid]
+);
+
+if (result.rows.length === 0) {
+return res.status(404).json({
+success: false,
+message: "User not found"
+});
+}
+
+return res.status(200).json({
+success: true,
+user: result.rows[0]
+});
+
+} catch (err) {
+console.error(err);
+return res.status(500).json({
+success: false,
+message: "Internal Server Error"
+});
+}
+};
+
 const registerUser = async (req, res) => {
+const client = await pool.connect();
+try {
+await client.query("BEGIN");
+const { stbx_uid, google_uid, username, eoa_address } = req.body;
+const result = await client.query(
+`INSERT INTO users
+(stbx_uid, google_uid, username, eoa_address)
+VALUES ($1, $2, $3, $4)
+RETURNING *`,
+[stbx_uid, google_uid, username, eoa_address]
+);
 
-    const client = await pool.connect();
+await client.query(
+`INSERT INTO username_history
+(user_id, username, is_current)
+VALUES ($1, $2, TRUE)`,
+[result.rows[0].id, username]
+);
 
-    try {
+await client.query("COMMIT");
+res.status(201).json({
+success: true,
+message: "User registered successfully",
+user: result.rows[0]
+});
 
-        await client.query("BEGIN");
+} catch (err) {
+await client.query("ROLLBACK");
+console.error(err);
 
-        const { stbx_uid, google_uid, username, eoa_address } = req.body;
+res.status(500).json({
+success: false,
+message: "Registration failed"
+});
 
-        const result = await client.query(
-            `INSERT INTO users
-            (stbx_uid, google_uid, username, eoa_address)
-            VALUES ($1, $2, $3, $4)
-            RETURNING *`,
-            [stbx_uid, google_uid, username, eoa_address]
-        );
-
-        // Username permanently reserve
-        await client.query(
-            `INSERT INTO username_history
-            (user_id, username, is_current)
-            VALUES ($1, $2, TRUE)`,
-            [result.rows[0].id, username]
-        );
-
-        await client.query("COMMIT");
-
-        res.status(201).json({
-            success: true,
-            message: "User registered successfully",
-            user: result.rows[0]
-        });
-
-    } catch (err) {
-
-        await client.query("ROLLBACK");
-
-        console.error(err);
-
-        res.status(500).json({
-            success: false,
-            message: "Registration failed"
-        });
-
-    } finally {
-
-        client.release();
-
-    }
-
+} finally {
+client.release();
+}
 };
 
 const getUser = async (req, res) => {
-    try {
+try {
+const { stbx_uid } = req.params;
+const result = await pool.query(
+"SELECT * FROM users WHERE stbx_uid = $1",
+[stbx_uid]
+);
 
-        const { stbx_uid } = req.params;
+if (result.rows.length === 0) {
+return res.status(404).json({
+success: false,
+message: "User not found"
+});
+}
 
-        const result = await pool.query(
-            "SELECT * FROM users WHERE stbx_uid = $1",
-            [stbx_uid]
-        );
+res.status(200).json({
+success: true,
+user: result.rows[0]
+});
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found"
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            user: result.rows[0]
-        });
-
-    } catch (err) {
-
-        console.error(err);
-
-        res.status(500).json({
-            success: false,
-            message: "Database Error"
-        });
-
-    }
+} catch (err) {
+console.error(err);
+res.status(500).json({
+success: false,
+message: "Database Error"
+});
+}
 };
 
 
@@ -100,10 +121,10 @@ const userResult = await client.query(
 );
 if (userResult.rows.length === 0) {
 await client.query("ROLLBACK");
-    return res.status(404).json({
-        success: false,
-        message: "User not found"
-    });
+return res.status(404).json({
+success: false,
+message: "User not found"
+});
 }
 
 const user = userResult.rows[0];
@@ -198,4 +219,4 @@ message: "Username updated successfully"
 }
 };
 
-module.exports = { registerUser, getUser, updateUsername };
+module.exports = { registerUser, getUser, getProfile, updateUsername };
