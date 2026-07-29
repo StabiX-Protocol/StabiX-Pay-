@@ -215,4 +215,40 @@ client.release();
 }
 };
 
-module.exports = { registerUser, getUser, getProfile, updateUsername };
+
+const googleLogin = async (req, res) => {
+try {
+const { google_uid } = req.body;
+
+const result = await pool.query(
+`SELECT
+stbx_uid,
+username
+FROM users
+WHERE google_uid = $1`,
+[google_uid]
+);
+
+if (result.rows.length === 0) {
+return res.status(404).json({
+success: false,
+message: "No StabiX account found."
+});
+}
+
+return res.status(200).json({
+success: true,
+user: result.rows[0]
+});
+
+} catch (err) {
+console.error(err);
+
+return res.status(500).json({
+success: false,
+message: "Internal Server Error"
+});
+}
+};
+
+module.exports = { registerUser, getUser, getProfile, updateUsername,googleLogin };

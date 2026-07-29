@@ -1,7 +1,9 @@
 const express = require("express");
+const cors = require("cors");
 const pool = require("./config/db"); 
 const app = express();
 app.use(express.json());
+app.use(cors());
 const healthRoutes = require("./routes/healthRoutes");
 const userRoutes = require("./routes/userRoutes")
 app.use("/api", healthRoutes);
