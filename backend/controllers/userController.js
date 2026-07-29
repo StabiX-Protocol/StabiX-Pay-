@@ -198,24 +198,20 @@ message: "Username updated successfully"
 });
 
 } catch (err) {
+await client.query("ROLLBACK");
+console.log("========== ERROR ==========");
+console.log(err);
+console.log("Message:", err.message);
+console.log("Code:", err.code);
+console.log("===========================");
 
-    await client.query("ROLLBACK");
-
-    console.log("========== ERROR ==========");
-    console.log(err);
-    console.log("Message:", err.message);
-    console.log("Code:", err.code);
-    console.log("===========================");
-
-    res.status(500).json({
-        success: false,
-        message: err.message
-    });
+res.status(500).json({
+success: false,
+message: err.message
+});
 
 } finally {
-
-    client.release();
-
+client.release();
 }
 };
 
