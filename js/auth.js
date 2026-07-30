@@ -1,88 +1,74 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-import {
-  collection,
-  query,
-  where,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
 
 const auth = getAuth(window.appFB);
 const provider = new GoogleAuthProvider();
 
+
 window.googleLogin = async () => {
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
 
-// check existing user by googleUID
-const q = query(
-  collection(db, "users"),
-  where("googleUID", "==", user.uid)
-);
+  window.initializeGoogleLogin(async (response) => {
 
-const snap = await getDocs(q);
+    try {
 
-if (snap.empty) {
-    await auth.signOut();
+      const apiResponse = await fetch(
+        "http://localhost:3000/api/users/google-login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            id_token: response.credential
+          })
+        }
+      );
 
-    alert("No StabiX account found with this Google account.\n\nPlease create an account first.");
-    return;
-}
+      const data = await apiResponse.json();
 
-const existingUser = snap.docs[0];
+      if (!apiResponse.ok) {
+        alert(data.message || "No StabiX account found with this Google account.");
+        return;
+      }
 
-localStorage.setItem("stbx_uid", existingUser.id);
-localStorage.setItem("stbx_google_uid", user.uid);
+      localStorage.setItem("stbx_uid", data.user.stbx_uid);
+      localStorage.setItem("stbx_google_uid", data.user.google_uid);
 
-location.reload();
-return;
-    
-  } catch (e) {
-    console.log("Google Login Error:", e);
-    alert(e.message);
-  }
+      location.reload();
+
+    } catch (e) {
+      console.log("Google Login Error:", e);
+      alert(e.message);
+    }
+
+  });
+
+  google.accounts.id.prompt();
+
 };
+
+
 
 window.googleResetLogin = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
-    const q = query(
-      collection(db, "users"),
-      where("googleUID", "==", user.uid)
-    );
-
-    const snap = await getDocs(q);
-
-    if (snap.empty) {
-      alert("No account found with this Google account.");
-      return;
-    }
-
-    localStorage.setItem("reset_uid", snap.docs[0].id);
-
-    renderResetPassword();
+    alert("Reset password migration pending.");
+return;
 
   } catch (e) {
     alert(e.message);
   }
 };
 
-window.googleLogout = async () => {
-  await signOut(auth);
+window.googleLogout = () => {
   localStorage.clear();
+
+  google.accounts.id.disableAutoSelect();
+
   location.reload();
 };
 
-window.onAuthStateChanged = onAuthStateChanged;
-window.auth = auth;
+
