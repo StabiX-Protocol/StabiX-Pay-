@@ -20,15 +20,7 @@ import "./App/Business/business.js";
 
 
 window.appDiv = function(h){document.getElementById("app").innerHTML = h;}
-const googleUID = localStorage.getItem("stbx_google_uid");
-const stbxUID = getCurrentUserId();
 
-window.WALLET = stbxUID || null;
-
-if (window.WALLET) {
-  window.userRef = doc(db, "users", window.WALLET);
-  window.validatorRef = doc(db, "validators", window.WALLET);
-}
 /* ================= SETUP ================= */
 function renderSetup(){
   appDiv(`
@@ -174,15 +166,29 @@ window.updatePassword = async () => {
     return alert("Reset session expired.");
   }
 
-  await updateDoc(doc(db, "users", stbxId), {
+ const response = await fetch("http://localhost:3000/api/users/reset-password", {
+  method: "PATCH",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    stbx_uid: stbxId,
     password
-  });
+  })
+});
 
-  localStorage.removeItem("reset_uid");
+const data = await response.json();
 
-  alert("Password updated successfully.");
+if (!response.ok) {
+  alert(data.message);
+  return;
+}
 
-  renderSetup();
+localStorage.removeItem("reset_uid");
+
+alert("Password updated successfully.");
+
+renderSetup();
 };
 
 
@@ -217,26 +223,35 @@ window.saveUsername = async () => {
   const newStbxId = generateSTBX();
 
 window.WALLET = newStbxId;
-window.userRef = doc(db, "users", newStbxId);
-window.validatorRef = doc(db, "validators", newStbxId);
-
 localStorage.setItem("stbx_uid", newStbxId);
-  
-  await setDoc(userRef, {
-    username,
-    password,
-    stbxId: newStbxId,
-    walletAddress: newStbxId,
-    googleUID: localStorage.getItem("stbx_google_uid") || "",
-    eoaAddress: "",
-    balance: 0,
-    usdtBalance: 0,
-    pendingRequest: false,
-    lastUsernameChange: serverTimestamp(),
-    createdAt: serverTimestamp()
-  });
 
-  renderApp();
+  const response = await fetch("http://localhost:3000/api/users/register", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    stbx_uid: newStbxId,
+    google_uid: localStorage.getItem("stbx_google_uid") || "",
+    username,
+    password
+  })
+});
+
+const data = await response.json();
+
+if (!response.ok) {
+  alert(data.message);
+  return;
+}
+
+ localStorage.setItem("stbx_uid", data.user.stbx_uid);
+
+if (data.user.google_uid) {
+  localStorage.setItem("stbx_google_uid", data.user.google_uid);
+}
+
+location.reload();
 };
 
 async function manualLogin() {
@@ -247,27 +262,32 @@ async function manualLogin() {
     return alert("Fill all fields");
   }
 
-  const loginRef = doc(db, "users", stbxId);
-  const snap = await getDoc(loginRef);
+  const response = await fetch("http://localhost:3000/api/users/login", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    stbx_uid: stbxId,
+    password
+  })
+});
 
-  if (!snap.exists()) {
-    return alert("Account not found");
-  }
+const data = await response.json();
 
-  const user = snap.data();
-
-  if (user.password !== password) {
-    return alert("Wrong password");
-  }
-
-  localStorage.setItem("stbx_uid", stbxId);
-
-  if (user.googleUID) {
-    localStorage.setItem("stbx_google_uid", user.googleUID);
-  }
-
-  location.reload();
+if (!response.ok) {
+  return alert(data.message);
 }
+
+  localStorage.setItem("stbx_uid", data.user.stbx_uid);
+
+if (data.user.google_uid) {
+  localStorage.setItem("stbx_google_uid", data.user.google_uid);
+} else {
+  localStorage.removeItem("stbx_google_uid");
+}
+
+location.reload();
 window.manualLogin = manualLogin;
 
 function forgotPassword() {
@@ -303,16 +323,12 @@ if(amount) amount.style.display = "none";
 if(confirm) confirm.style.display = "none";
 };
 
+
+  window.WALLET = localStorage.getItem("stbx_uid");
+const stbxUID = window.WALLET;
 /* ================= INIT ================= */
 async function init() {
-  if (!window.WALLET) {
-    renderSetup();
-    return;
-  }
-
-  const snap = await getDoc(userRef);
-
-  if (!snap.exists()) {
+  if (!stbxUID) {
     renderSetup();
     return;
   }
