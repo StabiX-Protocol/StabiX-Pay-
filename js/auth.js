@@ -1,11 +1,4 @@
 
-
-
-
-const auth = getAuth(window.appFB);
-const provider = new GoogleAuthProvider();
-
-
 window.googleLogin = async () => {
 
   window.initializeGoogleLogin(async (response) => {
@@ -52,11 +45,16 @@ window.googleLogin = async () => {
 
 window.googleResetLogin = async () => {
   try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
 
-    alert("Reset password migration pending.");
-return;
+    window.initializeGoogleLogin(async (response) => {
+
+      const id_token = response.credential;
+
+      alert("Reset password migration pending.");
+
+    });
+
+    google.accounts.id.prompt();
 
   } catch (e) {
     alert(e.message);
