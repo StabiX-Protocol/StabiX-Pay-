@@ -1,4 +1,3 @@
-import "./firebase.js"
 import "./Tx/tx.js";
 import "./auth.js"
 import "./App/home.js";
@@ -18,17 +17,7 @@ import "./App/DW/network.js";
 import "./App/Validator/Validatorpanel.js";
 
 import "./App/Business/business.js";
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  serverTimestamp,
-  collection,
-  query,
-  where,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
 
 window.appDiv = function(h){document.getElementById("app").innerHTML = h;}
 const googleUID = localStorage.getItem("stbx_google_uid");
