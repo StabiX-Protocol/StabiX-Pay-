@@ -45,10 +45,11 @@ window.googleLogin = async () => {
 
 window.googleResetLogin = async () => {
   try {
+   window.initializeGoogleLogin(async (response) => {
 
-    window.initializeGoogleLogin(async (response) => {
+  const id_token = response.credential;
 
-      const id_token = response.credential;
+});
 
       alert("Reset password migration pending.");
 
