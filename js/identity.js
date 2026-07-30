@@ -18,14 +18,7 @@ window.initializeGoogleLogin = function (callback) {
 
   google.accounts.id.initialize({
     client_id: window.GOOGLE_CLIENT_ID,
-    callback: callback
+    callback
   });
 
 };
-
-window.startGoogleLogin = function () {
-
-  google.accounts.id.prompt();
-
-};
-
