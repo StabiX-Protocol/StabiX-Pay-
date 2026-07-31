@@ -24,10 +24,20 @@ date:null
 window.isScanFlow = false;
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
-const user = (await getDoc(userRef)).data();
+const response = await fetch(
+  `http://localhost:3000/api/users/profile/${window.WALLET}`
+);
+
+const data = await response.json();
+
+if (!response.ok) {
+  alert(data.message);
+  return;
+}
+
+const user = data.user;
 window.userData = user;
-const isValidator = (await getDoc(validatorRef)).exists();
-const now = new Date();
+const isValidator = false;
 const yyyy = now.getFullYear();
 const mm = String(now.getMonth() + 1).padStart(2,"0");
 const dd = String(now.getDate()).padStart(2,"0");
@@ -676,8 +686,7 @@ navigator.clipboard.writeText(WALLET)
 
   // ================= EOA WALLET =================
 window.editEOA = async ()=>{
-const snap = await getDoc(userRef);
-const current = snap.data()?.eoaAddress;
+const current = window.userData?.eoaAddress || "";
 const addr = prompt(
 "Enter your EOA Wallet Address",
 current || ""
@@ -698,16 +707,31 @@ if (current && current.toLowerCase() === newAddr.toLowerCase()) {
     return;
 }
 
-await updateDoc(userRef, {
-    eoaAddress: newAddr
-});
+const response = await fetch(
+  "http://localhost:3000/api/users/eoa-address",
+  {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      stbx_uid: window.WALLET,
+      eoa_address: newAddr
+    })
+  }
+);
 
-alert(current ? "Wallet address updated successfully." : "Wallet address linked successfully.");
-renderApp();
-await updateDoc(userRef,{
-eoaAddress: addr.trim()
-});
-renderApp();
+const data = await response.json();
+
+if (!response.ok) {
+  alert(data.message);
+  return;
+}
+
+alert(data.message);
+window.userData.eoaAddress = newAddr;
+
+await renderApp();
 };
 
   // ================= Change Username=================

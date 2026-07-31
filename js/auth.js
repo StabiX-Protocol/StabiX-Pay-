@@ -1,4 +1,3 @@
-
 window.googleLogin = async () => {
 
   window.initializeGoogleLogin(async (response) => {
@@ -42,14 +41,13 @@ window.googleLogin = async () => {
 };
 
 
-
 window.googleResetLogin = async () => {
+
   try {
-   window.initializeGoogleLogin(async (response) => {
 
-  const id_token = response.credential;
+    window.initializeGoogleLogin(async (response) => {
 
-});
+      const id_token = response.credential;
 
       alert("Reset password migration pending.");
 
@@ -60,14 +58,16 @@ window.googleResetLogin = async () => {
   } catch (e) {
     alert(e.message);
   }
+
 };
 
+
 window.googleLogout = () => {
+
   localStorage.clear();
 
   google.accounts.id.disableAutoSelect();
 
   location.reload();
+
 };
-
-
