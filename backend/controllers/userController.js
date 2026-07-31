@@ -251,4 +251,41 @@ message: "Internal Server Error"
 }
 };
 
-module.exports = { registerUser, getUser, getProfile, updateUsername,googleLogin };
+const updateEOAAddress = async (req, res) => {
+  try {
+
+    const { stbx_uid, eoa_address } = req.body;
+
+    const result = await pool.query(
+      `UPDATE users
+       SET eoa_address = $1
+       WHERE stbx_uid = $2
+       RETURNING eoa_address`,
+      [eoa_address, stbx_uid]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Wallet address updated successfully."
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+
+  }
+};
+
+module.exports = { registerUser, getUser, getProfile, updateUsername,googleLogin, updateEOAAddress}
