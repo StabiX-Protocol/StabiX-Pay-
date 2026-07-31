@@ -737,10 +737,9 @@ await renderApp();
   // ================= Change Username=================
 window.changeUsername = async () => {
 
-    const snap = await getDoc(userRef);
-    const data = snap.data() || {};
+   const data = window.userData || {};
 
-    const current = data.username || "";
+const current = data.username || "";
 
     if (data.lastUsernameChange) {
 
@@ -787,30 +786,35 @@ window.changeUsername = async () => {
         return;
     }
 
-    const check = query(
-        collection(db, "users"),
-        where("username", "==", newName)
-    );
+    const response = await fetch(
+  "http://localhost:3000/api/users/username",
+  {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      stbx_uid: window.WALLET,
+      new_username: newName
+    })
+  }
+);
 
-    const result = await getDocs(check);
+const result = await response.json();
 
-    if (!result.empty) {
+if (!response.ok) {
+  alert(result.message);
+  return;
+}
 
-        const own = result.docs.find(doc => doc.id === userRef.id);
+alert(result.message);
 
-        if (!own) {
-            alert("Username already taken.");
-            return;
-        }
-    }
+window.userData.username = newName;
+window.userData.lastUsernameChange = new Date();
 
-    await updateDoc(userRef, {
-        username: newName,
-        lastUsernameChange: serverTimestamp()
-    });
+await renderApp();
 
-    alert("Username updated successfully.");
+return;
 
-    renderApp();
 
 };
