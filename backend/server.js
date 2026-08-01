@@ -7,8 +7,10 @@ app.use(express.json());
 app.use(cors());
 const healthRoutes = require("./routes/healthRoutes");
 const userRoutes = require("./routes/userRoutes")
+const transactionRoutes = require("./routes/transactionRoutes");
 app.use("/api", healthRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/transactions", transactionRoutes);
 pool.connect()
 .then(() => {
 console.log("✅ PostgreSQL Connected");
