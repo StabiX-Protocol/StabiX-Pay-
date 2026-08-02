@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const {processTransaction} = require("../services/transactionService"); 
 
 const getBalance = async (req, res) => {
   try {
@@ -7,8 +8,8 @@ const getBalance = async (req, res) => {
 
     const result = await pool.query(
   `SELECT
-      asset,
-      balance
+  asset,
+  balance
    FROM wallet_balances
    WHERE stbx_uid = $1
    ORDER BY asset`,
@@ -44,7 +45,7 @@ const updateBalance = async (client, stbx_uid, asset, amount) => {
 await client.query(
   `UPDATE wallet_balances
    SET balance = balance + $1,
-       updated_at = CURRENT_TIMESTAMP
+   updated_at = CURRENT_TIMESTAMP
    WHERE stbx_uid = $2
    AND asset = $3`,
   [
@@ -54,23 +55,23 @@ await client.query(
   ]
 );   
 };
-
 const debitBalance = async (
-    client,
-    stbx_uid,
-   asset,
-   amount
-    ) => {
+  client,
+  stbx_uid,
+  asset,
+  amount
+) => {
 
-   await updateBalance(
-   client,
+  await updateBalance(
+    client,
     stbx_uid,
     asset,
     -Number(amount)
   );
 
+};
 
-  const creditBalance = async (
+const creditBalance = async (
   client,
   stbx_uid,
   asset,
@@ -86,7 +87,6 @@ const debitBalance = async (
 
 };
 
-};
 module.exports = {
   getBalance,
   updateBalance,

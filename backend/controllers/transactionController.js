@@ -1,5 +1,8 @@
 const pool = require("../config/db");
 const { debitBalance,creditBalance } = require("./balanceController");
+const {
+  processTransaction
+} = require("../services/transactionService");
 
 const sendTransaction = async (req, res) => {
   const client = await pool.connect();
@@ -102,6 +105,16 @@ await client.query(
     note || null
   ]
 );
+
+await processTransaction(
+  client,
+  sender_stbx_uid,
+  receiver_stbx_uid,
+  asset,
+  amount,
+  note
+);
+
 await client.query("COMMIT");
 return res.status(200).json({
   success: true,
