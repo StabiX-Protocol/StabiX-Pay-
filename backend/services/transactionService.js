@@ -21,6 +21,20 @@ const processTransaction = async (
     amount,
     note
   };
+
+await debitBalance(
+  client,
+  sender_stbx_uid,
+  asset,
+  amount
+);
+
+await creditBalance(
+  client,
+  receiver_stbx_uid,
+  asset,
+  amount
+);
 };
 module.exports = {processTransaction};
 

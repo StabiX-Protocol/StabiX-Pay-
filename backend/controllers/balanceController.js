@@ -1,5 +1,4 @@
 const pool = require("../config/db");
-const {processTransaction} = require("../services/transactionService"); 
 
 const getBalance = async (req, res) => {
   try {
