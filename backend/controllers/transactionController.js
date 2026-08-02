@@ -86,6 +86,47 @@ return res.status(200).json({
   }
 };
 
+const getTransactionHistory = async (req, res) => {
+  try {
+
+    const { stbx_uid } = req.params;
+    const result = await pool.query(
+  `SELECT
+      tx_id,
+      sender_stbx_uid,
+      receiver_stbx_uid,
+      asset,
+      amount,
+      tx_type,
+      status,
+      note,
+      blockchain_tx_hash,
+      created_at
+   FROM transactions
+   WHERE sender_stbx_uid = $1
+      OR receiver_stbx_uid = $1
+   ORDER BY created_at DESC`,
+  [stbx_uid]
+);
+
+return res.status(200).json({
+  success: true,
+  transactions: result.rows
+});
+
+  } catch (err) {
+
+    console.error(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+
+  }
+};
+
 module.exports = {
-  sendTransaction
+  sendTransaction,
+  getTransactionHistory
 };
