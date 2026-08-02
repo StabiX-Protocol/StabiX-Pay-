@@ -5,12 +5,19 @@ const pool = require("./config/db");
 const app = express();
 app.use(express.json());
 app.use(cors());
+
 const healthRoutes = require("./routes/healthRoutes");
 const userRoutes = require("./routes/userRoutes")
 const transactionRoutes = require("./routes/transactionRoutes");
+const balanceRoutes = require("./routes/balanceRoutes");
+
+
 app.use("/api", healthRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/transactions", transactionRoutes);
+app.use("/api/balance", balanceRoutes);
+
+
 pool.connect()
 .then(() => {
 console.log("✅ PostgreSQL Connected");
