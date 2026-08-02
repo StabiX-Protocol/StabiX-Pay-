@@ -126,7 +126,55 @@ return res.status(200).json({
   }
 };
 
+const getTransactionBySTRId = async (req, res) => {
+  try {
+
+    const { str_id } = req.params;
+
+    const result = await pool.query(
+  `SELECT
+      tx_id,
+      sender_stbx_uid,
+      receiver_stbx_uid,
+      asset,
+      amount,
+      tx_type,
+      status,
+      note,
+      blockchain_tx_hash,
+      created_at,
+      updated_at
+   FROM transactions
+   WHERE tx_id = $1`,
+  [str_id]
+);
+
+if (result.rows.length === 0) {
+  return res.status(404).json({
+    success: false,
+    message: "Transaction not found"
+  });
+}
+
+return res.status(200).json({
+  success: true,
+  transaction: result.rows[0]
+});
+
+  } catch (err) {
+
+    console.error(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+
+  }
+};
+
 module.exports = {
   sendTransaction,
-  getTransactionHistory
+  getTransactionHistory,
+  getTransactionBySTRId
 };
