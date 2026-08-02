@@ -11,11 +11,13 @@ const userRoutes = require("./routes/userRoutes")
 const transactionRoutes = require("./routes/transactionRoutes");
 const balanceRoutes = require("./routes/balanceRoutes");
 const depositRoutes = require("./routes/depostRoutes");
+const withdrawRoutes = require("./routes/withdrawRoutes");
 
 app.use("/api", healthRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/deposits", depositRoutes);
+app.use("/api/withdraws", withdrawRoutes);
 app.use("/api/balance", balanceRoutes);
 
 
