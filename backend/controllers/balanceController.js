@@ -40,6 +40,56 @@ return res.status(200).json({
 };
 
 
+const updateBalance = async (client, stbx_uid, asset, amount) => {
+await client.query(
+  `UPDATE wallet_balances
+   SET balance = balance + $1,
+       updated_at = CURRENT_TIMESTAMP
+   WHERE stbx_uid = $2
+   AND asset = $3`,
+  [
+    amount,
+    stbx_uid,
+    asset
+  ]
+);   
+};
+
+const debitBalance = async (
+    client,
+    stbx_uid,
+   asset,
+   amount
+    ) => {
+
+   await updateBalance(
+   client,
+    stbx_uid,
+    asset,
+    -Number(amount)
+  );
+
+
+  const creditBalance = async (
+  client,
+  stbx_uid,
+  asset,
+  amount
+) => {
+
+  await updateBalance(
+    client,
+    stbx_uid,
+    asset,
+    Number(amount)
+  );
+
+};
+
+};
 module.exports = {
-  getBalance
+  getBalance,
+  updateBalance,
+  debitBalance,
+  creditBalance
 };

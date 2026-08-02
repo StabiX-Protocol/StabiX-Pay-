@@ -1,8 +1,10 @@
 const pool = require("../config/db");
+const { debitBalance,creditBalance } = require("./balanceController");
 
 const sendTransaction = async (req, res) => {
+  const client = await pool.connect();
   try {
-
+await client.query("BEGIN");
     const {
       sender_stbx_uid,
       receiver_stbx_uid,
@@ -11,10 +13,28 @@ const sendTransaction = async (req, res) => {
       note
     } = req.body;
 
-    const sender = await pool.query(
+    const sender = await client.query(
   "SELECT stbx_uid FROM users WHERE stbx_uid = $1",
   [sender_stbx_uid]
 );
+const senderBalance = await client.query(
+  'SELECT balance FROM wallet_balances WHERE stbx_uid = $1 AND asset = $2',
+  [sender_stbx_uid, asset]
+);
+
+if (senderBalance.rows.length === 0) {
+  return res.status(404).json({
+    success: false,
+    message: "Sender wallet balance not found"
+  });
+}
+const currentBalance = Number(senderBalance.rows[0].balance);
+if (currentBalance <Number(amount)) {
+  return res.status(400).json({
+    success: false,
+    message: "Insufficient balance"
+  });
+}
 
 if (sender.rows.length === 0) {
   return res.status(404).json({
@@ -23,7 +43,9 @@ if (sender.rows.length === 0) {
   });
 }
 
-const receiver = await pool.query(
+await debitBalance(client, sender_stbx_uid, asset, amount);
+
+const receiver = await client.query(
   "SELECT stbx_uid FROM users WHERE stbx_uid = $1",
   [receiver_stbx_uid]
 );
@@ -34,13 +56,26 @@ if (receiver.rows.length === 0) {
     message: "Receiver not found"
   });
 }
+await client.query(
+  `INSERT INTO wallet_balances
+   (stbx_uid, asset, balance)
+   VALUES ($1, $2, 0)
+   ON CONFLICT (stbx_uid, asset)
+   DO NOTHING`,
+  [
+    receiver_stbx_uid,
+    asset
+  ]
+);
+await creditBalance(client, receiver_stbx_uid, asset, amount);
+
 
 const STRId =
   "STR" +
   Date.now() +
   Math.floor(Math.random() * 1000);
 
-await pool.query(
+await client.query(
   `INSERT INTO transactions
   (
     tx_id,
@@ -67,7 +102,7 @@ await pool.query(
     note || null
   ]
 );
-
+await client.query("COMMIT");
 return res.status(200).json({
   success: true,
   message: "Transaction completed successfully.",
@@ -75,6 +110,7 @@ return res.status(200).json({
 });
 
   } catch (err) {
+    await client.query("ROLLBACK");
 
     console.error(err);
 
@@ -83,6 +119,9 @@ return res.status(200).json({
       message: "Internal Server Error"
     });
 
+  }
+  finally {
+    client.release();
   }
 };
 
@@ -131,7 +170,7 @@ const getTransactionBySTRId = async (req, res) => {
 
     const { str_id } = req.params;
 
-    const result = await pool.query(
+    const result = await client.query(
   `SELECT
       tx_id,
       sender_stbx_uid,
