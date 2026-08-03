@@ -5,7 +5,8 @@ const router = express.Router();
 const {
   approveDeposit,
   rejectDeposit,
-  approveWithdraw
+  approveWithdraw,
+  rejectWithdraw
 } = require("../controllers/validatorController");
 
 router.patch(
@@ -21,6 +22,11 @@ router.patch(
 router.patch(
   "/withdraw/approve/:STRId",
   approveWithdraw
+);
+
+router.patch(
+  "/withdraw/reject/:STRId",
+  rejectWithdraw
 );
 
 //router.patch(
