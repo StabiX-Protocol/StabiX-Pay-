@@ -1,5 +1,5 @@
 const pool = require("../config/db");
-const {creditBalance} = require("./balanceController");
+const {creditBalance,debitBalance} = require("./balanceController");
 
 const approveDeposit = async (req, res) => {
 
@@ -133,7 +133,82 @@ client.release();
 }
 };
 
+const approveWithdraw = async (req, res) => {
+
+const client = await pool.connect();
+
+try {
+await client.query("BEGIN");
+
+const { STRId } = req.params;
+
+const withdraw = await client.query(
+`SELECT *
+FROM withdraws
+WHERE STRId = $1`,
+[STRId]
+);
+
+    if (withdraw.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Withdraw not found"
+      });
+    }
+
+    if (withdraw.rows[0].status !== "PENDING") {
+      return res.status(400).json({
+        success: false,
+        message: "Withdraw already processed"
+      });
+    }
+
+    await debitBalance(
+  client,
+  withdraw.rows[0].stbx_uid,
+  withdraw.rows[0].asset,
+  withdraw.rows[0].amount
+);
+
+await client.query(
+  `UPDATE withdraws
+   SET status = 'APPROVED',
+       updated_at = NOW()
+   WHERE STRId = $1`,
+  [STRId]
+);
+
+await client.query("COMMIT");
+
+return res.status(200).json({
+  success: true,
+  message: "Withdraw approved successfully.",
+  STRId: STRId
+});
+
+    
+
+  } catch (err) {
+
+    await client.query("ROLLBACK");
+
+    console.error(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+
+  } finally {
+
+    client.release();
+
+  }
+
+};
+
 module.exports = {
 approveDeposit,
-rejectDeposit
+rejectDeposit,
+approveWithdraw
 };
