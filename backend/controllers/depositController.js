@@ -2,167 +2,142 @@ const pool = require("../config/db");
 
 const createDeposit = async (req, res) => {
 
-  const client = await pool.connect();
+const client = await pool.connect();
+try {
+await client.query("BEGIN");
 
-  try {
+const {
+stbx_uid,
+asset,
+amount,
+blockchain_tx_hash
+} = req.body;
 
-    await client.query("BEGIN");
+const user = await client.query(
+"SELECT stbx_uid FROM users WHERE stbx_uid = $1",
+[stbx_uid]
+);
 
-    const {
-      stbx_uid,
-      asset,
-      amount,
-      blockchain_tx_hash
-    } = req.body;
+if (user.rows.length === 0) {
+return res.status(404).json({
+success: false,
+message: "User not found"
+});
+}
 
-    const user = await client.query(
-      "SELECT stbx_uid FROM users WHERE stbx_uid = $1",
-      [stbx_uid]
-    );
+const STRId =
+"STR" +
+Date.now() +
+Math.floor(Math.random() * 1000);
 
-    if (user.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found"
-      });
-    }
+await client.query(
+`INSERT INTO deposits
+(
+STRId,
+stbx_uid,
+asset,
+amount,
+blockchain_tx_hash,
+status
+)
+VALUES
+(
+$1,$2,$3,$4,$5,$6
+)`,
+[
+STRId,
+stbx_uid,
+asset,
+amount,
+blockchain_tx_hash,
+"PENDING"
+]
+);
 
-    const STRId =
-      "STR" +
-      Date.now() +
-      Math.floor(Math.random() * 1000);
-
-    await client.query(
-      `INSERT INTO deposits
-      (
-        STRId,
-        stbx_uid,
-        asset,
-        amount,
-        blockchain_tx_hash,
-        status
-      )
-      VALUES
-      (
-        $1,$2,$3,$4,$5,$6
-      )`,
-      [
-        STRId,
-        stbx_uid,
-        asset,
-        amount,
-        blockchain_tx_hash,
-        "PENDING"
-      ]
-    );
-
-    await client.query("COMMIT");
-
-    return res.status(201).json({
-      success: true,
-      message: "Deposit request submitted.",
-      STRId: STRId
-    });
-
-  } catch (err) {
-
-    await client.query("ROLLBACK");
-
-    console.error(err);
-
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error"
-    });
-
-  } finally {
-
-    client.release();
-
-  }
-
+await client.query("COMMIT");
+return res.status(201).json({
+success: true,
+message: "Deposit request submitted.",
+STRId: STRId
+});
+} catch (err) {
+await client.query("ROLLBACK");
+console.error(err);
+return res.status(500).json({
+success: false,
+message: "Internal Server Error"
+});
+} finally {
+client.release();
+}
 };
 
 const getDepositHistory = async (req, res) => {
+try {
+const { stbx_uid } = req.params;
 
-  try {
+const result = await pool.query(
+`SELECT
+STRId,
+asset,
+amount,
+blockchain_tx_hash,
+status,
+created_at
+FROM deposits
+WHERE stbx_uid = $1
+ORDER BY created_at DESC`,
+[stbx_uid]
+);
 
-    const { stbx_uid } = req.params;
+return res.status(200).json({
+success: true,
+deposits: result.rows
+});
 
-    const result = await pool.query(
-      `SELECT
-        STRId,
-        asset,
-        amount,
-        blockchain_tx_hash,
-        status,
-        created_at
-      FROM deposits
-      WHERE stbx_uid = $1
-      ORDER BY created_at DESC`,
-      [stbx_uid]
-    );
-
-    return res.status(200).json({
-      success: true,
-      deposits: result.rows
-    });
-
-  } catch (err) {
-
-    console.error(err);
-
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error"
-    });
-
-  }
-
+} catch (err) {
+console.error(err);
+return res.status(500).json({
+success: false,
+message: "Internal Server Error"
+});
+}
 };
 
 const getDepositById = async (req, res) => {
+try {
+const { STRId } = req.params;
 
-  try {
+const result = await pool.query(
+`SELECT *
+FROM deposits
+WHERE STRId = $1`,
+[STRId]
+);
 
-    const { STRId } = req.params;
+if (result.rows.length === 0) {
+return res.status(404).json({
+success: false,
+message: "Deposit not found"
+});
+}
 
-    const result = await pool.query(
-      `SELECT *
-       FROM deposits
-       WHERE STRId = $1`,
-      [STRId]
-    );
+return res.status(200).json({
+success: true,
+deposit: result.rows[0]
+});
 
-    if (result.rows.length === 0) {
-
-      return res.status(404).json({
-        success: false,
-        message: "Deposit not found"
-      });
-
-    }
-
-    return res.status(200).json({
-      success: true,
-      deposit: result.rows[0]
-    });
-
-  } catch (err) {
-
-    console.error(err);
-
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error"
-    });
-
-  }
-
+} catch (err) {
+console.error(err);
+return res.status(500).json({
+success: false,
+message: "Internal Server Error"
+});
+}
 };
 
 module.exports = {
-  createDeposit,
-  getDepositHistory,
-  getDepositById
+createDeposit,
+getDepositHistory,
+getDepositById
 };
