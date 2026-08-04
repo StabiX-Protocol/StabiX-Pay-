@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const { generateToken } = require("../utils/jwt");
 
 const getProfile = async (req, res) => {
 try {
@@ -236,9 +237,15 @@ message: "No StabiX account found."
 });
 }
 
+const token = generateToken({
+stbx_uid: result.rows[0].stbx_uid,
+username: result.rows[0].username
+});
+
 return res.status(200).json({
 success: true,
-user: result.rows[0]
+user: result.rows[0],
+token: token
 });
 
 } catch (err) {
