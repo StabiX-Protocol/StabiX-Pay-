@@ -149,114 +149,136 @@ WHERE STRId = $1`,
 [STRId]
 );
 
-    if (withdraw.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Withdraw not found"
-      });
-    }
+if (withdraw.rows.length === 0) {
+return res.status(404).json({
+success: false,
+message: "Withdraw not found"
+});
+}
 
-    if (withdraw.rows[0].status !== "PENDING") {
-      return res.status(400).json({
-        success: false,
-        message: "Withdraw already processed"
-      });
-    }
+if (withdraw.rows[0].status !== "PENDING") {
+return res.status(400).json({
+success: false,
+message: "Withdraw already processed"
+});
+}
 
-    await debitBalance(
-  client,
-  withdraw.rows[0].stbx_uid,
-  withdraw.rows[0].asset,
-  withdraw.rows[0].amount
+await debitBalance(
+client,
+withdraw.rows[0].stbx_uid,
+withdraw.rows[0].asset,
+withdraw.rows[0].amount
 );
 
 await client.query(
-  `UPDATE withdraws
-   SET status = 'APPROVED',
-       updated_at = NOW()
-   WHERE STRId = $1`,
-  [STRId]
+`UPDATE withdraws
+SET status = 'APPROVED',
+updated_at = NOW()
+WHERE STRId = $1`,
+[STRId]
 );
 
 await client.query("COMMIT");
-
 return res.status(200).json({
-  success: true,
-  message: "Withdraw approved successfully.",
-  STRId: STRId
+success: true,
+message: "Withdraw approved successfully.",
+STRId: STRId
 });
 
-    
+} catch (err) {
+await client.query("ROLLBACK");
+console.error(err);
+return res.status(500).json({
+success: false,
+message: "Internal Server Error"
+});
 
-  } catch (err) {
-
-    await client.query("ROLLBACK");
-
-    console.error(err);
-
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error"
-    });
-
-  } finally {
-
-    client.release();
-
-  }
-
+} finally {
+client.release();
+}
 };
 
 const rejectWithdraw = async (req, res) => {
 
-  const client = await pool.connect();
+const client = await pool.connect();
+try {
+
+await client.query("BEGIN");
+const { STRId } = req.params;
+
+const withdraw = await client.query(
+`SELECT *
+FROM withdraws
+WHERE STRId = $1`,
+[STRId]
+);
+
+if (withdraw.rows.length === 0) {
+return res.status(404).json({
+success: false,
+message: "Withdraw not found"
+});
+}
+
+if (withdraw.rows[0].status !== "PENDING") {
+return res.status(400).json({
+success: false,
+message: "Withdraw already processed"
+});
+}
+
+await client.query(
+`UPDATE withdraws
+SET status = 'REJECTED',
+updated_at = NOW()
+WHERE STRId = $1`,
+[STRId]
+);
+
+await client.query("COMMIT");
+return res.status(200).json({
+success: true,
+message: "Withdraw rejected successfully.",
+STRId: STRId
+});
+
+} catch (err) {
+await client.query("ROLLBACK");
+console.error(err);
+return res.status(500).json({
+success: false,
+message: "Internal Server Error"
+});
+
+} finally {
+client.release();
+}
+};
+
+const getPendingDeposits = async (req, res) => {
 
   try {
 
-    await client.query("BEGIN");
-
-    const { STRId } = req.params;
-
-    const withdraw = await client.query(
-      `SELECT *
-       FROM withdraws
-       WHERE STRId = $1`,
-      [STRId]
+    const result = await pool.query(
+      `SELECT
+        STRId,
+        stbx_uid,
+        asset,
+        amount,
+        blockchain_tx_hash,
+        created_at
+      FROM deposits
+      WHERE status = 'PENDING'
+      ORDER BY created_at ASC`
     );
-
-    if (withdraw.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Withdraw not found"
-      });
-    }
-
-    if (withdraw.rows[0].status !== "PENDING") {
-      return res.status(400).json({
-        success: false,
-        message: "Withdraw already processed"
-      });
-    }
-
-    await client.query(
-      `UPDATE withdraws
-       SET status = 'REJECTED',
-           updated_at = NOW()
-       WHERE STRId = $1`,
-      [STRId]
-    );
-
-    await client.query("COMMIT");
 
     return res.status(200).json({
       success: true,
-      message: "Withdraw rejected successfully.",
-      STRId: STRId
+      count: result.rows.length,
+      deposits: result.rows
     });
 
   } catch (err) {
-
-    await client.query("ROLLBACK");
 
     console.error(err);
 
@@ -264,10 +286,6 @@ const rejectWithdraw = async (req, res) => {
       success: false,
       message: "Internal Server Error"
     });
-
-  } finally {
-
-    client.release();
 
   }
 
@@ -277,5 +295,6 @@ module.exports = {
 approveDeposit,
 rejectDeposit,
 approveWithdraw,
-rejectWithdraw
+rejectWithdraw,
+getPendingDeposits
 };

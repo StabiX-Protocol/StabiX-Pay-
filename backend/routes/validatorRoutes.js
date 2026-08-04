@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require ("express");
 
 const router = express.Router();
 
@@ -6,7 +6,8 @@ const {
   approveDeposit,
   rejectDeposit,
   approveWithdraw,
-  rejectWithdraw
+  rejectWithdraw,
+  getPendingDeposits
 } = require("../controllers/validatorController");
 
 router.patch(
@@ -19,6 +20,11 @@ router.patch(
   rejectDeposit
 );
 
+router.get(
+  "/deposit/pending",
+  getPendingDeposits
+);
+
 router.patch(
   "/withdraw/approve/:STRId",
   approveWithdraw
@@ -29,8 +35,5 @@ router.patch(
   rejectWithdraw
 );
 
-//router.patch(
-  //"/withdraw/reject/:STRId",
-//);
 
 module.exports = router;
