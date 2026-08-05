@@ -8,7 +8,30 @@ const {
   getDepositById
 } = require("../controllers/depositController");
 
-router.post("/", createDeposit);
+const {
+  depositValidation
+} = require("../validators/transactionValidator");
+
+const {
+  validationResult
+} = require("express-validator");
+
+const validate = (req, res, next) => {
+
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      success: false,
+      errors: errors.array()
+    });
+  }
+
+  next();
+
+};
+
+router.post("/", depositValidation,validate,createDeposit);
 
 router.get("/history/:stbx_uid", getDepositHistory);
 
