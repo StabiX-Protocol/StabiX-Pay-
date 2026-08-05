@@ -254,7 +254,7 @@ if (data.user.google_uid) {
 location.reload();
 };
 
-async function manualLogin() {
+async function manualLogin(){ 
   const stbxId = document.getElementById("loginStbx").value.trim();
   const password = document.getElementById("loginPwd").value.trim();
 
@@ -272,6 +272,7 @@ async function manualLogin() {
     password
   })
 });
+}
 
 const data = await response.json();
 

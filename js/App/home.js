@@ -1,15 +1,3 @@
-import {
-  doc,
-  getDoc,
-  updateDoc,
-  serverTimestamp,
-  collection,
-  query,
-  where,
-  orderBy,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
 window.MODE = null;
 window.primaryAsset = localStorage.getItem("primaryAsset") || "USDC";
 window.keepAssetOpen = false;
@@ -24,7 +12,6 @@ date:null
 window.isScanFlow = false;
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
-localStorage.clear();
 const data = await response.json();
 if (!response.ok) {
 alert(data.message);
@@ -570,7 +557,6 @@ if(window.keepAssetOpen){
 }
 
        // RECEIVE POPUP
-try{
 try {
 const response = await fetch(
 `http://localhost:3000/api/transactions/history/${WALLET}`,
@@ -609,20 +595,6 @@ headers: {
 
   console.log("Receive popup error", e);
 
-}
-if(!snap.empty){
-const docSnap = snap.docs[0];
-const t = docSnap.data();
-if(t.type === "received"){
-const key = "rx_" + docSnap.id;
-if(!sessionStorage.getItem(key)){
-showTxPopup(`Received ${t.amount} ${t.asset || "USDC"} from ${t.counterparty}`);
-sessionStorage.setItem(key,"1");
-}
-}
-}
-}catch(e){
-console.log("Receive popup error", e);
 }
 }
 
@@ -685,7 +657,7 @@ box.style.display = "block"
 }
 }
 window.showReceive = ()=>{
-const wallet = WALLET
+const wallet = window.getCurrentUserId();
   const asset = window.primaryAsset;
 
 document.getElementById("receiveText").innerText = "Receive " + asset;
