@@ -24,15 +24,11 @@ date:null
 window.isScanFlow = false;
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
-const response = await fetch(
-  `http://localhost:3000/api/users/profile/${window.WALLET}`
-);
-
+localStorage.clear();
 const data = await response.json();
-
 if (!response.ok) {
-  alert(data.message);
-  return;
+alert(data.message);
+return;
 }
 
 const user = data.user;
@@ -575,12 +571,45 @@ if(window.keepAssetOpen){
 
        // RECEIVE POPUP
 try{
-const q = query(
-collection(db,"transactions"),
-where("userId","==",WALLET),
-orderBy("createdAt","desc")
-);
-const snap = await getDocs(q);
+try {
+const response = await fetch(
+`http://localhost:3000/api/transactions/history/${WALLET}`,
+{
+headers: {
+        Authorization: `Bearer ${window.getToken()}`
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  if (response.ok && data.transactions.length > 0) {
+
+    const t = data.transactions[0];
+
+    if (t.type === "received") {
+
+      const key = "rx_" + t.STRId;
+
+      if (!sessionStorage.getItem(key)) {
+
+        showTxPopup(
+          `Received ${t.amount} ${t.asset} from ${t.counterparty}`
+        );
+
+        sessionStorage.setItem(key, "1");
+
+      }
+
+    }
+
+  }
+
+} catch (e) {
+
+  console.log("Receive popup error", e);
+
+}
 if(!snap.empty){
 const docSnap = snap.docs[0];
 const t = docSnap.data();
@@ -712,10 +741,11 @@ const response = await fetch(
   {
     method: "PATCH",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${window.getToken()}`
     },
     body: JSON.stringify({
-      stbx_uid: window.WALLET,
+      stbx_uid: window.getCurrentUserId(),
       eoa_address: newAddr
     })
   }
@@ -791,10 +821,11 @@ const current = data.username || "";
   {
     method: "PATCH",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${window.getToken()}`
     },
     body: JSON.stringify({
-      stbx_uid: window.WALLET,
+      stbx_uid: window.getCurrentUserId(),
       new_username: newName
     })
   }
@@ -815,6 +846,5 @@ window.userData.lastUsernameChange = new Date();
 await renderApp();
 
 return;
-
 
 };
