@@ -5,6 +5,7 @@ const pool = require("./config/db");
 const app = express();
 app.use(express.json());
 app.use(cors());
+const rateLimiter = require("express-rate-limit");
 
 const healthRoutes = require("./routes/healthRoutes");
 const userRoutes = require("./routes/userRoutes")

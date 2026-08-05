@@ -1,0 +1,1 @@
+const rateLiniter = require("express-rate-limit");

@@ -6,6 +6,19 @@ window.setCurrentUserId = function (uid) {
   localStorage.setItem("stbx_uid", uid);
 };
 
+window.setToken = function (token) {
+  localStorage.setItem("jwt_token", token);
+};
+
+window.getToken = function () {
+  return localStorage.getItem("jwt_token");
+};
+
+window.clearSession = function () {
+  localStorage.removeItem("jwt_token");
+  localStorage.removeItem("stbx_uid");
+};
+
 window.generateSTBX = function () {
   const random = Math.floor(1000000000 + Math.random() * 9000000000);
   return "STBX" + random.toString();

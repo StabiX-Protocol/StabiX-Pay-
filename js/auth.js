@@ -23,7 +23,8 @@ window.googleLogin = async () => {
         alert(data.message || "No StabiX account found with this Google account.");
         return;
       }
-
+      
+      window.setToken(data.token);
       localStorage.setItem("stbx_uid", data.user.stbx_uid);
       localStorage.setItem("stbx_google_uid", data.user.google_uid);
 
@@ -64,7 +65,8 @@ window.googleResetLogin = async () => {
 
 window.googleLogout = () => {
 
-  localStorage.clear();
+  window.clearSession();
+  localStorage.removeItem("stbx_google_uid");
 
   google.accounts.id.disableAutoSelect();
 
