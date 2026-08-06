@@ -194,51 +194,79 @@ line-height:1.6;
 
 // ================== SUBMIT WITHDRAW (Advance Mode)==================//
 window.submitWithdrawFinal = async function(asset, network){
+
 const amount = document.getElementById("amount").value;
 const eoa = document.getElementById("eoa").value.trim();
-const str = await window.generateSTR();
+
 if(!amount || !eoa){
 alert("Missing fields");
 return;
 }
+
 if(Number(amount) <= 0){
 alert("Invalid amount");
 return;
 }
+
 if(!isValidAddress(eoa, network)){
 alert("Invalid wallet address");
 return;
 }
 
 let balance = 0;
+
 if(asset === "USDT"){
 balance = Number(window.userData?.usdtBalance || 0);
 }
+
 if(asset === "USDC"){
 balance = Number(window.userData?.balance || 0);
 }
+
 if(Number(amount) > balance){
 alert("Insufficient Balance");
 return;
 }
-await addDoc(collection(db, "requests"), {
-userId: WALLET,
-type: "withdraw",
-mode: "advanced",
+
+try{
+
+const response = await fetch(
+"http://localhost:3000/api/withdraw/request",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+Authorization:`Bearer ${window.getToken()}`
+},
+body:JSON.stringify({
+stbx_uid:window.getCurrentUserId(),
 asset,
 network,
-amount: Number(amount),
-wallet: eoa,
-eoa: eoa,
-str: str,
-status: "pending",
-createdAt: serverTimestamp()
+amount:Number(amount),
+eoa_address:eoa,
+mode:"advanced"
+})
 });
-await updateDoc(userRef, {
-pendingRequest: true
-});
+
+const data = await response.json();
+
+if(!response.ok){
+alert(data.message);
+return;
+}
+
 alert(
-"Withdraw Request Submitted\nYour funds will reflect in your wallet shortly"
+"Withdraw Request Submitted\nYour request has been sent for validation."
 );
+
 goDeposit();
+
+}catch(err){
+
+console.log(err);
+
+alert("Server Error");
+
+}
+
 };

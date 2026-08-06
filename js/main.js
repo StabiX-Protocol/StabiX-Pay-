@@ -192,7 +192,8 @@ renderSetup();
 };
 
 
-window.saveUsername = async () => {
+wwindow.saveUsername = async () => {
+
   const username = document.getElementById("uname").value.trim().toLowerCase();
   const password = document.getElementById("signupPwd").value.trim();
   const confirm = document.getElementById("confirmPwd").value.trim();
@@ -202,59 +203,49 @@ window.saveUsername = async () => {
   }
 
   if (password.length < 6) {
-    return alert("Password must be at least 6 digits");
+    return alert("Password must be at least 6 characters");
   }
 
   if (password !== confirm) {
     return alert("Passwords do not match");
   }
 
-  const q = query(
-    collection(db, "users"),
-    where("username", "==", username)
-  );
-
-  const existing = await getDocs(q);
-
-  if (!existing.empty) {
-    return alert("Username already taken");
-  }
-
   const newStbxId = generateSTBX();
 
-window.WALLET = newStbxId;
-localStorage.setItem("stbx_uid", newStbxId);
-
   const response = await fetch("http://localhost:3000/api/users/register", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    stbx_uid: newStbxId,
-    google_uid: localStorage.getItem("stbx_google_uid") || "",
-    username,
-    password
-  })
-});
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      stbx_uid: newStbxId,
+      google_uid: localStorage.getItem("stbx_google_uid") || "",
+      username,
+      password
+    })
+  });
 
-const data = await response.json();
+  const data = await response.json();
 
-if (!response.ok) {
-  alert(data.message);
-  return;
-}
+  if (!response.ok) {
+    alert(data.message);
+    return;
+  }
 
- localStorage.setItem("stbx_uid", data.user.stbx_uid);
+  window.WALLET = data.user.stbx_uid;
 
-if (data.user.google_uid) {
-  localStorage.setItem("stbx_google_uid", data.user.google_uid);
-}
+  localStorage.setItem("stbx_uid", data.user.stbx_uid);
 
-location.reload();
+  if (data.user.google_uid) {
+    localStorage.setItem("stbx_google_uid", data.user.google_uid);
+  }
+
+  location.reload();
+
 };
 
-async function manualLogin(){ 
+async function manualLogin() {
+
   const stbxId = document.getElementById("loginStbx").value.trim();
   const password = document.getElementById("loginPwd").value.trim();
 
@@ -263,32 +254,34 @@ async function manualLogin(){
   }
 
   const response = await fetch("http://localhost:3000/api/users/login", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    stbx_uid: stbxId,
-    password
-  })
-});
-}
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      stbx_uid: stbxId,
+      password
+    })
+  });
 
-const data = await response.json();
+  const data = await response.json();
 
-if (!response.ok) {
-  return alert(data.message);
-}
+  if (!response.ok) {
+    return alert(data.message);
+  }
 
   localStorage.setItem("stbx_uid", data.user.stbx_uid);
 
-if (data.user.google_uid) {
-  localStorage.setItem("stbx_google_uid", data.user.google_uid);
-} else {
-  localStorage.removeItem("stbx_google_uid");
+  if (data.user.google_uid) {
+    localStorage.setItem("stbx_google_uid", data.user.google_uid);
+  } else {
+    localStorage.removeItem("stbx_google_uid");
+  }
+
+  location.reload();
+
 }
 
-location.reload();
 window.manualLogin = manualLogin;
 
 function forgotPassword() {
@@ -325,7 +318,7 @@ if(confirm) confirm.style.display = "none";
 };
 
 
-  window.WALLET = localStorage.getItem("stbx_uid");
+ window.WALLET = window.getCurrentUserId();
 const stbxUID = window.WALLET;
 /* ================= INIT ================= */
 async function init() {

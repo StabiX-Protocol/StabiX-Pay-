@@ -159,30 +159,54 @@ line-height:1.6;">
 
 // ================== SUBMIT DEPOSIT(Advance Mode)==================//
 window.submitDepositFinal = async function(asset, network){
+
 const amount = document.getElementById("amount").value;
 const txHash = document.getElementById("txHash").value;
 const eoa = document.getElementById("eoa").value;
-const str = await window.generateSTR();
+
 if(!amount || !txHash || !eoa){
 alert("Fill all fields");
 return;
 }
-await addDoc(collection(db, "requests"), {
-userId: WALLET,
-type: "deposit",
-mode: "advanced", 
+
+try{
+
+const response = await fetch(
+"http://localhost:3000/api/deposit/request",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+Authorization:`Bearer ${window.getToken()}`
+},
+body:JSON.stringify({
+stbx_uid:window.getCurrentUserId(),
 asset,
 network,
-amount: Number(amount),
-txHash,
-eoa,
-str: str,
-status: "pending",
-createdAt: serverTimestamp()
+amount:Number(amount),
+tx_hash:txHash,
+eoa_address:eoa,
+mode:"advanced"
+})
 });
-await updateDoc(userRef, {
-pendingRequest: true
-});
+
+const data = await response.json();
+
+if(!response.ok){
+alert(data.message);
+return;
+}
+
 alert("Deposit request sent");
+
 goDeposit();
+
+}catch(err){
+
+console.log(err);
+
+alert("Server Error");
+
+}
+
 };

@@ -197,149 +197,110 @@ window.listenNotifications = async function () {
  const t = new Date(d.created_at).getTime();
  const unreadLimit =
   7 * 24 * 60 * 60 * 1000;
-
  return (now - t) < unreadLimit;
  }).length;
  updateNotif(count);
-
-  } catch (err) {
-
-    console.log(err);
-
-  }
-
+} catch (err) {
+ console.log(err);
+ }
 };
 
 function updateNotif(count) {
-
-  const el =
-    document.getElementById("notifCount");
-
-  if (!el) return;
-
-  if (count === 0) {
-
-    el.style.display = "none";
-
-  } else {
-
-    el.style.display = "flex";
-
-    el.innerText = count;
-
-  }
-
+ const el =
+ document.getElementById("notifCount");
+ if (!el) return;
+ if (count === 0) {
+ el.style.display = "none";
+ } else {
+ el.style.display = "flex";
+ el.innerText = count;
+ }
 }
 
 window.closeNotifications = () => {
-
-  document.getElementById(
-    "notifScreen"
-  ).style.display = "none";
-
-  renderApp();
-
+ document.getElementById(
+ "notifScreen"
+ ).style.display = "none";
+ renderApp();
 };
 
 function formatTime(ts) {
-
-  if (!ts) return "";
-
-  const date = new Date(ts);
-
-  return date.toLocaleString("en-IN", {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-
+ if (!ts) return "";
+ const date = new Date(ts);
+ return date.toLocaleString("en-IN", {
+ hour: "2-digit",
+ minute: "2-digit"
+ });
 }
 
 function formatDate(ts) {
-
-  if (!ts) return "";
-
-  const date = new Date(ts);
-
-  return date.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short"
-  });
-
+ if (!ts) return "";
+ const date = new Date(ts);
+ return date.toLocaleDateString("en-IN", {
+ day: "2-digit",
+ month: "short"
+ });
 }
 
 function formatDateGroup(ts) {
-
-  if (!ts) return "";
-
-  const date = new Date(ts);
-
-  return date.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric"
-  });
-
+ if (!ts) return "";
+ const date = new Date(ts);
+ return date.toLocaleDateString("en-IN", {
+ day: "2-digit",
+ month: "long",
+ year: "numeric"
+ });
 }
 
 function formatRelativeDate(ts) {
+ if (!ts) return "";
+ const now = new Date();
+ const date = new Date(ts);
+ const diffTime = now - date;
+ const diffDays =
+ Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-  if (!ts) return "";
+ if (diffDays === 0) return "Today";
+ if (diffDays === 1) return "Yesterday";
+ if (diffDays === 2) return "2 days ago";
+ if (diffDays === 3) return "3 days ago";
 
-  const now = new Date();
-
-  const date = new Date(ts);
-
-  const diffTime = now - date;
-
-  const diffDays =
-    Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays === 2) return "2 days ago";
-  if (diffDays === 3) return "3 days ago";
-
-  return date.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric"
-  });
-
+ return date.toLocaleDateString("en-IN", {
+ day: "2-digit",
+ month: "short",
+ year: "numeric"
+ });
 }
 
 window.openNotifDetail = async (id) => {
+ try {
+ await fetch(
+ `http://localhost:3000/api/notifications/read/${id}`,
+ {
+ method: "PATCH",
+ headers: {
+ Authorization: `Bearer ${window.getToken()}`
+ }
+ }
+ );
 
-  try {
+ const response = await fetch(
+ `http://localhost:3000/api/notifications/detail/${id}`,
+ {
+ headers: {
+ Authorization: `Bearer ${window.getToken()}`
+ }
+ }
+ );
 
-    await fetch(
-      `http://localhost:3000/api/notifications/read/${id}`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${window.getToken()}`
-        }
-      }
-    );
+ const data = await response.json();
+ if (!response.ok) {
+ alert(data.message || "Notification not found");
+ return;
+ }
 
-    const response = await fetch(
-      `http://localhost:3000/api/notifications/detail/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${window.getToken()}`
-        }
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      alert(data.message || "Notification not found");
-      return;
-    }
-
-    const d = data.notification;
-
-    let html = `
+ const d = data.notification;
+ let html = `
 <div style="
 background:var(--bg);
 min-height:100vh;
@@ -407,73 +368,51 @@ ${formatTime(d.created_at)}
 </div>
 `;
 
-    appDiv(html);
-
-  } catch (err) {
-
-    console.log(err);
-
-    alert("Server Error");
-
-  }
-
+ appDiv(html);
+ } catch (err) {
+ console.log(err);
+ alert("Server Error");
+ }
 };
 
 window.sendValidatorNotification = async () => {
+ const title =
+ document.getElementById("vTitle").value.trim();
+ const body =
+ document.getElementById("vBody").value.trim();
+ if (!title || !body) {
+ alert("Enter title & message");
+ return;
+ }
 
-  const title =
-    document.getElementById("vTitle").value.trim();
+ try {
+ const response = await fetch(
+ "http://localhost:3000/api/notifications/broadcast",
+ {
+ method: "POST",
+ headers: {
+ "Content-Type": "application/json",
+ Authorization: `Bearer ${window.getToken()}`
+ },
+ body: JSON.stringify({
+ title,
+ body
+ })
+ }
+ );
 
-  const body =
-    document.getElementById("vBody").value.trim();
+ const data = await response.json();
+ if (!response.ok) {
+ alert(data.message);
+ return;
+ }
 
-  if (!title || !body) {
+ alert("Notification sent to all users");
+ document.getElementById("vTitle").value = "";
+ document.getElementById("vBody").value = "";
 
-    alert("Enter title & message");
-
-    return;
-
-  }
-
-  try {
-
-    const response = await fetch(
-      "http://localhost:3000/api/notifications/broadcast",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${window.getToken()}`
-        },
-        body: JSON.stringify({
-          title,
-          body
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-
-      alert(data.message);
-
-      return;
-
-    }
-
-    alert("Notification sent to all users");
-
-    document.getElementById("vTitle").value = "";
-
-    document.getElementById("vBody").value = "";
-
-  } catch (err) {
-
-    console.log(err);
-
-    alert("Server Error");
-
-  }
-
+ } catch (err) {
+ console.log(err);
+ alert("Server Error");
+ }
 };

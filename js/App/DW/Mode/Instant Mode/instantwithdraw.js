@@ -124,51 +124,79 @@ Withdraw
 }
 
 window.submitInstantWithdraw = async function(asset, network){
+
 const to = document.getElementById("eoa").value.trim();
 const amount = document.getElementById("amount").value;
-const str = await window.generateSTR();
+
 if(!to || !amount){
 alert("Missing fields");
 return;
 }
+
 if(Number(amount) <= 0){
 alert("Invalid amount");
 return;
 }
+
 if(!isValidAddress(to, network)){
 alert("Invalid wallet address");
 return;
 }
-  
+
 let balance = 0;
+
 if(asset === "USDT"){
 balance = Number(window.userData?.usdtBalance || 0);
 }
+
 if(asset === "USDC"){
 balance = Number(window.userData?.balance || 0);
 }
+
 if(Number(amount) > balance){
 alert("Insufficient Balance");
 return;
 }
-await addDoc(collection(db, "requests"), {
-userId: WALLET,
-type: "withdraw",
-mode: "instant",
+
+try{
+
+const response = await fetch(
+"http://localhost:3000/api/withdraw/request",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+Authorization:`Bearer ${window.getToken()}`
+},
+body:JSON.stringify({
+stbx_uid:window.getCurrentUserId(),
 asset,
 network,
-amount: Number(amount),
-wallet: to,
-eoa: to,
-str: str,
-status: "pending",
-createdAt: serverTimestamp()
+amount:Number(amount),
+eoa_address:to,
+mode:"instant"
+})
 });
-await updateDoc(userRef, {
-pendingRequest: true
-});
+
+const data = await response.json();
+
+if(!response.ok){
+alert(data.message);
+return;
+}
+
 alert(
 "Withdraw Request Submitted\nYour funds will reflect in your wallet shortly"
 );
+
 goDeposit();
+
+}catch(err){
+
+console.log(err);
+
+alert("Server Error");
+
+}
+
 };

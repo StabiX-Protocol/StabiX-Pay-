@@ -178,7 +178,16 @@ window.closeLogoutPopup = () => {
 window.confirmLogout = async () => {
     document.getElementById("logoutPopup").style.display = "none";
 
-    await auth.signOut();
+    try{
+await fetch("http://localhost:3000/api/auth/logout",{
+method:"POST",
+headers:{
+Authorization:`Bearer ${window.getToken()}`
+}
+});
+}catch(e){
+console.log(e);
+}
 
     localStorage.removeItem("stbx_uid");
     localStorage.removeItem("stbx_google_uid");

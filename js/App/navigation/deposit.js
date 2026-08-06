@@ -1,7 +1,22 @@
 /*========Deposit Nav======[*/
 window.goDeposit = async () => {
-const snap = await getDoc(userRef);
-const user = snap.data();
+const response = await fetch(
+  `http://localhost:3000/api/users/profile/${window.getCurrentUserId()}`,
+  {
+    headers: {
+      Authorization: `Bearer ${window.getToken()}`
+    }
+  }
+);
+
+const data = await response.json();
+
+if (!response.ok) {
+  alert(data.message);
+  return;
+}
+
+const user = data.user;
 document.querySelector(".box").innerHTML = `
 <h2>Select Asset</h2>
 <div style="display:flex;flex-direction:column;gap:12px;margin-top:15px;">
@@ -55,51 +70,94 @@ Recent Activity
 `;
 
   (async () => {
-const q = query(
-collection(db, "transactions"),
-where("userId", "==", WALLET));
-const snap = await getDocs(q);
-let arr = [];
-snap.forEach(d => {
-const t = d.data();
-if(t.type === "deposit" || t.type === "withdraw"){
-arr.push({...t,_time: t.createdAt?.seconds || 0});
-}
-});
-arr.sort((a,b)=> b._time - a._time);
-arr = arr.slice(0,5);
-let html = "";
-arr.forEach(t => {
-const isDeposit = t.type === "deposit";
-const time = t.createdAt
-? new Date(t.createdAt.seconds * 1000).toLocaleString("en-IN", {
-day: "2-digit",
-month: "short",
-hour: "2-digit",
-minute: "2-digit"
-})
-: "";
-html += `
+
+  const response = await fetch(
+    `http://localhost:3000/api/transactions/history/${window.getCurrentUserId()}`,
+    {
+      headers: {
+        Authorization: `Bearer ${window.getToken()}`
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) return;
+
+  let arr = data.transactions.filter(t =>
+    t.type === "deposit" ||
+    t.type === "withdraw"
+  );
+
+  arr.sort(
+    (a, b) =>
+      new Date(b.created_at) -
+      new Date(a.created_at)
+  );
+
+  arr = arr.slice(0, 5);
+
+  let html = "";
+
+  arr.forEach(t => {
+
+    const isDeposit =
+      t.type === "deposit";
+
+    const time = new Date(
+      t.created_at
+    ).toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    html += `
 <div style="
 display:flex;
 justify-content:space-between;
 padding:10px 0;
 border-bottom:1px solid var(--border);">
+
 <div style="font-size:13px;">
-<div>${isDeposit ? "Deposit" : "Withdraw"}</div>
-<div style="font-size:11px;opacity:0.6;">${time}</div>
+
+<div>
+${isDeposit ? "Deposit" : "Withdraw"}
 </div>
+
+<div style="
+font-size:11px;
+opacity:.6;">
+
+${time}
+
+</div>
+
+</div>
+
 <div style="
 font-weight:600;
-color:${isDeposit ? "var(--success)" : "var(--danger)"};">
-${isDeposit ? "+" : "-"} ${t.amount} ${t.asset || ""}
+color:${isDeposit
+? "var(--success)"
+: "var(--danger)"};">
+
+${isDeposit ? "+" : "-"}
+${t.amount}
+${t.asset}
+
 </div>
+
 </div>
 `;
-});
-document.getElementById("recentTxs").innerHTML =
-html || `<div style="opacity:0.5;">No recent D/W</div>`;
-})(); 
+
+  });
+
+  document.getElementById("recentTxs").innerHTML =
+    html ||
+    `<div style="opacity:.5;">No recent D/W</div>`;
+
+})();
 selectTab("deposit");
 };
 

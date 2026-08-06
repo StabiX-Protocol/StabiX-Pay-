@@ -28,11 +28,22 @@ alert("Invalid QR");
 return;
 } 
 try{
-const docSnap = await getDoc(doc(db,"users",targetId))
-if(!docSnap.exists()){
-alert("User not found")
-return
+const response = await fetch(
+  `http://localhost:3000/api/users/profile/${targetId}`,
+  {
+    headers: {
+      Authorization: `Bearer ${window.getToken()}`
+    }
+  }
+);
+
+const user = await response.json();
+
+if (!response.ok) {
+  alert(user.message || "User not found");
+  return;
 }
+
 window.scannedAsset = window.primaryAsset;
 }catch(e){
 alert("Error checking user")
@@ -108,12 +119,23 @@ alert("Invalid QR");
 return;
 }
 const targetId = data.id;
-const docSnap = await getDoc(doc(db, "users", targetId));
-window.scannedAsset = window.primaryAsset;
-if (!docSnap.exists()) {
-alert("User not found");
-return;
+const response = await fetch(
+  `http://localhost:3000/api/users/profile/${targetId}`,
+  {
+    headers: {
+      Authorization: `Bearer ${window.getToken()}`
+    }
+  }
+);
+
+const user = await response.json();
+
+if (!response.ok) {
+  alert(user.message || "User not found");
+  return;
 }
+
+window.scannedAsset = window.primaryAsset;
 document.getElementById("scannerOverlay").style.display = "none";
 document.getElementById("previewId").value = targetId
 window.isScanFlow = true;
@@ -128,7 +150,7 @@ e.target.value = "";
 
 window.confirmReceiver = () => {
 const id = document.getElementById("previewId").value;
-if (id === WALLET) {
+if (id === window.getCurrentUserId()) {
 alert("Self Transfer Not Allowed");
 return;
 }
