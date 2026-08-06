@@ -50,6 +50,7 @@ Authorization: `Bearer ${window.getToken()}`
 }
 );
 const data = await response.json();
+window.lastSTRId = data.STRId;
 if (!response.ok) {
 alert(data.message || "User not found");
 return;

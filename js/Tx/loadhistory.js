@@ -1,32 +1,88 @@
 /* ================= HISTORY ================= */
-window.loadHistory = async function() {
-const q = query(
-collection(db, "transactions"),
-where("userId", "==", WALLET)
-);
-const snap = await getDocs(q);
-renderHistoryFromSnap(snap, "No transactions");
-}
+
+window.loadHistory = async function () {
+
+  try {
+
+    const response = await fetch(
+      `http://localhost:3000/api/transactions/history/${window.getCurrentUserId()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${window.getToken()}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message);
+      return;
+    }
+
+    window.renderHistory(
+      data.transactions,
+      "No transactions"
+    );
+
+  } catch (err) {
+
+    console.log(err);
+
+  }
+
+};
 
 window.loadHistoryByDate = async () => {
-const selected = document.getElementById("historyDate")?.value;
-if (!selected) {
-loadHistory(); 
-return;
-}
-const startDate = new Date(selected);
-startDate.setHours(0, 0, 0, 0);
-const endDate = new Date(selected);
-endDate.setHours(23, 59, 59, 999);
-const start = Timestamp.fromDate(startDate);
-const end = Timestamp.fromDate(endDate);
-const q = query(
-collection(db, "transactions"),
-where("userId", "==", WALLET),
-where("createdAt", ">=", start),
-where("createdAt", "<=", end),
-orderBy("createdAt", "desc")
-);
-const snap = await getDocs(q);
-renderHistoryFromSnap(snap, "No transactions for this date");
+
+  const selected =
+    document.getElementById("historyDate")?.value;
+
+  try {
+
+    const response = await fetch(
+      `http://localhost:3000/api/transactions/history/${window.getCurrentUserId()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${window.getToken()}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message);
+      return;
+    }
+
+    let transactions = data.transactions;
+
+    if (selected) {
+
+      transactions = transactions.filter((t) => {
+
+        const d = new Date(t.created_at)
+          .toISOString()
+          .slice(0, 10);
+
+        return d === selected;
+
+      });
+
+    }
+
+    window.renderHistory(
+      transactions,
+      selected
+        ? "No transactions for this date"
+        : "No transactions"
+    );
+
+  } catch (err) {
+
+    console.log(err);
+
+  }
+
 };

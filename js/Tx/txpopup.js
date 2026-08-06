@@ -11,8 +11,8 @@ const ring = document.querySelector(".circle-progress")
 const done = document.getElementById("txDoneBtn")
 popup.style.display="flex"
 msgBox.innerText = msg
-  strBox.innerText = window.currentSTR
-  ? `STR ID : ${window.currentSTR}`
+ strBox.innerText = window.lastSTRId
+  ? `STR ID : ${window.lastSTRId}`
   : "";
 done.style.display="none"
 const timeBox = document.getElementById("txTime")
