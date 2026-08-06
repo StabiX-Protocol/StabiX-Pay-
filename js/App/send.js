@@ -27,7 +27,7 @@ window.isScanFlow = false;
 window.goAmount = async ()=>{
 const toWallet = document.getElementById("sendTo").value.trim()
 if(!toWallet){
-alert("Enter wallet ID")
+alert("Enter StabiX UID")
 return
 }
 const stbxPattern = /^STBX\d{10}$/;
@@ -35,15 +35,24 @@ if (!stbxPattern.test(toWallet)) {
 alert("Enter valid StabiX UID (example: STBX123456789)")
 return
 }
-if(toWallet === WALLET){
+if(toWallet === window.getCurrentUserId()){
 alert("Self transfer not allowed")
 return
 }
+
 try{
-const snap = await getDoc(doc(db,"users",toWallet))
-if(!snap.exists()){
-alert("User not found")
-return
+const response = await fetch(
+`http://localhost:3000/api/users/profile/${toWallet}`,
+{
+headers: {
+Authorization: `Bearer ${window.getToken()}`
+}
+}
+);
+const data = await response.json();
+if (!response.ok) {
+alert(data.message || "User not found");
+return;
 }
 const asset = window.primaryAsset;
 document.getElementById("amountText").innerText = "Send " + asset;
@@ -79,10 +88,25 @@ if(!amount || amount <= 0){
 alert("Enter valid amount")
 return
 }
-const snap = await getDoc(userRef)
+const response = await fetch(
+`http://localhost:3000/api/users/profile/${window.getCurrentUserId()}`,
+{
+headers: {
+Authorization: `Bearer ${window.getToken()}`
+}
+}
+);
+const data = await response.json();
+if (!response.ok) {
+alert(data.message);
+return;
+}
+
 const asset = window.primaryAsset;
-const balance = asset === "USDC"
-? snap.data().balance || 0: snap.data().usdtBalance || 0;
+const balance =
+asset === "USDC"
+? data.user.balance || 0
+: data.user.usdtBalance || 0;
 if(amount > balance){
 alert("Insufficient Balance")
 return
@@ -119,7 +143,7 @@ document.getElementById("amountScreen").style.display = "none";
 document.getElementById("confirmScreen").style.display = "flex";
 document.getElementById("confirmAmount").innerText = "-" + amount + " " + window.primaryAsset;
 document.getElementById("confirmTo").innerText = toWallet;
-document.getElementById("confirmFrom").innerText = WALLET;
+document.getElementById("confirmFrom").innerText = window.getCurrentUserId();
 document.getElementById("feeText").innerText ="0 " + window.primaryAsset;
 };
 

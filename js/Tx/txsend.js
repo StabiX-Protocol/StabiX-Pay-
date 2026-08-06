@@ -1,78 +1,42 @@
-/* ================= SEND USDC/USDT ================= */
-window.sendUSDC = async ()=>{
-const asset = window.primaryAsset;
-window.isSender = true;
-const input = document.getElementById("sendTo");
-const toWallet = input ? input.value.trim() : "";
-const amtInput = document.getElementById("sendAmt");
-const amount = amtInput ? Number(amtInput.value) : 0;
-if(!toWallet || amount<=0) return alert("Invalid Input");
-if(toWallet === WALLET){
-showTxPopup("Self Transfers Are Not Allowed","failed");
-failed = true;
+window.sendUSDC = async () => {
+
+const toWallet = document.getElementById("sendTo").value.trim();
+const amount = Number(document.getElementById("sendAmt").value);
+
+if (!toWallet || amount <= 0) {
+alert("Invalid Input");
 return;
 }
-let failed = false;
-try{
-document.getElementById("sendPopup")?.remove();
-await runTransaction(db, async(tx)=>{
-const str = await generateSTR();
-window.currentSTR = str;
-const fromSnap = await tx.get(userRef);
-const toRef = doc(db,"users",toWallet);
-const toSnap = await tx.get(toRef);
-if(!toSnap.exists()){
-showTxPopup("User Not Found","failed");
-failed = true;
-return;
-}
-const fromBalance = asset === "USDC"
-? fromSnap.data().balance: fromSnap.data().usdtBalance || 0;
-if(fromBalance < amount)
+
+try {
+const response = await fetch(
+"http://localhost:3000/api/transactions/send",
 {
-showTxPopup("Insufficient Balance","failed");
-failed = true;
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+sender_stbx_uid: window.getCurrentUserId(),
+receiver_stbx_uid: toWallet,
+asset: window.primaryAsset,
+amount: amount
+})
+}
+);
+
+const data = await response.json();
+if (!response.ok) {
+alert(data.message || "Transaction Failed");
 return;
 }
-if(asset === "USDC"){
-tx.update(userRef,{ balance: fromBalance - amount });
-tx.update(toRef,{ balance: (toSnap.data().balance || 0) + amount });
-}else{
-tx.update(userRef,{ usdtBalance: fromBalance - amount });
-tx.update(toRef,{ usdtBalance: (toSnap.data().usdtBalance || 0) + amount });
-}
-tx.set(doc(collection(db,"transactions")),{
-userId: WALLET,
-type:"sent",
-amount,
-asset,
-counterparty:toWallet,
-str: str,
-createdAt:serverTimestamp()
-});
-tx.set(doc(collection(db,"transactions")),{
-userId: toWallet,
-type:"received",
-amount,
-asset,
-counterparty:WALLET,
-str: str,
-createdAt:serverTimestamp()
-});
-});
-if(!failed){
-if(window.isSender){
-showTxPopup(`Sent ${amount} ${asset} to ${toWallet}`, "success");
-} 
-await updateLiveFeed({
-str: window.currentSTR,
-amount,
-asset
-});
-renderApp();
-window.isSender = false;
-}
-}catch(e){
-if(e!=="Receiver not found") console.log(e);
+showTxPopup(
+`Sent ${amount} ${window.primaryAsset} to ${toWallet}`,
+"success"
+);
+await window.renderApp();
+} catch (err) {
+console.log(err);
+alert("Server Error");
 }
 };
