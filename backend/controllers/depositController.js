@@ -9,6 +9,8 @@ await client.query("BEGIN");
 const {
 stbx_uid,
 asset,
+mode,
+network,
 amount,
 blockchain_tx_hash
 } = req.body;
@@ -36,18 +38,22 @@ await client.query(
 STRId,
 stbx_uid,
 asset,
+mode,
+network,
 amount,
 blockchain_tx_hash,
 status
 )
 VALUES
 (
-$1,$2,$3,$4,$5,$6
+$1,$2,$3,$4,$5,$6,$7,$8
 )`,
 [
 STRId,
 stbx_uid,
 asset,
+mode,
+network,
 amount,
 blockchain_tx_hash,
 "PENDING"
@@ -80,6 +86,8 @@ const result = await pool.query(
 `SELECT
 STRId,
 asset,
+mode,
+network,
 amount,
 blockchain_tx_hash,
 status,
@@ -139,5 +147,5 @@ message: "Internal Server Error"
 module.exports = {
 createDeposit,
 getDepositHistory,
-getDepositById
+getDepositById,
 };
