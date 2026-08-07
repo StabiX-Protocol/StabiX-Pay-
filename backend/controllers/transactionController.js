@@ -97,7 +97,7 @@ try {
 const { stbx_uid } = req.params;
 const result = await pool.query(
 `SELECT
-tx_id,
+str_id,
 sender_stbx_uid,
 receiver_stbx_uid,
 asset,
@@ -133,7 +133,7 @@ const { str_id } = req.params;
 
 const result = await pool.query(
 `SELECT
-tx_id,
+str_id,
 sender_stbx_uid,
 receiver_stbx_uid,
 asset,
@@ -145,7 +145,7 @@ blockchain_tx_hash,
 created_at,
 updated_at
 FROM transactions
-WHERE tx_id = $1`,
+WHERE str_id = $1`,
 [str_id]
 );
 
@@ -170,8 +170,62 @@ message: "Internal Server Error"
 }
 };
 
+const searchTransactions = async (req, res) => {
+  try {
+
+    const { stbx_uid } = req.params;
+    const { q } = req.query;
+
+    const result = await pool.query(
+      `
+      SELECT
+        str_id,
+        sender_stbx_uid,
+        receiver_stbx_uid,
+        asset,
+        amount,
+        tx_type,
+        status,
+        note,
+        blockchain_tx_hash,
+        created_at
+      FROM transactions
+      WHERE
+      (
+        sender_stbx_uid = $1
+        OR receiver_stbx_uid = $1
+      )
+      AND
+      (
+        sender_stbx_uid ILIKE '%' || $2 || '%'
+        OR receiver_stbx_uid ILIKE '%' || $2 || '%'
+        OR str_id ILIKE '%' || $2 || '%'
+      )
+      ORDER BY created_at DESC
+      `,
+      [stbx_uid, q]
+    );
+
+    return res.status(200).json({
+      success: true,
+      transactions: result.rows
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+
+  }
+};
+
 module.exports = {
 sendTransaction,
 getTransactionHistory,
-getTransactionBySTRId
+getTransactionBySTRId,
+searchTransactions
 };

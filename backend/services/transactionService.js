@@ -44,7 +44,7 @@ Math.floor(Math.random() * 1000);
 await client.query(
 `INSERT INTO transactions
 (
-tx_id,
+str_id,
 sender_stbx_uid,
 receiver_stbx_uid,
 asset,

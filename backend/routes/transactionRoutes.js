@@ -4,7 +4,8 @@ const router = express.Router();
 const {
   sendTransaction,
   getTransactionHistory,
-  getTransactionBySTRId
+  getTransactionBySTRId,
+  searchTransactions
 } = require("../controllers/transactionController");
 
 const { transactionValidation } = require("../validators/transactionValidator");
@@ -23,5 +24,6 @@ next();
 router.post("/send",transactionValidation,validate, sendTransaction);
 router.get("/history/:stbx_uid", getTransactionHistory);
 router.get("/:str_id", getTransactionBySTRId);
+router.get("/search/:stbx_uid", searchTransactions);
 
 module.exports = router;
