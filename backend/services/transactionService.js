@@ -8,7 +8,7 @@ receiver_stbx_uid,
 asset,
 amount,
 note
-) => {
+) => {s
 
 await debitBalance(
 client,
