@@ -85,9 +85,9 @@ Recent Activity
   if (!response.ok) return;
 
   let arr = data.transactions.filter(t =>
-    t.type === "deposit" ||
-    t.type === "withdraw"
-  );
+  t.tx_type === "deposit" ||
+  t.tx_type === "withdraw"
+);
 
   arr.sort(
     (a, b) =>
@@ -102,7 +102,7 @@ Recent Activity
   arr.forEach(t => {
 
     const isDeposit =
-      t.type === "deposit";
+  t.tx_type === "deposit";
 
     const time = new Date(
       t.created_at

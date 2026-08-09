@@ -14,7 +14,8 @@ const response = await fetch(
 {
 method: "POST",
 headers: {
-"Content-Type": "application/json"
+"Content-Type": "application/json",
+Authorization: `Bearer ${window.getToken()}`
 },
 body: JSON.stringify({
 sender_stbx_uid: window.getCurrentUserId(),

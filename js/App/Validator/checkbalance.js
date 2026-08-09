@@ -17,7 +17,7 @@ window.checkUserBalance = async () => {
   try {
 
     const response = await fetch(
-      `http://localhost:3000/api/users/profile/${userId}`,
+      `http://localhost:3000/api/validator/users/${userId}/balance`,
       {
         headers: {
           Authorization: `Bearer ${window.getToken()}`

@@ -1,5 +1,7 @@
 window.approveReq = async (type, STRId) => {
+
   try {
+
     const endpoint =
       type === "deposit"
         ? `/api/validator/deposit/approve/${STRId}`
@@ -23,10 +25,14 @@ window.approveReq = async (type, STRId) => {
     }
 
     alert("Request approved");
+
     loadRequests();
 
   } catch (err) {
+
     console.log(err);
     alert("Server Error");
+
   }
+
 };

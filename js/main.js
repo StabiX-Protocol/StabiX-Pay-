@@ -186,7 +186,7 @@ renderSetup();
 };
 
 
-wwindow.saveUsername = async () => {
+window.saveUsername = async () => {
 
   const username = document.getElementById("uname").value.trim().toLowerCase();
   const password = document.getElementById("signupPwd").value.trim();
@@ -261,10 +261,11 @@ async function manualLogin() {
   const data = await response.json();
 
   if (!response.ok) {
-    return alert(data.message);
-  }
+return alert(data.message);
+}
 
-  localStorage.setItem("stbx_uid", data.user.stbx_uid);
+window.setToken(data.token);
+localStorage.setItem("stbx_uid", data.user.stbx_uid);
 
   if (data.user.google_uid) {
     localStorage.setItem("stbx_google_uid", data.user.google_uid);

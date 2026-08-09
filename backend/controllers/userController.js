@@ -1,5 +1,75 @@
 const pool = require("../config/db");
 const { generateToken } = require("../utils/jwt");
+const bcrypt = require("bcrypt");
+
+const loginUser = async (req, res) => {
+try {
+const { stbx_uid, password } = req.body;
+
+const result = await pool.query(
+`SELECT
+stbx_uid,
+google_uid,
+username,
+password
+FROM users
+WHERE stbx_uid = $1`,
+[stbx_uid]
+);
+
+if (result.rows.length === 0) {
+return res.status(404).json({
+success: false,
+message: "Invalid StabiX ID or password"
+});
+}
+
+const user = result.rows[0];
+
+if (!user.password) {
+return res.status(400).json({
+success: false,
+message: "Password login is not available for this account"
+});
+}
+
+const validPassword = await bcrypt.compare(
+password,
+user.password
+);
+
+if (!validPassword) {
+return res.status(401).json({
+success: false,
+message: "Invalid StabiX UID or password"
+});
+}
+
+const token = generateToken({
+stbx_uid: user.stbx_uid,
+username: user.username
+});
+
+return res.status(200).json({
+success: true,
+user: {
+stbx_uid: user.stbx_uid,
+google_uid: user.google_uid,
+username: user.username
+},
+token
+});
+
+} catch (err) {
+console.error(err);
+
+return res.status(500).json({
+success: false,
+message: "Internal Server Error"
+});
+}
+};
+
 
 const getProfile = async (req, res) => {
 try {
@@ -43,13 +113,14 @@ const registerUser = async (req, res) => {
 const client = await pool.connect();
 try {
 await client.query("BEGIN");
-const { stbx_uid, google_uid, username, eoa_address } = req.body;
+const { stbx_uid, google_uid, username, eoa_address, password } = req.body;
+const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
 const result = await client.query(
 `INSERT INTO users
-(stbx_uid, google_uid, username, eoa_address)
-VALUES ($1, $2, $3, $4)
+(stbx_uid, google_uid, username, eoa_address, password)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING *`,
-[stbx_uid, google_uid, username, eoa_address]
+[stbx_uid, google_uid, username, eoa_address, hashedPassword]
 );
 
 await client.query(
@@ -217,13 +288,31 @@ client.release();
 };
 
 
+const { OAuth2Client } = require("google-auth-library");
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const googleLogin = async (req, res) => {
 try {
-const { google_uid } = req.body;
+const { id_token } = req.body;
+
+if (!id_token) {
+return res.status(400).json({
+success: false,
+message: "Google ID token required"
+});
+}
+
+const ticket = await googleClient.verifyIdToken({
+idToken: id_token,
+audience: process.env.GOOGLE_CLIENT_ID
+});
+
+const payload = ticket.getPayload();
+const google_uid = payload.sub;
 
 const result = await pool.query(
 `SELECT
 stbx_uid,
+google_uid,
 username
 FROM users
 WHERE google_uid = $1`,
@@ -245,18 +334,20 @@ username: result.rows[0].username
 return res.status(200).json({
 success: true,
 user: result.rows[0],
-token: token
+token
 });
 
 } catch (err) {
-console.error(err);
+console.error("Google Login Error:", err);
 
-return res.status(500).json({
+return res.status(401).json({
 success: false,
-message: "Internal Server Error"
+message: "Invalid Google login"
 });
 }
 };
+
+
 
 const updateEOAAddress = async (req, res) => {
 try {
@@ -290,4 +381,54 @@ message: "Internal Server Error"
 }
 };
 
-module.exports = { registerUser, getUser, getProfile, updateUsername,googleLogin, updateEOAAddress}
+const resetPassword = async (req, res) => {
+try {
+const { stbx_uid, password } = req.body;
+
+if (!stbx_uid || !password) {
+return res.status(400).json({
+success: false,
+message: "StabiX ID and password are required"
+});
+}
+
+if (password.length < 6) {
+return res.status(400).json({
+success: false,
+message: "Password must be at least 6 characters"
+});
+}
+
+const hashedPassword = await bcrypt.hash(password, 10);
+
+const result = await pool.query(
+`UPDATE users
+SET password = $1
+WHERE stbx_uid = $2
+RETURNING stbx_uid`,
+[hashedPassword, stbx_uid]
+);
+
+if (result.rows.length === 0) {
+return res.status(404).json({
+success: false,
+message: "User not found"
+});
+}
+
+return res.status(200).json({
+success: true,
+message: "Password updated successfully"
+});
+
+} catch (err) {
+console.error(err);
+
+return res.status(500).json({
+success: false,
+message: "Internal Server Error"
+});
+}
+};
+
+module.exports = {loginUser, registerUser, getUser, getProfile, updateUsername,googleLogin, updateEOAAddress, resetPassword}

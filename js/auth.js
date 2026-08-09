@@ -5,7 +5,7 @@ window.googleLogin = async () => {
     try {
 
       const apiResponse = await fetch(
-        "http://localhost:3000/api/users/google-login",
+        "http://localhost:3000/api/users/login/google",
         {
           method: "POST",
           headers: {
@@ -48,16 +48,48 @@ window.googleResetLogin = async () => {
 
     window.initializeGoogleLogin(async (response) => {
 
-      const id_token = response.credential;
+      try {
 
-      alert("Reset password migration pending.");
+        const apiResponse = await fetch(
+          "http://localhost:3000/api/users/login/google",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              id_token: response.credential
+            })
+          }
+        );
+
+        const data = await apiResponse.json();
+
+        if (!apiResponse.ok) {
+          alert(data.message || "No StabiX account found with this Google account.");
+          return;
+        }
+
+        localStorage.setItem("reset_uid", data.user.stbx_uid);
+
+        renderResetPassword();
+
+      } catch (e) {
+
+        console.log("Google Reset Error:", e);
+        alert("Google verification failed");
+
+      }
 
     });
 
     google.accounts.id.prompt();
 
   } catch (e) {
+
+    console.log(e);
     alert(e.message);
+
   }
 
 };

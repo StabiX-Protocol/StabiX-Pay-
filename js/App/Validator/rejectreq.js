@@ -1,5 +1,7 @@
 window.rejectReq = async (type, STRId) => {
+
   try {
+
     const endpoint =
       type === "deposit"
         ? `/api/validator/deposit/reject/${STRId}`
@@ -23,10 +25,14 @@ window.rejectReq = async (type, STRId) => {
     }
 
     alert("Request rejected");
+
     loadRequests();
 
   } catch (err) {
+
     console.log(err);
     alert("Server Error");
+
   }
+
 };
