@@ -13,7 +13,8 @@ const {
   getPendingDeposits,
   getPendingWithdraws,
   getPendingRequests,
-  getAllUsers
+  getAllUsers,
+  getUserBalance
 } = require("../controllers/validatorController");
 
 router.patch(
@@ -70,6 +71,13 @@ router.get(
   verifyToken,
   verifyValidator,
   getAllUsers
+);
+
+router.get(
+  "/users/:stbx_uid/balance",
+  verifyToken,
+  verifyValidator,
+  getUserBalance
 );
 
 
