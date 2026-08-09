@@ -125,78 +125,62 @@ Withdraw
 
 window.submitInstantWithdraw = async function(asset, network){
 
-const to = document.getElementById("eoa").value.trim();
-const amount = document.getElementById("amount").value;
+  const to = document.getElementById("eoa").value.trim();
+  const amount = document.getElementById("amount").value.trim();
 
-if(!to || !amount){
-alert("Missing fields");
-return;
-}
+  if(!to || !amount){
+    alert("Missing fields");
+    return;
+  }
 
-if(Number(amount) <= 0){
-alert("Invalid amount");
-return;
-}
+  if(Number(amount) <= 0){
+    alert("Invalid amount");
+    return;
+  }
 
-if(!isValidAddress(to, network)){
-alert("Invalid wallet address");
-return;
-}
+  if(!isValidAddress(to, network)){
+    alert("Invalid wallet address");
+    return;
+  }
 
-let balance = 0;
+  try{
 
-if(asset === "USDT"){
-balance = Number(window.userData?.usdtBalance || 0);
-}
+    const response = await fetch(
+      "http://localhost:3000/api/withdraw/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${window.getToken()}`
+        },
+        body: JSON.stringify({
+          stbx_uid: window.getCurrentUserId(),
+          asset: asset,
+          mode: "instant",
+          network: network,
+          amount: Number(amount),
+          wallet_address: to
+        })
+      }
+    );
 
-if(asset === "USDC"){
-balance = Number(window.userData?.balance || 0);
-}
+    const data = await response.json();
 
-if(Number(amount) > balance){
-alert("Insufficient Balance");
-return;
-}
+    if(!response.ok){
+      alert(data.message || "Withdraw request failed");
+      return;
+    }
 
-try{
+    alert(
+      "Withdraw Request Submitted\nYour request has been sent for validation."
+    );
 
-const response = await fetch(
-"http://localhost:3000/api/withdraw/request",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-Authorization:`Bearer ${window.getToken()}`
-},
-body:JSON.stringify({
-stbx_uid:window.getCurrentUserId(),
-asset,
-network,
-amount:Number(amount),
-eoa_address:to,
-mode:"instant"
-})
-});
+    goDeposit();
 
-const data = await response.json();
+  }catch(err){
 
-if(!response.ok){
-alert(data.message);
-return;
-}
+    console.error(err);
+    alert("Server Error");
 
-alert(
-"Withdraw Request Submitted\nYour funds will reflect in your wallet shortly"
-);
-
-goDeposit();
-
-}catch(err){
-
-console.log(err);
-
-alert("Server Error");
-
-}
-
+  }
 };

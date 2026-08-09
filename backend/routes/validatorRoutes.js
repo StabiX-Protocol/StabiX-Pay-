@@ -11,7 +11,9 @@ const {
   approveWithdraw,
   rejectWithdraw,
   getPendingDeposits,
-  getPendingWithdraws
+  getPendingWithdraws,
+  getPendingRequests,
+  getAllUsers
 } = require("../controllers/validatorController");
 
 router.patch(
@@ -54,6 +56,20 @@ router.patch(
   verifyToken,
   verifyValidator,
   rejectWithdraw
+);
+
+router.get(
+  "/pending-requests",
+  verifyToken,
+  verifyValidator,
+  getPendingRequests
+);
+
+router.get(
+  "/users",
+  verifyToken,
+  verifyValidator,
+  getAllUsers
 );
 
 

@@ -286,68 +286,68 @@ return /^0x([A-Fa-f0-9]{64})$/.test(hash);
 
 window.submitInstantDeposit = async function(asset, network){
 
-const amount = document.getElementById("amount").value.trim();
-const txHash = document.getElementById("txHash").value.trim();
-const eoa = document.getElementById("eoa").value.trim();
+  const amount = document.getElementById("amount").value.trim();
+  const txHash = document.getElementById("txHash").value.trim();
+  const eoa = document.getElementById("eoa").value.trim();
 
-if(!amount || !txHash || !eoa){
-alert("All fields are required");
-return;
-}
+  if(!amount || !txHash || !eoa){
+    alert("All fields are required");
+    return;
+  }
 
-if(Number(amount) <= 0){
-alert("Invalid amount");
-return;
-}
+  if(Number(amount) <= 0){
+    alert("Invalid amount");
+    return;
+  }
 
-if(!isValidTxHash(txHash)){
-alert("Invalid transaction hash");
-return;
-}
+  if(!isValidTxHash(txHash)){
+    alert("Invalid transaction hash");
+    return;
+  }
 
-if(!isValidAddress(eoa, network)){
-alert("Invalid wallet address");
-return;
-}
+  if(!isValidAddress(eoa, network)){
+    alert("Invalid wallet address");
+    return;
+  }
 
-try{
+  try{
 
-const response = await fetch(
-"http://localhost:3000/api/deposit/request",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-Authorization:`Bearer ${window.getToken()}`
-},
-body:JSON.stringify({
-stbx_uid:window.getCurrentUserId(),
-asset,
-network,
-amount:Number(amount),
-tx_hash:txHash,
-eoa_address:eoa,
-mode:"instant"
-})
-});
+    const response = await fetch(
+      "http://localhost:3000/api/deposits",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${window.getToken()}`
+        },
+        body: JSON.stringify({
+          stbx_uid: window.getCurrentUserId(),
+          asset: asset,
+          mode: "instant",
+          network: network,
+          amount: Number(amount),
+          blockchain_tx_hash: txHash
+        })
+      }
+    );
 
-const data = await response.json();
+    const data = await response.json();
 
-if(!response.ok){
-alert(data.message);
-return;
-}
+    if(!response.ok){
+      alert(data.message || "Deposit request failed");
+      return;
+    }
 
-alert("Deposit Request Submitted\nYour funds will reflect in StabiX shortly");
+    alert(
+      "Deposit Request Submitted\nYour funds will reflect in StabiX shortly"
+    );
 
-goDeposit();
+    goDeposit();
 
-}catch(err){
+  }catch(err){
 
-console.log(err);
+    console.error(err);
+    alert("Server Error");
 
-alert("Server Error");
-
-}
-
+  }
 };

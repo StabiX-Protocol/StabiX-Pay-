@@ -25,10 +25,10 @@ app.use("/api/validator", validatorRoutes);
 
 pool.connect()
 .then(() => {
-console.log("✅ PostgreSQL Connected");
+console.log("✅ Server Connected");
 })
 .catch((err) => {
-console.error("❌ Database Connection Failed");
+console.error("❌ Server Connection Failed");
 console.error(err.message);
 });
 

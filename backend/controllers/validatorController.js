@@ -323,11 +323,101 @@ const result = await pool.query(
   }
 };
 
+/*both request*/
+const getPendingRequests = async (req, res) => {
+  try {
+
+    const result = await pool.query(`
+      SELECT
+        STRId,
+        stbx_uid,
+        asset,
+        mode,
+        network,
+        amount,
+        blockchain_tx_hash,
+        NULL::text AS wallet_address,
+        'deposit' AS type,
+        status,
+        created_at
+      FROM deposits
+      WHERE status = 'PENDING'
+
+      UNION ALL
+
+      SELECT
+        STRId,
+        stbx_uid,
+        asset,
+        mode,
+        network,
+        amount,
+        NULL::text AS blockchain_tx_hash,
+        wallet_address,
+        'withdraw' AS type,
+        status,
+        created_at
+      FROM withdraws
+      WHERE status = 'PENDING'
+
+      ORDER BY created_at ASC
+    `);
+
+    return res.status(200).json({
+      success: true,
+      count: result.rows.length,
+      requests: result.rows
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+
+  }
+};
+
+const getAllUsers = async (req, res) => {
+  try {
+
+    const result = await pool.query(`
+      SELECT
+        username,
+        stbx_uid,
+        eoa_address
+      FROM users
+      ORDER BY created_at DESC
+    `);
+
+    return res.status(200).json({
+      success: true,
+      count: result.rows.length,
+      users: result.rows
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+
+  }
+};
+
 module.exports = {
 approveDeposit,
 rejectDeposit,
 approveWithdraw,
 rejectWithdraw,
 getPendingDeposits,
-getPendingWithdraws
+getPendingWithdraws,
+getPendingRequests,
+getAllUsers
 };

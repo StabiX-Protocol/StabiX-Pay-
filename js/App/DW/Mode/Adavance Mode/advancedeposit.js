@@ -160,53 +160,56 @@ line-height:1.6;">
 // ================== SUBMIT DEPOSIT(Advance Mode)==================//
 window.submitDepositFinal = async function(asset, network){
 
-const amount = document.getElementById("amount").value;
-const txHash = document.getElementById("txHash").value;
-const eoa = document.getElementById("eoa").value;
+  const amount = document.getElementById("amount").value.trim();
+  const txHash = document.getElementById("txHash").value.trim();
+  const eoa = document.getElementById("eoa").value.trim();
 
-if(!amount || !txHash || !eoa){
-alert("Fill all fields");
-return;
-}
+  if(!amount || !txHash || !eoa){
+    alert("Fill all fields");
+    return;
+  }
 
-try{
+  if(Number(amount) <= 0){
+    alert("Invalid amount");
+    return;
+  }
 
-const response = await fetch(
-"http://localhost:3000/api/deposit/request",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-Authorization:`Bearer ${window.getToken()}`
-},
-body:JSON.stringify({
-stbx_uid:window.getCurrentUserId(),
-asset,
-network,
-amount:Number(amount),
-tx_hash:txHash,
-eoa_address:eoa,
-mode:"advanced"
-})
-});
+  try{
 
-const data = await response.json();
+    const response = await fetch(
+      "http://localhost:3000/api/deposits",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${window.getToken()}`
+        },
+        body: JSON.stringify({
+          stbx_uid: window.getCurrentUserId(),
+          asset: asset,
+          mode: "advanced",
+          network: network,
+          amount: Number(amount),
+          blockchain_tx_hash: txHash
+        })
+      }
+    );
 
-if(!response.ok){
-alert(data.message);
-return;
-}
+    const data = await response.json();
 
-alert("Deposit request sent");
+    if(!response.ok){
+      alert(data.message || "Deposit request failed");
+      return;
+    }
 
-goDeposit();
+    alert("Deposit request sent");
 
-}catch(err){
+    goDeposit();
 
-console.log(err);
+  }catch(err){
 
-alert("Server Error");
-
-}
-
+    console.error(err);
+    alert("Server Error");
+s
+  }
 };

@@ -1,8 +1,12 @@
-window.rejectReq = async (reqId) => {
+window.rejectReq = async (type, STRId) => {
   try {
+    const endpoint =
+      type === "deposit"
+        ? `/api/validator/deposit/reject/${STRId}`
+        : `/api/validator/withdraw/reject/${STRId}`;
 
     const response = await fetch(
-      `http://localhost:3000/api/validator/reject/${reqId}`,
+      `http://localhost:3000${endpoint}`,
       {
         method: "PATCH",
         headers: {
@@ -14,25 +18,15 @@ window.rejectReq = async (reqId) => {
     const data = await response.json();
 
     if (!response.ok) {
-
       alert(data.message || "Reject failed");
-
       return;
-
     }
 
-    alert("Rejected");
-s
+    alert("Request rejected");
     loadRequests();
 
-    renderApp();
-
   } catch (err) {
-
     console.log(err);
-
     alert("Server Error");
-
   }
-
 };

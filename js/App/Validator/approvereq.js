@@ -1,9 +1,12 @@
-window.approveReq = async (reqId) => {
-
+window.approveReq = async (type, STRId) => {
   try {
+    const endpoint =
+      type === "deposit"
+        ? `/api/validator/deposit/approve/${STRId}`
+        : `/api/validator/withdraw/approve/${STRId}`;
 
     const response = await fetch(
-      `http://localhost:3000/api/validator/approve/${reqId}`,
+      `http://localhost:3000${endpoint}`,
       {
         method: "PATCH",
         headers: {
@@ -20,15 +23,10 @@ window.approveReq = async (reqId) => {
     }
 
     alert("Request approved");
-
     loadRequests();
 
   } catch (err) {
-
     console.log(err);
-
     alert("Server Error");
-
   }
-
 };
