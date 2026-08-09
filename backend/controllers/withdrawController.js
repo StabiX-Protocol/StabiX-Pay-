@@ -88,18 +88,22 @@ await client.query(
 STRId,
 stbx_uid,
 asset,
+mode,
+network,
 amount,
 wallet_address,
 status
 )
 VALUES
 (
-$1,$2,$3,$4,$5,$6
+$1,$2,$3,$4,$5,$6,$7,$8
 )`,
 [
 STRId,
 stbx_uid,
 asset,
+mode,
+network,
 amount,
 wallet_address,
 "PENDING"
@@ -110,7 +114,7 @@ await client.query("COMMIT");
 return res.status(201).json({
 success: true,
 message: "Withdraw request submitted.",
-STR_id: STRId
+STRId: STRId
 });
 } catch (err) {
 await client.query("ROLLBACK");
@@ -124,6 +128,76 @@ client.release();
 }
 };
 
+const getWithdrawHistory = async (req, res) => {
+try {
+const { stbx_uid } = req.params;
+
+const result = await pool.query(
+`SELECT
+STRId,
+asset,
+mode,
+network,
+amount,
+wallet_address,
+status,
+created_at
+FROM withdraws
+WHERE stbx_uid = $1
+ORDER BY created_at DESC`,
+[stbx_uid]
+);
+
+return res.status(200).json({
+success: true,
+withdraws: result.rows
+});
+
+} catch (err) {
+console.error(err);
+return res.status(500).json({
+success: false,
+message: "Internal Server Error"
+});
+}
+};
+
+
+const getWithdrawById = async (req, res) => {
+try {
+const { STRId } = req.params;
+
+const result = await pool.query(
+`SELECT *
+FROM withdraws
+WHERE STRId = $1`,
+[STRId]
+);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Withdraw not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      withdraw: result.rows[0]
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
+};
+
 module.exports = {
-createWithdraw
+createWithdraw,
+getWithdrawHistory,
+getWithdrawById
 };

@@ -3,7 +3,9 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  createWithdraw
+  createWithdraw,
+  getWithdrawHistory,
+  getWithdrawById
 } = require("../controllers/withdrawController");
 
 const {
@@ -30,5 +32,9 @@ const validate = (req, res, next) => {
 };
 
 router.post("/",withdrawValidation,validate,createWithdraw);
+
+router.get("/history/:stbx_uid", getWithdrawHistory);
+
+router.get("/:STRId", getWithdrawById);
 
 module.exports = router;
