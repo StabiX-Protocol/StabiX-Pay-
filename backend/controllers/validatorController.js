@@ -256,35 +256,71 @@ client.release();
 };
 
 const getPendingDeposits = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+        STRId,
+        stbx_uid,
+        asset,
+        mode,
+        network,
+        amount,
+        blockchain_tx_hash,
+        created_at
+      FROM deposits
+      WHERE status = 'PENDING'
+      ORDER BY created_at ASC`
+    );
+
+    return res.status(200).json({
+      success: true,
+      count: result.rows.length,
+      deposits: result.rows
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
+};
+
+const getPendingWithdraws = async (req, res) => {
 try {
 
 const result = await pool.query(
-`SELECT
-STRId,
-stbx_uid,
-asset,
-amount,
-blockchain_tx_hash,
-created_at
-FROM deposits
-WHERE status = 'PENDING'
-ORDER BY created_at ASC`
-);
+       `SELECT
+        STRId,
+        stbx_uid,
+        asset,
+        mode,
+        network,
+        amount,
+        wallet_address,
+        status,
+        created_at
+      FROM withdraws
+      WHERE status = 'PENDING'
+      ORDER BY created_at ASC`
+    );
 
-return res.status(200).json({
-success: true,
-count: result.rows.length,
-deposits: result.rows
-});
+    return res.status(200).json({
+      success: true,
+      count: result.rows.length,
+      withdraws: result.rows
+    });
 
-} catch (err) {
-console.error(err);
+  } catch (err) {
+    console.error(err);
 
-return res.status(500).json({
-success: false,
-message: "Internal Server Error"
-});
-}
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
 };
 
 module.exports = {
@@ -292,5 +328,6 @@ approveDeposit,
 rejectDeposit,
 approveWithdraw,
 rejectWithdraw,
-getPendingDeposits
+getPendingDeposits,
+getPendingWithdraws
 };

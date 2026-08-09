@@ -10,7 +10,8 @@ const {
   rejectDeposit,
   approveWithdraw,
   rejectWithdraw,
-  getPendingDeposits
+  getPendingDeposits,
+  getPendingWithdraws
 } = require("../controllers/validatorController");
 
 router.patch(
@@ -32,6 +33,13 @@ router.get(
   verifyToken,
   verifyValidator,
   getPendingDeposits
+);
+
+router.get(
+  "/withdraw/pending",
+  verifyToken,
+  verifyValidator,
+  getPendingWithdraws
 );
 
 router.patch(
