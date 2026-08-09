@@ -18,129 +18,123 @@ import "./App/Validator/Validatorpanel.js";
 
 import "./App/Business/business.js";
 
-
 window.appDiv = function(h){document.getElementById("app").innerHTML = h;}
 
 /* ================= SETUP ================= */
 function renderSetup(){
-  appDiv(`
-    <div class="auth-page">
+appDiv(`
+<div class="auth-page">
 
+<div class="auth-logo">
+<h1>StabiX</h1>
+<p>Pay Stablecoins Instant, Free & Secure</p>
+</div>
 
-      <div class="auth-logo">
-        <h1>StabiX</h1>
-        <p>Pay Stablecoins Instant, Free & Secure</p>
-      </div>
+<div class="auth-box">
+<h2>Log in</h2>
 
-      <div class="auth-box">
-        <h2>Log in</h2>
+<input id="loginStbx" placeholder="StabiX ID" />
+<input id="loginPwd" type="password" placeholder="Password" />
 
-        <input id="loginStbx" placeholder="StabiX ID" />
-        <input id="loginPwd" type="password" placeholder="Password" />
+<button onclick="manualLogin()">Log In</button>
 
-        <button onclick="manualLogin()">Log In</button>
+<div class="divider">or</div>
 
-        <div class="divider">or</div>
-
-        <button class="google-btn" onclick="googleLogin()">
-    <img src="media/google-logo.png" class="google-icon" alt="Google">
-    <span>Continue with Google</span>
+<button class="google-btn" onclick="googleLogin()">
+<img src="media/google-logo.png" class="google-icon" alt="Google">
+<span>Continue with Google</span>
 </button>
 
-        <div class="auth-links">
-  <span class="auth-link" onclick="renderSignup();">
-    Create Account
-  </span>
+<div class="auth-links">
+<span class="auth-link" onclick="renderSignup();">
+Create Account
+</span>
 
-  <span class="auth-link" onclick="forgotPassword();">
-    Forgot Password?
-  </span>
+<span class="auth-link" onclick="forgotPassword();">
+Forgot Password?
+</span>
 </div>
-      </div>
+</div>
+</div>
+`);
 
-    </div>
-  `);
-
-  selectTab("home");
-  document.getElementById("bottomNav").style.display = "none";
+selectTab("home");
+document.getElementById("bottomNav").style.display = "none";
 }
 
 function renderSignup(){
-  appDiv(`
-    <div class="auth-page">
+appDiv(`
+<div class="auth-page">
 
-     <div class="auth-close" onclick="renderSetup()">×</div>
+<div class="auth-close" onclick="renderSetup()">×</div>
 
-      <div class="auth-logo">
-        <h1>StabiX</h1>
-        <p>Pay Stablecoins Instant, Free & Secure</p>
-      </div>
+<div class="auth-logo">
+<h1>StabiX</h1>
+<p>Pay Stablecoins Instant, Free & Secure</p>
+</div>
 
-      <div class="auth-box">
-        <h2>Create Account</h2>
+<div class="auth-box">
+<h2>Create Account</h2>
 
-        <button class="google-btn" onclick="googleLogin()">
-    <img src="media/google-logo.png" class="google-icon" alt="Google">
-    <span>Continue with Google</span>
+<button class="google-btn" onclick="googleLogin()">
+<img src="media/google-logo.png" class="google-icon" alt="Google">
+<span>Continue with Google</span>
 </button>
-
-    </div>
-  `);
+</div>
+`);
 }
 window.renderSetup = renderSetup;
 window.renderUsernameSetup = renderUsernameSetup;
 window.renderSignup = renderSignup;
 
 function renderUsernameSetup(){
-  appDiv(`
-    <div class="auth-page">
+appDiv(`
+<div class="auth-page">
 
-      <div class="auth-close" onclick="renderSignup()">×</div>
+<div class="auth-close" onclick="renderSignup()">×</div>
 
-      <div class="auth-logo">
-        <h1>StabiX</h1>
-        <p>Pay Stablecoins Instant, Free & Secure</p>
-      </div>
+<div class="auth-logo">
+<h1>StabiX</h1>
+<p>Pay Stablecoins Instant, Free & Secure</p>
+</div>
 
-      <div class="auth-box">
-        <h2>Sign In</h2>
+<div class="auth-box">
+<h2>Sign In</h2>
 
-        <input id="uname" placeholder="Choose Username" />
-        <input id="signupPwd" type="password" placeholder="Password" />
-        <input id="confirmPwd" type="password" placeholder="Confirm Password" />
+<input id="uname" placeholder="Choose Username" />
+<input id="signupPwd" type="password" placeholder="Password" />
+<input id="confirmPwd" type="password" placeholder="Confirm Password" />
 
-        <button onclick="saveUsername()">Create Account</button>
-      </div>
-
-    </div>
-  `);
+<button onclick="saveUsername()">Create Account</button>
+</div>
+</div>
+`);
 }
 window.renderUsernameSetup = renderUsernameSetup;
 
 function renderResetPassword() {
-  appDiv(`
-    <div class="auth-page">
+appDiv(`
+<div class="auth-page">
 
-      <div class="auth-close" onclick="renderSetup()">×</div>
+<div class="auth-close" onclick="renderSetup()">×</div>
 
-      <div class="auth-logo">
-        <h1>StabiX</h1>
-        <p>Pay Stablecoins Instant, Free & Secure</p>
-      </div>
+<div class="auth-logo">
+<h1>StabiX</h1>
+<p>Pay Stablecoins Instant, Free & Secure</p>
+</div>
 
-      <div class="auth-box">
-        <h2>New Password</h2>
+<div class="auth-box">
+<h2>New Password</h2>
 
-        <input id="newPwd" type="password" placeholder="New Password">
-        <input id="confirmNewPwd" type="password" placeholder="Confirm Password">
+<input id="newPwd" type="password" placeholder="New Password">
+<input id="confirmNewPwd" type="password" placeholder="Confirm Password">
 
-        <button onclick="updatePassword()">
-          Update Password
-        </button>
-      </div>
-
-    </div>
-  `);
+<button onclick="updatePassword()">
+Update Password
+</button>
+</div>
+</div>
+`);
 }
 window.renderResetPassword = renderResetPassword;
 
@@ -285,26 +279,26 @@ async function manualLogin() {
 window.manualLogin = manualLogin;
 
 function forgotPassword() {
-  appDiv(`
-    <div class="auth-page">
+appDiv(`
+<div class="auth-page">
 
-      <div class="auth-close" onclick="renderSetup()">×</div>
+<div class="auth-close" onclick="renderSetup()">×</div>
 
-      <div class="auth-logo">
-        <h1>StabiX</h1>
-        <p>Pay Stablecoins Instant, Free & Secure</p>
-      </div>
+<div class="auth-logo">
+<h1>StabiX</h1>
+<p>Pay Stablecoins Instant, Free & Secure</p>
+</div>
 
-      <div class="auth-box">
-        <h2>Reset Password</h2>
+<div class="auth-box">
+<h2>Reset Password</h2>
 
-        <button class="google-btn" onclick="googleResetLogin()">
-          <img src="media/google-logo.png" class="google-icon" alt="Google">
-          <span>Continue with Google</span>
-      </div>
+<button class="google-btn" onclick="googleResetLogin()">
+<img src="media/google-logo.png" class="google-icon" alt="Google">
+<span>Continue with Google</span>
+</div>
 
-    </div>
-  `);
+</div>
+`);
 }
 window.forgotPassword = forgotPassword;
 
@@ -322,11 +316,10 @@ if(confirm) confirm.style.display = "none";
 const stbxUID = window.WALLET;
 /* ================= INIT ================= */
 async function init() {
-  if (!stbxUID) {
-    renderSetup();
-    return;
-  }
-
-  renderApp();
+if (!stbxUID) {
+renderSetup();
+return;
+}
+renderApp();
 }
 init();

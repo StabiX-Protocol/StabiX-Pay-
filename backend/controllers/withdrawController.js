@@ -9,6 +9,8 @@ await client.query("BEGIN");
 const {
 stbx_uid,
 asset,
+mode,
+network,
 amount,
 wallet_address
 } = req.body;
@@ -22,6 +24,33 @@ if (user.rows.length === 0) {
 return res.status(404).json({
 success: false,
 message: "User not found"
+});
+}
+
+if (!["USDT", "USDC"].includes(asset)) {
+return res.status(400).json({
+success: false,
+message: "Unsupported asset"
+});
+}
+
+if (!["instant", "advanced"].includes(mode)) {
+return res.status(400).json({
+success: false,
+message: "Invalid withdraw mode"
+});
+}
+
+if (![
+"Ethereum (Testnet)",
+"Arbitrum (Testnet)",
+"Polygon (Testnet)",
+"Base (Testnet)",
+"Tron (Testnet)"
+].includes(network)) {
+return res.status(400).json({
+success: false,
+message: "Unsupported network"
 });
 }
 

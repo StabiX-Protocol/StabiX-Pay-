@@ -16,6 +16,10 @@ return false;
 };
 
 window.selectDWAsset = (asset) => {
+if (!["USDT", "USDC"].includes(asset)) {
+alert("Unsupported asset");
+return;
+}
 window.MODE = null;
 window.selectedDWAsset = asset;
 document.querySelector(".box").innerHTML = `

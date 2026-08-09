@@ -1,5 +1,4 @@
 window.rejectReq = async (reqId) => {
-
   try {
 
     const response = await fetch(
