@@ -12,7 +12,17 @@ date:null
 window.isScanFlow = false;
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
+const response = await fetch(
+`http://localhost:3000/api/users/profile/${window.getCurrentUserId()}`,
+{
+headers: {
+Authorization: `Bearer ${window.getToken()}`
+}
+}
+);
+
 const data = await response.json();
+
 if (!response.ok) {
 alert(data.message);
 return;
@@ -21,6 +31,7 @@ return;
 const user = data.user;
 window.userData = user;
 const isValidator = false;
+const now = new Date();
 const yyyy = now.getFullYear();
 const mm = String(now.getMonth() + 1).padStart(2,"0");
 const dd = String(now.getDate()).padStart(2,"0");
