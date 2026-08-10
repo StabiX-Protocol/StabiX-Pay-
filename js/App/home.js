@@ -13,7 +13,7 @@ window.isScanFlow = false;
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
 const response = await fetch(
-`http://localhost:3000/api/users/profile/${window.getCurrentUserId()}`,
+`http://10.148.199.19:3000/api/users/profile/${window.getCurrentUserId()}`,
 {
 headers: {
 Authorization: `Bearer ${window.getToken()}`
@@ -570,7 +570,7 @@ if(window.keepAssetOpen){
        // RECEIVE POPUP
 try {
 const response = await fetch(
-`http://localhost:3000/api/transactions/history/${WALLET}`,
+`http://10.148.199.19:3000/api/transactions/history/${WALLET}`,
 {
 headers: {
         Authorization: `Bearer ${window.getToken()}`
@@ -720,7 +720,7 @@ if (current && current.toLowerCase() === newAddr.toLowerCase()) {
 }
 
 const response = await fetch(
-  "http://localhost:3000/api/users/eoa-address",
+  "http://10.148.199.19:3000/api/users/eoa-address",
   {
     method: "PATCH",
     headers: {
@@ -800,7 +800,7 @@ const current = data.username || "";
     }
 
     const response = await fetch(
-  "http://localhost:3000/api/users/username",
+  "http://10.148.199.19:3000/api/users/username",
   {
     method: "PATCH",
     headers: {

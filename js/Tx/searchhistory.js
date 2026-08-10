@@ -11,7 +11,7 @@ window.setupHistorySearch = () => {
     try {
 
       const response = await fetch(
-        `http://localhost:3000/api/transactions/history/${window.getCurrentUserId()}`,
+        `http://10.148.199.19:3000/api/transactions/history/${window.getCurrentUserId()}`,
         {
           headers: {
             Authorization: `Bearer ${window.getToken()}`

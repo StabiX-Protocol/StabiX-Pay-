@@ -10,7 +10,7 @@ return;
 
 try {
 const response = await fetch(
-"http://localhost:3000/api/transactions/send",
+"http://10.148.199.19:3000/api/transactions/send",
 {
 method: "POST",
 headers: {

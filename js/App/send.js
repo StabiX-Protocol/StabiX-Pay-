@@ -42,7 +42,7 @@ return
 
 try{
 const response = await fetch(
-`http://localhost:3000/api/users/profile/${toWallet}`,
+`http://http://10.148.199.19:3000localhost:3000/api/users/profile/${toWallet}`,
 {
 headers: {
 Authorization: `Bearer ${window.getToken()}`
@@ -90,7 +90,7 @@ alert("Enter valid amount")
 return
 }
 const response = await fetch(
-`http://localhost:3000/api/users/profile/${window.getCurrentUserId()}`,
+`http://10.148.199.19:3000/api/users/profile/${window.getCurrentUserId()}`,
 {
 headers: {
 Authorization: `Bearer ${window.getToken()}`

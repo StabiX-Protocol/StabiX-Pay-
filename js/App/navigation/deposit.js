@@ -1,7 +1,7 @@
 /*========Deposit Nav======[*/
 window.goDeposit = async () => {
 const response = await fetch(
-  `http://localhost:3000/api/users/profile/${window.getCurrentUserId()}`,
+  `http://10.148.199.19:3000/api/users/profile/${window.getCurrentUserId()}`,
   {
     headers: {
       Authorization: `Bearer ${window.getToken()}`
@@ -72,7 +72,7 @@ Recent Activity
   (async () => {
 
   const response = await fetch(
-    `http://localhost:3000/api/transactions/history/${window.getCurrentUserId()}`,
+    `http://10.148.199.19:3000/api/transactions/history/${window.getCurrentUserId()}`,
     {
       headers: {
         Authorization: `Bearer ${window.getToken()}`

@@ -8,7 +8,7 @@ window.rejectReq = async (type, STRId) => {
         : `/api/validator/withdraw/reject/${STRId}`;
 
     const response = await fetch(
-      `http://localhost:3000${endpoint}`,
+      `http://10.148.199.19:3000${endpoint}`,
       {
         method: "PATCH",
         headers: {
