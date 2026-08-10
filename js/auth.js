@@ -5,7 +5,7 @@ window.googleLogin = async () => {
     try {
 
       const apiResponse = await fetch(
-        "http://localhost:3000/api/users/login/google",
+        "http://10.148.199.19:3000/api/users/login/google",
         {
           method: "POST",
           headers: {
@@ -51,7 +51,7 @@ window.googleResetLogin = async () => {
       try {
 
         const apiResponse = await fetch(
-          "http://localhost:3000/api/users/login/google",
+          "http://10.148.199.19:3000/api/users/login/google",
           {
             method: "POST",
             headers: {

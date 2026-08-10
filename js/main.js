@@ -160,7 +160,7 @@ window.updatePassword = async () => {
     return alert("Reset session expired.");
   }
 
- const response = await fetch("http://localhost:3000/api/users/reset-password", {
+ const response = await fetch("http://10.148.199.19:3000/api/users/reset-password", {
   method: "PATCH",
   headers: {
     "Content-Type": "application/json"
@@ -206,7 +206,7 @@ window.saveUsername = async () => {
 
   const newStbxId = generateSTBX();
 
-  const response = await fetch("http://localhost:3000/api/users/register", {
+  const response = await fetch("http://10.148.199.19:3000/api/users/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -247,7 +247,7 @@ async function manualLogin() {
     return alert("Fill all fields");
   }
 
-  const response = await fetch("http://localhost:3000/api/users/login", {
+  const response = await fetch("http://10.148.199.19:3000/api/users/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
