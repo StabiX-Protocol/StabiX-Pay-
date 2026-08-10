@@ -322,7 +322,7 @@ WHERE google_uid = $1`,
 if (result.rows.length === 0) {
 return res.status(404).json({
 success: false,
-message: "No StabiX account found."
+message: "No StabiX account found with this Google account."
 });
 }
 
@@ -338,11 +338,11 @@ token
 });
 
 } catch (err) {
-console.error("Google Login Error:", err);
+console.error(err);
 
 return res.status(401).json({
 success: false,
-message: "Invalid Google login"
+message: "Invalid Google ID token"
 });
 }
 };
