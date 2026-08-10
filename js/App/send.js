@@ -42,7 +42,7 @@ return
 
 try{
 const response = await fetch(
-`http://http://10.148.199.19:3000localhost:3000/api/users/profile/${toWallet}`,
+`http://10.148.199.19:3000/api/users/profile/${toWallet}`,
 {
 headers: {
 Authorization: `Bearer ${window.getToken()}`
