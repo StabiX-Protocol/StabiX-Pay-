@@ -1,6 +1,8 @@
 const pool = require("../config/db");
 const { generateToken } = require("../utils/jwt");
 const bcrypt = require("bcrypt");
+const { OAuth2Client } = require("google-auth-library");
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const loginUser = async (req, res) => {
 try {
@@ -113,14 +115,45 @@ const registerUser = async (req, res) => {
 const client = await pool.connect();
 try {
 await client.query("BEGIN");
-const { stbx_uid, google_uid, username, eoa_address, password } = req.body;
+const { stbx_uid, google_id_token, google_uid, username, eoa_address, password } = req.body;
+
+let finalGoogleUid = google_uid || null;
+
+if (google_id_token) {
+const ticket = await googleClient.verifyIdToken({
+idToken: google_id_token,
+audience: process.env.GOOGLE_CLIENT_ID
+});
+
+const payload = ticket.getPayload();
+finalGoogleUid = payload.sub;
+
+const existingGoogleUser = await client.query(
+`SELECT stbx_uid
+FROM users
+WHERE google_uid = $1`,
+[finalGoogleUid]
+);
+
+if (existingGoogleUser.rows.length > 0) {
+await client.query("ROLLBACK");
+
+return res.status(409).json({
+success: false,
+message: "This Google account is already linked to a StabiX account",
+stbx_uid: existingGoogleUser.rows[0].stbx_uid
+});
+}
+}
+
 const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
+
 const result = await client.query(
 `INSERT INTO users
 (stbx_uid, google_uid, username, eoa_address, password)
 VALUES ($1, $2, $3, $4, $5)
 RETURNING *`,
-[stbx_uid, google_uid, username, eoa_address, hashedPassword]
+[stbx_uid, finalGoogleUid, username, eoa_address, hashedPassword]
 );
 
 await client.query(
@@ -288,8 +321,6 @@ client.release();
 };
 
 
-const { OAuth2Client } = require("google-auth-library");
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const googleLogin = async (req, res) => {
 try {
 const { id_token } = req.body;
