@@ -76,7 +76,7 @@ appDiv(`
 <div class="auth-box">
 <h2>Create Account</h2>
 
-<button class="google-btn" onclick="googleLogin()">
+<button class="google-btn" onclick="googleSignup()">
 <img src="media/google-logo.png" class="google-icon" alt="Google">
 <span>Continue with Google</span>
 </button>
@@ -204,7 +204,11 @@ window.saveUsername = async () => {
     return alert("Passwords do not match");
   }
 
-  const newStbxId = generateSTBX();
+  const googleToken = localStorage.getItem("pending_google_token");
+
+  if (!googleToken) {
+    return alert("Google signup session expired. Please try again.");
+  }
 
   const response = await fetch("http://10.148.199.19:3000/api/users/register", {
     method: "POST",
@@ -212,8 +216,8 @@ window.saveUsername = async () => {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      stbx_uid: newStbxId,
-      google_uid: localStorage.getItem("stbx_google_uid") || "",
+      stbx_uid: generateSTBX(),
+      google_id_token: googleToken,
       username,
       password
     })
@@ -233,6 +237,8 @@ window.saveUsername = async () => {
   if (data.user.google_uid) {
     localStorage.setItem("stbx_google_uid", data.user.google_uid);
   }
+
+  localStorage.removeItem("pending_google_token");
 
   location.reload();
 

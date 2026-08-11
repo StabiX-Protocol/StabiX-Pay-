@@ -1,5 +1,4 @@
 window.googleLogin = async () => {
-
   window.initializeGoogleLogin(async (response) => {
 
     try {
@@ -19,20 +18,31 @@ window.googleLogin = async () => {
 
       const data = await apiResponse.json();
 
-      if (!apiResponse.ok) {
-        alert(data.message || "No StabiX account found with this Google account.");
+      if (apiResponse.ok) {
+
+        window.setToken(data.token);
+        localStorage.setItem("stbx_uid", data.user.stbx_uid);
+        localStorage.setItem("stbx_google_uid", data.user.google_uid);
+
+        location.reload();
         return;
       }
-      
-      window.setToken(data.token);
-      localStorage.setItem("stbx_uid", data.user.stbx_uid);
-      localStorage.setItem("stbx_google_uid", data.user.google_uid);
 
-      location.reload();
+      if (apiResponse.status === 404) {
+
+        localStorage.setItem("pending_google_token", response.credential);
+
+        renderUsernameSetup();
+        return;
+      }
+
+      alert(data.message || "Google login failed.");
 
     } catch (e) {
+
       console.log("Google Login Error:", e);
       alert(e.message);
+
     }
 
   });
@@ -41,6 +51,28 @@ window.googleLogin = async () => {
 
 };
 
+window.googleSignup = async () => {
+
+  window.initializeGoogleLogin(async (response) => {
+
+    try {
+
+      localStorage.setItem("pending_google_token", response.credential);
+
+      renderUsernameSetup();
+
+    } catch (e) {
+
+      console.log("Google Signup Error:", e);
+      alert(e.message);
+
+    }
+
+  });
+
+  google.accounts.id.prompt();
+
+};
 
 window.googleResetLogin = async () => {
 
