@@ -18,7 +18,6 @@ window.initializeGoogleLogin = function (callback) {
     use_fedcm_for_prompt: false
   });
 
-  google.accounts.id.prompt();
 };
 
 
