@@ -25,7 +25,7 @@ app.use("/api/validator", validatorRoutes);
 
 pool.connect()
 .then(() => {
-console.log("✅ Server Connected");
+console.log("✅ Server Start");
 })
 .catch((err) => {
 console.error("❌ Server Connection Failed");

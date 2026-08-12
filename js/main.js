@@ -204,7 +204,7 @@ window.saveUsername = async () => {
     return alert("Passwords do not match");
   }
 
-  const googleToken = localStorage.getItem("pending_google_token");
+  const googleToken = window.pendingGoogleToken;
 
   if (!googleToken) {
     return alert("Google signup session expired. Please try again.");
@@ -216,8 +216,7 @@ window.saveUsername = async () => {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      stbx_uid: generateSTBX(),
-      google_id_token: googleToken,
+      google_id_token: window.pendingGoogleToken ,
       username,
       password
     })

@@ -28,14 +28,6 @@ window.googleLogin = async () => {
         return;
       }
 
-      if (apiResponse.status === 404) {
-
-        localStorage.setItem("pending_google_token", response.credential);
-
-        renderUsernameSetup();
-        return;
-      }
-
       alert(data.message || "Google login failed.");
 
     } catch (e) {
@@ -57,15 +49,14 @@ window.googleSignup = async () => {
 
     try {
 
-      localStorage.setItem("pending_google_token", response.credential);
+      window.pendingGoogleToken = response.credential;
 
       renderUsernameSetup();
 
     } catch (e) {
 
-      console.log("Google Signup Error:", e);
-      alert(e.message);
-
+      console.error("Google Signup Error:", e);
+      alert("Google signup failed");
     }
 
   });
@@ -73,7 +64,6 @@ window.googleSignup = async () => {
   google.accounts.id.prompt();
 
 };
-
 window.googleResetLogin = async () => {
 
   try {
