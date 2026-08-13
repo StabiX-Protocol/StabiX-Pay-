@@ -3,6 +3,7 @@ const { generateToken } = require("../utils/jwt");
 const bcrypt = require("bcrypt");
 const { OAuth2Client } = require("google-auth-library");
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const jwt = require("jsonwebtoken")
 
 const loginUser = async (req, res) => {
 try {
@@ -112,76 +113,115 @@ message: "Internal Server Error"
 };
 
 const registerUser = async (req, res) => {
-const client = await pool.connect();
-try {
-await client.query("BEGIN");
-const { stbx_uid, google_id_token, google_uid, username, eoa_address, password } = req.body;
+  const client = await pool.connect();
 
-let finalGoogleUid = google_uid || null;
+  try {
+    await client.query("BEGIN");
 
-if (google_id_token) {
-const ticket = await googleClient.verifyIdToken({
-idToken: google_id_token,
-audience: process.env.GOOGLE_CLIENT_ID
-});
+    const {
+      stbx_uid,
+      google_id_token,
+      google_uid,
+      username,
+      eoa_address,
+      password
+    } = req.body;
 
-const payload = ticket.getPayload();
-finalGoogleUid = payload.sub;
+    let finalGoogleUid = google_uid || null;
 
-const existingGoogleUser = await client.query(
-`SELECT stbx_uid
-FROM users
-WHERE google_uid = $1`,
-[finalGoogleUid]
-);
+    if (google_id_token) {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: google_id_token,
+        audience: process.env.GOOGLE_CLIENT_ID
+      });
 
-if (existingGoogleUser.rows.length > 0) {
-await client.query("ROLLBACK");
+      const payload = ticket.getPayload();
 
-return res.status(409).json({
-success: false,
-message: "This Google account is already linked to a StabiX account",
-stbx_uid: existingGoogleUser.rows[0].stbx_uid
-});
-}
-}
+      finalGoogleUid = payload.sub;
 
-const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
+      const existingGoogleUser = await client.query(
+        `SELECT stbx_uid
+         FROM users
+         WHERE google_uid = $1`,
+        [finalGoogleUid]
+      );
 
-const result = await client.query(
-`INSERT INTO users
-(stbx_uid, google_uid, username, eoa_address, password)
-VALUES ($1, $2, $3, $4, $5)
-RETURNING *`,
-[stbx_uid, finalGoogleUid, username, eoa_address, hashedPassword]
-);
+      if (existingGoogleUser.rows.length > 0) {
+        await client.query("ROLLBACK");
 
-await client.query(
-`INSERT INTO username_history
-(user_id, username, is_current)
-VALUES ($1, $2, TRUE)`,
-[result.rows[0].id, username]
-);
+        return res.status(409).json({
+          success: false,
+          message: "This Google account is already linked to a StabiX account",
+          stbx_uid: existingGoogleUser.rows[0].stbx_uid
+        });
+      }
+    }
 
-await client.query("COMMIT");
-res.status(201).json({
-success: true,
-message: "User registered successfully",
-user: result.rows[0]
-});
+    const hashedPassword = password
+      ? await bcrypt.hash(password, 10)
+      : null;
 
-} catch (err) {
-await client.query("ROLLBACK");
-console.error(err);
+    const result = await client.query(
+      `INSERT INTO users
+       (stbx_uid, google_uid, username, eoa_address, password)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [
+        stbx_uid,
+        finalGoogleUid,
+        username,
+        eoa_address,
+        hashedPassword
+      ]
+    );
 
-res.status(500).json({
-success: false,
-message: "Registration failed"
-});
+    await client.query(
+      `INSERT INTO username_history
+       (user_id, username, is_current)
+       VALUES ($1, $2, TRUE)`,
+      [result.rows[0].id, username]
+    );
 
-} finally {
-client.release();
-}
+    await client.query("COMMIT");
+
+    const token = jwt.sign(
+      {
+        stbx_uid: result.rows[0].stbx_uid,
+        user_id: result.rows[0].id,
+        role: result.rows[0].role
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d"
+      }
+    );
+
+    return res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      token,
+      user: {
+        stbx_uid: result.rows[0].stbx_uid,
+        google_uid: result.rows[0].google_uid,
+        username: result.rows[0].username,
+        eoa_address: result.rows[0].eoa_address,
+        role: result.rows[0].role
+      }
+    });
+
+  } catch (err) {
+    await client.query("ROLLBACK");
+
+    console.error("REGISTER ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Registration failed"
+    });
+
+  } finally {
+    client.release();
+  }
 };
 
 const getUser = async (req, res) => {

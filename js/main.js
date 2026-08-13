@@ -231,16 +231,16 @@ window.saveUsername = async () => {
 
   window.WALLET = data.user.stbx_uid;
 
-  localStorage.setItem("stbx_uid", data.user.stbx_uid);
+window.setToken(data.token);
+localStorage.setItem("stbx_uid", data.user.stbx_uid);
 
-  if (data.user.google_uid) {
-    localStorage.setItem("stbx_google_uid", data.user.google_uid);
-  }
+if (data.user.google_uid) {
+  localStorage.setItem("stbx_google_uid", data.user.google_uid);
+}
 
-  localStorage.removeItem("pending_google_token");
+localStorage.removeItem("pending_google_token");
 
-  location.reload();
-
+location.reload();
 };
 
 async function manualLogin() {
@@ -269,17 +269,18 @@ async function manualLogin() {
 return alert(data.message);
 }
 
+window.WALLET = data.user.stbx_uid;
+
 window.setToken(data.token);
 localStorage.setItem("stbx_uid", data.user.stbx_uid);
 
-  if (data.user.google_uid) {
-    localStorage.setItem("stbx_google_uid", data.user.google_uid);
-  } else {
-    localStorage.removeItem("stbx_google_uid");
-  }
+if (data.user.google_uid) {
+  localStorage.setItem("stbx_google_uid", data.user.google_uid);
+}
 
-  location.reload();
+localStorage.removeItem("pending_google_token");
 
+location.reload();
 }
 
 window.manualLogin = manualLogin;
