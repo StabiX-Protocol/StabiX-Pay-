@@ -179,6 +179,7 @@ if (!response.ok) {
 }
 
 localStorage.removeItem("reset_uid");
+localStorage.removeItem("reset_google_token");
 
 alert("Password updated successfully.");
 
