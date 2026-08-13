@@ -1,65 +1,93 @@
-
 window.GOOGLE_CLIENT_ID =
   "555121729616-a7a7ertm7i6pgfaps0s2mc9l3v6p6fci.apps.googleusercontent.com";
 
-window.initializeGoogleLogin = function (callback) {
 
-  if (
-    !window.google ||
-    !google.accounts ||
-    !google.accounts.id
-  ) {
-    console.error("Google Identity Services not loaded");
-    alert("Google login is unavailable.");
-    return false;
+let googleInitialized = false;
+let googleAuthMode = null;
+
+
+/* =========================================
+   GOOGLE CALLBACK
+========================================= */
+
+async function handleGoogleCredential(response) {
+
+  console.log("🔥 GOOGLE CALLBACK RECEIVED");
+
+  if (!response || !response.credential) {
+    console.error("❌ Google credential missing");
+    alert("Google authentication failed.");
+    return;
   }
 
-  google.accounts.id.initialize({
-    client_id: window.GOOGLE_CLIENT_ID,
-    callback: callback,
-    auto_select: false
-  });
+  console.log(
+    "Credential exists:",
+    true
+  );
 
-  return true;
-};
+  console.log(
+    "Credential length:",
+    response.credential.length
+  );
 
 
+  /* ================================
+     GOOGLE SIGNUP
+  ================================= */
 
-window.googleLogin = function () {
+  if (googleAuthMode === "signup") {
 
-  console.log("=== GOOGLE LOGIN START ===");
+    console.log("🟢 GOOGLE SIGNUP");
 
-  window.initializeGoogleLogin(async (response) => {
+    localStorage.setItem(
+      "pending_google_token",
+      response.credential
+    );
 
-    console.log("Google callback received:", response);
+    renderUsernameSetup();
+
+    return;
+  }
+
+
+  /* ================================
+     GOOGLE LOGIN
+  ================================= */
+
+  if (googleAuthMode === "login") {
+
+    console.log("🟢 GOOGLE LOGIN");
 
     try {
-
-      if (!response || !response.credential) {
-        console.error("No Google credential received");
-        alert("Google authentication failed.");
-        return;
-      }
-
-      console.log("Google ID token received");
 
       const apiResponse = await fetch(
         "http://10.148.199.19:3000/api/users/login/google",
         {
           method: "POST",
+
           headers: {
             "Content-Type": "application/json"
           },
+
           body: JSON.stringify({
             id_token: response.credential
           })
         }
       );
 
+
       const data = await apiResponse.json();
 
-      console.log("Google API status:", apiResponse.status);
-      console.log("Google API response:", data);
+      console.log(
+        "Google Login API:",
+        apiResponse.status,
+        data
+      );
+
+
+      /* ================================
+         EXISTING ACCOUNT
+      ================================= */
 
       if (apiResponse.ok) {
 
@@ -71,15 +99,23 @@ window.googleLogin = function () {
         );
 
         if (data.user.google_uid) {
+
           localStorage.setItem(
             "stbx_google_uid",
             data.user.google_uid
           );
+
         }
 
         location.reload();
+
         return;
       }
+
+
+      /* ================================
+         GOOGLE ACCOUNT NOT REGISTERED
+      ================================= */
 
       if (apiResponse.status === 404) {
 
@@ -89,167 +125,276 @@ window.googleLogin = function () {
         );
 
         renderUsernameSetup();
+
         return;
       }
 
+
       alert(
-        data.message || "Google login failed."
+        data.message ||
+        "Google login failed."
       );
 
-    } catch (e) {
+    } catch (error) {
 
-      console.error("Google Login Error:", e);
-      alert("Google login failed. Check console.");
-
-    }
-
-  });
-
-  console.log("Calling Google prompt...");
-
-  google.accounts.id.prompt((notification) => {
-
-    console.log("Google prompt notification:", notification);
-
-    if (notification.isNotDisplayed()) {
       console.error(
-        "Google prompt NOT displayed:",
-        notification.getNotDisplayedReason()
+        "❌ Google Login Error:",
+        error
+      );
+
+      alert(
+        "Google login failed. Please try again."
       );
     }
 
-    if (notification.isSkippedMoment()) {
-      console.warn(
-        "Google prompt skipped:",
-        notification.getSkippedReason()
-      );
-    }
-
-    if (notification.isDismissedMoment()) {
-      console.warn(
-        "Google prompt dismissed:",
-        notification.getDismissedReason()
-      );
-    }
-
-  });
-
-};
+    return;
+  }
 
 
-window.googleSignup = async () => {
+  /* ================================
+     GOOGLE RESET
+  ================================= */
 
-  const initialized = window.initializeGoogleLogin((response) => {
+  if (googleAuthMode === "reset") {
 
-    if (!response || !response.credential) {
-      alert("Google authentication failed.");
-      return;
-    }
+    console.log("🟢 GOOGLE PASSWORD RESET");
 
-    localStorage.setItem(
-      "pending_google_token",
-      response.credential
-    );
+    try {
 
-    renderUsernameSetup();
-  });
+      const apiResponse = await fetch(
+        "http://10.148.199.19:3000/api/users/login/google",
+        {
+          method: "POST",
 
-  if (!initialized) return;
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-  google.accounts.id.prompt();
-};
-
-
-window.googleResetLogin = async () => {
-
-  try {
-
-    window.initializeGoogleLogin(async (response) => {
-
-      try {
-
-        if (!response || !response.credential) {
-          alert("Google authentication failed.");
-          return;
+          body: JSON.stringify({
+            id_token: response.credential
+          })
         }
-
-        const apiResponse = await fetch(
-          "http://10.148.199.19:3000/api/users/login/google",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              id_token: response.credential
-            })
-          }
-        );
-
-        const data = await apiResponse.json();
+      );
 
 
-        if (!apiResponse.ok) {
-
-          alert(
-            data.message ||
-            "No StabiX account found with this Google account."
-          );
-
-          return;
-        }
+      const data = await apiResponse.json();
 
 
-        
-
-        localStorage.setItem(
-          "reset_uid",
-          data.user.stbx_uid
-        );
-
-
-       
-
-        localStorage.setItem(
-          "reset_google_token",
-          response.credential
-        );
+      console.log(
+        "Google Reset API:",
+        apiResponse.status,
+        data
+      );
 
 
-        renderResetPassword();
-
-      } catch (e) {
-
-        console.error(
-          "Google Reset Error:",
-          e
-        );
+      if (!apiResponse.ok) {
 
         alert(
-          "Google verification failed."
+          data.message ||
+          "No StabiX account found with this Google account."
         );
+
+        return;
       }
 
-    });
 
-  } catch (e) {
+      localStorage.setItem(
+        "reset_uid",
+        data.user.stbx_uid
+      );
+
+
+      localStorage.setItem(
+        "reset_google_token",
+        response.credential
+      );
+
+
+      renderResetPassword();
+
+    } catch (error) {
+
+      console.error(
+        "❌ Google Reset Error:",
+        error
+      );
+
+      alert(
+        "Google verification failed."
+      );
+    }
+
+    return;
+  }
+
+}
+
+
+/* =========================================
+   INITIALIZE GOOGLE — ONLY ONCE
+========================================= */
+
+window.initializeGoogleLogin = function () {
+
+  if (googleInitialized) {
+
+    console.log(
+      "✅ Google GIS already initialized"
+    );
+
+    return true;
+  }
+
+
+  if (
+    !window.google ||
+    !window.google.accounts ||
+    !window.google.accounts.id
+  ) {
 
     console.error(
-      "Google Reset Error:",
-      e
+      "❌ Google Identity Services not loaded"
     );
 
     alert(
-      "Google verification failed."
+      "Google login is unavailable. Please try again."
     );
+
+    return false;
   }
+
+
+  google.accounts.id.initialize({
+
+    client_id:
+      window.GOOGLE_CLIENT_ID,
+
+    callback:
+      handleGoogleCredential,
+
+    auto_select:
+      false,
+
+    use_fedcm_for_prompt:
+      false
+
+  });
+
+
+  googleInitialized = true;
+
+
+  console.log(
+    "✅ Google GIS initialized ONCE"
+  );
+
+
+  return true;
+};
+
+
+/* =========================================
+   START GOOGLE AUTH
+========================================= */
+
+function startGoogleAuth(mode) {
+
+  console.log(
+    "Starting Google auth:",
+    mode
+  );
+
+
+  googleAuthMode = mode;
+
+
+  const initialized =
+    window.initializeGoogleLogin();
+
+
+  if (!initialized) {
+    return;
+  }
+
+
+  console.log(
+    "Opening Google account selector..."
+  );
+
+
+  google.accounts.id.prompt(
+    (notification) => {
+
+      console.log(
+        "Google prompt notification:",
+        notification
+      );
+
+      if (
+        notification.isNotDisplayed()
+      ) {
+
+        console.warn(
+          "⚠️ Google prompt not displayed:",
+          notification.getNotDisplayedReason()
+        );
+      }
+
+
+      if (
+        notification.isSkippedMoment()
+      ) {
+
+        console.warn(
+          "⚠️ Google prompt skipped:",
+          notification.getSkippedReason()
+        );
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================
+   LOGIN BUTTON
+========================================= */
+
+window.googleLogin = function () {
+
+  startGoogleAuth("login");
 
 };
 
 
+/* =========================================
+   SIGNUP BUTTON
+========================================= */
+
+window.googleSignup = function () {
+
+  startGoogleAuth("signup");
+
+};
 
 
-window.googleLogout = () => {
+/* =========================================
+   RESET PASSWORD BUTTON
+========================================= */
+
+window.googleResetLogin = function () {
+
+  startGoogleAuth("reset");
+
+};
+
+
+/* =========================================
+   LOGOUT
+========================================= */
+
+window.googleLogout = function () {
 
   window.clearSession();
 
@@ -270,13 +415,20 @@ window.googleLogout = () => {
   );
 
 
+  googleAuthMode = null;
+
+
   if (
     window.google &&
     google.accounts &&
     google.accounts.id
   ) {
+
     google.accounts.id.disableAutoSelect();
+
   }
 
+
   location.reload();
+
 };
