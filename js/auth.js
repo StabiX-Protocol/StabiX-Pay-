@@ -25,16 +25,23 @@ window.initializeGoogleLogin = function (callback) {
 
 
 
-window.googleLogin = async () => {
+window.googleLogin = function () {
 
-  const initialized = window.initializeGoogleLogin(async (response) => {
+  console.log("=== GOOGLE LOGIN START ===");
+
+  window.initializeGoogleLogin(async (response) => {
+
+    console.log("Google callback received:", response);
 
     try {
 
       if (!response || !response.credential) {
+        console.error("No Google credential received");
         alert("Google authentication failed.");
         return;
       }
+
+      console.log("Google ID token received");
 
       const apiResponse = await fetch(
         "http://10.148.199.19:3000/api/users/login/google",
@@ -51,6 +58,9 @@ window.googleLogin = async () => {
 
       const data = await apiResponse.json();
 
+      console.log("Google API status:", apiResponse.status);
+      console.log("Google API response:", data);
+
       if (apiResponse.ok) {
 
         window.setToken(data.token);
@@ -60,10 +70,12 @@ window.googleLogin = async () => {
           data.user.stbx_uid
         );
 
-        localStorage.setItem(
-          "stbx_google_uid",
-          data.user.google_uid
-        );
+        if (data.user.google_uid) {
+          localStorage.setItem(
+            "stbx_google_uid",
+            data.user.google_uid
+          );
+        }
 
         location.reload();
         return;
@@ -80,20 +92,48 @@ window.googleLogin = async () => {
         return;
       }
 
-      alert(data.message || "Google login failed.");
+      alert(
+        data.message || "Google login failed."
+      );
 
-    } catch (err) {
+    } catch (e) {
 
-      console.error("Google Login Error:", err);
-      alert("Google login failed.");
+      console.error("Google Login Error:", e);
+      alert("Google login failed. Check console.");
 
     }
 
   });
 
-  if (!initialized) return;
+  console.log("Calling Google prompt...");
 
-  google.accounts.id.prompt();
+  google.accounts.id.prompt((notification) => {
+
+    console.log("Google prompt notification:", notification);
+
+    if (notification.isNotDisplayed()) {
+      console.error(
+        "Google prompt NOT displayed:",
+        notification.getNotDisplayedReason()
+      );
+    }
+
+    if (notification.isSkippedMoment()) {
+      console.warn(
+        "Google prompt skipped:",
+        notification.getSkippedReason()
+      );
+    }
+
+    if (notification.isDismissedMoment()) {
+      console.warn(
+        "Google prompt dismissed:",
+        notification.getDismissedReason()
+      );
+    }
+
+  });
+
 };
 
 
