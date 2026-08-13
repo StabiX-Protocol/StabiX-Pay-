@@ -2,30 +2,32 @@
 window.GOOGLE_CLIENT_ID =
   "555121729616-a7a7ertm7i6pgfaps0s2mc9l3v6p6fci.apps.googleusercontent.com";
 
-
-
 window.initializeGoogleLogin = function (callback) {
 
-  if (!window.google || !google.accounts || !google.accounts.id) {
+  if (
+    !window.google ||
+    !google.accounts ||
+    !google.accounts.id
+  ) {
     console.error("Google Identity Services not loaded");
-    alert("Google login is unavailable. Please try again.");
-    return;
+    alert("Google login is unavailable.");
+    return false;
   }
 
   google.accounts.id.initialize({
     client_id: window.GOOGLE_CLIENT_ID,
     callback: callback,
-    use_fedcm_for_prompt: false
+    auto_select: false
   });
 
+  return true;
 };
-
 
 
 
 window.googleLogin = async () => {
 
-  window.initializeGoogleLogin(async (response) => {
+  const initialized = window.initializeGoogleLogin(async (response) => {
 
     try {
 
@@ -49,7 +51,6 @@ window.googleLogin = async () => {
 
       const data = await apiResponse.json();
 
-
       if (apiResponse.ok) {
 
         window.setToken(data.token);
@@ -59,18 +60,14 @@ window.googleLogin = async () => {
           data.user.stbx_uid
         );
 
-        if (data.user.google_uid) {
-          localStorage.setItem(
-            "stbx_google_uid",
-            data.user.google_uid
-          );
-        }
+        localStorage.setItem(
+          "stbx_google_uid",
+          data.user.google_uid
+        );
 
         location.reload();
         return;
       }
-
-
 
       if (apiResponse.status === 404) {
 
@@ -83,68 +80,44 @@ window.googleLogin = async () => {
         return;
       }
 
+      alert(data.message || "Google login failed.");
 
-      alert(
-        data.message ||
-        "Google login failed."
-      );
+    } catch (err) {
 
-    } catch (e) {
+      console.error("Google Login Error:", err);
+      alert("Google login failed.");
 
-      console.error(
-        "Google Login Error:",
-        e
-      );
-
-      alert(
-        "Google login failed. Please try again."
-      );
     }
 
   });
 
+  if (!initialized) return;
+
+  google.accounts.id.prompt();
 };
-
-
 
 
 window.googleSignup = async () => {
 
-  window.initializeGoogleLogin(async (response) => {
+  const initialized = window.initializeGoogleLogin((response) => {
 
-    try {
-
-      if (!response || !response.credential) {
-        alert("Google authentication failed.");
-        return;
-      }
-
-     
-
-      localStorage.setItem(
-        "pending_google_token",
-        response.credential
-      );
-
-      renderUsernameSetup();
-
-    } catch (e) {
-
-      console.error(
-        "Google Signup Error:",
-        e
-      );
-
-      alert(
-        "Google signup failed."
-      );
+    if (!response || !response.credential) {
+      alert("Google authentication failed.");
+      return;
     }
 
+    localStorage.setItem(
+      "pending_google_token",
+      response.credential
+    );
+
+    renderUsernameSetup();
   });
 
+  if (!initialized) return;
+
+  google.accounts.id.prompt();
 };
-
-
 
 
 window.googleResetLogin = async () => {
