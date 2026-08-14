@@ -189,59 +189,165 @@ renderSetup();
 
 window.saveUsername = async () => {
 
-  const username = document.getElementById("uname").value.trim().toLowerCase();
-  const password = document.getElementById("signupPwd").value.trim();
-  const confirm = document.getElementById("confirmPwd").value.trim();
+  const username =
+    document.getElementById("uname").value.trim().toLowerCase();
+
+  const password =
+    document.getElementById("signupPwd").value.trim();
+
+  const confirm =
+    document.getElementById("confirmPwd").value.trim();
+
 
   if (!username || !password || !confirm) {
     return alert("Fill all fields");
   }
 
+
   if (password.length < 6) {
     return alert("Password must be at least 6 characters");
   }
+
 
   if (password !== confirm) {
     return alert("Passwords do not match");
   }
 
-  const googleToken = window.pendingGoogleToken;
+
+  /* =================================
+     GET GOOGLE TOKEN
+  ================================= */
+
+  const googleToken =
+    localStorage.getItem("pending_google_token");
+
 
   if (!googleToken) {
-    return alert("Google signup session expired. Please try again.");
+    return alert(
+      "Google signup session expired. Please try again."
+    );
   }
 
-  const response = await fetch("http://10.148.199.19:3000/api/users/register", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      google_id_token: window.pendingGoogleToken ,
-      username,
-      password
-    })
-  });
 
-  const data = await response.json();
+  console.log(
+    "✅ Pending Google token found:",
+    googleToken.length
+  );
 
-  if (!response.ok) {
-    alert(data.message);
-    return;
+
+  /* =================================
+     REGISTER USER
+  ================================= */
+
+  try {
+
+    const response = await fetch(
+      "http://10.148.199.19:3000/api/users/register",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+
+          google_id_token:
+            googleToken,
+
+          username:
+            username,
+
+          password:
+            password
+
+        })
+      }
+    );
+
+
+    const data =
+      await response.json();
+
+
+    console.log(
+      "Google Signup API:",
+      response.status,
+      data
+    );
+
+
+    if (!response.ok) {
+
+      alert(
+        data.message ||
+        "Google signup failed."
+      );
+
+      return;
+    }
+
+
+    /* =================================
+       ACCOUNT CREATED
+    ================================= */
+
+    window.WALLET =
+      data.user.stbx_uid;
+
+
+    window.setToken(
+      data.token
+    );
+
+
+    localStorage.setItem(
+      "stbx_uid",
+      data.user.stbx_uid
+    );
+
+
+    if (data.user.google_uid) {
+
+      localStorage.setItem(
+        "stbx_google_uid",
+        data.user.google_uid
+      );
+
+    }
+
+
+    /* =================================
+       REMOVE TEMP GOOGLE TOKEN
+    ================================= */
+
+    localStorage.removeItem(
+      "pending_google_token"
+    );
+
+
+    console.log(
+      "✅ Google account created successfully"
+    );
+
+
+    location.reload();
+
+
+  } catch (error) {
+
+    console.error(
+      "❌ Google Signup Error:",
+      error
+    );
+
+
+    alert(
+      "Google signup failed. Please try again."
+    );
+
   }
 
-  window.WALLET = data.user.stbx_uid;
-
-window.setToken(data.token);
-localStorage.setItem("stbx_uid", data.user.stbx_uid);
-
-if (data.user.google_uid) {
-  localStorage.setItem("stbx_google_uid", data.user.google_uid);
-}
-
-localStorage.removeItem("pending_google_token");
-
-location.reload();
 };
 
 async function manualLogin() {
