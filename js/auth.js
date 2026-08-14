@@ -4,11 +4,6 @@ window.GOOGLE_CLIENT_ID =
 let googleInitialized = false;
 let googleAuthMode = null;
 
-
-/* =========================================
-   GOOGLE CALLBACK
-========================================= */
-
 async function handleGoogleCredential(response) {
 
   console.log("🔥 GOOGLE CALLBACK RECEIVED");
@@ -25,9 +20,6 @@ async function handleGoogleCredential(response) {
   );
 
 
-  /* =========================
-     SIGNUP
-  ========================= */
 
   if (googleAuthMode === "signup") {
 
@@ -43,10 +35,6 @@ async function handleGoogleCredential(response) {
     return;
   }
 
-
-  /* =========================
-     LOGIN
-  ========================= */
 
   if (googleAuthMode === "login") {
 
@@ -134,9 +122,6 @@ async function handleGoogleCredential(response) {
   }
 
 
-  /* =========================
-     RESET PASSWORD
-  ========================= */
 
   if (googleAuthMode === "reset") {
 
@@ -207,10 +192,6 @@ async function handleGoogleCredential(response) {
 }
 
 
-/* =========================================
-   GOOGLE INITIALIZATION
-========================================= */
-
 window.initializeGoogleLogin = function () {
 
   if (
@@ -268,10 +249,6 @@ window.initializeGoogleLogin = function () {
 };
 
 
-/* =========================================
-   START GOOGLE AUTH
-========================================= */
-
 window.startGoogleAuth = function (mode) {
 
   console.log(
@@ -297,11 +274,6 @@ window.startGoogleAuth = function (mode) {
 };
 
 
-/* =========================================
-   OLD BUTTON FUNCTIONS
-   KEPT FOR COMPATIBILITY
-========================================= */
-
 window.googleLogin = function () {
 
   window.startGoogleAuth("login");
@@ -322,10 +294,6 @@ window.googleResetLogin = function () {
 
 };
 
-
-/* =========================================
-   OFFICIAL GOOGLE BUTTON RENDER
-========================================= */
 
 window.renderGoogleLoginButton = function () {
 
@@ -416,10 +384,6 @@ window.renderGoogleResetButton = function () {
 
 };
 
-
-/* =========================================
-   LOGOUT
-========================================= */
 
 window.googleLogout = function () {
 

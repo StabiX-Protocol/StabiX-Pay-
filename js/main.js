@@ -43,7 +43,7 @@ appDiv(`
 <div id="googleLoginButton"></div>
 
 <div class="auth-links">
-<span class="auth-link" onclick="renderSignup();">
+<span class="auth-link" onclick="renderSetup();">
 Create Account
 </span>
 
@@ -251,16 +251,19 @@ window.saveUsername = async () => {
 
         body: JSON.stringify({
 
-          google_id_token:
-            googleToken,
+  stbx_uid:
+    window.generateSTBX(),
 
-          username:
-            username,
+  google_id_token:
+    googleToken,
 
-          password:
-            password
+  username:
+    username,
 
-        })
+  password:
+    password
+
+})
       }
     );
 
