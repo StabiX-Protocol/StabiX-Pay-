@@ -85,10 +85,6 @@ async function handleGoogleCredential(response) {
       );
 
 
-      /* ================================
-         EXISTING ACCOUNT
-      ================================= */
-
       if (apiResponse.ok) {
 
         window.setToken(data.token);
@@ -112,10 +108,6 @@ async function handleGoogleCredential(response) {
         return;
       }
 
-
-      /* ================================
-         GOOGLE ACCOUNT NOT REGISTERED
-      ================================= */
 
       if (apiResponse.status === 404) {
 
@@ -329,6 +321,7 @@ function startGoogleAuth(mode) {
         "Google prompt notification:",
         notification
       );
+
 
       if (
         notification.isNotDisplayed()
