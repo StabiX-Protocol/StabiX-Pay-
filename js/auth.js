@@ -1,7 +1,6 @@
 window.GOOGLE_CLIENT_ID =
   "555121729616-a7a7ertm7i6pgfaps0s2mc9l3v6p6fci.apps.googleusercontent.com";
 
-
 let googleInitialized = false;
 let googleAuthMode = null;
 
@@ -21,19 +20,14 @@ async function handleGoogleCredential(response) {
   }
 
   console.log(
-    "Credential exists:",
-    true
-  );
-
-  console.log(
-    "Credential length:",
+    "✅ Google credential received:",
     response.credential.length
   );
 
 
-  /* ================================
-     GOOGLE SIGNUP
-  ================================= */
+  /* =========================
+     SIGNUP
+  ========================= */
 
   if (googleAuthMode === "signup") {
 
@@ -44,15 +38,15 @@ async function handleGoogleCredential(response) {
       response.credential
     );
 
-    renderUsernameSetup();
+    window.renderUsernameSetup();
 
     return;
   }
 
 
-  /* ================================
-     GOOGLE LOGIN
-  ================================= */
+  /* =========================
+     LOGIN
+  ========================= */
 
   if (googleAuthMode === "login") {
 
@@ -64,17 +58,14 @@ async function handleGoogleCredential(response) {
         "http://10.148.199.19:3000/api/users/login/google",
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json"
           },
-
           body: JSON.stringify({
             id_token: response.credential
           })
         }
       );
-
 
       const data = await apiResponse.json();
 
@@ -116,7 +107,7 @@ async function handleGoogleCredential(response) {
           response.credential
         );
 
-        renderUsernameSetup();
+        window.renderUsernameSetup();
 
         return;
       }
@@ -143,9 +134,9 @@ async function handleGoogleCredential(response) {
   }
 
 
-  /* ================================
-     GOOGLE RESET
-  ================================= */
+  /* =========================
+     RESET PASSWORD
+  ========================= */
 
   if (googleAuthMode === "reset") {
 
@@ -157,20 +148,16 @@ async function handleGoogleCredential(response) {
         "http://10.148.199.19:3000/api/users/login/google",
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json"
           },
-
           body: JSON.stringify({
             id_token: response.credential
           })
         }
       );
 
-
       const data = await apiResponse.json();
-
 
       console.log(
         "Google Reset API:",
@@ -195,14 +182,12 @@ async function handleGoogleCredential(response) {
         data.user.stbx_uid
       );
 
-
       localStorage.setItem(
         "reset_google_token",
         response.credential
       );
 
-
-      renderResetPassword();
+      window.renderResetPassword();
 
     } catch (error) {
 
@@ -223,20 +208,10 @@ async function handleGoogleCredential(response) {
 
 
 /* =========================================
-   INITIALIZE GOOGLE — ONLY ONCE
+   GOOGLE INITIALIZATION
 ========================================= */
 
 window.initializeGoogleLogin = function () {
-
-  if (googleInitialized) {
-
-    console.log(
-      "✅ Google GIS already initialized"
-    );
-
-    return true;
-  }
-
 
   if (
     !window.google ||
@@ -253,6 +228,16 @@ window.initializeGoogleLogin = function () {
     );
 
     return false;
+  }
+
+
+  if (googleInitialized) {
+
+    console.log(
+      "✅ Google GIS already initialized"
+    );
+
+    return true;
   }
 
 
@@ -275,11 +260,9 @@ window.initializeGoogleLogin = function () {
 
   googleInitialized = true;
 
-
   console.log(
-    "✅ Google GIS initialized ONCE"
+    "✅ Google GIS initialized"
   );
-
 
   return true;
 };
@@ -289,20 +272,17 @@ window.initializeGoogleLogin = function () {
    START GOOGLE AUTH
 ========================================= */
 
-function startGoogleAuth(mode) {
+window.startGoogleAuth = function (mode) {
 
   console.log(
-    "Starting Google auth:",
+    "🔥 Starting Google auth:",
     mode
   );
 
-
   googleAuthMode = mode;
-
 
   const initialized =
     window.initializeGoogleLogin();
-
 
   if (!initialized) {
     return;
@@ -310,75 +290,129 @@ function startGoogleAuth(mode) {
 
 
   console.log(
-    "Opening Google account selector..."
+    "Google mode:",
+    googleAuthMode
   );
 
-
-  google.accounts.id.prompt(
-    (notification) => {
-
-      console.log(
-        "Google prompt notification:",
-        notification
-      );
-
-
-      if (
-        notification.isNotDisplayed()
-      ) {
-
-        console.warn(
-          "⚠️ Google prompt not displayed:",
-          notification.getNotDisplayedReason()
-        );
-      }
-
-
-      if (
-        notification.isSkippedMoment()
-      ) {
-
-        console.warn(
-          "⚠️ Google prompt skipped:",
-          notification.getSkippedReason()
-        );
-      }
-
-    }
-  );
-
-}
+};
 
 
 /* =========================================
-   LOGIN BUTTON
+   OLD BUTTON FUNCTIONS
+   KEPT FOR COMPATIBILITY
 ========================================= */
 
 window.googleLogin = function () {
 
-  startGoogleAuth("login");
+  window.startGoogleAuth("login");
 
 };
 
-
-/* =========================================
-   SIGNUP BUTTON
-========================================= */
 
 window.googleSignup = function () {
 
-  startGoogleAuth("signup");
+  window.startGoogleAuth("signup");
+
+};
+
+
+window.googleResetLogin = function () {
+
+  window.startGoogleAuth("reset");
 
 };
 
 
 /* =========================================
-   RESET PASSWORD BUTTON
+   OFFICIAL GOOGLE BUTTON RENDER
 ========================================= */
 
-window.googleResetLogin = function () {
+window.renderGoogleLoginButton = function () {
 
-  startGoogleAuth("reset");
+  const container =
+    document.getElementById("googleLoginButton");
+
+  if (!container) {
+    return;
+  }
+
+  if (!window.initializeGoogleLogin()) {
+    return;
+  }
+
+  googleAuthMode = "login";
+
+  container.innerHTML = "";
+
+  google.accounts.id.renderButton(
+    container,
+    {
+      theme: "outline",
+      size: "large",
+      width: 320,
+      text: "continue_with"
+    }
+  );
+
+};
+
+
+window.renderGoogleSignupButton = function () {
+
+  const container =
+    document.getElementById("googleSignupButton");
+
+  if (!container) {
+    return;
+  }
+
+  if (!window.initializeGoogleLogin()) {
+    return;
+  }
+
+  googleAuthMode = "signup";
+
+  container.innerHTML = "";
+
+  google.accounts.id.renderButton(
+    container,
+    {
+      theme: "outline",
+      size: "large",
+      width: 320,
+      text: "continue_with"
+    }
+  );
+
+};
+
+
+window.renderGoogleResetButton = function () {
+
+  const container =
+    document.getElementById("googleResetButton");
+
+  if (!container) {
+    return;
+  }
+
+  if (!window.initializeGoogleLogin()) {
+    return;
+  }
+
+  googleAuthMode = "reset";
+
+  container.innerHTML = "";
+
+  google.accounts.id.renderButton(
+    container,
+    {
+      theme: "outline",
+      size: "large",
+      width: 320,
+      text: "continue_with"
+    }
+  );
 
 };
 
@@ -407,9 +441,7 @@ window.googleLogout = function () {
     "reset_uid"
   );
 
-
   googleAuthMode = null;
-
 
   if (
     window.google &&
@@ -420,7 +452,6 @@ window.googleLogout = function () {
     google.accounts.id.disableAutoSelect();
 
   }
-
 
   location.reload();
 

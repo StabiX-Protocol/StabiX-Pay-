@@ -40,10 +40,7 @@ appDiv(`
 
 <div class="divider">or</div>
 
-<button class="google-btn" onclick="googleLogin()">
-<img src="media/google-logo.png" class="google-icon" alt="Google">
-<span>Continue with Google</span>
-</button>
+<div id="googleLoginButton"></div>
 
 <div class="auth-links">
 <span class="auth-link" onclick="renderSignup();">
@@ -57,6 +54,7 @@ Forgot Password?
 </div>
 </div>
 `);
+window.renderGoogleLoginButton();
 
 selectTab("home");
 document.getElementById("bottomNav").style.display = "none";
@@ -76,12 +74,13 @@ appDiv(`
 <div class="auth-box">
 <h2>Create Account</h2>
 
-<button class="google-btn" onclick="googleSignup()">
-<img src="media/google-logo.png" class="google-icon" alt="Google">
-<span>Continue with Google</span>
-</button>
+<div id="googleSignupButton"></div>
+
+</div>
 </div>
 `);
+
+window.renderGoogleSignupButton();
 }
 window.renderSetup = renderSetup;
 window.renderUsernameSetup = renderUsernameSetup;
@@ -406,13 +405,12 @@ appDiv(`
 <div class="auth-box">
 <h2>Reset Password</h2>
 
-<button class="google-btn" onclick="googleResetLogin()">
-<img src="media/google-logo.png" class="google-icon" alt="Google">
-<span>Continue with Google</span>
+<div id="googleResetButton"></div>
 </div>
 
 </div>
 `);
+window.renderGoogleResetButton();
 }
 window.forgotPassword = forgotPassword;
 
