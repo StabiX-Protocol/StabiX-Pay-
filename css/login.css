@@ -106,89 +106,44 @@ box-shadow:var(--shadow);
 }
 
 
-.google-btn{
-  position:relative;
+#googleLoginButton,
+#googleSignupButton,
+#googleResetButton{
   width:100%;
-  height:58px;
   display:flex;
-  align-items:center;
   justify-content:center;
-  gap:12px;
-  padding:0 18px;
-  background:var(--surface);
-  border:1.5px solid var(--border);
-  border-radius:18px;
-  color:var(--text);
-  font-size:16px;
-  font-weight:600;
-  letter-spacing:.1px;
-  cursor:pointer;
+  align-items:center;
+  margin-bottom:16px;
+  border-radius:16px;
   overflow:hidden;
-  isolation:isolate;
   box-shadow:var(--shadow);
-  transition:border-color .25s ease, box-shadow .25s ease, transform .15s ease;
+  transition:box-shadow .25s ease, transform .15s ease;
 }
 
-.google-btn::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index:-1;
-  background:linear-gradient(115deg,transparent 25%,rgba(37,99,235,.12) 48%,transparent 72%);
-  transform:translateX(-130%);
-  transition:transform .6s ease;
+#googleLoginButton:last-child,
+#googleSignupButton:last-child,
+#googleResetButton:last-child{
+  margin-bottom:0;
 }
 
-.google-btn:hover{
-  border-color:color-mix(in srgb, var(--primary) 45%, var(--border));
-  box-shadow:0 10px 22px -8px rgba(37,99,235,.28), var(--shadow);
+#googleLoginButton:hover,
+#googleSignupButton:hover,
+#googleResetButton:hover{
+  box-shadow:0 10px 22px -8px color-mix(in srgb, var(--primary) 45%, transparent), var(--shadow);
   transform:translateY(-1px);
 }
 
-.google-btn:hover::before{ transform:translateX(130%); }
-
-.google-btn:active{
+#googleLoginButton:active,
+#googleSignupButton:active,
+#googleResetButton:active{
   transform:translateY(0) scale(.98);
-  box-shadow:var(--shadow);
 }
-
-.google-btn:focus-visible{
-  outline:2px solid var(--primary);
-  outline-offset:2px;
-}
-
-.google-btn:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-  transform:none;
-  box-shadow:none;
-}
-.google-btn:disabled::before{ display:none; }
-
-.google-icon{ width:22px; height:22px; flex-shrink:0; }
-
-.google-btn-spinner{
-  display:none;
-  width:19px;
-  height:19px;
-  border-radius:50%;
-  border:2px solid var(--border);
-  border-top-color:var(--primary);
-  animation:stbxspin .7s linear infinite;
-}
-
-.google-btn.is-loading{ cursor:default; }
-.google-btn.is-loading .google-icon{ display:none; }
-.google-btn.is-loading .google-btn-spinner{ display:inline-block; }
-.google-btn.is-loading .label-default{ display:none; }
-.google-btn.is-loading .label-loading{ display:inline; }
-.label-loading{ display:none; }
-
-@keyframes stbxspin{ to{ transform:rotate(360deg); } }
 
 @media (prefers-reduced-motion: reduce){
-  .google-btn, .google-btn::before, .google-btn-spinner{
-    transition:none; animation:none;
+  #googleLoginButton,
+  #googleSignupButton,
+  #googleResetButton{
+    transition:none;
   }
 }
 
