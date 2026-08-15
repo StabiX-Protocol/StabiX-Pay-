@@ -23,144 +23,231 @@ async function handleGoogleCredential(response) {
 
   if (googleAuthMode === "signup") {
 
-    console.log("🟢 GOOGLE SIGNUP");
+  console.log("🟢 GOOGLE SIGNUP");
 
-    localStorage.setItem(
-      "pending_google_token",
-      response.credential
+  try {
+
+    const apiResponse = await fetch(
+      "http://10.148.199.19:3000/api/users/login/google",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          id_token: response.credential
+        })
+      }
     );
 
-    window.renderUsernameSetup();
+    const data = await apiResponse.json();
 
-    return;
+    console.log(
+      "Google Signup Existing Account Check:",
+      apiResponse.status,
+      data
+    );
+
+    /*
+      GOOGLE ACCOUNT ALREADY EXISTS
+    */
+
+    if (apiResponse.ok) {
+
+      alert(
+        "This Google account is already registered with StabiX.\n\n" +
+        "Please use Login to access your account.\n\n" +
+        "If you forgot your password, use Forgot Password."
+      );
+
+      window.renderSetup();
+
+      return;
+    }
+
+
+    /*
+      GOOGLE ACCOUNT DOES NOT EXIST
+      → CONTINUE WITH SIGNUP
+    */
+
+    if (apiResponse.status === 404) {
+
+      localStorage.setItem(
+        "pending_google_token",
+        response.credential
+      );
+
+      window.renderUsernameSetup();
+
+      return;
+    }
+
+
+    alert(
+      data.message ||
+      "Google account verification failed."
+    );
+
+  } catch (error) {
+
+    console.error(
+      "❌ Google Signup Check Error:",
+      error
+    );
+
+    alert(
+      "Unable to verify Google account. Please try again."
+    );
   }
+
+  return;
+}
 
 
   if (googleAuthMode === "login") {
 
-    console.log("🟢 GOOGLE LOGIN");
+  console.log("🟢 GOOGLE LOGIN");
 
-    try {
+  try {
 
-      const apiResponse = await fetch(
-        "http://10.148.199.19:3000/api/users/login/google",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            id_token: response.credential
-          })
-        }
+    const apiResponse = await fetch(
+      "http://10.148.199.19:3000/api/users/login/google",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          id_token: response.credential
+        })
+      }
+    );
+
+    const data = await apiResponse.json();
+
+    console.log(
+      "Google Login API:",
+      apiResponse.status,
+      data
+    );
+
+
+    /*
+      EXISTING GOOGLE ACCOUNT
+      → LOGIN SUCCESS
+    */
+
+    if (apiResponse.ok) {
+
+      window.setToken(
+        data.token
       );
 
-      const data = await apiResponse.json();
-
-      console.log(
-        "Google Login API:",
-        apiResponse.status,
-        data
+      localStorage.setItem(
+        "stbx_uid",
+        data.user.stbx_uid
       );
 
-
-      if (apiResponse.ok) {
-
-        window.setToken(data.token);
+      if (data.user.google_uid) {
 
         localStorage.setItem(
-          "stbx_uid",
-          data.user.stbx_uid
+          "stbx_google_uid",
+          data.user.google_uid
         );
 
-        if (data.user.google_uid) {
-
-          localStorage.setItem(
-            "stbx_google_uid",
-            data.user.google_uid
-          );
-
-        }
-
-        location.reload();
-
-        return;
       }
 
+      location.reload();
 
-      if (apiResponse.status === 404) {
-
-        localStorage.setItem(
-          "pending_google_token",
-          response.credential
-        );
-
-        window.renderUsernameSetup();
-
-        return;
-      }
-
-
-      alert(
-        data.message ||
-        "Google login failed."
-      );
-
-    } catch (error) {
-
-      console.error(
-        "❌ Google Login Error:",
-        error
-      );
-
-      alert(
-        "Google login failed. Please try again."
-      );
+      return;
     }
 
-    return;
+
+    /*
+      GOOGLE ACCOUNT NOT REGISTERED
+    */
+
+    if (apiResponse.status === 404) {
+
+      alert(
+        "Google Account Not Registered\n\n" +
+        "This Google account is not linked to a StabiX account.\n\n" +
+        "Please create a new account to continue."
+      );
+
+      window.renderSignup();
+
+      return;
+    }
+
+
+    /*
+      OTHER ERROR
+    */
+
+    alert(
+      data.message ||
+      "Google login failed. Please try again."
+    );
+
+  } catch (error) {
+
+    console.error(
+      "❌ Google Login Error:",
+      error
+    );
+
+    alert(
+      "Unable to connect to StabiX.\n\n" +
+      "Please try again."
+    );
   }
 
+  return;
+}
 
 
   if (googleAuthMode === "reset") {
 
-    console.log("🟢 GOOGLE PASSWORD RESET");
+  console.log("🟢 GOOGLE PASSWORD RESET");
 
-    try {
+  try {
 
-      const apiResponse = await fetch(
-        "http://10.148.199.19:3000/api/users/login/google",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            id_token: response.credential
-          })
-        }
-      );
+    const apiResponse = await fetch(
+      "http://10.148.199.19:3000/api/users/login/google",
+      {
+        method: "POST",
 
-      const data = await apiResponse.json();
+        headers: {
+          "Content-Type": "application/json"
+        },
 
-      console.log(
-        "Google Reset API:",
-        apiResponse.status,
-        data
-      );
-
-
-      if (!apiResponse.ok) {
-
-        alert(
-          data.message ||
-          "No StabiX account found with this Google account."
-        );
-
-        return;
+        body: JSON.stringify({
+          id_token: response.credential
+        })
       }
+    );
 
+    const data = await apiResponse.json();
+
+    console.log(
+      "Google Reset API:",
+      apiResponse.status,
+      data
+    );
+
+
+    /*
+      GOOGLE ACCOUNT REGISTERED
+      → CONTINUE RESET
+    */
+
+    if (apiResponse.ok) {
 
       localStorage.setItem(
         "reset_uid",
@@ -174,20 +261,52 @@ async function handleGoogleCredential(response) {
 
       window.renderResetPassword();
 
-    } catch (error) {
-
-      console.error(
-        "❌ Google Reset Error:",
-        error
-      );
-
-      alert(
-        "Google verification failed."
-      );
+      return;
     }
 
-    return;
+
+    /*
+      GOOGLE ACCOUNT NOT REGISTERED
+    */
+
+    if (apiResponse.status === 404) {
+
+      alert(
+        "Google Account Not Registered\n\n" +
+        "This Google account is not linked to a StabiX account.\n\n" +
+        "Please create a new account to continue."
+      );
+
+      window.renderSignup();
+
+      return;
+    }
+
+
+    /*
+      OTHER ERROR
+    */
+
+    alert(
+      data.message ||
+      "Google verification failed. Please try again."
+    );
+
+  } catch (error) {
+
+    console.error(
+      "❌ Google Reset Error:",
+      error
+    );
+
+    alert(
+      "Unable to connect to StabiX.\n\n" +
+      "Please try again."
+    );
   }
+
+  return;
+}
 
 }
 
