@@ -24,7 +24,7 @@ window.generateSTBX = function () {
     1000000000 + Math.random() * 9000000000
   );
 
-  return "STBX" + random.toString();
+  return "STBX10" + random.toString();
 };
 
 window.GOOGLE_CLIENT_ID =
