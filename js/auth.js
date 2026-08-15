@@ -308,9 +308,9 @@ window.renderGoogleLoginButton = function () {
     return;
   }
 
-  googleAuthMode = "login";
-
   container.innerHTML = "";
+
+  googleAuthMode = "login";
 
   google.accounts.id.renderButton(
     container,
@@ -321,7 +321,6 @@ window.renderGoogleLoginButton = function () {
       text: "continue_with"
     }
   );
-
 };
 
 
@@ -338,9 +337,9 @@ window.renderGoogleSignupButton = function () {
     return;
   }
 
-  googleAuthMode = "signup";
-
   container.innerHTML = "";
+
+  googleAuthMode = "signup";
 
   google.accounts.id.renderButton(
     container,
@@ -351,7 +350,6 @@ window.renderGoogleSignupButton = function () {
       text: "continue_with"
     }
   );
-
 };
 
 
@@ -368,9 +366,9 @@ window.renderGoogleResetButton = function () {
     return;
   }
 
-  googleAuthMode = "reset";
-
   container.innerHTML = "";
+
+  googleAuthMode = "reset";
 
   google.accounts.id.renderButton(
     container,
@@ -381,7 +379,6 @@ window.renderGoogleResetButton = function () {
       text: "continue_with"
     }
   );
-
 };
 
 

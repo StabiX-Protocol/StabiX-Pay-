@@ -43,7 +43,7 @@ appDiv(`
 <div id="googleLoginButton"></div>
 
 <div class="auth-links">
-<span class="auth-link" onclick="renderSetup();">
+<span class="auth-link" onclick="renderSignup();">
 Create Account
 </span>
 
