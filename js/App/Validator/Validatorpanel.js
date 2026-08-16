@@ -9,7 +9,7 @@ import "./checkbalance.js";
 window.validatorPanel = function () {
     return `
 <hr>
-s
+
 <h3>Validator Panel</h3>
 
 <input

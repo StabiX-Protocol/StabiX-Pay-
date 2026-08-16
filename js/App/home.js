@@ -1,5 +1,5 @@
 window.MODE = null;
-window.primaryAsset = localStorage.getItem("primaryAsset") || "USDC";
+window.primaryAsset = localStorage.getItem("primaryAsset") || "USDT";
 window.keepAssetOpen = false;
 window.scanDone = false
 window.scanTargetId = null
