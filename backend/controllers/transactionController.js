@@ -124,7 +124,7 @@ const getTransactionHistory = async (req, res) => {
       UNION ALL
 
       SELECT
-        str_id As "STRId",
+       "STRId" As "STRId",
         NULL AS sender_stbx_uid,
         stbx_uid AS receiver_stbx_uid,
         'deposit' AS type,
@@ -141,7 +141,7 @@ const getTransactionHistory = async (req, res) => {
       UNION ALL
 
       SELECT
-        str_id As "STRId",
+         "STRId" As "STRId",
         stbx_uid AS sender_stbx_uid,
         NULL AS receiver_stbx_uid,
         'withdraw' AS type,
