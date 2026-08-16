@@ -49,7 +49,8 @@ window.syncWalletBalances = async function () {
                 window.userData.balance = balance;
             }
         }
-
+        window.updateBalanceUI();
+        
         console.log("Synced balances:", {
             USDT: window.userData.usdtBalance,
             USDC: window.userData.balance
@@ -713,6 +714,16 @@ window.getPrimaryBalance = function () {
     }
 
     return "0.00";
+};
+
+window.updateBalanceUI = function(){
+
+    const balanceEl = document.querySelector(".balanceBig");
+
+    if (!balanceEl) return;
+
+    balanceEl.textContent =
+        `${window.getPrimaryBalance()} ${window.primaryAsset}`;
 };
  /*=============UI Interface Of Balance Name ========*/
 window.toggleProfile = ()=>{
