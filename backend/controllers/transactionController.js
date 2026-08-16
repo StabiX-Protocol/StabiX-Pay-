@@ -100,7 +100,7 @@ const getTransactionHistory = async (req, res) => {
     const result = await pool.query(
       `
       SELECT
-      "STRId",
+    str_id As "STRId",
         sender_stbx_uid,
         receiver_stbx_uid,
         CASE
@@ -124,7 +124,7 @@ const getTransactionHistory = async (req, res) => {
       UNION ALL
 
       SELECT
-        "STRId",
+        str_id As "STRId",
         NULL AS sender_stbx_uid,
         stbx_uid AS receiver_stbx_uid,
         'deposit' AS type,
@@ -141,7 +141,7 @@ const getTransactionHistory = async (req, res) => {
       UNION ALL
 
       SELECT
-        "STRId",
+        str_id As "STRId",
         stbx_uid AS sender_stbx_uid,
         NULL AS receiver_stbx_uid,
         'withdraw' AS type,
@@ -182,7 +182,7 @@ const { str_id } = req.params;
 
 const result = await pool.query(
 `SELECT
- "STRId",
+ str_id As "STRId",
 sender_stbx_uid,
 receiver_stbx_uid,
 CASE
