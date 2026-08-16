@@ -323,7 +323,6 @@ const result = await pool.query(
   }
 };
 
-/*both request*/
 const getPendingRequests = async (req, res) => {
   try {
 

@@ -100,7 +100,7 @@ const getTransactionHistory = async (req, res) => {
     const result = await pool.query(
       `
       SELECT
-        str_id AS "STRId",
+      "STRId",
         sender_stbx_uid,
         receiver_stbx_uid,
         CASE
@@ -182,7 +182,7 @@ const { str_id } = req.params;
 
 const result = await pool.query(
 `SELECT
-str_id AS "STRId",
+ "STRId",
 sender_stbx_uid,
 receiver_stbx_uid,
 CASE
