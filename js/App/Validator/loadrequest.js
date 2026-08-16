@@ -56,7 +56,7 @@ Time: ${time}
 
 <br><br>
 
-<button onclick="approveReq('${r.id}')">
+<button onclick="approveReq('${r.type}','${r.STRId}')">
 Approve
 </button>
 
