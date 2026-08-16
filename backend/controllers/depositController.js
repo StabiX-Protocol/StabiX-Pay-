@@ -62,7 +62,7 @@ Math.floor(Math.random() * 1000);
 await client.query(
 `INSERT INTO deposits
 (
-STRId,
+"STRId",
 stbx_uid,
 asset,
 mode,
