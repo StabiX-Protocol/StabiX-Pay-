@@ -35,17 +35,21 @@ window.checkUserBalance = async () => {
 
     }
 
-    let balance = 0;
 
-    if (asset === "USDC") {
 
-      balance = data.user.balance || 0;
 
-    } else {
+    const balanceRow = (data.balances || []).find(
+  (item) => item.asset === asset
+);
 
-      balance = data.user.usdtBalance || 0;
+const balance = balanceRow
+  ? Number(balanceRow.balance)
+  : 0;
 
-    }
+document.getElementById("balanceOut").innerText =
+  `${asset} Balance: ${balance}`;
+  
+
 
     document.getElementById("balanceOut").innerText =
       `${asset} Balance: ${balance}`;
