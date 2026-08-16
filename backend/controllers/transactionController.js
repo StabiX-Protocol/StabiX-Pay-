@@ -182,7 +182,7 @@ const { str_id } = req.params;
 
 const result = await pool.query(
 `SELECT
- str_id As "STRId",
+str_id As "STRId",
 sender_stbx_uid,
 receiver_stbx_uid,
 CASE

@@ -50,6 +50,29 @@ window.syncWalletBalances = async function () {
             }
         }
         window.updateBalanceUI();
+
+        // ================= UPDATE ASSET UI =================
+
+const usdtEl = document.getElementById("assetUSDTBalance");
+const usdcEl = document.getElementById("assetUSDCBalance");
+
+if (usdtEl) {
+    usdtEl.textContent =
+        Number(window.userData.usdtBalance || 0).toFixed(2);
+}
+
+if (usdcEl) {
+    usdcEl.textContent =
+        Number(window.userData.balance || 0).toFixed(2);
+}
+
+// Update primary balance at top
+const primaryEl = document.querySelector(".balanceBig");
+
+if (primaryEl) {
+    primaryEl.textContent =
+        `${window.getPrimaryBalance()} ${window.primaryAsset}`;
+}
         
         console.log("Synced balances:", {
             USDT: window.userData.usdtBalance,
@@ -333,7 +356,7 @@ appDiv(`
     <div style="font-size:14px">USDT</div>
     </div>
     </div>
-    <div style="font-weight:bold">
+    <div id="assetUSDTBalance" style="font-weight:bold"> 
     ${Number(window.userData?.usdtBalance || 0).toFixed(2)}
     </div>
     </div>
@@ -355,8 +378,8 @@ appDiv(`
     <div style="font-size:14px">USDC</div>
     </div>
     </div>
-    <div style="font-weight:bold">
-    ${Number(window.userData?.balance || 0).toFixed(2)}    
+    <div id="assetUSDCBalance" style="font-weight:bold">
+    ${Number(window.userData?.balance || 0).toFixed(2)}
     </div>
     </div>   
 

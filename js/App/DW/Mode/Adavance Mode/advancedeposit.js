@@ -210,6 +210,5 @@ window.submitDepositFinal = async function(asset, network){
 
     console.error(err);
     alert("Server Error");
-s
   }
 };
