@@ -328,7 +328,7 @@ const getPendingRequests = async (req, res) => {
 
     const result = await pool.query(`
       SELECT
-        STRId,
+        "STRId",
         stbx_uid,
         asset,
         mode,
@@ -345,7 +345,7 @@ const getPendingRequests = async (req, res) => {
       UNION ALL
 
       SELECT
-        STRId,
+        "STRId",
         stbx_uid,
         asset,
         mode,
