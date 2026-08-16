@@ -83,11 +83,11 @@ const result = await pool.query(
 stbx_uid,
 username,
 eoa_address,
+role,
 created_at,
 last_username_change
 FROM users
-WHERE stbx_uid = $1
-`,
+WHERE stbx_uid = $1`,
 [stbx_uid]
 );
 
