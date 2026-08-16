@@ -616,6 +616,8 @@ appDiv(`
     </div>
     </div>
 `);
+await window.syncWalletBalances();
+window.updateBalanceUI();
 document.getElementById("bottomNav").style.display = "flex";
 selectTab("home");
 listenNotifications();
