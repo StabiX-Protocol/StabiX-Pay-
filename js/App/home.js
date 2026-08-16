@@ -101,7 +101,7 @@ appDiv(`
           cursor:pointer;
         "
       >
-        ${user.eoaAddress ? "Change" : "Add"}
+        ${user.eoa_address ? "Change" : "Add"}
       </span>
 
     </div>
@@ -111,7 +111,7 @@ appDiv(`
       color:var(--text);
       word-break:break-all;
     ">
-      ${user.eoaAddress || "Not linked"}
+      ${user.eoa_address || "Not linked"}
     </div>
 
   </div>
@@ -698,7 +698,7 @@ navigator.clipboard.writeText(WALLET)
 
   // ================= EOA WALLET =================
 window.editEOA = async ()=>{
-const current = window.userData?.eoaAddress || "";
+const current = window.userData?.eoa_address || "";
 const addr = prompt(
 "Enter your EOA Wallet Address",
 current || ""
@@ -742,7 +742,7 @@ if (!response.ok) {
 }
 
 alert(data.message);
-window.userData.eoaAddress = newAddr;
+window.userData.eoa_address = newAddr;
 
 await renderApp();
 };
