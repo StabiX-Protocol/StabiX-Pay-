@@ -93,86 +93,89 @@ client.release();
 };
 
 const getTransactionHistory = async (req, res) => {
-try {
-const { stbx_uid } = req.params;
+  try {
 
-const result = await pool.query(
-`
-SELECT
-str_id AS "STRId",
-sender_stbx_uid,
-receiver_stbx_uid,
-CASE
-WHEN sender_stbx_uid = $1 THEN 'sent'
-WHEN receiver_stbx_uid = $1 THEN 'received'
-END AS type,
-CASE
-WHEN sender_stbx_uid = $1 THEN receiver_stbx_uid
-WHEN receiver_stbx_uid = $1 THEN sender_stbx_uid
-END AS counterparty,
-asset,
-amount,
-status,
-note,
-blockchain_tx_hash,
-created_at
-FROM transactions
-WHERE sender_stbx_uid = $1
-OR receiver_stbx_uid = $1
+    const { stbx_uid } = req.params;
 
-UNION ALL
+    const result = await pool.query(
+      `
+      SELECT
+        str_id AS "STRId",
+        sender_stbx_uid,
+        receiver_stbx_uid,
+        CASE
+          WHEN sender_stbx_uid = $1 THEN 'sent'
+          WHEN receiver_stbx_uid = $1 THEN 'received'
+        END AS type,
+        CASE
+          WHEN sender_stbx_uid = $1 THEN receiver_stbx_uid
+          WHEN receiver_stbx_uid = $1 THEN sender_stbx_uid
+        END AS counterparty,
+        asset,
+        amount,
+        status,
+        note,
+        blockchain_tx_hash,
+        created_at
+      FROM transactions
+      WHERE sender_stbx_uid = $1
+      OR receiver_stbx_uid = $1
 
-SELECT
-strid AS "STRId",
-NULL AS sender_stbx_uid,
-stbx_uid AS receiver_stbx_uid,
-'deposit' AS type,
-'Deposit' AS counterparty,
-asset,
-amount,
-status,
-NULL AS note,
-blockchain_tx_hash,
-created_at
-FROM deposits
-WHERE stbx_uid = $1
+      UNION ALL
 
-UNION ALL
+      SELECT
+        "STRId",
+        NULL AS sender_stbx_uid,
+        stbx_uid AS receiver_stbx_uid,
+        'deposit' AS type,
+        'Deposit' AS counterparty,
+        asset,
+        amount,
+        status,
+        NULL AS note,
+        blockchain_tx_hash,
+        created_at
+      FROM deposits
+      WHERE stbx_uid = $1
 
-SELECT
-strid AS "STRId",
-stbx_uid AS sender_stbx_uid,
-NULL AS receiver_stbx_uid,
-'withdraw' AS type,
-'Withdraw' AS counterparty,
-asset,
-amount,
-status,
-NULL AS note,
-blockchain_tx_hash,
-created_at
-FROM withdraws
-WHERE stbx_uid = $1
+      UNION ALL
 
-ORDER BY created_at DESC
-`,
-[stbx_uid]
-);
+      SELECT
+        "STRId",
+        stbx_uid AS sender_stbx_uid,
+        NULL AS receiver_stbx_uid,
+        'withdraw' AS type,
+        'Withdraw' AS counterparty,
+        asset,
+        amount,
+        status,
+        NULL AS note,
+        blockchain_tx_hash,
+        created_at
+      FROM withdraws
+      WHERE stbx_uid = $1
 
-return res.status(200).json({
-success: true,
-transactions: result.rows
-});
+      ORDER BY created_at DESC
+      `,
+      [stbx_uid]
+    );
 
-} catch (err) {
-console.error(err);
-return res.status(500).json({
-success: false,
-message: "Internal Server Error"
-});
-}
+    return res.status(200).json({
+      success: true,
+      transactions: result.rows
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+
+  }
 };
-
 const getTransactionBySTRId = async (req, res) => {
 try {
 const { str_id } = req.params;
