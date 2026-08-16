@@ -10,6 +10,61 @@ amount:null,
 date:null
 };
 window.isScanFlow = false;
+
+window.syncWalletBalances = async function () {
+
+    try {
+
+        const response = await fetch(
+            `http://10.148.199.19:3000/api/balance/${window.getCurrentUserId()}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${window.getToken()}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error("Balance API error:", data.message);
+            return false;
+        }
+
+        // Reset old balance values
+        window.userData.balance = 0;
+        window.userData.usdtBalance = 0;
+
+        // DB balances
+        for (const item of data.balances) {
+
+            const asset = item.asset;
+            const balance = Number(item.balance) || 0;
+
+            if (asset === "USDT") {
+                window.userData.usdtBalance = balance;
+            }
+
+            if (asset === "USDC") {
+                window.userData.balance = balance;
+            }
+        }
+
+        console.log("Synced balances:", {
+            USDT: window.userData.usdtBalance,
+            USDC: window.userData.balance
+        });
+
+        return true;
+
+    } catch (err) {
+
+        console.error("Balance sync error:", err);
+        return false;
+
+    }
+};
+
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
 const response = await fetch(
@@ -30,7 +85,8 @@ return;
 
 const user = data.user;
 window.userData = user;
-const isValidator = window.userData.role ==="VALIDATOR";
+window.syncWalletBalances();
+const isVALIDATOR = window.userData.role ==="VALIDATOR";
 const now = new Date();
 const yyyy = now.getFullYear();
 const mm = String(now.getMonth() + 1).padStart(2,"0");
@@ -277,7 +333,7 @@ appDiv(`
     </div>
     </div>
     <div style="font-weight:bold">
-    ${window.userData?.usdtBalance?.toFixed(2) || "0.00"}
+    ${Number(window.userData?.usdtBalance || 0).toFixed(2)}
     </div>
     </div>
                  <!-- USDC -->
@@ -299,7 +355,7 @@ appDiv(`
     </div>
     </div>
     <div style="font-weight:bold">
-    ${window.userData?.balance?.toFixed(2) || "0.00"}
+    ${Number(window.userData?.balance || 0).toFixed(2)}    
     </div>
     </div>   
 
@@ -354,7 +410,8 @@ appDiv(`
     </div>
     </div>
     <div style="font-weight:bold">
-    ${window.userData?.usdtBalance?.toFixed(2) || "0.00"}</div>
+    ${Number(window.userData?.usdtBalance || 0).toFixed(2)}
+    </div>
     </div>
 
                 <!-- USDC -->
@@ -383,7 +440,7 @@ appDiv(`
     </div>
     </div>
     <div style="font-weight:bold">
-    ${window.userData?.balance?.toFixed(2) || "0.00"}
+    ${Number(window.userData?.balance || 0).toFixed(2)}
     </div>
     </div>
 
@@ -513,7 +570,7 @@ appDiv(`
     onchange="loadHistoryByDate()"/>
     <div id="history">Loading...</div>
     </div>
-    ${isValidator ? validatorPanel() : ""}
+    ${isVALIDATOR ? validatorPanel() : ""}
 
     <div id="previewScreen" style="
     display:none;
@@ -645,18 +702,17 @@ openAssetSelector();
 }
 
  /*=============Primary Balance ========*/
-window.getPrimaryBalance = function(){
-if(window.primaryAsset === "USDC"){
-return (window.userData.balance || 0).toFixed(2);
-}
-if(window.primaryAsset === "USDT"){
-return (window.userData.usdtBalance || 0).toFixed(2);
-}
-};
-window.setPrimary = function(asset){
-window.primaryAsset = asset;
-localStorage.setItem("primaryAsset", asset);
-renderApp();
+window.getPrimaryBalance = function () {
+
+    if (window.primaryAsset === "USDT") {
+        return Number(window.userData?.usdtBalance || 0).toFixed(2);
+    }
+
+    if (window.primaryAsset === "USDC") {
+        return Number(window.userData?.balance || 0).toFixed(2);
+    }
+
+    return "0.00";
 };
  /*=============UI Interface Of Balance Name ========*/
 window.toggleProfile = ()=>{

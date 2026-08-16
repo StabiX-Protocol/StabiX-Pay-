@@ -4,10 +4,8 @@ const {creditBalance,debitBalance} = require("./balanceController");
 const approveDeposit = async (req, res) => {
 
   const client = await pool.connect();
-
   try {
-
-    await client.query("BEGIN");
+await client.query("BEGIN");
 
     const { STRId } = req.params;
 
