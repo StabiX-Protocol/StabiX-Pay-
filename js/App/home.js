@@ -30,7 +30,7 @@ return;
 
 const user = data.user;
 window.userData = user;
-const isValidator = false;
+const isValidator = window.userData.role ==="validator";
 const now = new Date();
 const yyyy = now.getFullYear();
 const mm = String(now.getMonth() + 1).padStart(2,"0");
