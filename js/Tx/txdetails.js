@@ -20,6 +20,8 @@ window.openTxDetail = async (STRId) => {
 
     const t = data.transaction;
 
+    const displayAmount = Number(t.amount).toFixed(2);
+
     const isCredit =
       t.type === "received" ||
       t.type === "deposit";
@@ -65,7 +67,9 @@ display:flex;
 align-items:center;
 justify-content:center;
 cursor:pointer;
-">←</div>
+">
+←
+</div>
 
 <div style="text-align:center;margin-top:40px;">
 
@@ -74,7 +78,7 @@ font-size:36px;
 font-weight:700;
 letter-spacing:0.5px;">
 
-${t.amount} ${t.asset}
+${displayAmount} ${t.asset}
 
 </div>
 
@@ -83,20 +87,20 @@ margin-top:6px;
 font-size:15px;
 font-weight:600;
 color:${
-t.type === "deposit" ||
-t.type === "received"
-? "var(--success)"
-: "var(--danger)"
+  t.type === "deposit" ||
+  t.type === "received"
+    ? "var(--success)"
+    : "var(--danger)"
 };">
 
 ${
-t.type === "deposit"
-? "Deposit"
-: t.type === "withdraw"
-? "Withdraw"
-: t.type === "received"
-? "Received"
-: "Sent"
+  t.type === "deposit"
+    ? "Deposit"
+    : t.type === "withdraw"
+      ? "Withdraw"
+      : t.type === "received"
+        ? "Received"
+        : "Sent"
 }
 
 </div>
@@ -133,7 +137,11 @@ STR ID : ${t.STRId}
 
 </div>
 
-<div style="margin:20px 0;height:1px;background:var(--border);"></div>
+<div style="
+margin:20px 0;
+height:1px;
+background:var(--border);">
+</div>
 
 <div style="
 background:var(--surface);
@@ -143,11 +151,18 @@ padding:16px;">
 
 <div style="margin-bottom:14px;">
 
-<div style="color:var(--subtext);font-size:12px;">
+<div style="
+color:var(--subtext);
+font-size:12px;">
+
 From
+
 </div>
 
-<div style="font-weight:600;font-size:14px;word-break:break-all;">
+<div style="
+font-weight:600;
+font-size:14px;
+word-break:break-all;">
 
 ${from}
 
@@ -157,11 +172,18 @@ ${from}
 
 <div>
 
-<div style="color:var(--subtext);font-size:12px;">
+<div style="
+color:var(--subtext);
+font-size:12px;">
+
 To
+
 </div>
 
-<div style="font-weight:600;font-size:14px;word-break:break-all;">
+<div style="
+font-weight:600;
+font-size:14px;
+word-break:break-all;">
 
 ${to}
 
