@@ -111,6 +111,8 @@ ${month}
         if (t.type === "withdraw") userId = "Withdraw";
         if (!userId) userId = "System";
 
+        const displayAmount = Number(t.amount).toFixed(2);
+
         html += `
 <div onclick="openTxDetail('${t.STRId}')" style="
 display:flex;
@@ -169,7 +171,7 @@ font-weight:bold;
 color:${color};
 font-size:15px;">
 
-${isCredit ? "+" : "-"} ${t.amount} ${t.asset}
+${isCredit ? "+" : "-"} ${displayAmount} ${t.asset}
 
 </div>
 
