@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const{verifyToken} =require("../middleware/authMiddleware");
 
 const {
   sendTransaction,
@@ -23,7 +24,7 @@ next();
 
 router.post("/send",transactionValidation,validate, sendTransaction);
 router.get("/history/:stbx_uid", getTransactionHistory);
-router.get("/:str_id", getTransactionBySTRId);
+router.get("/:str_id", verifyToken,getTransactionBySTRId);
 router.get("/search/:stbx_uid", searchTransactions);
 
 module.exports = router;
