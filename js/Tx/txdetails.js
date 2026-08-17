@@ -20,34 +20,36 @@ window.openTxDetail = async (STRId) => {
 
     const t = data.transaction;
 
-    const isCredit =
-      t.type === "received" ||
-      t.type === "deposit";
+const displayAmount = Number(t.amount).toFixed(2);
 
-    let from = "";
-    let to = "";
+const isCredit =
+  t.type === "received" ||
+  t.type === "deposit";
 
-    if (t.type === "deposit") {
+let from = "";
+let to = "";
 
-      from = t.eoa_address || "External";
-      to = t.stbx_uid;
+if (t.type === "deposit") {
 
-    } else if (t.type === "withdraw") {
+  from = t.eoa_address || "External";
+  to = t.stbx_uid;
 
-      from = t.stbx_uid;
-      to = t.eoa_address || "External";
+} else if (t.type === "withdraw") {
 
-    } else {
+  from = t.stbx_uid;
+  to = t.eoa_address || "External";
 
-      from = isCredit
-        ? (t.counterparty || "System")
-        : t.stbx_uid;
+} else {
 
-      to = isCredit
-        ? t.stbx_uid
-        : (t.counterparty || "System");
+  from = isCredit
+    ? (t.counterparty || "System")
+    : t.stbx_uid;
 
-    }
+  to = isCredit
+    ? t.stbx_uid
+    : (t.counterparty || "System");
+
+}
 
     document.querySelector(".box").innerHTML = `
 
@@ -74,7 +76,7 @@ font-size:36px;
 font-weight:700;
 letter-spacing:0.5px;">
 
-${t.amount} ${t.asset}
+${displayAmount} ${t.asset}
 
 </div>
 
