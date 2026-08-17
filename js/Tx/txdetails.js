@@ -76,7 +76,7 @@ font-size:36px;
 font-weight:700;
 letter-spacing:0.5px;">
 
-${displayAmount} ${t.asset}
+${t.amount} ${t.asset}
 
 </div>
 
