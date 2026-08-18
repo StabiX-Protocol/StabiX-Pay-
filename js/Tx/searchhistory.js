@@ -10,8 +10,15 @@ window.setupHistorySearch = () => {
 
     try {
 
+      if (!val) {
+
+        await window.loadHistoryByDate();
+        return;
+
+      }
+
       const response = await fetch(
-        `http://10.148.199.19:3000/api/transactions/history/${window.getCurrentUserId()}`,
+        `http://10.148.199.19:3000/api/transactions/search/${window.getCurrentUserId()}?q=${encodeURIComponent(val)}`,
         {
           headers: {
             Authorization: `Bearer ${window.getToken()}`
@@ -22,32 +29,32 @@ window.setupHistorySearch = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message);
+
+        console.error("Search API error:", data);
+
+        window.renderHistory(
+          [],
+          "No results"
+        );
+
         return;
       }
 
-      let transactions = data.transactions;
-
-      if (val) {
-
-        transactions = transactions.filter((t) =>
-
-          (t.counterparty || "")
-            .toLowerCase()
-            .includes(val.toLowerCase())
-
-        );
-
-      }
+      const transactions = data.transactions || [];
 
       window.renderHistory(
         transactions,
-        val ? "No results" : "No transactions"
+        "No results"
       );
 
     } catch (err) {
 
-      console.log(err);
+      console.error("Transaction search error:", err);
+
+      window.renderHistory(
+        [],
+        "No results"
+      );
 
     }
 
