@@ -108,10 +108,10 @@ Select Network
 </div>
 </div>
 <div style="display:flex;flex-direction:column;gap:12px;">
-${networkCardWithdraw(asset,"Ethereum","Sepolia","~2 min","$5")}
-${networkCardWithdraw(asset,"Arbitrum","Sepolia","~10 sec","Low")}
-${networkCardWithdraw(asset,"Polygon","Amoy","~5 sec","Very low")}
-${networkCardWithdraw(asset,"Base","Sepolia","~5 sec","Low")}
+${networkCardWithdraw(asset,"Ethereum","(Sepolia)","~2 min","$5")}
+${networkCardWithdraw(asset,"Arbitrum","(Sepolia)","~10 sec","Low")}
+${networkCardWithdraw(asset,"Polygon","(Amoy)","~5 sec","Very low")}
+${networkCardWithdraw(asset,"Base","(Sepolia)","~5 sec","Low")}
 </div>
 `;
 };
