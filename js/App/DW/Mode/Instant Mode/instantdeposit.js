@@ -134,12 +134,6 @@ Deposit
 `;
 };
 
-window.copyAddress = function(addr){
-navigator.clipboard.writeText(addr);
-};
-function isValidTxHash(hash){
-return /^0x([A-Fa-f0-9]{64})$/.test(hash);
-}
 
 window.openInstantDeposit = function(asset){
 document.querySelector(".box").innerHTML = `
