@@ -237,9 +237,22 @@ window.submitWithdrawFinal = async function(asset, network){
 
     const data = await response.json();
 
-    if(!response.ok){
-  console.error("WITHDRAW ERROR:", response.status, data);
-  alert(data.message || "Withdraw request failed");
+   if(!response.ok){
+
+  console.error("ADVANCE WITHDRAW ERROR:", {
+    status: response.status,
+    response: data
+  });
+
+  let errorMessage = data.message || "Withdraw request failed";
+
+  if(data.errors && Array.isArray(data.errors)){
+    errorMessage = data.errors
+      .map(error => error.msg)
+      .join("\n");
+  }
+
+  alert(errorMessage);
   return;
 }
 
