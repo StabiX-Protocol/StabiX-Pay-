@@ -26,14 +26,10 @@ Select Network
 
 
 <div style="display:flex;flex-direction:column;gap:12px;">
-
-${instantNetworkCard(asset,"Ethereum","Sepolia","~2 min","$5 fee")}
-
-${instantNetworkCard(asset,"Arbitrum","Sepolia","~10 sec","Low fee")}
-
-${instantNetworkCard(asset,"Polygon","Amoy","~5 sec","Very low")}
-
-${instantNetworkCard(asset,"Base","Sepolia","~5 sec","Low fee")}
+${instantNetworkCard(asset,"Ethereum","(Testnet)","~2 min","$5 fee")}
+${instantNetworkCard(asset,"Arbitrum","(Testnet)","~10 sec","Low fee")}
+${instantNetworkCard(asset,"Polygon","(Testnet)","~5 sec","Very low")}
+${instantNetworkCard(asset,"Base","(Testnet)","~5 sec","Low fee")}
 
 </div>
 
@@ -84,7 +80,7 @@ Fee: ${fee}
 
 window.selectInstantNetwork = function(asset, network){
 
-const wallet = WALLETS[asset]?.[network] || "Not available";
+const wallet = window.WALLETS[asset]?.[network] || "Not available";
 
 document.querySelector(".box").innerHTML = `
 

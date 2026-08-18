@@ -32,3 +32,6 @@ const EXPLORERS = {
 "Polygon Amoy": "https://polygonscan.com/address/",
 "Base Sepolia": "https://basescan.org/address/"
 };
+
+window.WALLETS = WALLETS
+window.VAULTS = VAULTS
