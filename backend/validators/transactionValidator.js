@@ -51,20 +51,20 @@ const withdrawValidation = [
     .isIn(["instant", "advanced"])
     .withMessage("Invalid withdraw mode"),
 
-  body("network")
-    .isIn([
-      "Ethereum (Testnet)",
-      "Arbitrum (Testnet)",
-      "Polygon (Testnet)",
-      "Base (Testnet)",
-      "Tron (Testnet)",
-      "Ethereum (Sepolia)",
-      "Arbitrum (Sepolia)",
-      "Polygon (Amoy)",
-      "Base (Sepolia)",
-      "Tron (Nile Testnet)"
-    ])
-    .withMessage("Invalid withdraw network"),
+ body("network")
+  .isIn([
+    "Ethereum (Testnet)",
+    "Arbitrum (Testnet)",
+    "Polygon (Testnet)",
+    "Base (Testnet)",
+    "Tron (Testnet)",
+    "Ethereum (Sepolia)",
+    "Arbitrum (Sepolia)",
+    "Polygon (Amoy)",
+    "Base (Sepolia)",
+    "Tron (Nile Testnet)"
+  ])
+  .withMessage("Invalid withdraw network"),
 
   body("amount")
     .isFloat({ gt: 0 })
