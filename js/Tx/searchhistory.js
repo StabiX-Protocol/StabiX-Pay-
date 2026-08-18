@@ -17,14 +17,19 @@ window.setupHistorySearch = () => {
       return;
     }
 
-    // Purana result turant clear
-    window.renderHistory([], "Searching...");
+    const historyBox = document.getElementById("history");
+
+    if (historyBox) {
+      historyBox.innerHTML =
+        `<span class="small">Searching...</span>`;
+    }
 
     try {
 
       const response = await fetch(
-        `http://10.148.199.19:3000/api/transactions/search/${window.getCurrentUserId()}?q=${encodeURIComponent(q)}`,
+        `http://10.148.199.19:3000/api/transactions/search/${window.getCurrentUserId()}?q=${encodeURIComponent(q)}&_=${Date.now()}`,
         {
+          cache: "no-store",
           headers: {
             Authorization: `Bearer ${window.getToken()}`
           }
@@ -38,17 +43,9 @@ window.setupHistorySearch = () => {
         return;
       }
 
-      if (!response.ok) {
-        window.renderHistory([], "No results");
-        return;
-      }
-
-      const transactions = data.transactions || [];
-
-      if (transactions.length === 0) {
-        window.renderHistory([], "No results");
-        return;
-      }
+      const transactions = Array.isArray(data.transactions)
+        ? data.transactions
+        : [];
 
       window.renderHistory(
         transactions,
