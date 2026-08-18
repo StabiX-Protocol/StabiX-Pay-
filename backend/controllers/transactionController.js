@@ -295,10 +295,22 @@ const searchTransactions = async (req, res) => {
 
     const result = await pool.query(
       `
+
       SELECT
-        str_id,
+        str_id AS "STRId",
         sender_stbx_uid,
         receiver_stbx_uid,
+
+        CASE
+          WHEN sender_stbx_uid = $1 THEN 'sent'
+          WHEN receiver_stbx_uid = $1 THEN 'received'
+        END AS type,
+
+        CASE
+          WHEN sender_stbx_uid = $1 THEN receiver_stbx_uid
+          WHEN receiver_stbx_uid = $1 THEN sender_stbx_uid
+        END AS counterparty,
+
         asset,
         amount,
         tx_type,
@@ -306,18 +318,89 @@ const searchTransactions = async (req, res) => {
         note,
         blockchain_tx_hash,
         created_at
+
       FROM transactions
+
       WHERE
-      (
-        sender_stbx_uid = $1
-        OR receiver_stbx_uid = $1
-      )
-      AND
-      (
-        sender_stbx_uid ILIKE '%' || $2 || '%'
-        OR receiver_stbx_uid ILIKE '%' || $2 || '%'
-        OR str_id ILIKE '%' || $2 || '%'
-      )
+        (
+          sender_stbx_uid = $1
+          OR receiver_stbx_uid = $1
+        )
+
+        AND
+        (
+          sender_stbx_uid ILIKE '%' || $2 || '%'
+          OR receiver_stbx_uid ILIKE '%' || $2 || '%'
+          OR str_id ILIKE '%' || $2 || '%'
+        )
+
+
+      UNION ALL
+
+
+      
+      SELECT
+        "STRId" AS "STRId",
+        NULL AS sender_stbx_uid,
+        stbx_uid AS receiver_stbx_uid,
+
+        'deposit' AS type,
+
+        'Deposit' AS counterparty,
+
+        asset,
+        amount,
+        NULL AS tx_type,
+        status,
+        NULL AS note,
+        blockchain_tx_hash,
+        created_at
+
+      FROM deposits
+
+      WHERE
+        stbx_uid = $1
+
+        AND
+        (
+          "STRId" ILIKE '%' || $2 || '%'
+          OR stbx_uid ILIKE '%' || $2 || '%'
+        )
+
+
+      UNION ALL
+
+
+     
+      SELECT
+        "STRId" AS "STRId",
+        stbx_uid AS sender_stbx_uid,
+        NULL AS receiver_stbx_uid,
+
+        'withdraw' AS type,
+
+        'Withdraw' AS counterparty,
+
+        asset,
+        amount,
+        NULL AS tx_type,
+        status,
+        NULL AS note,
+        NULL AS blockchain_tx_hash,
+        created_at
+
+      FROM withdraws
+
+      WHERE
+        stbx_uid = $1
+
+        AND
+        (
+          "STRId" ILIKE '%' || $2 || '%'
+          OR stbx_uid ILIKE '%' || $2 || '%'
+        )
+
+
       ORDER BY created_at DESC
       `,
       [stbx_uid, q]
