@@ -36,7 +36,6 @@ body("blockchain_tx_hash")
 .withMessage("Invalid blockchain transaction hash")
 ];
 
-
 const withdrawValidation = [
 
   body("stbx_uid")
@@ -58,7 +57,12 @@ const withdrawValidation = [
       "Arbitrum (Testnet)",
       "Polygon (Testnet)",
       "Base (Testnet)",
-      "Tron (Testnet)"
+      "Tron (Testnet)",
+      "Ethereum (Sepolia)",
+      "Arbitrum (Sepolia)",
+      "Polygon (Amoy)",
+      "Base (Sepolia)",
+      "Tron (Nile Testnet)"
     ])
     .withMessage("Invalid withdraw network"),
 
@@ -72,8 +76,9 @@ const withdrawValidation = [
     .withMessage("Invalid wallet address")
 
 ];
+
 module.exports = {
   transactionValidation,
   depositValidation,
   withdrawValidation
-};
+};s
