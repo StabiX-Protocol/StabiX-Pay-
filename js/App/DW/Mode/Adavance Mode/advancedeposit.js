@@ -92,7 +92,7 @@ border-radius:12px;
 border:1px solid var(--border);
 margin-bottom:15px;">
 <div style="font-size:12px;opacity:0.6;">Vault Address</div>
-<a href="${EXPLORERS[network]}${vault}" target="_blank" style="
+<a href="${window.EXPLORERS[network]}${vault}" target="_blank" style="
 font-size:13px;
 color:var(--primary);
 word-break:break-all;

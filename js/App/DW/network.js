@@ -33,5 +33,6 @@ const EXPLORERS = {
 "Base Sepolia": "https://basescan.org/address/"
 };
 
-window.WALLETS = WALLETS
-window.VAULTS = VAULTS
+window.WALLETS = WALLETS;
+window.VAULTS = VAULTS;
+window.EXPLORERS = EXPLORERS;
