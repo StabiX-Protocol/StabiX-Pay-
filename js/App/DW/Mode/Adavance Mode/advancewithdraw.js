@@ -217,7 +217,7 @@ window.submitWithdrawFinal = async function(asset, network){
   try{
 
     const response = await fetch(
-      "http://10.148.199.19:3000/api/withdraw/",
+      "http://10.148.199.19:3000/api/withdraws",
       {
         method: "POST",
         headers: {
@@ -243,7 +243,7 @@ window.submitWithdrawFinal = async function(asset, network){
     }
 
     alert(
-      "Withdraw Request Submitted\nYour request has been sent for validation."
+      "Withdraw Request Submitted\nYour Merkle Proof will be available once the batch is created. Withdraw only after receiving the proof. Withdrawals require your private key StabiX cannot withdraw funds on your behalf.."
     );
 
     goDeposit();

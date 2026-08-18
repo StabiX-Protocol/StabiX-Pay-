@@ -185,7 +185,7 @@ if(!response.ok){
 }
 
     alert(
-      "Withdraw Request Submitted\nYour request has been sent for validation."
+      "Withdraw Request Submitted\nYour Funds Will Be Withdrawn To Your Wallet Address Shortly."
     );
 
     goDeposit();
