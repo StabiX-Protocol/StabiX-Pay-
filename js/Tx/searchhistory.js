@@ -4,21 +4,19 @@ window.setupHistorySearch = () => {
 
   if (!input) return;
 
-  input.addEventListener("input", async (e) => {
+  input.oninput = async (e) => {
 
-    const val = e.target.value.trim();
+    const q = e.target.value.trim();
 
     try {
 
-      if (!val) {
-
-        await window.loadHistoryByDate();
+      if (!q) {
+        await loadHistoryByDate();
         return;
-
       }
 
       const response = await fetch(
-        `http://10.148.199.19:3000/api/transactions/search/${window.getCurrentUserId()}?q=${encodeURIComponent(val)}`,
+        `http://10.148.199.19:3000/api/transactions/search/${window.getCurrentUserId()}?q=${encodeURIComponent(q)}`,
         {
           headers: {
             Authorization: `Bearer ${window.getToken()}`
@@ -29,21 +27,12 @@ window.setupHistorySearch = () => {
       const data = await response.json();
 
       if (!response.ok) {
-
-        console.error("Search API error:", data);
-
-        window.renderHistory(
-          [],
-          "No results"
-        );
-
+        window.renderHistory([], "No results");
         return;
       }
 
-      const transactions = data.transactions || [];
-
       window.renderHistory(
-        transactions,
+        data.transactions || [],
         "No results"
       );
 
@@ -51,13 +40,7 @@ window.setupHistorySearch = () => {
 
       console.error("Transaction search error:", err);
 
-      window.renderHistory(
-        [],
-        "No results"
-      );
-
+      window.renderHistory([], "No results");
     }
-
-  });
-
+  };
 };
