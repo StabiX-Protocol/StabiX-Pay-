@@ -15,7 +15,7 @@ import "./App/navigation/setting.js";
 import "./App/DW/Mode/Instant Mode/instantdeposit.js";
 import "./App/DW/Mode/Instant Mode/instantwithdraw.js";
 import "./App/DW/Mode/Adavance Mode/advancedeposit.js";
-import "./App/DW/Mode/Adavance Mode/advancedwithdraw.js";
+import "./App/DW/Mode/Adavance Mode/advancewithdraw.js";
 
 import "./App/DW/dwnav.js";
 import "./App/DW/network.js";
