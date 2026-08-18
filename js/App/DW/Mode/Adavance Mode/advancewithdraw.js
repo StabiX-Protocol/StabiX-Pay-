@@ -238,9 +238,10 @@ window.submitWithdrawFinal = async function(asset, network){
     const data = await response.json();
 
     if(!response.ok){
-      alert(data.message || "Withdraw request failed");
-      return;
-    }
+  console.error("WITHDRAW ERROR:", response.status, data);
+  alert(data.message || "Withdraw request failed");
+  return;
+}
 
     alert(
       "Withdraw Request Submitted\nYour Merkle Proof will be available once the batch is created. Withdraw only after receiving the proof. Withdrawals require your private key StabiX cannot withdraw funds on your behalf.."
