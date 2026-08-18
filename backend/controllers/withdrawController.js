@@ -42,17 +42,22 @@ const createWithdraw = async (req, res) => {
     }
 
     if (![
-      "Ethereum (Testnet)",
-      "Arbitrum (Testnet)",
-      "Polygon (Testnet)",
-      "Base (Testnet)",
-      "Tron (Testnet)"
-    ].includes(network)) {
-      return res.status(400).json({
-        success: false,
-        message: "Unsupported network"
-      });
-    }
+  "Ethereum (Testnet)",
+  "Arbitrum (Testnet)",
+  "Polygon (Testnet)",
+  "Base (Testnet)",
+  "Tron (Testnet)",
+  "Ethereum (Sepolia)",
+  "Arbitrum (Sepolia)",
+  "Polygon (Amoy)",
+  "Base (Sepolia)",
+  "Tron (Nile Testnet)"
+].includes(network)) {
+  return res.status(400).json({
+    success: false,
+    message: "Unsupported network"
+  });
+}
 
     if (!Number.isFinite(Number(amount)) || Number(amount) <= 0) {
       return res.status(400).json({
