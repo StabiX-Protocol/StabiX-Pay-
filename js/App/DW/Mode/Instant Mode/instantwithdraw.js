@@ -164,12 +164,25 @@ window.submitInstantWithdraw = async function(asset, network){
       }
     );
 
-    const data = await response.json();
+   const contentType = response.headers.get("content-type") || "";
 
-    if(!response.ok){
-      alert(data.message || "Withdraw request failed");
-      return;
-    }
+let data;
+
+if (contentType.includes("application/json")) {
+  data = await response.json();
+} else {
+  const text = await response.text();
+
+  console.error("WITHDRAW SERVER RESPONSE:", text);
+
+  alert("Withdraw server returned an invalid response.");
+  return;
+}
+
+if(!response.ok){
+  alert(data.message || "Withdraw request failed");
+  return;
+}
 
     alert(
       "Withdraw Request Submitted\nYour request has been sent for validation."
