@@ -36,24 +36,42 @@ body("blockchain_tx_hash")
 .withMessage("Invalid blockchain transaction hash")
 ];
 
+
 const withdrawValidation = [
-body("stbx_uid")
-.notEmpty()
-.withMessage("STBX UID is required"),
 
-body("asset")
-.isIn(["USDT", "USDC"])
-.withMessage("Invalid asset"),
+  body("stbx_uid")
+    .trim()
+    .notEmpty()
+    .withMessage("STBX UID is required"),
 
-body("amount")
-.isFloat({ gt: 0 })
-.withMessage("Amount must be greater than 0"),
+  body("asset")
+    .isIn(["USDT", "USDC"])
+    .withMessage("Invalid asset"),
 
-body("wallet_address")
-.matches(/^0x[a-fA-F0-9]{40}$/)
-.withMessage("Invalid wallet address")
+  body("mode")
+    .isIn(["instant", "advanced"])
+    .withMessage("Invalid withdraw mode"),
+
+  body("network")
+    .isIn([
+      "Ethereum (Testnet)",
+      "Arbitrum (Testnet)",
+      "Polygon (Testnet)",
+      "Base (Testnet)",
+      "Tron (Testnet)"
+    ])
+    .withMessage("Invalid withdraw network"),
+
+  body("amount")
+    .isFloat({ gt: 0 })
+    .withMessage("Amount must be greater than 0"),
+
+  body("wallet_address")
+    .trim()
+    .matches(/^0x[a-fA-F0-9]{40}$/)
+    .withMessage("Invalid wallet address")
+
 ];
-
 module.exports = {
   transactionValidation,
   depositValidation,
