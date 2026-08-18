@@ -6,6 +6,7 @@ import "./App/send.js";
 import "./App/notification.js";
 import "./App/qr.js";
 
+import "./App/DW/Mode/selectmode.js"
 import "./App/navigation/homenav.js";
 import "./App/navigation/deposit.js";
 import "./App/navigation/history.js";
