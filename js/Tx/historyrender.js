@@ -4,6 +4,13 @@ window.renderHistory = function (transactions, emptyText) {
 
   transactions.forEach((t) => {
 
+  if (
+    t.type === "withdraw" &&
+    String(t.status || "").toUpperCase() !== "APPROVED"
+  ) {
+    return;
+  }
+
     if (window.filters.type) {
       if (t.type !== window.filters.type) return;
     }
