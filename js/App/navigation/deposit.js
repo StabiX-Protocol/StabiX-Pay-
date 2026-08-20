@@ -35,7 +35,7 @@ cursor:pointer;">
 <div>USDT</div>
 </div>
 <div style="font-weight:bold">
-${user.usdtBalance?.toFixed(2) || "0.00"}
+${window.userData?.usdtBalance?.toFixed(2) || "0.00"}
 </div>
 </div>
 
@@ -53,8 +53,7 @@ cursor:pointer;">
 <div>USDC</div>
 </div>
 <div style="font-weight:bold">
-${user.balance?.toFixed(2) || "0.00"}
-</div>
+${window.userData?.balance?.toFixed(2) || "0.00"}</div>
 </div>
 
 <div style="margin-top:25px;">
