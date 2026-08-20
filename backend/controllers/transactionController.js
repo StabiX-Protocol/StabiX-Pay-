@@ -154,6 +154,7 @@ const getTransactionHistory = async (req, res) => {
         created_at
       FROM withdraws
       WHERE stbx_uid = $1
+      AND status = 'APPROVED'
 
       ORDER BY created_at DESC
       `,
@@ -401,6 +402,7 @@ const searchTransactions = async (req, res) => {
 
       WHERE
         stbx_uid = $1
+        AND status = 'APPROVED'
         AND
         (
           "STRId" ILIKE '%' || $2 || '%'
