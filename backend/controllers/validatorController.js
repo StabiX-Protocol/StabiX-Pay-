@@ -96,7 +96,7 @@ const { STRId } = req.params;
 const deposit = await client.query(
 `SELECT *
 FROM deposits
-WHERE STRId = $1`,
+WHERE "STRId" = $1`,
 [STRId]
 );
 
@@ -155,7 +155,7 @@ const { STRId } = req.params;
 const withdraw = await client.query(
 `SELECT *
 FROM withdraws
-WHERE STRId = $1`,
+WHERE "STRId" = $1`,
 [STRId]
 );
 
@@ -219,7 +219,7 @@ const { STRId } = req.params;
 const withdraw = await client.query(
 `SELECT *
 FROM withdraws
-WHERE STRId = $1`,
+WHERE "STRId" = $1`,
 [STRId]
 );
 
@@ -269,7 +269,7 @@ const getPendingDeposits = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT
-        STRId,
+        "STRId",
         stbx_uid,
         asset,
         mode,
@@ -303,7 +303,7 @@ try {
 
 const result = await pool.query(
        `SELECT
-        STRId,
+        "STRId",
         stbx_uid,
         asset,
         mode,
