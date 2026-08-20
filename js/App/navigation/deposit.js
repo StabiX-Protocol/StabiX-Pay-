@@ -69,7 +69,7 @@ Recent Activity
 </div>
 `;
 
-  (async () => {
+ (async () => {
 
   const response = await fetch(
     `http://10.148.199.19:3000/api/transactions/history/${window.getCurrentUserId()}`,
@@ -82,12 +82,16 @@ Recent Activity
 
   const data = await response.json();
 
-  if (!response.ok) return;
+  if (!response.ok) {
+    document.getElementById("recentTxs").innerHTML =
+      `<div style="opacity:.5;">Unable to load activity</div>`;
+    return;
+  }
 
-  let arr = data.transactions.filter(t =>
-  t.tx_type === "deposit" ||
-  t.tx_type === "withdraw"
-);
+  let arr = (data.transactions || []).filter(t =>
+    t.type === "deposit" ||
+    t.type === "withdraw"
+  );
 
   arr.sort(
     (a, b) =>
@@ -101,8 +105,7 @@ Recent Activity
 
   arr.forEach(t => {
 
-    const isDeposit =
-  t.tx_type === "deposit";
+    const isDeposit = t.type === "deposit";
 
     const time = new Date(
       t.created_at
@@ -120,37 +123,34 @@ justify-content:space-between;
 padding:10px 0;
 border-bottom:1px solid var(--border);">
 
-<div style="font-size:13px;">
+  <div style="font-size:13px;">
 
-<div>
-${isDeposit ? "Deposit" : "Withdraw"}
-</div>
+    <div>
+      ${isDeposit ? "Deposit" : "Withdraw"}
+    </div>
 
-<div style="
-font-size:11px;
-opacity:.6;">
+    <div style="
+    font-size:11px;
+    opacity:.6;">
+      ${time}
+    </div>
 
-${time}
+  </div>
 
-</div>
+  <div style="
+  font-weight:600;
+  color:${isDeposit
+    ? "var(--success)"
+    : "var(--danger)"};">
 
-</div>
+    ${isDeposit ? "+" : "-"}
+    ${Number(t.amount).toFixed(2)}
+    ${t.asset}
 
-<div style="
-font-weight:600;
-color:${isDeposit
-? "var(--success)"
-: "var(--danger)"};">
-
-${isDeposit ? "+" : "-"}
-${t.amount}
-${t.asset}
-
-</div>
+  </div>
 
 </div>
 `;
-
   });
 
   document.getElementById("recentTxs").innerHTML =
