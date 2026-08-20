@@ -118,7 +118,7 @@ await client.query(
 `UPDATE deposits
 SET status = 'REJECTED',
 updated_at = NOW()
-WHERE STRId = $1`,
+WHERE "STRId" = $1`,
 [STRId]
 );
 
@@ -143,8 +143,8 @@ client.release();
 }
 };
 
-const approveWithdraw = async (req, res) => {
 
+const approveWithdraw = async (req, res) => {
 const client = await pool.connect();
 
 try {
@@ -184,7 +184,7 @@ await client.query(
 `UPDATE withdraws
 SET status = 'APPROVED',
 updated_at = NOW()
-WHERE STRId = $1`,
+WHERE "STRId" = $1`,
 [STRId]
 );
 
@@ -241,7 +241,7 @@ await client.query(
 `UPDATE withdraws
 SET status = 'REJECTED',
 updated_at = NOW()
-WHERE STRId = $1`,
+WHERE "STRId" = $1`,
 [STRId]
 );
 
