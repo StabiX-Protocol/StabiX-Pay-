@@ -1,0 +1,41 @@
+@media (max-width:480px){
+
+.box{
+margin:12px;
+padding:18px;
+padding-bottom:90px;
+border-radius:18px;
+}
+
+}
+
+@media (min-width:481px) and (max-width:768px){
+
+.box{
+max-width:500px;
+}
+
+}
+
+@media (min-width:769px){
+
+body{
+display:flex;
+justify-content:center;
+padding:24px;
+}
+
+.box{
+max-width:520px;
+min-height:auto;
+}
+
+}
+
+@media (min-width:1200px){
+
+.box{
+max-width:560px;
+}
+
+}

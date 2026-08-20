@@ -9,6 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="./media/icon-192.png">
 <link rel="shortcut icon" href="./media/icon-192.png">
 <link rel="apple-touch-icon" href="./media/icon-192.png">
+<script src="https://accounts.google.com/gsi/client" async defer></script> 
 </head>
 <body>
 <div id="app">Loading…</div>
@@ -279,13 +280,15 @@ height:70px;
 background:color-mix(in srgb, var(--bg) 90%, transparent);
 backdrop-filter:blur(12px);
 border-radius:22px;
-display:none;
+display:flex;
 justify-content:space-around;
 align-items:center;
 z-index:999;
-box-shadow:0 8px 30px rgba(0,0,0,0.3);
+box-shadow:var(--shadow);
 ">
-<div id="tab-home" onclick="navigateHome()" style="flex:1;text-align:center;cursor:pointer">
+
+<!-- HOME TAB -->
+<div id="tab-home" onclick="navigateHome();selectTab(this)" style="flex:1;text-align:center;cursor:pointer" class="nav-item nav-item-active">
 <div class="nav-icon">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
 <path d="M3 10L12 3L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -294,8 +297,9 @@ box-shadow:0 8px 30px rgba(0,0,0,0.3);
 </div>
 <div class="nav-text">Home</div>
 </div>
-  
-<div id="tab-deposit" onclick="goDeposit();selectTab('deposit')" style="flex:1;text-align:center;cursor:pointer">
+
+<!-- D/W TAB -->
+<div id="tab-deposit" onclick="goDeposit();selectTab(this)" style="flex:1;text-align:center;cursor:pointer" class="nav-item">
 <div class="nav-icon">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
 <path d="M7 8V14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -304,10 +308,22 @@ box-shadow:0 8px 30px rgba(0,0,0,0.3);
 <path d="M14 11L17 8L20 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 </div>
-
 <div class="nav-text">D/W</div>
 </div>
-<div id="tab-history" onclick="goHistory();selectTab('history')" style="flex:1;text-align:center;cursor:pointer">
+
+<!-- BUSINESS -->
+<div id="tab-business" onclick="openBusiness();selectTab(this)">
+<div class="business-fab">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+<circle cx="12" cy="7.2" r="3.2" fill="white"/>
+<path d="M6.5 18c0-3.2 2.7-5 5.5-5s5.5 1.8 5.5 5" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+</svg>
+</div>
+<div class="nav-text">Business</div>
+</div>
+
+<!-- HISTORY -->
+<div id="tab-history" onclick="goHistory();selectTab(this)" style="flex:1;text-align:center;cursor:pointer" class="nav-item">
 <div class="nav-icon">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
@@ -316,8 +332,9 @@ box-shadow:0 8px 30px rgba(0,0,0,0.3);
 </div>
 <div class="nav-text">History</div>
 </div>
-  
-<div id="tab-settings" onclick="goSettings();selectTab('settings')" style="flex:1;text-align:center;cursor:pointer">
+
+<!-- SETTINGS -->
+<div id="tab-settings" onclick="goSettings();selectTab(this)" style="flex:1;text-align:center;cursor:pointer" class="nav-item">
 <div class="nav-icon">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
 <line x1="5" y1="7" x2="19" y2="7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
@@ -331,7 +348,7 @@ box-shadow:0 8px 30px rgba(0,0,0,0.3);
 
   
 <script src="./js/identity.js"></script>
-<script type="module" src="./js/app.js"></script>
+<script type="module" src="./js/main.js"></script>
 <script src="./js/auth.js"></script>
   
 <!--

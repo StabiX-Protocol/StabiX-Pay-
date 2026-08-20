@@ -1,0 +1,310 @@
+/* ===== Sending UI===== */
+#sendScreen,
+#amountScreen,
+#confirmScreen{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:var(--bg);
+color:var(--text);
+z-index:999;
+display:none;
+flex-direction:column;
+transition:.25s;
+}
+
+.sendHeader{
+display:flex;
+align-items:center;
+justify-content:center;
+position:relative;
+padding:18px 20px;
+background:var(--card);
+border-bottom:1px solid var(--border);
+}
+
+.sendHeader button{
+position:absolute;
+left:18px;
+margin:0;
+width:42px;
+height:42px;
+padding:0;
+border-radius:12px;
+background:var(--surface);
+border:1px solid var(--border);
+color:var(--text);
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:var(--shadow);
+}
+
+.sendHeader h2{
+margin:0;
+font-size:21px;
+font-weight:700;
+letter-spacing:.2px;
+color:var(--text);
+}
+
+.sendBody{
+flex:1;
+padding:24px 20px;
+overflow-y:auto;
+}
+
+.sendTitle{
+font-size:30px;
+font-weight:800;
+letter-spacing:-.5px;
+margin-bottom:10px;
+color:var(--text);
+}
+
+.sendSub{
+font-size:15px;
+line-height:1.6;
+color:var(--subtext);
+margin-bottom:24px;
+}
+
+.addressBox{
+display:flex;
+gap:12px;
+align-items:center;
+color:var(--text);
+}
+
+.addressBox input{
+flex:1;
+height:58px;
+padding:0 18px;
+border-radius:16px;
+border:1px solid var(--border);
+background:var(--surface);
+color:var(--text);
+font-size:16px;
+font-weight:600;
+transition:.2s ease;
+}
+
+.addressBox input::placeholder{
+color:var(--subtext);
+}
+
+.addressBox input:focus{
+outline:none;
+border-color:var(--primary);
+box-shadow:0 0 0 4px rgba(59,130,246,.15);
+}
+
+.addressBox button{
+width:58px;
+height:58px;
+padding:0;
+margin:0;
+border:none;
+border-radius:16px;
+background:var(--surface);
+border:1px solid var(--border);
+color:var(--text);
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:var(--shadow);
+transition:.2s;
+}
+
+.addressBox button:active{
+transform:scale(.96);
+}
+
+.nextBtn{
+margin-top:28px;
+width:100%;
+height:58px;
+border:none;
+border-radius:18px;
+background:linear-gradient(180deg,var(--primary),var(--primary-hover));
+color:#fff;
+font-size:17px;
+font-weight:700;
+letter-spacing:.2px;
+box-shadow:0 10px 28px rgba(37,99,235,.28);
+transition:.2s;
+}
+
+.nextBtn:hover{
+filter:brightness(1.05);
+}
+
+.nextBtn:active{
+transform:scale(.985);
+box-shadow:0 5px 14px rgba(37,99,235,.18);
+}
+
+.sendHint{
+margin-top:20px;
+padding:16px 18px;
+background:var(--surface);
+border:1px solid var(--border);
+border-radius:14px;
+box-shadow:var(--shadow);
+transition:.2s;
+}
+
+.hintTitle{
+font-size:14px;
+font-weight:700;
+color:var(--text);
+margin-bottom:10px;
+letter-spacing:.2px;
+}
+
+.hintLine{
+font-size:13px;
+color:var(--subtext);
+line-height:1.75;
+}
+
+.backBtn{
+width:42px;
+height:42px;
+padding:0;
+margin:0;
+background:var(--surface);
+border:1px solid var(--border);
+border-radius:14px;
+color:var(--text);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:20px;
+flex-shrink:0;
+box-shadow:var(--shadow);
+transition:.2s;
+}
+
+.backBtn:hover{
+background:var(--card);
+}
+
+.backBtn:active{
+transform:scale(.95);
+}
+
+.sendIcon{
+font-size:64px;
+text-align:center;
+color:var(--success);
+margin-bottom:14px;
+animation:sendGlow 1.8s ease-in-out infinite;
+filter:drop-shadow(0 0 14px rgba(34,197,94,.45));
+}
+@keyframes sendGlow{
+0%{
+transform:translateY(3px) scale(.98);
+opacity:.7;
+}
+50%{
+transform:translateY(-5px) scale(1.04);
+opacity:1;
+}
+100%{
+transform:translateY(3px) scale(.98);
+opacity:.7;
+}
+}
+
+.amountInput{
+width:100%;
+height:74px;
+padding:0 22px;
+border:2px solid var(--primary);
+border-radius:20px;
+background:var(--surface);
+color:var(--text);
+font-size:40px;
+font-weight:700;
+outline:none;
+box-sizing:border-box;
+transition:.2s;
+box-shadow:inset 0 1px 2px rgba(0,0,0,.04);
+}
+
+.amountInput:focus{
+border-color:var(--primary);
+box-shadow:
+0 0 0 4px rgba(59,130,246,.15),
+var(--shadow);
+}
+
+.amountInput::placeholder{
+color:var(--subtext);
+font-size:24px;
+font-weight:500;
+}
+
+/* ===== Confirm Screen===== */
+.confirmAmount{
+    margin:40px 0 28px;
+    font-size:60px;
+    font-weight:700;
+    text-align:center;
+    color:var(--text);
+}
+
+.confirmDivider{
+    border:none;
+    border-top:1px solid var(--border);
+    margin:0 0 26px;
+}
+
+.confirmRow{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    padding:14px 0;
+}
+
+.confirmLabel{
+    font-size:15px;
+    color:var(--subtext);
+    white-space:nowrap;
+}
+
+.confirmValue{
+    font-size:15px;
+    font-weight:600;
+    color:var(--text);
+    text-align:right;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.mono{
+    font-family:monospace;
+}
+
+.confirmHint{
+    margin:22px 0 26px;
+    font-size:13px;
+    line-height:1.6;
+    color:var(--subtext);
+}
+
+.confirmBtn{
+    width:100%;
+    height:56px;
+    border:none;
+    border-radius:16px;
+    background:var(--success);
+    color:var(--text);
+    font-size:18px;
+    font-weight:700;
+}

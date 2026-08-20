@@ -1,0 +1,56 @@
+.notifBell {
+  position: absolute;
+  top: -8px;
+  right: 0px;   
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.9;
+  margin: 0; 
+}
+.notifBell svg {
+  width: 22px;
+  height: 22px;
+}
+
+.notifBell:active {
+  transform: scale(0.95);
+  opacity: 0.7;
+}
+
+.notifCount {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+
+  background: #ff3b30;
+  color: white;
+
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 10px;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.notifHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.backBtn {
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.8;
+}
