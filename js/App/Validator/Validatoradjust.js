@@ -37,7 +37,7 @@ window.validatorAdjust = async () => {
   try {
 
     const response = await fetch(
-      "http://10.148.199.19:3000/api/validator/manual-adjust",
+      apiUrl("/api/validator/manual-adjust"),
       {
         method: "POST",
         headers: {

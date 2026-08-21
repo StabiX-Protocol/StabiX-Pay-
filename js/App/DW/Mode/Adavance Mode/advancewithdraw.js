@@ -217,7 +217,7 @@ window.submitWithdrawFinal = async function(asset, network){
   try{
 
     const response = await fetch(
-      "http://10.148.199.19:3000/api/withdraws",
+      apiUrl("/api/withdraws"),
       {
         method: "POST",
         headers: {

@@ -1,3 +1,4 @@
+import "./config.js";
 import "./Tx/tx.js";
 import "./auth.js"
 import "./App/home.js";
@@ -166,7 +167,7 @@ window.updatePassword = async () => {
     return alert("Reset session expired.");
   }
 
- const response = await fetch("http://10.148.199.19:3000/api/users/reset-password", {
+ const response = await fetch(apiUrl("/api/users/reset-password"), {
   method: "PATCH",
   headers: {
     "Content-Type": "application/json"
@@ -248,7 +249,7 @@ window.saveUsername = async () => {
   try {
 
     const response = await fetch(
-      "http://10.148.199.19:3000/api/users/register",
+      apiUrl("/api/users/register"),
       {
         method: "POST",
 
@@ -368,7 +369,7 @@ async function manualLogin() {
     return alert("Fill all fields");
   }
 
-  const response = await fetch("http://10.148.199.19:3000/api/users/login", {
+  const response = await fetch(apiUrl("/api/users/login"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json"

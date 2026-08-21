@@ -16,7 +16,7 @@ window.syncWalletBalances = async function () {
     try {
 
         const response = await fetch(
-            `http://10.148.199.19:3000/api/balance/${window.getCurrentUserId()}`,
+            apiUrl(`/api/balance/${window.getCurrentUserId()}`),
             {
                 headers: {
                     Authorization: `Bearer ${window.getToken()}`
@@ -92,7 +92,7 @@ if (primaryEl) {
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
 const response = await fetch(
-`http://10.148.199.19:3000/api/users/profile/${window.getCurrentUserId()}`,
+apiUrl(`/api/users/profile/${window.getCurrentUserId()}`),
 {
 headers: {
 Authorization: `Bearer ${window.getToken()}`
@@ -653,7 +653,7 @@ if(window.keepAssetOpen){
        // RECEIVE POPUP
 try {
 const response = await fetch(
-`http://10.148.199.19:3000/api/transactions/history/${WALLET}`,
+apiUrl(`/api/transactions/history/${WALLET}`),
 {
 headers: {
         Authorization: `Bearer ${window.getToken()}`
@@ -812,7 +812,7 @@ if (current && current.toLowerCase() === newAddr.toLowerCase()) {
 }
 
 const response = await fetch(
-  "http://10.148.199.19:3000/api/users/eoa-address",
+  apiUrl("/api/users/eoa-address"),
   {
     method: "PATCH",
     headers: {
@@ -892,7 +892,7 @@ const current = data.username || "";
     }
 
     const response = await fetch(
-  "http://10.148.199.19:3000/api/users/username",
+  apiUrl("/api/users/username"),
   {
     method: "PATCH",
     headers: {

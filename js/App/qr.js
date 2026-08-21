@@ -29,7 +29,7 @@ return;
 } 
 try{
 const response = await fetch(
-  `http://10.148.199.19:3000/api/users/profile/${targetId}`,
+  apiUrl(`/api/users/profile/${targetId}`),
   {
     headers: {
       Authorization: `Bearer ${window.getToken()}`
@@ -120,7 +120,7 @@ return;
 }
 const targetId = data.id;
 const response = await fetch(
-  `http://10.148.199.19:3000/api/users/profile/${targetId}`,
+  apiUrl(`/api/users/profile/${targetId}`),
   {
     headers: {
       Authorization: `Bearer ${window.getToken()}`

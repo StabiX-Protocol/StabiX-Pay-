@@ -6,7 +6,7 @@ window.openNotifications = async () => {
   try {
 
     const response = await fetch(
-      `http://10.148.199.19:3000/api/notifications/${window.getCurrentUserId()}`,
+      apiUrl(`/api/notifications/${window.getCurrentUserId()}`),
       {
         headers: {
           Authorization: `Bearer ${window.getToken()}`
@@ -178,7 +178,7 @@ ${formatTime(d.created_at)}
 window.listenNotifications = async function () {
  try {
  const response = await fetch(
- `http://10.148.199.19:3000/api/notifications/${window.getCurrentUserId()}`,
+ apiUrl(`/api/notifications/${window.getCurrentUserId()}`),
  {
  headers: {
  Authorization: `Bearer ${window.getToken()}`
@@ -275,7 +275,7 @@ function formatRelativeDate(ts) {
 window.openNotifDetail = async (id) => {
  try {
  await fetch(
- `http://10.148.199.19:3000/api/notifications/read/${id}`,
+ apiUrl(`/api/notifications/read/${id}`),
  {
  method: "PATCH",
  headers: {
@@ -285,7 +285,7 @@ window.openNotifDetail = async (id) => {
  );
 
  const response = await fetch(
- `http://10.148.199.19:3000/api/notifications/detail/${id}`,
+ apiUrl(`/api/notifications/detail/${id}`),
  {
  headers: {
  Authorization: `Bearer ${window.getToken()}`
@@ -387,7 +387,7 @@ window.sendValidatorNotification = async () => {
 
  try {
  const response = await fetch(
- "http://10.148.199.19:3000/api/notifications/broadcast",
+ apiUrl("/api/notifications/broadcast"),
  {
  method: "POST",
  headers: {
