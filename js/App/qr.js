@@ -3,7 +3,7 @@ window.openScanner = async ()=>{
 document.getElementById("scannerOverlay").style.display = "block"
 document.getElementById("torchBtn").style.display = "block"
 document.getElementById("galleryBtn").style.display = "block"
-  
+
 qrScanner = new Html5Qrcode("qr-reader")
 await qrScanner.start(
 { facingMode: "environment" },
@@ -29,19 +29,19 @@ return;
 } 
 try{
 const response = await fetch(
-  apiUrl(`/api/users/profile/${targetId}`),
-  {
-    headers: {
-      Authorization: `Bearer ${window.getToken()}`
-    }
-  }
+apiUrl(`/api/users/profile/${targetId}`),
+{
+headers: {
+Authorization: `Bearer ${window.getToken()}`
+}
+}
 );
-
+     
 const user = await response.json();
 
 if (!response.ok) {
-  alert(user.message || "User not found");
-  return;
+alert(user.message || "User not found");
+return;
 }
 
 window.scannedAsset = window.primaryAsset;
@@ -49,9 +49,7 @@ window.scannedAsset = window.primaryAsset;
 alert("Error checking user")
 return
 }
-
-await qrScanner.stop()
-document.getElementById("scannerOverlay").style.display = "none"    
+await window.stopQRScanner();
 document.getElementById("previewId").value = targetId
 window.scannedId = targetId  
 window.isScanFlow = true;
@@ -67,19 +65,53 @@ asset === "USDT"
 )
 }
 
+window.stopQRScanner = async () => {
+
+    try {
+        if (qrScanner) {
+            try {
+                if (qrScanner.getState() === 2) {
+                    await qrScanner.stop();
+                }
+            } catch (e) {
+                console.log("QR scanner stop:", e);
+            }
+
+            // Clear scanner UI
+            try {
+                await qrScanner.clear();
+            } catch (e) {
+                console.log("QR scanner clear:", e);
+            }
+
+            qrScanner = null;
+        }
+        const video = document.querySelector("#qr-reader video");
+
+        if (video && video.srcObject) {
+            video.srcObject
+                .getTracks()
+                .forEach(track => {
+                    track.stop();
+                });
+
+            video.srcObject = null;
+        }
+
+    } catch (e) {
+        console.log("Camera cleanup error:", e);
+    }
+
+    torchOn = false;
+    window.scanDone = false;
+
+    document.getElementById("scannerOverlay").style.display = "none";
+    document.getElementById("galleryBtn").style.display = "none";
+    document.getElementById("torchBtn").style.display = "none";
+};
+
 window.closeScanner = async () => {
-try {
-if (qrScanner && qrScanner.getState() === 2) {
-await qrScanner.stop();
-}
-} catch (e) {
-console.log("Scanner stop error:", e);
-}
-document.getElementById("scannerOverlay").style.display = "none";
-document.getElementById("galleryBtn").style.display = "none"
-document.getElementById("torchBtn").style.display = "none";
-torchOn = false;
-window.scanDone = false;
+ await window.stopQRScanner();
 };
 
 let torchOn = false;
@@ -120,19 +152,18 @@ return;
 }
 const targetId = data.id;
 const response = await fetch(
-  apiUrl(`/api/users/profile/${targetId}`),
-  {
-    headers: {
-      Authorization: `Bearer ${window.getToken()}`
-    }
-  }
+apiUrl(`/api/users/profile/${targetId}`),
+{
+headers: {
+Authorization: `Bearer ${window.getToken()}`
+}
+}
 );
 
 const user = await response.json();
-
 if (!response.ok) {
-  alert(user.message || "User not found");
-  return;
+alert(user.message || "User not found");
+return;
 }
 
 window.scannedAsset = window.primaryAsset;
@@ -173,5 +204,3 @@ document.getElementById("previewScreen").style.display = "none";
 document.getElementById("bottomNav").style.display = "flex";
 scanDone = false;
 };
-
-
