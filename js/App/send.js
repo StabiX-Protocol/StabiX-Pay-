@@ -30,9 +30,8 @@ if(!toWallet){
 alert("Enter StabiX UID")
 return
 }
-const stbxPattern = /^STBX\d{10}$/;
-if (!stbxPattern.test(toWallet)) {
-alert("Enter valid StabiX UID (example: STBX123456789)")
+const stbxPattern = /^STBX\d{12}$|^STBX100FOUNDER$/;if (!stbxPattern.test(toWallet)) {
+alert("Enter valid StabiX UID (example: STBX123456789012)")
 return
 }
 if(toWallet === window.getCurrentUserId()){
