@@ -83,36 +83,61 @@ this.value = v;
 });
 
 window.handleNext = async () => {
-const amount = Number(document.getElementById("sendAmt").value)
-if(!amount || amount <= 0){
-alert("Enter valid amount")
-return
-}
-const response = await fetch(
-apiUrl(`/api/users/profile/${window.getCurrentUserId()}`),
-{
-headers: {
-Authorization: `Bearer ${window.getToken()}`
-}
-}
-);
-const data = await response.json();
-if (!response.ok) {
-alert(data.message);
-return;
-}
+  const amount = Number(
+    document.getElementById("sendAmt").value
+  );
 
-const asset = window.primaryAsset;
-const balance =
-asset === "USDC"
-? data.user.balance || 0
-: data.user.usdtBalance || 0;
-if(amount > balance){
-alert("Insufficient Balance")
-return
-}
-openConfirm()
-}
+  if (!amount || amount <= 0) {
+    alert("Enter valid amount");
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      apiUrl(`/api/balance/${window.getCurrentUserId()}`),
+      {
+        headers: {
+          Authorization: `Bearer ${window.getToken()}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Unable to fetch balance");
+      return;
+    }
+
+    const asset = window.primaryAsset;
+
+    const balanceRow = data.balances?.find(
+      b => b.asset === asset
+    );
+
+    const balance = Number(
+      balanceRow?.balance || 0
+    );
+
+    console.log("SEND ASSET:", asset);
+    console.log("SEND BALANCE:", balance);
+    console.log("SEND AMOUNT:", amount);
+
+    if (amount > balance) {
+      alert("Insufficient Balance");
+      return;
+    }
+
+    openConfirm();
+
+  } catch (err) {
+
+    console.error("BALANCE CHECK ERROR:", err);
+
+    alert("Error checking balance");
+  }
+};
 
 window.backToAddress = ()=>{
 document.getElementById("amountScreen").style.display = "none";
