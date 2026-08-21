@@ -49,7 +49,7 @@ window.scannedAsset = window.primaryAsset;
 alert("Error checking user")
 return
 }
-await window.stopQRScanner();
+setTimeout(async()=>{await window.stopQRScanner();},100);
 document.getElementById("previewId").value = targetId
 window.scannedId = targetId  
 window.isScanFlow = true;
