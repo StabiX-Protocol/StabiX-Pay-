@@ -31,11 +31,11 @@ if (!response.ok) {
 alert(data.message || "Transaction Failed");
 return;
 }
-await window.renderApp();
 showTxPopup(
 `Sent ${amount} ${window.primaryAsset} to ${toWallet}`,
 "success"
 );
+await window.renderApp();
 } catch (err) {
 console.log(err);
 alert("Server Error");

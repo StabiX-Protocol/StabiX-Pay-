@@ -667,22 +667,6 @@ headers: {
 
     const t = data.transactions[0];
 
-    if (t.type === "received") {
-
-      const key = "rx_" + t.STRId;
-
-      if (!sessionStorage.getItem(key)) {
-
-        showTxPopup(
-          `Received ${t.amount} ${t.asset} from ${t.counterparty}`
-        );
-
-        sessionStorage.setItem(key, "1");
-
-      }
-
-    }
-
   }
 
 } catch (e) {
