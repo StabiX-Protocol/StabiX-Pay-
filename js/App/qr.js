@@ -84,13 +84,6 @@ window.stopQRScanner = async () => {
         qrCameraStream = video.srcObject;
     }
 
-    if (qrCameraStream) {
-        qrCameraStream.getTracks().forEach(track => {
-            track.stop();
-        });
-        qrCameraStream = null;
-    }
-
     if (qrScanner) {
         try {
             if (qrScanner.getState() === 2) {
@@ -105,6 +98,16 @@ window.stopQRScanner = async () => {
         } catch (e) {
             console.log("QR clear error:", e);
         }
+    }
+
+    if (qrCameraStream) {
+        qrCameraStream.getTracks().forEach(track => track.stop());
+        qrCameraStream = null;
+    }
+
+    if (video) {
+        video.pause();
+        video.srcObject = null;
     }
 
     qrScanner = null;
