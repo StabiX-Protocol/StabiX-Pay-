@@ -91,7 +91,6 @@ if (primaryEl) {
 
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
-window.syncWalletBalances();
 const response = await fetch(
 apiUrl(`/api/users/profile/${window.getCurrentUserId()}`),
 {
@@ -434,7 +433,7 @@ appDiv(`
     ` : ``}
     </div>
     </div>
-    <div style="font-weight:bold">
+    <div id="selectorUSDTBalance" style="font-weight:bold">
     ${Number(window.userData?.usdtBalance || 0).toFixed(2)}
     </div>
     </div>
@@ -464,7 +463,7 @@ appDiv(`
     ` : ``}
     </div>
     </div>
-    <div style="font-weight:bold">
+    <div id="selectorUSDCBalance" style="font-weight:bold">
     ${Number(window.userData?.balance || 0).toFixed(2)}
     </div>
     </div>
