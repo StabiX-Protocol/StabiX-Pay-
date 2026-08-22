@@ -70,48 +70,42 @@ asset === "USDT"
 
 window.stopQRScanner = async () => {
 
-    const scanner = qrScanner;
+    const video = document.querySelector("#qr-reader video");
 
-    try {
-        if (scanner) {
+    if (video && video.srcObject) {
+        const stream = video.srcObject;
 
-            try {
-                if (scanner.getState() === 2) {
-                    await scanner.stop();
-                }
-            } catch (e) {
-                console.log("QR stop error:", e);
-            }
+        stream.getTracks().forEach(track => {
+            track.stop();
+        });
 
-            try {
-                await scanner.clear();
-            } catch (e) {
-                console.log("QR clear error:", e);
-            }
-        }
-
-        const video = document.querySelector("#qr-reader video");
-
-        if (video && video.srcObject) {
-            video.srcObject.getTracks().forEach(track => {
-                track.stop();
-            });
-
-            video.srcObject = null;
-        }
-
-    } finally {
-
-        qrScanner = null;
-        scanProcessing = false;
-
-        torchOn = false;
-        window.scanDone = false;
-
-        document.getElementById("scannerOverlay").style.display = "none";
-        document.getElementById("galleryBtn").style.display = "none";
-        document.getElementById("torchBtn").style.display = "none";
+        video.srcObject = null;
     }
+
+    if (qrScanner) {
+        try {
+            if (qrScanner.getState() === 2) {
+                await qrScanner.stop();
+            }
+        } catch (e) {
+            console.log("QR stop error:", e);
+        }
+
+        try {
+            await qrScanner.clear();
+        } catch (e) {
+            console.log("QR clear error:", e);
+        }
+    }
+
+    qrScanner = null;
+    scanProcessing = false;
+    torchOn = false;
+    window.scanDone = false;
+
+    document.getElementById("scannerOverlay").style.display = "none";
+    document.getElementById("galleryBtn").style.display = "none";
+    document.getElementById("torchBtn").style.display = "none";
 };
 
 window.closeScanner = async () => {
