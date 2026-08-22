@@ -25,11 +25,35 @@ data = JSON.parse(decodedText);
 alert("Invalid QR");
 return;
 }
+
 const targetId = data.id;
+
 if((data.type || "").toLowerCase() !== "stabix"){
 alert("Invalid QR");
 return;
-} 
+}
+
+try {
+    await qrScanner.stop();
+} catch (e) {
+    console.log("QR stop error:", e);
+}
+
+try {
+    await qrScanner.clear();
+} catch (e) {
+    console.log("QR clear error:", e);
+}
+
+const video = document.querySelector("#qr-reader video");
+
+if (video && video.srcObject) {
+    video.srcObject.getTracks().forEach(track => track.stop());
+    video.srcObject = null;
+}
+
+qrScanner = null;
+
 try{
 const response = await fetch(
 apiUrl(`/api/users/profile/${targetId}`),
@@ -52,7 +76,6 @@ window.scannedAsset = window.primaryAsset;
 alert("Error checking user")
 return
 }
-setTimeout(async()=>{await window.stopQRScanner();},100);
 document.getElementById("previewId").value = targetId
 window.scannedId = targetId  
 window.isScanFlow = true;
