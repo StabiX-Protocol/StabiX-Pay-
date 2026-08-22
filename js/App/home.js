@@ -433,7 +433,7 @@ appDiv(`
     ` : ``}
     </div>
     </div>
-    <div id="assetUSDTBalance" style="font-weight:bold"> 
+    <div id="selectorUSDTBalance" style="font-weight:bold"> 
     ${Number(window.userData?.usdtBalance || 0).toFixed(2)}
     </div>
     </div>
@@ -463,11 +463,10 @@ appDiv(`
     ` : ``}
     </div>
     </div>
-    <div id="assetUSDCBalance" style="font-weight:bold">
+    <div id="selectorUSDCBalance" style="font-weight:bold">
     ${Number(window.userData?.balance || 0).toFixed(2)}
     </div>
     </div>
-
 
     <div id="confirmBox" style="
     display:none;
