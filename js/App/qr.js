@@ -1,4 +1,5 @@
-let qrScanner = null
+let qrScanner = null;
+let qrCameraStream = null;
 let scanProcessing = false;
 window.openScanner = async ()=>{
 document.getElementById("scannerOverlay").style.display = "block"
@@ -32,28 +33,7 @@ if((data.type || "").toLowerCase() !== "stabix"){
 alert("Invalid QR");
 return;
 }
-
-try {
-    await qrScanner.stop();
-} catch (e) {
-    console.log("QR stop error:", e);
-}
-
-try {
-    await qrScanner.clear();
-} catch (e) {
-    console.log("QR clear error:", e);
-}
-
-const video = document.querySelector("#qr-reader video");
-
-if (video && video.srcObject) {
-    video.srcObject.getTracks().forEach(track => track.stop());
-    video.srcObject = null;
-}
-
-qrScanner = null;
-
+await window.stopQRScanner();
 try{
 const response = await fetch(
 apiUrl(`/api/users/profile/${targetId}`),
@@ -89,6 +69,11 @@ asset === "USDT"
 : "./media/usd-coin-usdc-logo.png";
 }
 )
+const video = document.querySelector("#qr-reader video");
+
+if (video && video.srcObject) {
+    qrCameraStream = video.srcObject;
+}
 }
 
 window.stopQRScanner = async () => {
@@ -96,13 +81,14 @@ window.stopQRScanner = async () => {
     const video = document.querySelector("#qr-reader video");
 
     if (video && video.srcObject) {
-        const stream = video.srcObject;
+        qrCameraStream = video.srcObject;
+    }
 
-        stream.getTracks().forEach(track => {
+    if (qrCameraStream) {
+        qrCameraStream.getTracks().forEach(track => {
             track.stop();
         });
-
-        video.srcObject = null;
+        qrCameraStream = null;
     }
 
     if (qrScanner) {
