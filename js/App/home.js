@@ -91,6 +91,7 @@ if (primaryEl) {
 
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
+await window.syncWalletBalance()
 const response = await fetch(
 apiUrl(`/api/users/profile/${window.getCurrentUserId()}`),
 {
