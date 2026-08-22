@@ -1,4 +1,5 @@
 let qrScanner = null
+let scanProcessing = false;
 window.openScanner = async ()=>{
 document.getElementById("scannerOverlay").style.display = "block"
 document.getElementById("torchBtn").style.display = "block"
@@ -15,6 +16,8 @@ height: 250
 }
 },
 async (decodedText)=>{
+if (scanProcessing)return;
+scanProcessing = true;
 let data;
 try{
 data = JSON.parse(decodedText);
@@ -67,47 +70,48 @@ asset === "USDT"
 
 window.stopQRScanner = async () => {
 
+    const scanner = qrScanner;
+
     try {
-        if (qrScanner) {
+        if (scanner) {
+
             try {
-                if (qrScanner.getState() === 2) {
-                    await qrScanner.stop();
+                if (scanner.getState() === 2) {
+                    await scanner.stop();
                 }
             } catch (e) {
-                console.log("QR scanner stop:", e);
+                console.log("QR stop error:", e);
             }
 
-            // Clear scanner UI
             try {
-                await qrScanner.clear();
+                await scanner.clear();
             } catch (e) {
-                console.log("QR scanner clear:", e);
+                console.log("QR clear error:", e);
             }
-
-            qrScanner = null;
         }
+
         const video = document.querySelector("#qr-reader video");
 
         if (video && video.srcObject) {
-            video.srcObject
-                .getTracks()
-                .forEach(track => {
-                    track.stop();
-                });
+            video.srcObject.getTracks().forEach(track => {
+                track.stop();
+            });
 
             video.srcObject = null;
         }
 
-    } catch (e) {
-        console.log("Camera cleanup error:", e);
+    } finally {
+
+        qrScanner = null;
+        scanProcessing = false;
+
+        torchOn = false;
+        window.scanDone = false;
+
+        document.getElementById("scannerOverlay").style.display = "none";
+        document.getElementById("galleryBtn").style.display = "none";
+        document.getElementById("torchBtn").style.display = "none";
     }
-
-    torchOn = false;
-    window.scanDone = false;
-
-    document.getElementById("scannerOverlay").style.display = "none";
-    document.getElementById("galleryBtn").style.display = "none";
-    document.getElementById("torchBtn").style.display = "none";
 };
 
 window.closeScanner = async () => {
@@ -200,7 +204,8 @@ asset === "USDT"
 };
 
 window.closePreview = async () => {
+await window.stopQRScanner();
 document.getElementById("previewScreen").style.display = "none";
 document.getElementById("bottomNav").style.display = "flex";
-scanDone = false;
+window.scanDone = false;
 };

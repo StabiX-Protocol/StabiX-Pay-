@@ -438,7 +438,7 @@ appDiv(`
     </div>
     </div>
 
-                <!-- USDC -->
+              <!-- USDC -->
     <div onclick="confirmPrimary('USDC')" style="
     background:var(--bg);
     border:1px solid var(--border);
