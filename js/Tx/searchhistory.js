@@ -27,7 +27,7 @@ window.setupHistorySearch = () => {
     try {
 
       const response = await fetch(
-        apiUrl(`/api/transactions/search/${window.getCurrentUserId()}?q=${encodeURIComponent(q)}&_=${Date.now()}`),
+        apiUrl(`/api/transactions/search?q=${encodeURIComponent(q)}&_=${Date.now()}`),
         {
           cache: "no-store",
           headers: {

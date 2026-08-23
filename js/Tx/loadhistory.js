@@ -5,7 +5,7 @@ window.loadHistory = async function () {
   try {
 
     const response = await fetch(
-      apiUrl(`/api/transactions/history/${window.getCurrentUserId()}`),
+      apiUrl(`/api/transactions/history`),
       {
         headers: {
           Authorization: `Bearer ${window.getToken()}`
@@ -41,7 +41,7 @@ window.loadHistoryByDate = async () => {
   try {
 
     const response = await fetch(
-      apiUrl(`/api/transactions/history/${window.getCurrentUserId()}`),
+      apiUrl(`/api/transactions/history`),
       {
         headers: {
           Authorization: `Bearer ${window.getToken()}`
