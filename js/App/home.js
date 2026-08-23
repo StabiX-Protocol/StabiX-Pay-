@@ -16,7 +16,7 @@ window.syncWalletBalances = async function () {
     try {
 
         const response = await fetch(
-            apiUrl(`/api/balance/${window.getCurrentUserId()}`),
+            apiUrl(`/api/balance`),
             {
                 headers: {
                     Authorization: `Bearer ${window.getToken()}`
