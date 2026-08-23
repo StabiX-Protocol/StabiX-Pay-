@@ -3,7 +3,6 @@ const pool = require("../config/db");
 const {
 processTransaction
 } = require("../services/transactionService");
-const { rejectWithdraw } = require("./validatorController");
 
 const sendTransaction = async (req, res) => {
 
