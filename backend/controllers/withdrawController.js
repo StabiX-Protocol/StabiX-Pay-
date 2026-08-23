@@ -98,19 +98,25 @@ const createWithdraw = async (req, res) => {
 
     }
 
-    const currentBalance = Number(balance.rows[0].balance);
     const withdrawAmount = Number(amount);
 
-    if (currentBalance < withdrawAmount) {
+const debited = await debitBalance(
+  client,
+  stbx_uid,
+  asset,
+  withdrawAmount
+);
 
-      await client.query("ROLLBACK");
+if (!debited) {
 
-      return res.status(400).json({
-        success: false,
-        message: "Insufficient balance"
-      });
+  await client.query("ROLLBACK");
 
-    }
+  return res.status(400).json({
+    success: false,
+    message: "Insufficient balance"
+  });
+
+}
 
     const STRId =
       "STR" +

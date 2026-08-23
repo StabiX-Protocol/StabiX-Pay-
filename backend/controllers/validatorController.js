@@ -173,13 +173,6 @@ message: "Withdraw already processed"
 });
 }
 
-await debitBalance(
-client,
-withdraw.rows[0].stbx_uid,
-withdraw.rows[0].asset,
-withdraw.rows[0].amount
-);
-
 await client.query(
 `UPDATE withdraws
 SET status = 'APPROVED',
@@ -236,6 +229,13 @@ success: false,
 message: "Withdraw already processed"
 });
 }
+
+await creditBalance(
+  client,
+  withdraw.rows[0].stbx_uid,
+  withdraw.rows[0].asset,
+  withdraw.rows[0].amount
+);
 
 await client.query(
 `UPDATE withdraws
