@@ -1,5 +1,5 @@
 const pool = require("../config/db");
-const {creditBalance,debitBalance} = require("./balanceController");
+const {creditBalance} = require("./balanceController");
 
 const approveDeposit = async (req, res) => {
 
@@ -9,13 +9,13 @@ await client.query("BEGIN");
 
     const { STRId } = req.params;
 
-    const deposit = await client.query(
-      `SELECT *
-       FROM deposits
-       WHERE "STRId" = $1`,
-      [STRId]
-    );
-
+   const deposit = await client.query(
+  `SELECT *
+   FROM deposits
+   WHERE "STRId" = $1
+   FOR UPDATE`,
+  [STRId]
+  );
     if (deposit.rows.length === 0) {
       return res.status(404).json({
         success: false,
@@ -96,7 +96,8 @@ const { STRId } = req.params;
 const deposit = await client.query(
 `SELECT *
 FROM deposits
-WHERE "STRId" = $1`,
+WHERE "STRId" = $1
+FOR UPDATE`,
 [STRId]
 );
 
@@ -153,10 +154,11 @@ await client.query("BEGIN");
 const { STRId } = req.params;
 
 const withdraw = await client.query(
-`SELECT *
-FROM withdraws
-WHERE "STRId" = $1`,
-[STRId]
+  `SELECT *
+   FROM withdraws
+   WHERE "STRId" = $1
+   FOR UPDATE`,
+  [STRId]
 );
 
 if (withdraw.rows.length === 0) {
@@ -212,7 +214,8 @@ const { STRId } = req.params;
 const withdraw = await client.query(
 `SELECT *
 FROM withdraws
-WHERE "STRId" = $1`,
+WHERE "STRId" = $1
+FOR UPDATE`,
 [STRId]
 );
 

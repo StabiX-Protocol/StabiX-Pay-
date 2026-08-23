@@ -11,12 +11,12 @@ try {
 await client.query("BEGIN");
 
 const {
-sender_stbx_uid,
 receiver_stbx_uid,
 asset,
 amount,
 note
 } = req.body;
+const sender_stbx_uid = req.user.stbx_uid;
 
 const sender = await client.query(
 "SELECT stbx_uid FROM users WHERE stbx_uid = $1",
