@@ -98,7 +98,7 @@ client.release();
 const getTransactionHistory = async (req, res) => {
   try {
 
-    const { stbx_uid } = req.params;
+    const stbx_uid = req.user.stbx_uid;
 
     const result = await pool.query(
       `
@@ -183,7 +183,7 @@ const getTransactionHistory = async (req, res) => {
 
 const getTransactionBySTRId = async (req, res) => {
   try {
-
+    const{str_id} = req.params;
     const stbx_uid = req.user.stbx_uid;
 
     const result = await pool.query(
