@@ -32,10 +32,11 @@ window.sendUSDC = async () => {
     const data = await response.json();
 
     if (!response.ok) {
-      alert(data.message || "Transaction Failed");
-      return;
-    }
-
+  console.log("SEND STATUS:", response.status);
+  console.log("SEND RESPONSE:", data);
+  alert(data.message || "Transaction Failed");
+  return;
+}
     showTxPopup(
       `Sent ${amount} ${window.primaryAsset} to ${toWallet}`,
       "success"
