@@ -1,6 +1,13 @@
 const { body } = require("express-validator");
 
 const transactionValidation = [
+
+body("idempotency_key")
+  .trim()
+  .notEmpty()
+  .isLength({ max: 100 })
+  .withMessage("Idempotency key is required"),
+
 body("sender_stbx_uid")
 .notEmpty()
 .withMessage("Sender STBX UID is required"),

@@ -41,7 +41,7 @@ router.post(
 );
 
 router.get(
-  "/history/:stbx_uid",
+  "/history",
   verifyToken,
   getDepositHistory
 );

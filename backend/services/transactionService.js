@@ -7,7 +7,8 @@ sender_stbx_uid,
 receiver_stbx_uid,
 asset,
 amount,
-note
+note,
+idempotency_key
 ) => {
 
 const debited = await debitBalance(
@@ -57,11 +58,12 @@ asset,
 amount,
 tx_type,
 status,
-note
+note,
+idempotency_key
 )
 VALUES
 (
-$1,$2,$3,$4,$5,$6,$7,$8
+$1,$2,$3,$4,$5,$6,$7,$8,$9
 )`,
 [
 STRId,
@@ -71,7 +73,8 @@ asset,
 amount,
 "SEND",
 "SUCCESS",
-note || null
+note || null,
+idempotency_key
 ]
 );
 return STRId;

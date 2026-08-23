@@ -15,7 +15,8 @@ const {
 receiver_stbx_uid,
 asset,
 amount,
-note
+note,
+idempotency_key
 } = req.body;
 const sender_stbx_uid = req.user.stbx_uid;
 
@@ -49,7 +50,8 @@ sender_stbx_uid,
 receiver_stbx_uid,
 asset,
 amount,
-note
+note,
+idempotency_key
 );
 
 await client.query("COMMIT");
@@ -67,6 +69,22 @@ return res.status(400).json({
 success: false,
 message: "Insufficient balance"
 });
+}
+if (err.code === "23505") {
+  const existing = await pool.query(
+    `SELECT str_id
+     FROM transactions
+     WHERE idempotency_key = $1`,
+    [req.body.idempotency_key]
+  );
+
+  if (existing.rows.length > 0) {
+    return res.status(200).json({
+      success: true,
+      message: "Transaction already processed",
+      STR_id: existing.rows[0].str_id
+    });
+  }
 }
 return res.status(500).json({
 success: false,
