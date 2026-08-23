@@ -32,9 +32,6 @@ window.sendUSDC = async () => {
     const data = await response.json();
 
     if (!response.ok) {
-  console.log("SEND STATUS:", response.status);
-  console.log("SEND RESPONSE:", data);
- console.log("SEND VALIDATION ERRORS:", data.errors?.map(e => e.msg));
   alert(data.message || "Transaction Failed");
   return;
 }
