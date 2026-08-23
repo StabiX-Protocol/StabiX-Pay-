@@ -119,15 +119,14 @@ const registerUser = async (req, res) => {
     await client.query("BEGIN");
 
     const {
-      stbx_uid,
-      google_id_token,
-      google_uid,
-      username,
-      eoa_address,
-      password
-    } = req.body;
+  stbx_uid,
+  google_id_token,
+  username,
+  eoa_address,
+  password
+} = req.body;
 
-    let finalGoogleUid = google_uid || null;
+let finalGoogleUid = null;
 
     if (google_id_token) {
       const ticket = await googleClient.verifyIdToken({
@@ -226,7 +225,7 @@ const registerUser = async (req, res) => {
 
 const getUser = async (req, res) => {
 try {
-const { stbx_uid } = req.params;
+const stbx_uid = req.user.stbx_uid;
 const result = await pool.query(
 "SELECT * FROM users WHERE stbx_uid = $1",
 [stbx_uid]
@@ -257,7 +256,8 @@ message: "Database Error"
 const updateUsername = async (req, res) => {
 const client = await pool.connect();
 try {
-const { stbx_uid, new_username } = req.body;
+const { new_username } = req.body;
+const stbx_uid = req.user.stbx_uid;
 await client.query("BEGIN");
 
 const userResult = await client.query(
@@ -422,7 +422,8 @@ message: "Invalid Google ID token"
 
 const updateEOAAddress = async (req, res) => {
 try {
-const { stbx_uid, eoa_address } = req.body;
+const { eoa_address } = req.body;
+const stbx_uid = req.user.stbx_uid;
 
 const result = await pool.query(
 `UPDATE users

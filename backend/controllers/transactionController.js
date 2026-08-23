@@ -3,6 +3,7 @@ const pool = require("../config/db");
 const {
 processTransaction
 } = require("../services/transactionService");
+const { rejectWithdraw } = require("./validatorController");
 
 const sendTransaction = async (req, res) => {
 
@@ -166,7 +167,6 @@ const getTransactionHistory = async (req, res) => {
 const getTransactionBySTRId = async (req, res) => {
   try {
 
-    const { str_id } = req.params;
     const stbx_uid = req.user.stbx_uid;
 
     const result = await pool.query(
@@ -276,7 +276,7 @@ const getTransactionBySTRId = async (req, res) => {
 const searchTransactions = async (req, res) => {
   try {
 
-    const { stbx_uid } = req.params;
+    const stbx_uid = req.user.stbx_uid;
     const q = (req.query.q || "").trim();
 
     if (!q) {
