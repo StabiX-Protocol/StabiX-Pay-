@@ -7,13 +7,13 @@ try {
 await client.query("BEGIN");
 
 const {
-stbx_uid,
 asset,
 mode,
 network,
 amount,
 blockchain_tx_hash
 } = req.body;
+const stbx_uid =req.user.stbx_uid;
 
 const user = await client.query(
 "SELECT stbx_uid FROM users WHERE stbx_uid = $1",
@@ -53,6 +53,29 @@ success: false,
 message: "Unsupported network"
 });
 }
+
+if (!Number.isFinite(Number(amount)) || Number(amount) <= 0) {
+  return res.status(400).json({
+    success: false,
+    message: "Invalid amount"
+  });
+}
+if (
+  typeof blockchain_tx_hash !== "string" ||
+  blockchain_tx_hash.trim().length === 0
+) {
+  return res.status(400).json({
+    success: false,
+    message: "Blockchain transaction hash is required"
+  });
+}
+if (!/^0x[a-fA-F0-9]{64}$/.test(blockchain_tx_hash.trim())) {
+  return res.status(400).json({
+    success: false,
+    message: "Invalid blockchain transaction hash"
+  });
+}
+await client.query("BEGIN");
 
 const STRId =
 "STR" +
@@ -107,7 +130,7 @@ client.release();
 
 const getDepositHistory = async (req, res) => {
 try {
-const { stbx_uid } = req.params;
+const stbx_uid = req.user.stbx_uid;
 
 const result = await pool.query(
 `SELECT
@@ -142,12 +165,14 @@ message: "Internal Server Error"
 const getDepositById = async (req, res) => {
 try {
 const { STRId } = req.params;
+const stbx_uid = req.user.stbx_uid;
 
 const result = await pool.query(
 `SELECT *
 FROM deposits
-WHERE STRId = $1`,
-[STRId]
+WHERE "STRId" = $1
+AND stbx_uid = $2`,
+[STRId, stbx_uid]
 );
 
 if (result.rows.length === 0) {
