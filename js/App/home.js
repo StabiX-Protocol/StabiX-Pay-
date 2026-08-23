@@ -55,8 +55,6 @@ window.syncWalletBalances = async function () {
 
 const usdtEl = document.getElementById("assetUSDTBalance");
 const usdcEl = document.getElementById("assetUSDCBalance");
-const selectorUsdtEl = document.getElementById("selectorUSDTBalance");
-const selectorUsdcEl = document.getElementById("selectorUSDCBalance");
 
 if (usdtEl) {
     usdtEl.textContent =
@@ -66,16 +64,6 @@ if (usdtEl) {
 if (usdcEl) {
     usdcEl.textContent =
         Number(window.userData.balance || 0).toFixed(2);
-}
-
-if (selectorUsdtEl) {
-  selectorUsdtEl.textContent =
-    Number(window.userData.usdtBalance || 0).toFixed(2);
-}
-
-if (selectorUsdcEl) {
-  selectorUsdcEl.textContent =
-    Number(window.userData.balance || 0).toFixed(2);
 }
 
 // Update primary balance at top
@@ -446,7 +434,7 @@ appDiv(`
     </div>
     </div>
     <div id="selectorUSDTBalance" style="font-weight:bold"> 
-     ${Number(window.userData?.usdtBalance || 0).toFixed(2)}
+    ${Number(window.userData?.usdtBalance || 0).toFixed(2)}
     </div>
     </div>
 
@@ -688,10 +676,30 @@ headers: {
 }
 
  /*=============Open Selector ========*/
-window.openAssetSelector = function(){
-document.getElementById("assetSelector").style.display = "block";
-document.getElementById("bottomNav").style.display = "none";
-}
+window.openAssetSelector = async function(){
+
+    document.getElementById("assetSelector").style.display = "block";
+    document.getElementById("bottomNav").style.display = "none";
+
+    await window.syncWalletBalances();
+
+    const selectorUsdtEl =
+        document.getElementById("selectorUSDTBalance");
+
+    const selectorUsdcEl =
+        document.getElementById("selectorUSDCBalance");
+
+    if (selectorUsdtEl) {
+        selectorUsdtEl.textContent =
+            Number(window.userData?.usdtBalance || 0).toFixed(2);
+    }
+
+    if (selectorUsdcEl) {
+        selectorUsdcEl.textContent =
+            Number(window.userData?.balance || 0).toFixed(2);
+    }
+};
+
 window.closeAssetSelector = function(){
 document.getElementById("assetSelector").style.display = "none";
 document.getElementById("bottomNav").style.display = "flex";
@@ -719,7 +727,6 @@ localStorage.setItem("primaryAsset", window.primaryAsset);
 document.getElementById("confirmBox").style.display = "none";
 window.keepAssetOpen = true;
 renderApp();
-openAssetSelector();
 }
 
  /*=============Primary Balance ========*/
