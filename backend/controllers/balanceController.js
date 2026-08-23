@@ -2,7 +2,7 @@ const pool = require("../config/db");
 
 const getBalance = async (req, res) => {
 try {
-const { stbx_uid } = req.params;
+const stbx_uid = req.user.stbx_uid;
 const result = await pool.query(
 `SELECT
 asset,
