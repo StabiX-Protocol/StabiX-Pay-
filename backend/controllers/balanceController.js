@@ -57,12 +57,22 @@ asset,
 amount
 ) => {
 
-await updateBalance(
-client,
+const result = await client.query(
+`UPDATE wallet_balances
+ SET balance = balance - $1,
+ updated_at = CURRENT_TIMESTAMP
+ WHERE stbx_uid = $2
+ AND asset = $3
+ AND balance >= $1
+ RETURNING balance`,
+[
+Number(amount),
 stbx_uid,
-asset,
--Number(amount)
+asset
+]
 );
+
+return result.rows.length > 0;
 };
 
 const creditBalance = async (

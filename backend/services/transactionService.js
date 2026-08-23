@@ -10,12 +10,18 @@ amount,
 note
 ) => {
 
-await debitBalance(
+const debited = await debitBalance(
 client,
 sender_stbx_uid,
 asset,
 amount
 );
+
+if (!debited) {
+const error = new Error("Insufficient balance");
+error.code = "INSUFFICIENT_BALANCE";
+throw error;
+}
 
 await client.query(
 `INSERT INTO wallet_balances

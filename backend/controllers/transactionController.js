@@ -30,29 +30,6 @@ message: "Sender not found"
 });
 }
 
-const senderBalance = await client.query(
-`SELECT balance
-FROM wallet_balances
-WHERE stbx_uid = $1
-AND asset = $2`,
-[sender_stbx_uid, asset]
-);
-
-if (senderBalance.rows.length === 0) {
-return res.status(404).json({
-success: false,
-message: "Sender wallet balance not found"
-});
-}
-
-const currentBalance = Number(senderBalance.rows[0].balance);
-if (currentBalance < Number(amount)) {
-return res.status(400).json({
-success: false,
-message: "Insufficient balance"
-});
-}
-
 const receiver = await client.query(
 "SELECT stbx_uid FROM users WHERE stbx_uid = $1",
 [receiver_stbx_uid]
@@ -83,11 +60,19 @@ STR_id: STRId
 } catch (err) {
 await client.query("ROLLBACK");
 console.error(err);
+
+if (err.code === "INSUFFICIENT_BALANCE") {
+return res.status(400).json({
+success: false,
+message: "Insufficient balance"
+});
+}
 return res.status(500).json({
 success: false,
 message: "Internal Server Error"
 });
-} finally {
+}
+finally {
 client.release();
 }
 };
