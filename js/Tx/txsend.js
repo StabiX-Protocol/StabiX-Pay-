@@ -12,23 +12,22 @@ window.sendUSDC = async () => {
 
     const idempotency_key = crypto.randomUUID();
 
-    const response = await fetch(
-      apiUrl("/api/transactions/send"),
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${window.getToken()}`
-        },
-        body: JSON.stringify({
-          receiver_stbx_uid: toWallet,
-          asset: window.primaryAsset,
-          amount: amount,
-          idempotency_key: idempotency_key
-        })
-      }
-    );
-
+const response = await fetch(
+  apiUrl("/api/transactions/send"),
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${window.getToken()}`
+    },
+    body: JSON.stringify({
+      receiver_stbx_uid: toWallet,
+      asset: window.primaryAsset,
+      amount: amount,
+      idempotency_key: idempotency_key
+    })
+  }
+);
     const data = await response.json();
 
     if (!response.ok) {
