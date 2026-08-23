@@ -678,7 +678,7 @@ headers: {
  /*=============Open Selector ========*/
 window.openAssetSelector = async function(){
 
-    document.getElementById("assetSelector").style.display = "block";
+document.getElementById("assetSelector").style.display = "block";
     document.getElementById("bottomNav").style.display = "none";
 
     await window.syncWalletBalances();
