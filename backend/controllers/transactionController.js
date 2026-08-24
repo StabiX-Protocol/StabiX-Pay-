@@ -11,12 +11,13 @@ try {
 await client.query("BEGIN");
 
 const {
-sender_stbx_uid,
 receiver_stbx_uid,
 asset,
 amount,
-note
+note,
+idempotency_key
 } = req.body;
+const sender_stbx_uid = req.user.stbx_uid;
 
 const sender = await client.query(
 "SELECT stbx_uid FROM users WHERE stbx_uid = $1",
@@ -27,29 +28,6 @@ if (sender.rows.length === 0) {
 return res.status(404).json({
 success: false,
 message: "Sender not found"
-});
-}
-
-const senderBalance = await client.query(
-`SELECT balance
-FROM wallet_balances
-WHERE stbx_uid = $1
-AND asset = $2`,
-[sender_stbx_uid, asset]
-);
-
-if (senderBalance.rows.length === 0) {
-return res.status(404).json({
-success: false,
-message: "Sender wallet balance not found"
-});
-}
-
-const currentBalance = Number(senderBalance.rows[0].balance);
-if (currentBalance < Number(amount)) {
-return res.status(400).json({
-success: false,
-message: "Insufficient balance"
 });
 }
 
@@ -71,7 +49,8 @@ sender_stbx_uid,
 receiver_stbx_uid,
 asset,
 amount,
-note
+note,
+idempotency_key
 );
 
 await client.query("COMMIT");
@@ -83,11 +62,35 @@ STR_id: STRId
 } catch (err) {
 await client.query("ROLLBACK");
 console.error(err);
+
+if (err.code === "INSUFFICIENT_BALANCE") {
+return res.status(400).json({
+success: false,
+message: "Insufficient balance"
+});
+}
+if (err.code === "23505") {
+  const existing = await pool.query(
+    `SELECT str_id
+     FROM transactions
+     WHERE idempotency_key = $1`,
+    [req.body.idempotency_key]
+  );
+
+  if (existing.rows.length > 0) {
+    return res.status(200).json({
+      success: true,
+      message: "Transaction already processed",
+      STR_id: existing.rows[0].str_id
+    });
+  }
+}
 return res.status(500).json({
 success: false,
 message: "Internal Server Error"
 });
-} finally {
+}
+finally {
 client.release();
 }
 };
@@ -95,7 +98,7 @@ client.release();
 const getTransactionHistory = async (req, res) => {
   try {
 
-    const { stbx_uid } = req.params;
+    const stbx_uid = req.user.stbx_uid;
 
     const result = await pool.query(
       `
@@ -180,8 +183,7 @@ const getTransactionHistory = async (req, res) => {
 
 const getTransactionBySTRId = async (req, res) => {
   try {
-
-    const { str_id } = req.params;
+    const{str_id} = req.params;
     const stbx_uid = req.user.stbx_uid;
 
     const result = await pool.query(
@@ -291,7 +293,7 @@ const getTransactionBySTRId = async (req, res) => {
 const searchTransactions = async (req, res) => {
   try {
 
-    const { stbx_uid } = req.params;
+    const stbx_uid = req.user.stbx_uid;
     const q = (req.query.q || "").trim();
 
     if (!q) {

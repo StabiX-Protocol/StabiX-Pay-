@@ -22,9 +22,9 @@ errors: errors.array()
 next();
 };
 
-router.post("/send",transactionValidation,validate, sendTransaction);
-router.get("/history/:stbx_uid", getTransactionHistory);
+router.post("/send",verifyToken,transactionValidation,validate,sendTransaction);
+router.get("/history",verifyToken, getTransactionHistory);
 router.get("/:str_id", verifyToken,getTransactionBySTRId);
-router.get("/search/:stbx_uid", searchTransactions);
+router.get("/search",verifyToken, searchTransactions);
 
 module.exports = router;

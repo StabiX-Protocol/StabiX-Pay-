@@ -1,4 +1,3 @@
-
 const { debitBalance, creditBalance } = require("../controllers/balanceController");
 
 const processTransaction = async (
@@ -7,15 +6,22 @@ sender_stbx_uid,
 receiver_stbx_uid,
 asset,
 amount,
-note
-) => {s
+note,
+idempotency_key
+) => {
 
-await debitBalance(
+const debited = await debitBalance(
 client,
 sender_stbx_uid,
 asset,
 amount
 );
+
+if (!debited) {
+const error = new Error("Insufficient balance");
+error.code = "INSUFFICIENT_BALANCE";
+throw error;
+}
 
 await client.query(
 `INSERT INTO wallet_balances
@@ -51,11 +57,12 @@ asset,
 amount,
 tx_type,
 status,
-note
+note,
+idempotency_key
 )
 VALUES
 (
-$1,$2,$3,$4,$5,$6,$7,$8
+$1,$2,$3,$4,$5,$6,$7,$8,$9
 )`,
 [
 STRId,
@@ -65,7 +72,8 @@ asset,
 amount,
 "SEND",
 "SUCCESS",
-note || null
+note || null,
+idempotency_key
 ]
 );
 return STRId;

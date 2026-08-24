@@ -28,7 +28,7 @@ async function handleGoogleCredential(response) {
   try {
 
     const apiResponse = await fetch(
-      "http://10.148.199.19:3000/api/users/login/google",
+      apiUrl("/api/users/login/google"),
       {
         method: "POST",
 
@@ -114,7 +114,7 @@ async function handleGoogleCredential(response) {
   try {
 
     const apiResponse = await fetch(
-      "http://10.148.199.19:3000/api/users/login/google",
+      apiUrl("/api/users/login/google"),
       {
         method: "POST",
 
@@ -219,7 +219,7 @@ async function handleGoogleCredential(response) {
   try {
 
     const apiResponse = await fetch(
-      "http://10.148.199.19:3000/api/users/login/google",
+      apiUrl("/api/users/login/google"),
       {
         method: "POST",
 

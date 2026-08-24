@@ -1,5 +1,4 @@
 window.showTxPopup = (msg,type="success")=>{
-if(!window.isSender) return;
 const popup = document.getElementById("txPopup")
 const title = document.getElementById("txTitle")
 const msgBox = document.getElementById("txMsg")

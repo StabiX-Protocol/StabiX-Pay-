@@ -1,9 +1,11 @@
-let qrScanner = null
+let qrScanner = null;
+let qrCameraStream = null;
+let scanProcessing = false;
 window.openScanner = async ()=>{
 document.getElementById("scannerOverlay").style.display = "block"
 document.getElementById("torchBtn").style.display = "block"
 document.getElementById("galleryBtn").style.display = "block"
-  
+
 qrScanner = new Html5Qrcode("qr-reader")
 await qrScanner.start(
 { facingMode: "environment" },
@@ -15,6 +17,8 @@ height: 250
 }
 },
 async (decodedText)=>{
+if (scanProcessing)return;
+scanProcessing = true;
 let data;
 try{
 data = JSON.parse(decodedText);
@@ -22,26 +26,29 @@ data = JSON.parse(decodedText);
 alert("Invalid QR");
 return;
 }
+
 const targetId = data.id;
+
 if((data.type || "").toLowerCase() !== "stabix"){
 alert("Invalid QR");
 return;
-} 
+}
+await window.stopQRScanner();
 try{
 const response = await fetch(
-  `http://10.148.199.19:3000/api/users/profile/${targetId}`,
-  {
-    headers: {
-      Authorization: `Bearer ${window.getToken()}`
-    }
-  }
+apiUrl(`/api/users/profile/${targetId}`),
+{
+headers: {
+Authorization: `Bearer ${window.getToken()}`
+}
+}
 );
-
+     
 const user = await response.json();
 
 if (!response.ok) {
-  alert(user.message || "User not found");
-  return;
+alert(user.message || "User not found");
+return;
 }
 
 window.scannedAsset = window.primaryAsset;
@@ -49,9 +56,6 @@ window.scannedAsset = window.primaryAsset;
 alert("Error checking user")
 return
 }
-
-await qrScanner.stop()
-document.getElementById("scannerOverlay").style.display = "none"    
 document.getElementById("previewId").value = targetId
 window.scannedId = targetId  
 window.isScanFlow = true;
@@ -65,21 +69,59 @@ asset === "USDT"
 : "./media/usd-coin-usdc-logo.png";
 }
 )
+const video = document.querySelector("#qr-reader video");
+
+if (video && video.srcObject) {
+    qrCameraStream = video.srcObject;
+}
 }
 
+window.stopQRScanner = async () => {
+
+    const video = document.querySelector("#qr-reader video");
+
+    if (video && video.srcObject) {
+        qrCameraStream = video.srcObject;
+    }
+
+    if (qrScanner) {
+        try {
+            if (qrScanner.getState() === 2) {
+                await qrScanner.stop();
+            }
+        } catch (e) {
+            console.log("QR stop error:", e);
+        }
+
+        try {
+            await qrScanner.clear();
+        } catch (e) {
+            console.log("QR clear error:", e);
+        }
+    }
+
+    if (qrCameraStream) {
+        qrCameraStream.getTracks().forEach(track => track.stop());
+        qrCameraStream = null;
+    }
+
+    if (video) {
+        video.pause();
+        video.srcObject = null;
+    }
+
+    qrScanner = null;
+    scanProcessing = false;
+    torchOn = false;
+    window.scanDone = false;
+
+    document.getElementById("scannerOverlay").style.display = "none";
+    document.getElementById("galleryBtn").style.display = "none";
+    document.getElementById("torchBtn").style.display = "none";
+};
+
 window.closeScanner = async () => {
-try {
-if (qrScanner && qrScanner.getState() === 2) {
-await qrScanner.stop();
-}
-} catch (e) {
-console.log("Scanner stop error:", e);
-}
-document.getElementById("scannerOverlay").style.display = "none";
-document.getElementById("galleryBtn").style.display = "none"
-document.getElementById("torchBtn").style.display = "none";
-torchOn = false;
-window.scanDone = false;
+ await window.stopQRScanner();
 };
 
 let torchOn = false;
@@ -120,19 +162,18 @@ return;
 }
 const targetId = data.id;
 const response = await fetch(
-  `http://10.148.199.19:3000/api/users/profile/${targetId}`,
-  {
-    headers: {
-      Authorization: `Bearer ${window.getToken()}`
-    }
-  }
+apiUrl(`/api/users/profile/${targetId}`),
+{
+headers: {
+Authorization: `Bearer ${window.getToken()}`
+}
+}
 );
 
 const user = await response.json();
-
 if (!response.ok) {
-  alert(user.message || "User not found");
-  return;
+alert(user.message || "User not found");
+return;
 }
 
 window.scannedAsset = window.primaryAsset;
@@ -169,9 +210,8 @@ asset === "USDT"
 };
 
 window.closePreview = async () => {
+await window.stopQRScanner();
 document.getElementById("previewScreen").style.display = "none";
 document.getElementById("bottomNav").style.display = "flex";
-scanDone = false;
+window.scanDone = false;
 };
-
-

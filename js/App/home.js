@@ -16,7 +16,7 @@ window.syncWalletBalances = async function () {
     try {
 
         const response = await fetch(
-            `http://10.148.199.19:3000/api/balance/${window.getCurrentUserId()}`,
+            apiUrl(`/api/balance`),
             {
                 headers: {
                     Authorization: `Bearer ${window.getToken()}`
@@ -92,7 +92,7 @@ if (primaryEl) {
 /* ================= MAIN APP ================= */
 window.renderApp = async function(){
 const response = await fetch(
-`http://10.148.199.19:3000/api/users/profile/${window.getCurrentUserId()}`,
+apiUrl(`/api/users/profile/${window.getCurrentUserId()}`),
 {
 headers: {
 Authorization: `Bearer ${window.getToken()}`
@@ -433,12 +433,12 @@ appDiv(`
     ` : ``}
     </div>
     </div>
-    <div style="font-weight:bold">
+    <div id="selectorUSDTBalance" style="font-weight:bold"> 
     ${Number(window.userData?.usdtBalance || 0).toFixed(2)}
     </div>
     </div>
 
-                <!-- USDC -->
+              <!-- USDC -->
     <div onclick="confirmPrimary('USDC')" style="
     background:var(--bg);
     border:1px solid var(--border);
@@ -463,11 +463,10 @@ appDiv(`
     ` : ``}
     </div>
     </div>
-    <div style="font-weight:bold">
+    <div id="selectorUSDCBalance" style="font-weight:bold">
     ${Number(window.userData?.balance || 0).toFixed(2)}
     </div>
     </div>
-
 
     <div id="confirmBox" style="
     display:none;
@@ -653,7 +652,7 @@ if(window.keepAssetOpen){
        // RECEIVE POPUP
 try {
 const response = await fetch(
-`http://10.148.199.19:3000/api/transactions/history/${WALLET}`,
+apiUrl(`/api/transactions/history/${WALLET}`),
 {
 headers: {
         Authorization: `Bearer ${window.getToken()}`
@@ -667,22 +666,6 @@ headers: {
 
     const t = data.transactions[0];
 
-    if (t.type === "received") {
-
-      const key = "rx_" + t.STRId;
-
-      if (!sessionStorage.getItem(key)) {
-
-        showTxPopup(
-          `Received ${t.amount} ${t.asset} from ${t.counterparty}`
-        );
-
-        sessionStorage.setItem(key, "1");
-
-      }
-
-    }
-
   }
 
 } catch (e) {
@@ -693,10 +676,30 @@ headers: {
 }
 
  /*=============Open Selector ========*/
-window.openAssetSelector = function(){
+window.openAssetSelector = async function(){
+
 document.getElementById("assetSelector").style.display = "block";
-document.getElementById("bottomNav").style.display = "none";
-}
+    document.getElementById("bottomNav").style.display = "none";
+
+    await window.syncWalletBalances();
+
+    const selectorUsdtEl =
+        document.getElementById("selectorUSDTBalance");
+
+    const selectorUsdcEl =
+        document.getElementById("selectorUSDCBalance");
+
+    if (selectorUsdtEl) {
+        selectorUsdtEl.textContent =
+            Number(window.userData?.usdtBalance || 0).toFixed(2);
+    }
+
+    if (selectorUsdcEl) {
+        selectorUsdcEl.textContent =
+            Number(window.userData?.balance || 0).toFixed(2);
+    }
+};
+
 window.closeAssetSelector = function(){
 document.getElementById("assetSelector").style.display = "none";
 document.getElementById("bottomNav").style.display = "flex";
@@ -724,7 +727,6 @@ localStorage.setItem("primaryAsset", window.primaryAsset);
 document.getElementById("confirmBox").style.display = "none";
 window.keepAssetOpen = true;
 renderApp();
-openAssetSelector();
 }
 
  /*=============Primary Balance ========*/
@@ -812,7 +814,7 @@ if (current && current.toLowerCase() === newAddr.toLowerCase()) {
 }
 
 const response = await fetch(
-  "http://10.148.199.19:3000/api/users/eoa-address",
+  apiUrl("/api/users/eoa-address"),
   {
     method: "PATCH",
     headers: {
@@ -892,7 +894,7 @@ const current = data.username || "";
     }
 
     const response = await fetch(
-  "http://10.148.199.19:3000/api/users/username",
+  apiUrl("/api/users/username"),
   {
     method: "PATCH",
     headers: {

@@ -1,15 +1,16 @@
 const pool = require("../config/db");
+const {debitBalance} = require("./balanceController");
 
 const createWithdraw = async (req, res) => {
 
   const {
-    stbx_uid,
     asset,
     mode,
     network,
     amount,
     wallet_address
   } = req.body;
+  const stbx_uid = req.user.stbx_uid;
 
   const client = await pool.connect();
 
@@ -98,19 +99,25 @@ const createWithdraw = async (req, res) => {
 
     }
 
-    const currentBalance = Number(balance.rows[0].balance);
     const withdrawAmount = Number(amount);
 
-    if (currentBalance < withdrawAmount) {
+const debited = await debitBalance(
+  client,
+  stbx_uid,
+  asset,
+  withdrawAmount
+);
 
-      await client.query("ROLLBACK");
+if (!debited) {
 
-      return res.status(400).json({
-        success: false,
-        message: "Insufficient balance"
-      });
+  await client.query("ROLLBACK");
 
-    }
+  return res.status(400).json({
+    success: false,
+    message: "Insufficient balance"
+  });
+
+}
 
     const STRId =
       "STR" +
@@ -177,8 +184,7 @@ const createWithdraw = async (req, res) => {
 
 const getWithdrawHistory = async (req, res) => {
 try {
-const { stbx_uid } = req.params;
-
+const stbx_uid = req.user.stbx_uid;
 const result = await pool.query(
 `SELECT
 STRId,
@@ -211,15 +217,18 @@ message: "Internal Server Error"
 
 
 const getWithdrawById = async (req, res) => {
-try {
-const { STRId } = req.params;
+  try {
 
-const result = await pool.query(
-`SELECT *
-FROM withdraws
-WHERE STRId = $1`,
-[STRId]
-);
+    const { STRId } = req.params;
+    const stbx_uid = req.user.stbx_uid;
+
+    const result = await pool.query(
+      `SELECT *
+       FROM withdraws
+       WHERE "STRId" = $1
+       AND stbx_uid = $2`,
+      [STRId, stbx_uid]
+    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({

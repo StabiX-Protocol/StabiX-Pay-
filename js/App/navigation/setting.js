@@ -179,7 +179,7 @@ window.confirmLogout = async () => {
     document.getElementById("logoutPopup").style.display = "none";
 
     try{
-await fetch("http://10.148.199.19:3000/api/auth/logout",{
+await fetch(apiUrl("/api/auth/logout"),{
 method:"POST",
 headers:{
 Authorization:`Bearer ${window.getToken()}`

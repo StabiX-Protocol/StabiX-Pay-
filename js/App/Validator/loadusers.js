@@ -9,7 +9,7 @@ window.loadAllUsers = async () => {
   try {
 
     const response = await fetch(
-  "http://10.148.199.19:3000/api/validator/users",{
+  apiUrl("/api/validator/users"),{
         headers: {
           Authorization: `Bearer ${window.getToken()}`
         }

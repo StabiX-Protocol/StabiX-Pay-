@@ -177,7 +177,7 @@ window.submitDepositFinal = async function(asset, network){
   try{
 
     const response = await fetch(
-      "http://10.148.199.19:3000/api/deposits",
+      apiUrl("/api/deposits"),
       {
         method: "POST",
         headers: {

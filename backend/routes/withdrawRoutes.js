@@ -1,6 +1,6 @@
 const express = require("express");
-
 const router = express.Router();
+const { verifyToken } = require("../middleware/authMiddleware");
 
 const {
   createWithdraw,
@@ -31,10 +31,10 @@ const validate = (req, res, next) => {
 
 };
 
-router.post("/",withdrawValidation,validate,createWithdraw);
+router.post("/", verifyToken, withdrawValidation, validate, createWithdraw);
 
-router.get("/history/:stbx_uid", getWithdrawHistory);
+router.get("/history/:stbx_uid", verifyToken, getWithdrawHistory);
 
-router.get("/:STRId", getWithdrawById);
+router.get("/:STRId", verifyToken, getWithdrawById);
 
 module.exports = router;
