@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-
+import AppShell from "@/components/AppShell";
 export const metadata: Metadata = {
   title: "StabiX",
   description: "Fast and simple stablecoin payments",
@@ -20,7 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+     <body className="min-h-full flex flex-col">
+  <AppShell>{children}</AppShell>
+</body>
     </html>
   );
 }
