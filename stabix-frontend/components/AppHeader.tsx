@@ -19,9 +19,6 @@ export default function AppHeader() {
           </div>
 
           <div className="text-left">
-            <p className="text-[11px] font-medium text-slate-400">
-              Welcome back
-            </p>
 
             <p className="text-base font-bold tracking-tight text-slate-900 dark:text-white">
               Sumedh10
@@ -87,10 +84,6 @@ export default function AppHeader() {
         <div className="mx-5 mb-2 rounded-2xl bg-white p-4 shadow-lg ring-1 ring-slate-200 dark:bg-[#18181b] dark:ring-white/10">
           <p className="text-sm font-bold">
             Settings
-          </p>
-
-          <p className="mt-1 text-xs text-slate-400">
-            App preferences and security
           </p>
         </div>
       )}

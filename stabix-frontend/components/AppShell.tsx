@@ -13,7 +13,8 @@ export default function AppShell({
   const hideBottomNav =
     pathname.startsWith("/dw/") ||
     pathname.startsWith("/send/") ||
-    pathname.startsWith("/receive/");
+    pathname.startsWith("/receive/")||
+    pathname ==="/primary";
 
   return (
     <>

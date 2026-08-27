@@ -1,3 +1,7 @@
+"use client";
+
+import Link from "next/link";
+
 const assets = [
   {
     name: "USDT",
@@ -21,13 +25,14 @@ export default function Assets() {
           Assets
         </h2>
 
-        <button
-          type="button"
+        {/* Add / Select Primary Asset */}
+        <Link
+          href="/primary"
           aria-label="Add asset"
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-2xl font-light shadow-sm ring-1 ring-slate-100 dark:bg-[#18181b] dark:ring-white/10"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-2xl font-light shadow-sm ring-1 ring-slate-100 transition active:scale-90 dark:bg-[#18181b] dark:ring-white/10"
         >
           +
-        </button>
+        </Link>
       </div>
 
       <div className="overflow-hidden rounded-[24px] bg-white shadow-sm ring-1 ring-slate-100 dark:bg-[#18181b] dark:ring-white/10">
