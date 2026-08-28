@@ -1,7 +1,14 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
+
+const PUBLIC_ROUTES = [
+  "/login",
+  "/create-account",
+  "/forgot-password",
+];
 
 export default function AppShell({
   children,
@@ -9,18 +16,59 @@ export default function AppShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
 
-  const hideBottomNav =
-    pathname.startsWith("/dw/") ||
-    pathname.startsWith("/send/") ||
-    pathname.startsWith("/receive/")||
-    pathname ==="/primary";
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
+
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+
+  useEffect(() => {
+    const token = localStorage.getItem("jwt_token");
+
+    if (isPublicRoute) {
+      if (token && pathname === "/login") {
+        router.replace("/");
+        return;
+      }
+
+      setCheckingAuth(false);
+      return;
+    }
+
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+
+    setAuthenticated(true);
+    setCheckingAuth(false);
+  }, [pathname, router, isPublicRoute]);
+
+  if (checkingAuth) {
+    return null;
+  }
+
+  if (isPublicRoute) {
+    return (
+      <div className="min-h-screen bg-slate-100">
+        <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#f5f7fb] shadow-xl">
+          {children}
+        </main>
+      </div>
+    );
+  }
+
+  if (!authenticated) {
+    return null;
+  }
 
   return (
-    <>
-      {children}
-
-      {!hideBottomNav && <BottomNav />}
-    </>
+    <div className="min-h-screen bg-slate-100">
+      <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#f5f7fb] shadow-xl">
+        {children}
+        <BottomNav />
+      </main>
+    </div>
   );
 }

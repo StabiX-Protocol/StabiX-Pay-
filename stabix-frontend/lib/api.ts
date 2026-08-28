@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL|| "";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 export async function apiFetch(
   endpoint: string,
@@ -6,7 +6,7 @@ export async function apiFetch(
 ) {
   const token =
     typeof window !== "undefined"
-      ? localStorage.getItem("token")
+      ? localStorage.getItem("jwt_token")
       : null;
 
   const headers = new Headers(options.headers);
