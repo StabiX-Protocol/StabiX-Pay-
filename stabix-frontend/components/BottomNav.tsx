@@ -30,19 +30,6 @@ export default function BottomNav() {
           />
 
           <div className="fixed bottom-[94px] left-1/2 z-[60] w-[calc(100%-40px)] max-w-md -translate-x-1/2 overflow-hidden rounded-[24px] border border-slate-200 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-[#18181b]">
-            <MoreLink
-              icon="◉"
-              label="Profile"
-              href="/profile"
-              onClick={() => setMoreOpen(false)}
-            />
-
-            <MoreLink
-              icon="⚙"
-              label="Settings"
-              href="/settings"
-              onClick={() => setMoreOpen(false)}
-            />
 
             <MoreLink
               icon="▣"

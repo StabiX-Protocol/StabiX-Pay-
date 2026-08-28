@@ -57,10 +57,6 @@ export default function Assets() {
                   <p className="text-sm font-bold">
                     {asset.name}
                   </p>
-
-                  <p className="mt-0.5 text-xs text-slate-400">
-                    {asset.balance} {asset.name}
-                  </p>
                 </div>
               </div>
 

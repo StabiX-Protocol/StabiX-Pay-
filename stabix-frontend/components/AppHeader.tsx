@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AppHeader() {
+  const router = useRouter();
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
@@ -55,7 +57,7 @@ export default function AppHeader() {
           <button
             type="button"
             aria-label="Settings"
-            onClick={() => setSettingsOpen(!settingsOpen)}
+           onClick={() => router.push("/settings")}
             className={`flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 ${
               settingsOpen
                 ? "bg-slate-900 text-white dark:bg-white dark:text-black"
@@ -78,15 +80,6 @@ export default function AppHeader() {
           </button>
         </div>
       </header>
-
-      {/* Small Settings panel */}
-      {settingsOpen && (
-        <div className="mx-5 mb-2 rounded-2xl bg-white p-4 shadow-lg ring-1 ring-slate-200 dark:bg-[#18181b] dark:ring-white/10">
-          <p className="text-sm font-bold">
-            Settings
-          </p>
-        </div>
-      )}
     </>
   );
 }
