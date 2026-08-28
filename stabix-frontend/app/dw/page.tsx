@@ -19,7 +19,6 @@ const assets = [
 
 export default function DWPage() {
 
-
   return (
     <main className="min-h-screen bg-[#f6f7f9] px-5 pb-32 text-slate-900 dark:bg-[#0b0b0d] dark:text-white">
       <div className="mx-auto w-full max-w-md">
