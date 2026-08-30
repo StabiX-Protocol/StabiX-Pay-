@@ -13,7 +13,6 @@ declare global {
 
 export default function CreateAccountPage() {
   const router = useRouter();
-
   const googleRef = useRef<HTMLDivElement>(null);
 
   const [googleReady, setGoogleReady] = useState(false);
@@ -30,9 +29,9 @@ export default function CreateAccountPage() {
   const [message, setMessage] = useState("");
 
   /*
-   * ================================
-   * GOOGLE GIS READY CHECK
-   * ================================
+   * ==========================================
+   * GOOGLE SCRIPT READY
+   * ==========================================
    */
 
   useEffect(() => {
@@ -43,15 +42,13 @@ export default function CreateAccountPage() {
       }
     }, 100);
 
-    return () => {
-      clearInterval(timer);
-    };
+    return () => clearInterval(timer);
   }, []);
 
   /*
-   * ================================
-   * GOOGLE BUTTON
-   * ================================
+   * ==========================================
+   * RENDER GOOGLE BUTTON
+   * ==========================================
    */
 
   useEffect(() => {
@@ -59,53 +56,40 @@ export default function CreateAccountPage() {
       return;
     }
 
-    const container = googleRef.current;
+    if (!googleRef.current) {
+      return;
+    }
 
-    if (!container) {
+    const clientId =
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
+    if (!clientId) {
       console.error(
-        "❌ Google signup button container not found"
+        "❌ NEXT_PUBLIC_GOOGLE_CLIENT_ID missing"
       );
       return;
     }
 
     if (
-      !window.google ||
-      !window.google.accounts ||
-      !window.google.accounts.id
+      !window.google?.accounts?.id
     ) {
       console.error(
-        "❌ Google Identity Services not loaded"
+        "❌ Google Identity Services not ready"
       );
       return;
     }
 
-    /*
-     * EXACT WORKING CLIENT ID
-     */
+    googleRef.current.innerHTML = "";
 
     window.google.accounts.id.initialize({
-      client_id:
-        "555121729616-a7a7ertm7i6pgfaps0s2mc9l3v6p6fci.apps.googleusercontent.com",
-
+      client_id: clientId,
       callback: handleGoogleCredential,
-
       auto_select: false,
-
       use_fedcm_for_prompt: false,
     });
 
-    /*
-     * CLEAR OLD BUTTON
-     */
-
-    container.innerHTML = "";
-
-    /*
-     * RENDER GOOGLE BUTTON
-     */
-
     window.google.accounts.id.renderButton(
-      container,
+      googleRef.current,
       {
         theme: "outline",
         size: "large",
@@ -120,9 +104,9 @@ export default function CreateAccountPage() {
   }, [googleReady]);
 
   /*
-   * ================================
+   * ==========================================
    * GOOGLE CALLBACK
-   * ================================
+   * ==========================================
    */
 
   async function handleGoogleCredential(
@@ -144,31 +128,31 @@ export default function CreateAccountPage() {
       return;
     }
 
-    console.log(
-      "✅ Google credential received:",
-      response.credential.length
-    );
-
     try {
       setLoading(true);
       setMessage("");
 
+      console.log(
+        "✅ Google credential received:",
+        response.credential.length
+      );
+
       /*
-       * CHECK WHETHER GOOGLE ACCOUNT
-       * ALREADY EXISTS
+       * ======================================
+       * CHECK WHETHER GOOGLE ACCOUNT EXISTS
+       * ======================================
        */
 
       const apiUrl =
         `${process.env.NEXT_PUBLIC_API_URL}/api/users/login/google`;
 
       console.log(
-        "GOOGLE SIGNUP CHECK API:",
+        "GOOGLE CREATE CHECK API:",
         apiUrl
       );
 
-      const apiResponse = await fetch(
-        apiUrl,
-        {
+      const apiResponse =
+        await fetch(apiUrl, {
           method: "POST",
 
           headers: {
@@ -176,10 +160,10 @@ export default function CreateAccountPage() {
           },
 
           body: JSON.stringify({
-            id_token: response.credential,
+            id_token:
+              response.credential,
           }),
-        }
-      );
+        });
 
       const data =
         await apiResponse
@@ -187,15 +171,15 @@ export default function CreateAccountPage() {
           .catch(() => null);
 
       console.log(
-        "GOOGLE SIGNUP CHECK:",
+        "GOOGLE CREATE CHECK:",
         apiResponse.status,
         data
       );
 
       /*
-       * ================================
-       * GOOGLE ACCOUNT ALREADY EXISTS
-       * ================================
+       * ======================================
+       * ACCOUNT ALREADY EXISTS
+       * ======================================
        */
 
       if (apiResponse.ok) {
@@ -204,9 +188,13 @@ export default function CreateAccountPage() {
       }
 
       /*
-       * ================================
+       * ======================================
        * NEW GOOGLE ACCOUNT
-       * ================================
+       * ======================================
+       *
+       * Backend says 404
+       * → Google account not registered
+       * → continue signup
        */
 
       if (apiResponse.status === 404) {
@@ -220,134 +208,107 @@ export default function CreateAccountPage() {
       }
 
       /*
-       * OTHER API ERROR
+       * ======================================
+       * OTHER ERROR
+       * ======================================
        */
 
       setMessage(
         data?.message ||
-        "Google account verification failed."
+          "Google account verification failed."
       );
 
     } catch (error) {
       console.error(
-        "❌ GOOGLE SIGNUP CHECK ERROR:",
+        "❌ GOOGLE CREATE ACCOUNT ERROR:",
         error
       );
 
       setMessage(
         "Unable to connect to StabiX. Please try again."
       );
-
     } finally {
       setLoading(false);
     }
   }
 
   /*
-   * ================================
+   * ==========================================
    * GENERATE STBX UID
-   * ================================
+   * ==========================================
    */
 
   function generateSTBX() {
     const random =
       Math.floor(
         1000000000 +
-        Math.random() * 9000000000
+          Math.random() *
+            9000000000
       );
 
     return `STBX10${random}`;
   }
 
   /*
-   * ================================
+   * ==========================================
    * CREATE ACCOUNT
-   * ================================
+   * ==========================================
    */
 
   async function handleCreateAccount() {
     const cleanUsername =
-      username.trim().toLowerCase();
-
-    /*
-     * USERNAME
-     */
+      username
+        .trim()
+        .toLowerCase();
 
     if (!cleanUsername) {
       setMessage(
         "Please choose a username."
       );
-
       return;
     }
-
-    /*
-     * PASSWORD
-     */
 
     if (!password) {
       setMessage(
         "Please enter a password."
       );
-
       return;
     }
-
-    /*
-     * CONFIRM PASSWORD
-     */
 
     if (!confirmPassword) {
       setMessage(
         "Please confirm your password."
       );
-
       return;
     }
-
-    /*
-     * PASSWORD LENGTH
-     */
 
     if (password.length < 6) {
       setMessage(
         "Password must be at least 6 characters."
       );
-
       return;
     }
 
-    /*
-     * PASSWORD MATCH
-     */
-
-    if (password !== confirmPassword) {
+    if (
+      password !==
+      confirmPassword
+    ) {
       setMessage(
         "Passwords do not match."
       );
-
       return;
     }
-
-    /*
-     * GOOGLE TOKEN
-     */
 
     if (!googleToken) {
       setMessage(
         "Google signup session expired. Please try again."
       );
-
       return;
     }
 
     try {
       setLoading(true);
       setMessage("");
-
-      /*
-       * REGISTER API
-       */
 
       const apiUrl =
         `${process.env.NEXT_PUBLIC_API_URL}/api/users/register`;
@@ -357,17 +318,18 @@ export default function CreateAccountPage() {
         apiUrl
       );
 
-      const response = await fetch(
-        apiUrl,
-        {
+      const response =
+        await fetch(apiUrl, {
           method: "POST",
 
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type":
+              "application/json",
           },
 
           body: JSON.stringify({
-            stbx_uid: generateSTBX(),
+            stbx_uid:
+              generateSTBX(),
 
             google_id_token:
               googleToken,
@@ -378,8 +340,7 @@ export default function CreateAccountPage() {
             password:
               password,
           }),
-        }
-      );
+        });
 
       const data =
         await response
@@ -392,22 +353,14 @@ export default function CreateAccountPage() {
         data
       );
 
-      /*
-       * REGISTER FAILED
-       */
-
       if (!response.ok) {
         setMessage(
           data?.message ||
-          "Account registration failed."
+            "Account registration failed."
         );
 
         return;
       }
-
-      /*
-       * CHECK TOKEN
-       */
 
       if (
         !data?.token ||
@@ -421,9 +374,9 @@ export default function CreateAccountPage() {
       }
 
       /*
-       * ================================
-       * SAVE LOGIN SESSION
-       * ================================
+       * ======================================
+       * SAVE SESSION
+       * ======================================
        */
 
       localStorage.setItem(
@@ -436,7 +389,9 @@ export default function CreateAccountPage() {
         data.user.stbx_uid
       );
 
-      if (data.user.google_uid) {
+      if (
+        data.user.google_uid
+      ) {
         localStorage.setItem(
           "stbx_google_uid",
           data.user.google_uid
@@ -450,9 +405,7 @@ export default function CreateAccountPage() {
       setGoogleToken("");
 
       /*
-       * ================================
        * OPEN HOME
-       * ================================
        */
 
       router.replace("/");
@@ -466,22 +419,29 @@ export default function CreateAccountPage() {
       setMessage(
         "Unable to connect to StabiX. Please try again."
       );
-
     } finally {
       setLoading(false);
     }
   }
 
   /*
-   * ================================
+   * ==========================================
+   * BACK BUTTON
+   * ==========================================
+   */
+
+  function handleBack() {
+  router.push("/login");
+  }
+
+  /*
+   * ==========================================
    * PAGE
-   * ================================
+   * ==========================================
    */
 
   return (
     <>
-      {/* GOOGLE GIS SCRIPT */}
-
       <Script
         src="https://accounts.google.com/gsi/client"
         strategy="afterInteractive"
@@ -502,19 +462,16 @@ export default function CreateAccountPage() {
 
           <button
             type="button"
-            onClick={() => router.back()}
-            className="mb-8 flex h-11 w-11 items-center justify-center rounded-full bg-white text-2xl shadow-sm ring-1 ring-slate-200 active:scale-90"
-            aria-label="Go back"
+            onClick={handleBack}
+            className="mb-8 flex h-[52px] items-center rounded-[18px] bg-white px-5 text-[18px] font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200"
           >
-            ←
+            ← Back
           </button>
-
-          {/* =========================
-              GOOGLE START PAGE
-          ========================= */}
 
           {!showSignupForm ? (
             <>
+              {/* LOGO */}
+
               <h1 className="text-[64px] font-extrabold leading-none tracking-[-0.06em]">
                 StabiX
               </h1>
@@ -522,6 +479,8 @@ export default function CreateAccountPage() {
               <p className="mt-10 text-[28px] leading-tight text-slate-500">
                 Pay Stablecoins Instant, Free & Secure
               </p>
+
+              {/* TITLE */}
 
               <h2 className="mt-28 text-[42px] font-extrabold">
                 Create Account
@@ -532,13 +491,15 @@ export default function CreateAccountPage() {
               <div className="mt-10 flex w-full justify-center">
                 <div
                   ref={googleRef}
-                  className="w-full max-w-[360px]"
+                  className="flex min-h-[44px] w-full max-w-[360px] justify-center"
                 />
               </div>
 
-              <p className="mt-4 text-center text-[18px] leading-relaxed text-slate-500">
-                Create StabiX Account with google
+              <p className="mt-4 text-center text-[18px] text-slate-500">
+                Continue with Google to create your StabiX account.
               </p>
+
+              {/* LOADING */}
 
               {loading && (
                 <p className="mt-6 text-center text-slate-500">
@@ -546,21 +507,33 @@ export default function CreateAccountPage() {
                 </p>
               )}
 
+              {/* ERROR */}
+
               {message && (
                 <div className="mt-6 rounded-2xl bg-red-50 px-5 py-4 text-center text-[16px] font-medium text-red-600">
                   {message}
                 </div>
               )}
 
-              
+              {/* LOGIN LINK */}
+
+              <div className="mt-10 text-center text-[18px]">
+                <span className="text-slate-500">
+                  Already have an account?{" "}
+                </span>
+
+                <Link
+                  href="/login"
+                  className="font-semibold text-blue-600"
+                >
+                  Log in
+                </Link>
+              </div>
             </>
           ) : (
-
-            /* =========================
-               FINISH ACCOUNT
-            ========================= */
-
             <>
+              {/* FINISH ACCOUNT */}
+
               <h1 className="text-[64px] font-extrabold leading-none tracking-[-0.06em]">
                 StabiX
               </h1>
@@ -577,9 +550,9 @@ export default function CreateAccountPage() {
                 Choose your username and password.
               </p>
 
-              <div className="mt-10 space-y-4">
+              {/* FORM */}
 
-                {/* USERNAME */}
+              <div className="mt-10 space-y-4">
 
                 <input
                   type="text"
@@ -593,8 +566,6 @@ export default function CreateAccountPage() {
                   className="h-[76px] w-full rounded-[28px] bg-[#eaf1ff] px-9 text-[22px] outline-none ring-1 ring-slate-200"
                 />
 
-                {/* PASSWORD */}
-
                 <input
                   type="password"
                   placeholder="Password"
@@ -606,8 +577,6 @@ export default function CreateAccountPage() {
                   }
                   className="h-[76px] w-full rounded-[28px] bg-[#eaf1ff] px-9 text-[22px] outline-none ring-1 ring-slate-200"
                 />
-
-                {/* CONFIRM PASSWORD */}
 
                 <input
                   type="password"
@@ -621,15 +590,11 @@ export default function CreateAccountPage() {
                   className="h-[76px] w-full rounded-[28px] bg-[#eaf1ff] px-9 text-[22px] outline-none ring-1 ring-slate-200"
                 />
 
-                {/* ERROR */}
-
                 {message && (
                   <div className="rounded-2xl bg-red-50 px-5 py-4 text-center text-[16px] font-medium text-red-600">
                     {message}
                   </div>
                 )}
-
-                {/* CREATE ACCOUNT */}
 
                 <button
                   type="button"
@@ -651,61 +616,51 @@ export default function CreateAccountPage() {
         </div>
       </main>
 
-      {/* ================================
+      {/* ======================================
           EXISTING GOOGLE ACCOUNT MODAL
-          ================================ */}
+          ====================================== */}
 
       {showExistingModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-5 backdrop-blur-sm">
 
           <div className="w-full max-w-[390px] rounded-[30px] bg-white p-7 shadow-2xl">
 
-            {/* ICON */}
-
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-2xl font-bold text-blue-600">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-2xl">
               G
             </div>
-
-            {/* TITLE */}
 
             <h3 className="mt-5 text-[26px] font-extrabold text-slate-900">
               Google Account Already Registered
             </h3>
 
-            {/* MESSAGE */}
-
             <p className="mt-3 text-[17px] leading-relaxed text-slate-500">
-              This Google account is already
-              linked to a StabiX account.
+              This Google account is already linked to a StabiX account.
             </p>
 
             <p className="mt-2 text-[17px] leading-relaxed text-slate-500">
-              Please use Login to access your
-              account.
+              Please use Login to access your account.
             </p>
 
-            {/* BUTTONS */}
-
             <div className="mt-7 flex gap-3">
-
-              {/* CANCEL */}
 
               <button
                 type="button"
                 onClick={() =>
-                  setShowExistingModal(false)
+                  setShowExistingModal(
+                    false
+                  )
                 }
                 className="h-[58px] flex-1 rounded-[20px] bg-slate-100 text-[17px] font-bold text-slate-700"
               >
                 Cancel
               </button>
 
-              {/* LOGIN */}
-
               <button
                 type="button"
                 onClick={() =>
-                  router.push("/login")
+                  router.push(
+                    "/login"
+                  )
                 }
                 className="h-[58px] flex-1 rounded-[20px] bg-blue-600 text-[17px] font-bold text-white"
               >
