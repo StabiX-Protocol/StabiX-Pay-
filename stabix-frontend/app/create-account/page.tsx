@@ -496,7 +496,7 @@ export default function CreateAccountPage() {
               </div>
 
               <p className="mt-4 text-center text-[18px] text-slate-500">
-                Continue with Google to create your StabiX account.
+                 Create your StabiX account with google.
               </p>
 
               {/* LOADING */}
@@ -514,21 +514,7 @@ export default function CreateAccountPage() {
                   {message}
                 </div>
               )}
-
-              {/* LOGIN LINK */}
-
-              <div className="mt-10 text-center text-[18px]">
-                <span className="text-slate-500">
-                  Already have an account?{" "}
-                </span>
-
-                <Link
-                  href="/login"
-                  className="font-semibold text-blue-600"
-                >
-                  Log in
-                </Link>
-              </div>
+              
             </>
           ) : (
             <>
