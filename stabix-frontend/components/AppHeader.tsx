@@ -12,10 +12,11 @@ export default function AppHeader() {
       <header className="flex items-center justify-between px-5 pb-3 pt-6">
         {/* Profile */}
         <button
-          type="button"
-          className="flex items-center gap-3"
-          aria-label="Open profile"
-        >
+  type="button"
+  onClick={() => router.push("/profile")}
+  className="flex items-center gap-3"
+  aria-label="Open profile"
+>
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-sm font-bold text-white dark:bg-white dark:text-black">
             S
           </div>

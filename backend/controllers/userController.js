@@ -81,6 +81,7 @@ const { stbx_uid } = req.params;
 const result = await pool.query(
 `SELECT
 stbx_uid,
+email,
 username,
 eoa_address,
 role,
@@ -127,6 +128,7 @@ const registerUser = async (req, res) => {
 } = req.body;
 
 let finalGoogleUid = null;
+let finalEmail = null;
 
     if (google_id_token) {
       const ticket = await googleClient.verifyIdToken({
@@ -137,6 +139,7 @@ let finalGoogleUid = null;
       const payload = ticket.getPayload();
 
       finalGoogleUid = payload.sub;
+      finalEmail = payload.email || null;
 
       const existingGoogleUser = await client.query(
         `SELECT stbx_uid
@@ -168,6 +171,7 @@ let finalGoogleUid = null;
       [
         stbx_uid,
         finalGoogleUid,
+        finalEmail,
         username,
         eoa_address,
         hashedPassword
