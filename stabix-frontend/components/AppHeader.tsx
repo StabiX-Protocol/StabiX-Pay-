@@ -1,30 +1,80 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/api";
+
+type Profile = {
+  username?: string;
+  profile_image?: string | null;
+  profileImage?: string | null;
+};
 
 export default function AppHeader() {
   const router = useRouter();
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  const [username, setUsername] = useState("Sumedh10");
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      const stbxUid = localStorage.getItem("stbx_uid");
+
+      if (!stbxUid) return;
+
+      const data = await apiFetch(`/api/users/profile/${stbxUid}`);
+
+      if (data?.user) {
+        const user: Profile = data.user;
+
+        setUsername(user.username || "Sumedh10");
+
+        setProfileImage(
+          user.profile_image || user.profileImage || null
+        );
+      }
+    } catch (error) {
+      console.error("Header profile API error:", error);
+    }
+  };
+
+  const firstLetter =
+    username.trim().charAt(0).toUpperCase() || "S";
+
+  const profileImageUrl = profileImage
+    ? `${process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "")}${profileImage}`
+    : null;
 
   return (
     <>
       <header className="flex items-center justify-between px-5 pb-3 pt-6">
         {/* Profile */}
         <button
-  type="button"
-  onClick={() => router.push("/profile")}
-  className="flex items-center gap-3"
-  aria-label="Open profile"
->
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-sm font-bold text-white dark:bg-white dark:text-black">
-            S
-          </div>
+          type="button"
+          onClick={() => router.push("/profile")}
+          className="flex items-center gap-3"
+          aria-label="Open profile"
+        >
+          {profileImageUrl ? (
+            <img
+              src={profileImageUrl}
+              alt="Profile"
+              className="h-11 w-11 rounded-full object-cover shadow-sm"
+            />
+          ) : (
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
+              {firstLetter}
+            </div>
+          )}
 
           <div className="text-left">
-
             <p className="text-base font-bold tracking-tight text-slate-900 dark:text-white">
-              Sumedh10
+              {username}
             </p>
           </div>
         </button>
@@ -58,7 +108,7 @@ export default function AppHeader() {
           <button
             type="button"
             aria-label="Settings"
-           onClick={() => router.push("/settings")}
+            onClick={() => router.push("/settings")}
             className={`flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 ${
               settingsOpen
                 ? "bg-slate-900 text-white dark:bg-white dark:text-black"
@@ -76,7 +126,8 @@ export default function AppHeader() {
               strokeLinejoin="round"
             >
               <circle cx="12" cy="12" r="3" />
-              <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.8 1.8-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V22h-2.55v-.1a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.8-1.8.06-.06A1.7 1.7 0 0 0 7.6 15a1.7 1.7 0 0 0-1.56-1.03H5.9v-2.55h.14A1.7 1.7 0 0 0 7.6 10a1.7 1.7 0 0 0-.34-1.88L7.2 8.06l1.8-1.8.06.06A1.7 1.7 0 0 0 10.94 6a1.7 1.7 0 0 0 1.03-1.56V4h2.55v.44A1.7 1.7 0 0 0 15.55 6a1.7 1.7 0 0 0 1.88.34l.06-.06 1.8 1.8-.06.06A1.7 1.7 0 0 0 18.9 10a1.7 1.7 0 0 0 1.56 1.03h.14v2.55h-.14A1.7 1.7 0 0 0 19.4 15Z" />
+              <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.8 1.8-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V22h-2.55v-.1a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.8-1.8.06-.06A1.7 1.7 0 0 0 7.6 15a1.7 1.7 0 0 0-1.56-1.03H5.9v-2.55h.14A1.7 1.7 0 0 0 7.6 10a1.7 1.7 0 0 0-.34-1.88L7.2 8.06l1.8-1.8.06.06A1.7 1.7 0 0 0 10.94 6a1.7 1.7 0 0 0 1.03-1.56V4h2.55v.44A1.7 1.7 0 0 0 15.55 6a1.7 1.7 0 0 0 1.88.34l.06-.06 1.8 1.8-.06.06A1.7 1.7 0 0 0 18.9 10a1.7 1.7 0 0 0 1.56 1.03h.14v2.55h-.14A1.7 1.7 0 0 0 19.4 15Z"
+              />
             </svg>
           </button>
         </div>

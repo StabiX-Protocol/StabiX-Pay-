@@ -20,9 +20,27 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
+  const [imageViewerOpen, setImageViewerOpen] = useState(false);
+  
   useEffect(() => {
     loadProfile();
   }, []);
+
+  useEffect(() => {
+    if (!imageViewerOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setImageViewerOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [imageViewerOpen]);
 
   const loadProfile = async () => {
     try {
@@ -78,6 +96,10 @@ export default function ProfilePage() {
     profile?.profileImage ||
     null;
 
+    const profileImageUrl = profileImage
+  ? `${process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "")}${profileImage}`
+  : null;
+
   return (
     <main className="min-h-screen bg-[#f6f7f9] px-5 pb-32 text-slate-900 dark:bg-[#0b0b0d] dark:text-white">
 
@@ -85,45 +107,45 @@ export default function ProfilePage() {
 
         {/* HEADER */}
 
-       <header className="flex items-center py-7">
+        <header className="flex items-center py-7">
 
-  <button
-    type="button"
-    onClick={() => router.back()}
-    aria-label="Go back"
-    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-3xl transition active:scale-90"
-  >
-    ←
-  </button>
+          <button
+            type="button"
+            onClick={() => router.back()}
+            aria-label="Go back"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-3xl transition active:scale-90"
+          >
+            ←
+          </button>
 
-  <h1 className="ml-3 text-[28px] font-bold tracking-tight">
-    Profile
-  </h1>
+          <h1 className="ml-3 text-[28px] font-bold tracking-tight">
+            Profile
+          </h1>
 
-  <div className="flex-1" />
+          <div className="flex-1" />
 
-  <button
-    type="button"
-    onClick={() => router.push("/profile/edit")}
-    aria-label="Edit profile"
-    className="flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-5 w-5"
-    >
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
-    </svg>
-  </button>
+          <button
+            type="button"
+            onClick={() => router.push("/profile/edit")}
+            aria-label="Edit profile"
+            className="flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-5 w-5"
+            >
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+            </svg>
+          </button>
 
-</header>
+        </header>
 
         {loading ? (
 
@@ -145,11 +167,18 @@ export default function ProfilePage() {
 
               {profileImage ? (
 
-                <img
-                  src={profileImage}
-                  alt="Profile"
-                  className="h-28 w-28 rounded-full object-cover shadow-lg ring-4 ring-white dark:ring-[#18181b]"
-                />
+                <button
+                  type="button"
+                  onClick={() => setImageViewerOpen(true)}
+                  aria-label="View profile picture"
+                  className="block rounded-full transition active:scale-95"
+                >
+                  <img
+                   src={profileImageUrl || ""}
+                    alt="Profile"
+                    className="h-28 w-28 rounded-full object-cover shadow-lg ring-4 ring-white dark:ring-[#18181b]"
+                  />
+                </button>
 
               ) : (
 
@@ -281,6 +310,37 @@ export default function ProfilePage() {
         )}
 
       </div>
+
+
+      {/* PROFILE IMAGE VIEWER */}
+
+      {imageViewerOpen && profileImage && (
+
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 px-4 py-8"
+          onClick={() => setImageViewerOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Profile picture"
+        >
+
+          <div
+            className="flex max-h-full max-w-full items-center justify-center"
+            onClick={(event) => event.stopPropagation()}
+          >
+
+            <img
+             src={profileImageUrl || ""}
+              alt="Profile"
+              className="max-h-[90vh] max-w-[94vw] object-contain select-none"
+              draggable={false}
+            />
+
+          </div>
+
+        </div>
+
+      )}
 
 
       {/* COPY SUCCESS POPUP */}

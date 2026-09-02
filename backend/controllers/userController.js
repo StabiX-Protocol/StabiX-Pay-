@@ -5,6 +5,10 @@ const { OAuth2Client } = require("google-auth-library");
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const jwt = require("jsonwebtoken")
 
+const fs = require("fs");
+const path = require("path");
+const { moderateProfileImage } = require("../services/profileModeration");
+
 const loginUser = async (req, res) => {
 try {
 const { stbx_uid, password } = req.body;
@@ -86,7 +90,9 @@ username,
 eoa_address,
 role,
 created_at,
-last_username_change
+last_username_change,
+profile_image,
+profile_image_updated_at
 FROM users
 WHERE stbx_uid = $1`,
 [stbx_uid]
@@ -507,4 +513,217 @@ message: "Internal Server Error"
 }
 };
 
-module.exports = {loginUser, registerUser, getUser, getProfile, updateUsername,googleLogin, updateEOAAddress, resetPassword}
+const uploadProfileImage = async (req, res) => {
+  let savedFilePath = null;
+
+  try {
+    const stbx_uid = req.user.stbx_uid;
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Profile image is required."
+      });
+    }
+
+    const userResult = await pool.query(
+      `SELECT profile_image, profile_image_updated_at
+       FROM users
+       WHERE stbx_uid = $1`,
+      [stbx_uid]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    // 7-day profile image change rule
+    if (user.profile_image_updated_at) {
+      const lastUpdate = new Date(user.profile_image_updated_at);
+      const nextAllowed = new Date(
+        lastUpdate.getTime() + 7 * 24 * 60 * 60 * 1000
+      );
+
+      if (new Date() < nextAllowed) {
+        return res.status(429).json({
+          success: false,
+          message: "Profile image can be changed once every 7 days."
+        });
+      }
+    }
+
+    // Moderate BEFORE permanently saving the image
+    const moderation = await moderateProfileImage(
+      req.file.buffer,
+      req.file.originalname,
+      req.file.mimetype
+    );
+
+    if (!moderation.allowed) {
+      return res.status(400).json({
+        success: false,
+        message: "This image cannot be used as a profile image."
+      });
+    }
+
+    const uploadDir = path.join(
+      __dirname,
+      "../uploads/profile-images"
+    );
+
+    fs.mkdirSync(uploadDir, { recursive: true });
+
+    const extension =
+      req.file.mimetype === "image/jpeg"
+        ? ".jpg"
+        : req.file.mimetype === "image/png"
+        ? ".png"
+        : ".webp";
+
+    const filename = `${stbx_uid}-${Date.now()}${extension}`;
+
+    savedFilePath = path.join(uploadDir, filename);
+
+    fs.writeFileSync(savedFilePath, req.file.buffer);
+
+    const profileImageUrl =
+      `/uploads/profile-images/${filename}`;
+
+    const updateResult = await pool.query(
+      `UPDATE users
+       SET profile_image = $1,
+           profile_image_updated_at = NOW()
+       WHERE stbx_uid = $2
+       RETURNING profile_image, profile_image_updated_at`,
+      [profileImageUrl, stbx_uid]
+    );
+
+    if (updateResult.rows.length === 0) {
+      if (fs.existsSync(savedFilePath)) {
+        fs.unlinkSync(savedFilePath);
+      }
+
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // Delete previous profile image after successful DB update
+    if (user.profile_image) {
+      const oldFilePath = path.join(
+        __dirname,
+        "..",
+        user.profile_image.replace(/^\/+/, "")
+      );
+
+      if (
+        fs.existsSync(oldFilePath) &&
+        oldFilePath !== savedFilePath
+      ) {
+        fs.unlinkSync(oldFilePath);
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile image updated successfully.",
+      profile_image: profileImageUrl
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    if (savedFilePath && fs.existsSync(savedFilePath)) {
+      fs.unlinkSync(savedFilePath);
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to update profile image."
+    });
+  }
+};
+
+
+const removeProfileImage = async (req, res) => {
+  try {
+    const stbx_uid = req.user.stbx_uid;
+
+    const result = await pool.query(
+      `SELECT profile_image, profile_image_updated_at
+       FROM users
+       WHERE stbx_uid = $1`,
+      [stbx_uid]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    const user = result.rows[0];
+
+    if (!user.profile_image) {
+      return res.status(400).json({
+        success: false,
+        message: "No profile image to remove."
+      });
+    }
+
+    // Removal also counts as a profile image change
+    if (user.profile_image_updated_at) {
+      const lastUpdate = new Date(user.profile_image_updated_at);
+      const nextAllowed = new Date(
+        lastUpdate.getTime() + 7 * 24 * 60 * 60 * 1000
+      );
+
+      if (new Date() < nextAllowed) {
+        return res.status(429).json({
+          success: false,
+          message: "Profile image can be changed once every 7 days."
+        });
+      }
+    }
+
+    const filePath = path.join(
+      __dirname,
+      "..",
+      user.profile_image.replace(/^\/+/, "")
+    );
+
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    await pool.query(
+      `UPDATE users
+       SET profile_image = NULL,
+           profile_image_updated_at = NOW()
+       WHERE stbx_uid = $1`,
+      [stbx_uid]
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile image removed successfully."
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to remove profile image."
+    });
+  }
+};
+
+module.exports = {loginUser, registerUser, getUser, getProfile, updateUsername,googleLogin, updateEOAAddress, resetPassword, uploadProfileImage, removeProfileImage};

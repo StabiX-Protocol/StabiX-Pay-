@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {verifyToken} = require("../middleware/authMiddleware");
+const profileUpload = require("../middleware/profileUpload");
 
 const {
   registerUser,
@@ -10,7 +11,9 @@ const {
   loginUser,
   googleLogin,
   updateEOAAddress,
-  resetPassword
+  resetPassword,
+  uploadProfileImage,
+  removeProfileImage,
 } = require("../controllers/userController");
 
 router.get("/profile/:stbx_uid", verifyToken, getProfile);
@@ -25,6 +28,7 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/login/google", googleLogin);
 router.patch("/reset-password", resetPassword);
-
+router.post("/profile-image", verifyToken, profileUpload.single("profile_image"), uploadProfileImage);
+router.delete("/profile-image", verifyToken, removeProfileImage);
 
 module.exports = router;

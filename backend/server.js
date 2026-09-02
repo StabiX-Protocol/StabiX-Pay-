@@ -3,9 +3,13 @@ const express = require("express");
 const cors = require("cors");
 const pool = require("./config/db");
 const app = express();
-app.use(express.json());
+app.use(express.json({
+  type: "application/json"
+}));
 app.use(cors());
 const rateLimiter = require("express-rate-limit");
+const path = require("path");
+app.use("/uploads/profile-images",express.static(path.join(__dirname, "uploads/profile-images")));
 
 const healthRoutes = require("./routes/healthRoutes");
 const userRoutes = require("./routes/userRoutes")
