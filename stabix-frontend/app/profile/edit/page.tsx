@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Cropper, { Area } from "react-easy-crop";
 import { apiFetch } from "@/lib/api";
 import AppPopup from "@/components/AppPopup";
 
@@ -28,6 +29,14 @@ export default function EditProfilePage() {
   const [imageViewerOpen, setImageViewerOpen] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [removingImage, setRemovingImage] = useState(false);
+
+  // Crop states
+  const [cropOpen, setCropOpen] = useState(false);
+  const [cropImage, setCropImage] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] =
+    useState<Area | null>(null);
 
   const [savingUsername, setSavingUsername] = useState(false);
   const [savingEoa, setSavingEoa] = useState(false);
@@ -59,6 +68,22 @@ export default function EditProfilePage() {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [imageViewerOpen]);
+
+  useEffect(() => {
+    if (!cropOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeCropper();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [cropOpen]);
 
   const loadProfile = async () => {
     try {
@@ -124,10 +149,120 @@ export default function EditProfilePage() {
     }
 
     try {
+      const imageUrl = URL.createObjectURL(file);
+
+      setCropImage(imageUrl);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setCroppedAreaPixels(null);
+      setCropOpen(true);
+    } catch (error) {
+      console.error("Crop image error:", error);
+      showpopup("Unable to open image.");
+    } finally {
+      event.target.value = "";
+    }
+  };
+
+  const onCropComplete = (
+    _: Area,
+    croppedAreaPixels: Area
+  ) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  };
+
+  const closeCropper = () => {
+    if (cropImage) {
+      URL.revokeObjectURL(cropImage);
+    }
+
+    setCropOpen(false);
+    setCropImage(null);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setCroppedAreaPixels(null);
+  };
+
+  const createCroppedImage = async (
+    imageSrc: string,
+    pixelCrop: Area
+  ): Promise<Blob> => {
+    const image = new Image();
+
+    image.src = imageSrc;
+
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () =>
+        reject(new Error("Unable to load image."));
+    });
+
+    const canvas = document.createElement("canvas");
+
+    const size = Math.min(
+      pixelCrop.width,
+      pixelCrop.height
+    );
+
+    canvas.width = size;
+    canvas.height = size;
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      throw new Error("Unable to process image.");
+    }
+
+    ctx.drawImage(
+      image,
+      pixelCrop.x,
+      pixelCrop.y,
+      size,
+      size,
+      0,
+      0,
+      size,
+      size
+    );
+
+    return new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(
+              new Error("Unable to create cropped image.")
+            );
+          }
+        },
+        "image/jpeg",
+        0.92
+      );
+    });
+  };
+
+  const handleCropDone = async () => {
+    if (!cropImage || !croppedAreaPixels) {
+      showpopup("Please adjust the image first.");
+      return;
+    }
+
+    try {
       setUploadingImage(true);
 
+      const croppedBlob = await createCroppedImage(
+        cropImage,
+        croppedAreaPixels
+      );
+
       const formData = new FormData();
-      formData.append("profile_image", file);
+
+      formData.append(
+        "profile_image",
+        croppedBlob,
+        "profile-image.jpg"
+      );
 
       const token =
         typeof window !== "undefined"
@@ -159,17 +294,25 @@ export default function EditProfilePage() {
 
       if (!data?.success) {
         throw new Error(
-          data?.message || "Profile image update failed."
+          data?.message ||
+            "Profile image update failed."
         );
       }
 
       setProfileImage(data.profile_image || null);
 
-      showpopup("Profile image updated successfully.");
+      closeCropper();
+
+      showpopup(
+        "Profile image updated successfully."
+      );
 
       await loadProfile();
     } catch (error) {
-      console.error("Profile image upload error:", error);
+      console.error(
+        "Profile image upload error:",
+        error
+      );
 
       showpopup(
         error instanceof Error
@@ -178,7 +321,6 @@ export default function EditProfilePage() {
       );
     } finally {
       setUploadingImage(false);
-      event.target.value = "";
     }
   };
 
@@ -191,23 +333,32 @@ export default function EditProfilePage() {
     try {
       setRemovingImage(true);
 
-      const data = await apiFetch("/api/users/profile-image", {
-        method: "DELETE",
-      });
+      const data = await apiFetch(
+        "/api/users/profile-image",
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!data?.success) {
         throw new Error(
-          data?.message || "Profile image removal failed."
+          data?.message ||
+            "Profile image removal failed."
         );
       }
 
       setProfileImage(null);
 
-      showpopup("Profile image removed successfully.");
+      showpopup(
+        "Profile image removed successfully."
+      );
 
       await loadProfile();
     } catch (error) {
-      console.error("Profile image removal error:", error);
+      console.error(
+        "Profile image removal error:",
+        error
+      );
 
       showpopup(
         error instanceof Error
@@ -248,24 +399,33 @@ export default function EditProfilePage() {
     try {
       setSavingUsername(true);
 
-      const data = await apiFetch("/api/users/username", {
-        method: "PATCH",
-        body: JSON.stringify({
-          new_username: trimmedUsername,
-        }),
-      });
+      const data = await apiFetch(
+        "/api/users/username",
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            new_username: trimmedUsername,
+          }),
+        }
+      );
 
       if (!data?.success) {
         throw new Error(
-          data?.message || "Username update failed."
+          data?.message ||
+            "Username update failed."
         );
       }
 
-      showpopup("Username updated successfully.");
+      showpopup(
+        "Username updated successfully."
+      );
 
       await loadProfile();
     } catch (error) {
-      console.error("Username update error:", error);
+      console.error(
+        "Username update error:",
+        error
+      );
 
       showpopup(
         error instanceof Error
@@ -279,7 +439,9 @@ export default function EditProfilePage() {
 
   const saveEoaAddress = async () => {
     const trimmedAddress = eoaAddress.trim();
-    const currentAddress = (profile?.eoa_address || "").trim();
+    const currentAddress = (
+      profile?.eoa_address || ""
+    ).trim();
 
     // Blank
     if (!trimmedAddress) {
@@ -299,31 +461,42 @@ export default function EditProfilePage() {
       trimmedAddress.toLowerCase() ===
         currentAddress.toLowerCase()
     ) {
-      showpopup("Wallet address already linked.");
+      showpopup(
+        "Wallet address already linked."
+      );
       return;
     }
 
     try {
       setSavingEoa(true);
 
-      const data = await apiFetch("/api/users/eoa-address", {
-        method: "PATCH",
-        body: JSON.stringify({
-          eoa_address: trimmedAddress,
-        }),
-      });
+      const data = await apiFetch(
+        "/api/users/eoa-address",
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            eoa_address: trimmedAddress,
+          }),
+        }
+      );
 
       if (!data?.success) {
         throw new Error(
-          data?.message || "Wallet address update failed."
+          data?.message ||
+            "Wallet address update failed."
         );
       }
 
-      showpopup("Wallet address updated successfully.");
+      showpopup(
+        "Wallet address updated successfully."
+      );
 
       await loadProfile();
     } catch (error) {
-      console.error("Wallet address update error:", error);
+      console.error(
+        "Wallet address update error:",
+        error
+      );
 
       showpopup(
         error instanceof Error
@@ -336,10 +509,16 @@ export default function EditProfilePage() {
   };
 
   const firstLetter =
-    profile?.username?.trim()?.charAt(0)?.toUpperCase() || "?";
+    profile?.username
+      ?.trim()
+      ?.charAt(0)
+      ?.toUpperCase() || "?";
 
   const profileImageUrl = profileImage
-    ? `${process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "")}${profileImage}`
+    ? `${process.env.NEXT_PUBLIC_API_URL?.replace(
+        /\/$/,
+        ""
+      )}${profileImage}`
     : null;
 
   return (
@@ -374,7 +553,9 @@ export default function EditProfilePage() {
                 {profileImage ? (
                   <button
                     type="button"
-                    onClick={() => setImageViewerOpen(true)}
+                    onClick={() =>
+                      setImageViewerOpen(true)
+                    }
                     aria-label="View profile picture"
                     className="block rounded-full transition active:scale-95"
                   >
@@ -394,7 +575,11 @@ export default function EditProfilePage() {
                 <button
                   type="button"
                   onClick={handleCameraClick}
-                  disabled={uploadingImage}
+                  disabled={
+                    uploadingImage ||
+                    removingImage ||
+                    cropOpen
+                  }
                   aria-label="Change profile photo"
                   className="absolute bottom-0 right-0 flex h-10 w-10 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition active:scale-90 disabled:opacity-50"
                 >
@@ -414,7 +599,11 @@ export default function EditProfilePage() {
                       className="h-5 w-5"
                     >
                       <path d="M14.5 4h-5L8 6H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3l-1.5-2Z" />
-                      <circle cx="12" cy="12" r="3.5" />
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="3.5"
+                      />
                     </svg>
                   )}
                 </button>
@@ -437,7 +626,9 @@ export default function EditProfilePage() {
                   type="button"
                   onClick={handleRemoveImage}
                   disabled={
-                    removingImage || uploadingImage
+                    removingImage ||
+                    uploadingImage ||
+                    cropOpen
                   }
                   className="mt-3 rounded-xl px-4 py-2 text-sm font-semibold text-red-500 transition active:scale-95 disabled:opacity-50"
                 >
@@ -515,37 +706,108 @@ export default function EditProfilePage() {
         )}
       </div>
 
-      {/* PROFILE IMAGE VIEWER */}
+      {/* CROP MODAL */}
 
-      {imageViewerOpen && profileImageUrl && (
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 px-4 py-8"
-          onClick={() => setImageViewerOpen(false)}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Profile picture"
-        >
-          <div
-            className="flex max-h-full max-w-full items-center justify-center"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
-          >
-            <img
-              src={profileImageUrl}
-              alt="Profile"
-              className="max-h-[90vh] max-w-[94vw] object-contain select-none"
-              draggable={false}
-            />
-          </div>
-        </div>
-      )}
+      {cropOpen && cropImage && (
+        <div className="fixed inset-0 z-[10000] bg-black">
+          <div className="relative h-full w-full">
 
-      <AppPopup
-        open={popupOpen}
-        message={popupMessage}
-        onClose={() => setPopupOpen(false)}
+            {/* Crop area */}
+            <div className="absolute inset-x-0 bottom-32 top-0">
+              <Cropper
+                image={cropImage}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                cropShape="round"
+                showGrid={false}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+              />
+            </div>
+
+            {/* Bottom controls */}
+            <div className="absolute bottom-0 left-0 right-0 bg-black px-6 pb-8 pt-5 text-white">
+
+              <div className="mb-5 flex items-center gap-3">
+                <span className="text-sm text-white/70">
+                  Zoom
+                </span>
+
+                <input
+                  type="range"
+                  min={1}
+                  max={3}
+                  step={0.01}
+                  value={zoom}
+                  onChange={(event) =>
+                    setZoom(Number(event.target.value))
+                  }
+                  className="flex-1"
+                  aria-label="Zoom"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={closeCropper}
+                  disabled={uploadingImage}
+                  className="flex-1 rounded-2xl bg-white/10 py-3.5 text-sm font-semibold text-white transition active:scale-[0.98] disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+
+                <button
+  type="button"
+  onClick={handleCropDone}
+  disabled={uploadingImage}
+  className="flex-1 rounded-2xl bg-white py-3.5 text-sm font-semibold text-black transition active:scale-[0.98] disabled:opacity-50"
+>
+  {uploadingImage
+    ? "Uploading..."
+    : "Done"}
+</button>
+</div>
+</div>
+</div>
+</div>
+)}
+
+{/* PROFILE IMAGE VIEWER */}
+
+{imageViewerOpen && profileImageUrl && (
+  <div
+    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 px-4 py-8"
+    onClick={() =>
+      setImageViewerOpen(false)
+    }
+    role="dialog"
+    aria-modal="true"
+    aria-label="Profile picture"
+  >
+    <div
+      className="flex max-h-full max-w-full items-center justify-center"
+      onClick={(event) =>
+        event.stopPropagation()
+      }
+    >
+      <img
+        src={profileImageUrl}
+        alt="Profile"
+        className="max-h-[90vh] max-w-[94vw] object-contain select-none"
+        draggable={false}
       />
-    </main>
-  );
+    </div>
+  </div>
+)}
+
+<AppPopup
+  open={popupOpen}
+  message={popupMessage}
+  onClose={() => setPopupOpen(false)}
+/>
+</main>
+);
 }
