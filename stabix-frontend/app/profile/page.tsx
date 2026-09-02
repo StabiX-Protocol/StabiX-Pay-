@@ -85,24 +85,45 @@ export default function ProfilePage() {
 
         {/* HEADER */}
 
-        <header className="flex items-center justify-between py-7">
+       <header className="flex items-center py-7">
 
-          <button
-            type="button"
-            onClick={() => router.back()}
-            aria-label="Go back"
-            className="flex h-11 w-11 items-center justify-center rounded-full text-3xl transition active:scale-90"
-          >
-            ←
-          </button>
+  <button
+    type="button"
+    onClick={() => router.back()}
+    aria-label="Go back"
+    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-3xl transition active:scale-90"
+  >
+    ←
+  </button>
 
-          <h1 className="flex-1 text-center text-[28px] font-bold tracking-tight">
-            Profile
-          </h1>
+  <h1 className="ml-3 text-[28px] font-bold tracking-tight">
+    Profile
+  </h1>
 
-          <div className="w-11" />
+  <div className="flex-1" />
 
-        </header>
+  <button
+    type="button"
+    onClick={() => router.push("/profile/edit")}
+    aria-label="Edit profile"
+    className="flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+    >
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  </button>
+
+</header>
 
         {loading ? (
 
