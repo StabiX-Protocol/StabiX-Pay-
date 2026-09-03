@@ -640,7 +640,7 @@ if (!data?.allowed) {
                     cropOpen
                   }
                   aria-label="Change profile photo"
-                  className="absolute bottom-0 right-0 flex h-10 w-10 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition active:scale-90 disabled:opacity-50"
+                  className="absolute bottom-0 right-0 flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition active:scale-90 disabled:opacity-50"
                 >
                   {uploadingImage ? (
                     <span className="text-sm font-bold">
@@ -735,7 +735,7 @@ if (!data?.allowed) {
             {/* EOA */}
             <section className="mt-8">
               <label className="mb-2 block text-sm font-medium text-slate-500 dark:text-slate-400">
-                EOA Address
+                Wallet Address
               </label>
 
               <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-[#151518]">
@@ -744,9 +744,9 @@ if (!data?.allowed) {
                   onChange={(e) =>
                     setEoaAddress(e.target.value)
                   }
-                  rows={3}
-                  className="w-full resize-none bg-transparent text-[15px] font-medium outline-none"
-                  placeholder="Enter EOA Address"
+                  rows={1}
+                  className="w-full resize-none bg-transparent text-[15px] font-medium outline-none"                
+                  placeholder="Enter Wallet Address"
                 />
               </div>
 
@@ -758,7 +758,7 @@ if (!data?.allowed) {
               >
                 {savingEoa
                   ? "Saving..."
-                  : "Save EOA Address"}
+                  : "Save Wallet Address"}
               </button>
             </section>
           </>
