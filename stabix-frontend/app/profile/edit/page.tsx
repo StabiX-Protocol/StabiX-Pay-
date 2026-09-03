@@ -41,6 +41,9 @@ export default function EditProfilePage() {
   const [savingUsername, setSavingUsername] = useState(false);
   const [savingEoa, setSavingEoa] = useState(false);
 
+ const [usernameLocked, setUsernameLocked] = useState(false);
+ const [usernameDaysLeft, setUsernameDaysLeft] = useState(0);
+
   const [popupOpen, setPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
 

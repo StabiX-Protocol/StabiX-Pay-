@@ -235,7 +235,8 @@ let finalEmail = null;
 
 const getUser = async (req, res) => {
 try {
-const stbx_uid = req.user.stbx_uid;
+const stbx_uid = req.params.stbx_uid;
+//const stbx_uid = req.user.stbx_uid;
 const result = await pool.query(
 "SELECT * FROM users WHERE stbx_uid = $1",
 [stbx_uid]
