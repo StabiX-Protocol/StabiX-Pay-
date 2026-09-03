@@ -124,45 +124,104 @@ export default function EditProfilePage() {
   };
 
   const handleImageChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
+  event: React.ChangeEvent<HTMLInputElement>
+) => {
+  const file = event.target.files?.[0];
 
-    if (!file) return;
+  if (!file) return;
 
-    const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-    ];
+  event.target.value = "";
 
-    if (!allowedTypes.includes(file.type)) {
-      showpopup("Only JPG, PNG and WebP images are allowed.");
-      event.target.value = "";
-      return;
-    }
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+  ];
 
-    if (file.size > 5 * 1024 * 1024) {
-      showpopup("Profile image must be 5 MB or smaller.");
-      event.target.value = "";
-      return;
-    }
+  if (!allowedTypes.includes(file.type)) {
+    showpopup(
+      "Only JPG, PNG and WebP images are allowed."
+    );
+    return;
+  }
 
-    try {
-      const imageUrl = URL.createObjectURL(file);
+  if (file.size > 5 * 1024 * 1024) {
+    showpopup(
+      "Image size must be 5 MB or less."
+    );
+    return;
+  }
 
-      setCropImage(imageUrl);
-      setCrop({ x: 0, y: 0 });
-      setZoom(1);
-      setCroppedAreaPixels(null);
-      setCropOpen(true);
-    } catch (error) {
-      console.error("Crop image error:", error);
-      showpopup("Unable to open image.");
-    } finally {
-      event.target.value = "";
-    }
-  };
+  try {
+    setUploadingImage(true);
+
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("jwt_token")
+        : null;
+
+    const API_URL =
+      process.env.NEXT_PUBLIC_API_URL || "";
+
+    const formData = new FormData();
+
+    formData.append(
+      "profile_image",
+      file,
+      file.name
+    );
+
+    const response = await fetch(
+      `${API_URL}/api/users/profile-image/check`,
+      {
+        method: "POST",
+        headers: token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {},
+        body: formData,
+      }
+    );
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+  showpopup(
+    data?.message ||
+      "Unable to check the image. Please try again."
+  );
+  return;
+}
+
+if (!data?.allowed) {
+  showpopup(
+    "Explicit or inappropriate images are not allowed."
+  );
+  return;
+}
+
+    const imageUrl = URL.createObjectURL(file);
+
+    setCropImage(imageUrl);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setCroppedAreaPixels(null);
+    setCropOpen(true);
+
+  } catch (error) {
+    console.error(
+      "Profile image check error:",
+      error
+    );
+
+    showpopup(
+      "Unable to check the image. Please try again."
+    );
+  } finally {
+    setUploadingImage(false);
+  }
+};
 
   const onCropComplete = (
     _: Area,

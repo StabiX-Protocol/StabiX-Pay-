@@ -650,6 +650,52 @@ const uploadProfileImage = async (req, res) => {
   }
 };
 
+const checkProfileImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        allowed: false,
+        message: "Profile image is required."
+      });
+    }
+
+    const moderation = await moderateProfileImage(
+      req.file.buffer,
+      req.file.originalname,
+      req.file.mimetype
+    );
+
+    if (!moderation.allowed) {
+      return res.status(400).json({
+        success: false,
+        allowed: false,
+        message:
+          "Explicit or inappropriate images are not allowed."
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      allowed: true,
+      message: "Image is allowed."
+    });
+
+  } catch (err) {
+    console.error(
+      "Profile image moderation check error:",
+      err
+    );
+
+    return res.status(500).json({
+      success: false,
+      allowed: false,
+      message:
+        "Unable to check the image. Please try again."
+    });
+  }
+};
+
 
 const removeProfileImage = async (req, res) => {
   try {
@@ -726,4 +772,4 @@ const removeProfileImage = async (req, res) => {
   }
 };
 
-module.exports = {loginUser, registerUser, getUser, getProfile, updateUsername,googleLogin, updateEOAAddress, resetPassword, uploadProfileImage, removeProfileImage};
+module.exports = {loginUser, registerUser, getUser, getProfile, updateUsername,googleLogin, updateEOAAddress, resetPassword, uploadProfileImage,checkProfileImage, removeProfileImage};

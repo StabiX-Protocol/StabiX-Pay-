@@ -13,6 +13,7 @@ const {
   updateEOAAddress,
   resetPassword,
   uploadProfileImage,
+  checkProfileImage,
   removeProfileImage,
 } = require("../controllers/userController");
 
@@ -30,5 +31,6 @@ router.post("/login/google", googleLogin);
 router.patch("/reset-password", resetPassword);
 router.post("/profile-image", verifyToken, profileUpload.single("profile_image"), uploadProfileImage);
 router.delete("/profile-image", verifyToken, removeProfileImage);
+router.post("/profile-image/check", verifyToken, profileUpload.single("profile_image"), checkProfileImage);
 
 module.exports = router;
