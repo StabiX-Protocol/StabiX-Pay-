@@ -122,10 +122,18 @@ export default function SendAmountPage() {
     numericAmount > 0 &&
     numericAmount <= balance;
 
-  const handleConfirm = () => {
-    if (!isValidAmount) return;
 
-  };
+ const recipientUid = searchParams.get("recipient") || "";
+ const handleConfirm = () => {
+  if (!isValidAmount) return;
+  router.push(
+    `/send/confirm?asset=${asset}&amount=${encodeURIComponent(
+      amount
+    )}&recipient=${encodeURIComponent(
+      recipientUid
+    )}`
+  );
+};
 
   return (
     <main className="min-h-screen bg-black px-5 pb-6 pt-6 text-white">
