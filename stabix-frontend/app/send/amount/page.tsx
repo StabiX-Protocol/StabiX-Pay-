@@ -81,6 +81,13 @@ export default function SendAmountPage() {
           : current + ".";
       }
 
+      if (
+      current.includes(".") &&
+     current.split(".")[1].length >= 6
+     ) {
+     return current;
+       }
+
       if (!/^\d$/.test(key)) {
         return current;
       }
@@ -118,7 +125,6 @@ export default function SendAmountPage() {
   const handleConfirm = () => {
     if (!isValidAmount) return;
 
-    // Page 3 baad me connect karenge.
   };
 
   return (
@@ -160,21 +166,35 @@ export default function SendAmountPage() {
 
       {/* Amount */}
       <div className="mt-5 flex items-center justify-center">
-        <div className="flex items-center">
-          <span
-            className={`text-[82px] font-medium leading-none tracking-[-4px] ${
-              amount
-                ? "text-white"
-                : "text-slate-300"
-            }`}
-          >
-            {displayAmount}
-          </span>
+        <div className="flex w-full items-center justify-center gap-2 px-2">
+  <span
+    className={`whitespace-nowrap text-center font-medium leading-none tracking-[-3px] ${
+      amount
+        ? "text-white"
+        : "text-slate-300"
+    }`}
+    style={{
+      fontSize: `${Math.max(
+        48,
+        82 - Math.max(0, displayAmount.length - 4) * 6
+      )}px`,
+    }}
+  >
+    {displayAmount}
+  </span>
 
-          <span className="ml-3 text-[58px] font-medium leading-none tracking-[-3px] text-slate-400">
-            {asset}
-          </span>
-        </div>
+  <span
+    className="shrink-0 whitespace-nowrap font-medium leading-none tracking-[-3px] text-slate-400"
+    style={{
+      fontSize: `${Math.max(
+        42,
+        58 - Math.max(0, displayAmount.length - 4) * 3
+      )}px`,
+    }}
+  >
+    {asset}
+  </span>
+</div>
       </div>
 
       {/* Keypad */}
