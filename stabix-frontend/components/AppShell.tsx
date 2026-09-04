@@ -23,6 +23,9 @@ export default function AppShell({
 
   const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
 
+  //bottom navigation hide unhide logic
+  const hideBottomNav = pathname.startsWith("/send");
+
   useEffect(() => {
     const token = localStorage.getItem("jwt_token");
 
@@ -67,7 +70,7 @@ export default function AppShell({
     <div className="min-h-screen bg-slate-100">
       <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#f5f7fb] shadow-xl">
         {children}
-        <BottomNav />
+        {!hideBottomNav && <BottomNav />}
       </main>
     </div>
   );
