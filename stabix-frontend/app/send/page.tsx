@@ -34,6 +34,20 @@ export default function SendPage() {
     }
   }, []);
 
+  useEffect(() => {
+  const value = recipientUid.trim();
+
+  setRecipient(null);
+
+  if (!value) return;
+
+  const timer = setTimeout(() => {
+    lookupRecipient(value);
+  }, 400);
+
+  return () => clearTimeout(timer);
+}, [recipientUid]);
+
   const showPopup = (message: string) => {
     setPopupMessage(message);
     setPopupOpen(true);
@@ -194,21 +208,7 @@ export default function SendPage() {
             )}
           </div>
 
-          <button
-            type="button"
-            onClick={() =>
-              lookupRecipient(recipientUid)
-            }
-            disabled={
-              loadingRecipient ||
-              !recipientUid.trim()
-            }
-            className="mt-3 w-full rounded-2xl bg-slate-900 py-3.5 text-sm font-semibold text-white transition active:scale-[0.98] disabled:opacity-40 dark:bg-white dark:text-black"
-          >
-            {loadingRecipient
-              ? "Confirming recipient..."
-              : "Confirm Recipient"}
-          </button>
+          
         </section>
 
         {/* Recipient Card */}
