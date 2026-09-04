@@ -150,26 +150,19 @@ export default function SendPage() {
         </div>
 
         {/* Asset */}
-        <section className="mt-8">
-          <p className="mb-2 px-1 text-sm font-medium text-slate-500 dark:text-slate-400">
-            Asset
-          </p>
+<section className="mt-8">
+  <div className="flex flex-col items-center justify-center rounded-2xl bg-white px-4 py-6 shadow-sm dark:bg-[#18181b]">
+    <img
+      src={assetLogo}
+      alt={asset}
+      className="h-16 w-16 rounded-full object-contain"
+    />
 
-          <div className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[#18181b]">
-            <img
-              src={assetLogo}
-              alt={asset}
-              className="h-11 w-11 rounded-full object-contain"
-            />
-
-            <div>
-              <p className="text-base font-bold text-slate-900 dark:text-white">
-                {asset}
-              </p>
-
-            </div>
-          </div>
-        </section>
+    <p className="mt-3 text-xl font-bold text-slate-900 dark:text-white">
+      {asset}
+    </p>
+  </div>
+</section>
 
         {/* Recipient */}
         <section className="mt-8">
@@ -213,8 +206,8 @@ export default function SendPage() {
             className="mt-3 w-full rounded-2xl bg-slate-900 py-3.5 text-sm font-semibold text-white transition active:scale-[0.98] disabled:opacity-40 dark:bg-white dark:text-black"
           >
             {loadingRecipient
-              ? "Finding recipient..."
-              : "Find Recipient"}
+              ? "Confirming recipient..."
+              : "Confirm Recipient"}
           </button>
         </section>
 
@@ -247,9 +240,7 @@ export default function SendPage() {
                   {recipient.username}
                 </p>
 
-                <p className="mt-0.5 truncate text-sm text-slate-500 dark:text-slate-400">
-                  {recipient.stbx_uid}
-                </p>
+               
               </div>
 
               <div className="ml-auto flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-sm text-white">
