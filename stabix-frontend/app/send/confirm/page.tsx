@@ -22,6 +22,7 @@ export default function SendConfirmPage() {
 
   const [myUser, setMyUser] = useState<User | null>(null);
   const [recipient, setRecipient] = useState<User | null>(null);
+  const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
     const selectedAsset = searchParams.get("asset");
@@ -93,9 +94,60 @@ export default function SendConfirmPage() {
     router.back();
   };
 
-  const handleConfirm = () => {
-    // Actual transaction logic baad me.
-  };
+  const handleConfirm = async () => {
+  if (confirming) return;
+
+  try {
+    setConfirming(true);
+
+    const idempotencyKey = crypto.randomUUID();
+
+    const data = await apiFetch(
+      "/api/transactions/send",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          receiver_stbx_uid: recipientUid,
+          asset,
+          amount: Number(amount),
+          idempotency_key: idempotencyKey,
+        }),
+      }
+    );
+
+    if (!data?.success || !data?.STR_id) {
+      throw new Error(
+        data?.message ||
+          "Transaction failed."
+      );
+    }
+
+    router.push(
+      `/send/success?asset=${encodeURIComponent(
+        asset
+      )}&amount=${encodeURIComponent(
+        amount
+      )}&from=${encodeURIComponent(
+        myUser?.stbx_uid || ""
+      )}&fromUsername=${encodeURIComponent(
+        myUser?.username || ""
+      )}&to=${encodeURIComponent(
+        recipient?.stbx_uid || recipientUid
+      )}&toUsername=${encodeURIComponent(
+        recipient?.username || ""
+      )}&strId=${encodeURIComponent(
+        data.STR_id
+      )}`
+    );
+  } catch (error) {
+    console.error(
+      "Send transaction error:",
+      error
+    );
+  } finally {
+    setConfirming(false);
+  }
+};
 
   return (
     <main className="min-h-screen bg-black px-5 pb-6 pt-6 text-white">
@@ -201,9 +253,10 @@ export default function SendConfirmPage() {
         <button
           type="button"
           onClick={handleConfirm}
+          disabled={confirming}
           className="flex-1 rounded-full bg-blue-600 py-5 text-[18px] font-bold text-white transition active:scale-[0.98]"
         >
-          Confirm
+          { confirming ? "Confirming..." : "Confirm" }
         </button>
       </div>
     </main>
