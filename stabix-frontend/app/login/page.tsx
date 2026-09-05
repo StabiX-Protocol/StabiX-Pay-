@@ -18,6 +18,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleReady, setGoogleReady] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -253,22 +254,35 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f7fb] px-5 pb-10 text-[#111827]">
-      <div className="mx-auto max-w-[430px] pt-12">
+   <main className="min-h-screen w-full overflow-x-hidden bg-[#f5f7fb] dark:bg-[#0a0a0f] px-5 pb-10 text-[#111827] dark:text-white transition-colors">
 
-        <h1 className="text-[64px] font-extrabold leading-none tracking-[-0.06em]">
-          StabiX
-        </h1>
+  <div className="mx-auto w-full max-w-[430px] pt-12">
 
-        <p className="mt-10 text-[28px] leading-tight text-slate-500">
-          Pay Stablecoins Instant, Free & Secure
-        </p>
+    <div className="relative w-full">
 
-        <h2 className="mt-28 text-[48px] font-extrabold">
-          Log in
-        </h2>
+      {/* SUBTLE BACKGROUND GLOW */}
+      <div className="pointer-events-none absolute -top-12 left-1/2 -translate-x-1/2 h-[400px] w-[100vw] max-w-[700px] bg-[radial-gradient(ellipse_at_center,_rgba(59,130,246,0.10),transparent_65%)] dark:bg-[radial-gradient(ellipse_at_center,_rgba(59,130,246,0.16),transparent_65%)]" />
 
-        <div className="mt-12 space-y-4">
+      {/* LOGO */}
+      <h1 className="relative text-[64px] font-extrabold leading-none tracking-[-0.06em] dark:text-white antialiased">
+        StabiX
+      </h1>
+
+      {/* TAGLINE */}
+      <p className="relative mt-10 text-[28px] leading-tight tracking-[-0.02em] text-slate-500 dark:text-slate-400 font-medium">
+        Pay Stablecoins Instant,Free Globally
+      </p>
+
+      {/* TITLE */}
+      <h2 className="relative mt-14 text-[48px] font-extrabold tracking-[-0.04em] dark:text-white antialiased">
+        Log in
+      </h2>
+
+      {/* FORM */}
+      <div className="relative mt-12 space-y-4">
+
+        {/* STBX UID */}
+        <div className="relative w-full">
 
           <input
             type="text"
@@ -277,62 +291,134 @@ export default function LoginPage() {
             onChange={(e) =>
               setStbxUid(e.target.value)
             }
-            className="h-[76px] w-full rounded-[28px] bg-[#eaf1ff] px-9 text-[22px] outline-none ring-1 ring-slate-200"
+            className="h-[76px] w-full rounded-[28px] bg-[#eaf1ff] dark:bg-[#1e293b] px-9 text-[22px] text-[#111827] dark:text-white outline-none ring-1 ring-slate-200 dark:ring-slate-700/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition-all duration-300 placeholder:text-slate-400/80 focus:bg-white dark:focus:bg-[#252d3d] focus:ring-[8px] focus:ring-blue-600/10 focus:translate-y-[-1px]"
           />
 
+        </div>
+
+        {/* PASSWORD */}
+        <div className="relative w-full">
+
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
             value={password}
             onChange={(e) =>
               setPassword(e.target.value)
             }
-            className="h-[76px] w-full rounded-[28px] bg-[#eaf1ff] px-9 text-[22px] outline-none ring-1 ring-slate-200"
+            className="h-[76px] w-full rounded-[28px] bg-[#eaf1ff] dark:bg-[#1e293b] px-9 pr-[72px] text-[22px] text-[#111827] dark:text-white outline-none ring-1 ring-slate-200 dark:ring-slate-700/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition-all duration-300 placeholder:text-slate-400/80 focus:bg-white dark:focus:bg-[#252d3d] focus:ring-[8px] focus:ring-blue-600/10 focus:translate-y-[-1px]"
           />
 
+          {/* PASSWORD TOGGLE */}
           <button
             type="button"
-            onClick={handleLogin}
-            disabled={loading}
-            className="mt-3 h-[82px] w-full rounded-[30px] bg-blue-600 text-[24px] font-bold text-white disabled:opacity-50"
+            onClick={() =>
+              setShowPassword(!showPassword)
+            }
+            className="absolute right-[12px] top-1/2 -translate-y-1/2 grid h-[48px] w-[48px] place-items-center rounded-full bg-white/70 dark:bg-white/10 backdrop-blur-md text-slate-500 dark:text-slate-400 shadow-sm hover:bg-white dark:hover:bg-white/15 active:scale-[0.96] transition-all"
           >
-            {loading
-              ? "Please wait..."
-              : "Log In"}
+
+            {showPassword ? (
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                <line x1="2" y1="2" x2="22" y2="22" />
+              </svg>
+            ) : (
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="3"
+                />
+              </svg>
+            )}
+
           </button>
 
         </div>
 
-        <div className="my-8 flex items-center gap-5 text-lg text-slate-500">
-          <div className="h-px flex-1 bg-slate-200" />
-          <span>or</span>
-          <div className="h-px flex-1 bg-slate-200" />
-        </div>
+        {/* LOGIN BUTTON */}
+        <button
+          type="button"
+          onClick={handleLogin}
+          disabled={loading}
+          className="mt-3 h-[82px] w-full rounded-[30px] bg-gradient-to-b from-[#3b82f6] to-[#1d4ed8] text-[24px] font-bold text-white shadow-[0_12px_24px_-8px_rgba(37,99,235,0.5)] hover:translate-y-[-1px] active:translate-y-0 active:scale-[0.99] disabled:opacity-50 transition-all duration-300 relative overflow-hidden"
+        >
 
-        <div
-          ref={googleRef}
-          className="flex justify-center"
-        />
+          <span className="relative z-10">
+            {loading
+              ? "Please wait..."
+              : "Log In"}
+          </span>
 
-        <div className="mt-10 flex justify-between px-2 text-[19px] font-semibold">
+          <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
 
-          <Link
-            href="/create-account"
-            className="text-blue-600"
-          >
-            Create Account
-          </Link>
-
-          <Link
-            href="/forgot-password"
-            className="text-blue-600"
-          >
-            Forgot Password?
-          </Link>
-
-        </div>
+        </button>
 
       </div>
-    </main>
+
+      {/* OR */}
+      <div className="relative my-8 flex items-center gap-5 text-lg text-slate-500 dark:text-slate-400">
+
+        <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700/60" />
+
+        <span className="text-[16px] tracking-widest font-medium">
+          or
+        </span>
+
+        <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700/60" />
+
+      </div>
+
+      {/* GOOGLE */}
+      <div
+        ref={googleRef}
+        className="relative flex w-full justify-center rounded-[20px] bg-white dark:bg-[#1e293b] p-[6px] ring-1 ring-slate-200/60 dark:ring-slate-700/60 shadow-sm overflow-hidden"
+      />
+
+      {/* LINKS */}
+      <div className="relative mt-10 flex justify-between px-2 text-[19px] font-semibold">
+
+        <Link
+          href="/create-account"
+          className="text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          Create Account
+        </Link>
+
+        <Link
+          href="/forgot-password"
+          className="text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          Forgot Password?
+        </Link>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
   );
 }
