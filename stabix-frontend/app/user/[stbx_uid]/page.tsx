@@ -97,8 +97,8 @@ export default function UserPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-background text-foreground">
-        <div className="mx-auto w-full max-w-md px-4 py-8 text-center text-sm text-muted">
+<main className="h-[100dvh] overflow-hidden bg-background text-foreground">
+            <div className="mx-auto w-full max-w-md px-4 py-8 text-center text-sm text-muted">
           Loading...
         </div>
       </main>
@@ -119,7 +119,7 @@ export default function UserPage() {
 
   return (
     <main className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto w-full max-w-md px-4 pb-10">
+      <div className="mx-auto flex h-full w-full max-w-md flex-col px-4">
 
         {/* Header */}
         <div className="flex items-center pt-5">
@@ -161,7 +161,7 @@ export default function UserPage() {
         </div>
 
         {/* Transactions */}
-        <div className="mt-10">
+<div className="mt-10 min-h-0 flex-1 overflow-y-auto pb-24">
           <h2 className="text-lg font-bold">
             Transactions
           </h2>
@@ -203,7 +203,10 @@ export default function UserPage() {
     alt={transaction.asset}
     className="h-8 w-8 rounded-full object-contain"
   />
+  
 </div>
+
+
 
                     {/* Details */}
                     <div className="ml-3 min-w-0 flex-1">
@@ -245,8 +248,59 @@ export default function UserPage() {
                 );
               })}
             </div>
-          )}
+         )}
         </div>
+
+        {/* Bottom Payment Bar */}
+        <div className="fixed bottom-0 left-1/2 z-50 flex w-full max-w-md -translate-x-1/2 items-center gap-2 border-t border-[var(--border)] bg-background px-4 py-3">
+          
+          {/* Pay */}
+          <button
+            type="button"
+            onClick={() =>
+              router.push(
+                `/send/amount?asset=USDC&recipient=${encodeURIComponent(
+                  stbx_uid
+                )}`
+              )
+            }
+            className="h-12 shrink-0 rounded-full bg-blue-600 px-6 text-[16px] font-bold text-white transition active:scale-95"
+          >
+            Pay
+          </button>
+
+          {/* Message */}
+          <div className="flex h-12 min-w-0 flex-1 items-center rounded-full bg-slate-100 px-4 dark:bg-[#202124]">
+            <input
+              type="text"
+              placeholder="Message..."
+              className="min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-slate-500 dark:placeholder:text-slate-400"
+            />
+
+            {/* Send */}
+            <button
+              type="button"
+              aria-label="Send message"
+              className="ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-700 dark:text-white"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m22 2-7 20-4-9-9-4Z" />
+                <path d="M22 2 11 13" />
+              </svg>
+            </button>
+          </div>
+
+        </div>
+
       </div>
     </main>
   );
