@@ -12,13 +12,11 @@ type Balance = {
 const assets = [
   {
     name: "USDT",
-    symbol: "₮",
-    style: "bg-emerald-100 text-emerald-600",
+    logo: "/media/tether-usdt-logo.png",
   },
   {
     name: "USDC",
-    symbol: "$",
-    style: "bg-blue-100 text-blue-600",
+    logo: "/media/usd-coin-usdc-logo.png",
   },
 ];
 
@@ -125,11 +123,13 @@ export default function Assets() {
 
               <div className="flex items-center gap-3.5">
 
-                <div
-                  className={`flex h-11 w-11 items-center justify-center rounded-full text-lg font-bold ${asset.style}`}
-                >
-                  {asset.symbol}
-                </div>
+               <div className="flex h-11 w-11 items-center justify-center rounded-full">
+  <img
+    src={asset.logo}
+    alt={asset.name}
+    className="h-11 w-11 rounded-full object-contain"
+  />
+</div>
 
                 <div>
                   <p className="text-sm font-bold">

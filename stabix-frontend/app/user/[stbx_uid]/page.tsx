@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter,useSearchParams, } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 
 type User = {
@@ -25,6 +25,7 @@ type Transaction = {
 export default function UserPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
 
   const stbx_uid = params.stbx_uid as string;
 
@@ -125,7 +126,14 @@ export default function UserPage() {
         <div className="flex items-center pt-5">
          <button
   type="button"
-  onClick={() => router.replace("/")}
+  onClick={() => {
+  if (searchParams.get("from") === "home") {
+    router.replace("/");
+    return;
+  }
+
+  router.back();
+}}
   aria-label="Go back"
   className="flex h-10 w-10 items-center justify-center rounded-full text-2xl text-slate-800 dark:text-white"
 >

@@ -2,6 +2,7 @@ import AppHeader from "@/components/AppHeader";
 import BalanceCard from "@/components/BalanceCard";
 import QuickActions from "@/components/QuickActions";
 import Assets from "@/components/Assets";
+import People from "@/components/People";
 import ValidatorPanel from "@/components/ValidatorPanel";
 
 
@@ -15,7 +16,7 @@ export default function Home() {
 
         <QuickActions />
         <Assets />
-
+        <People />
         <ValidatorPanel />
       </div>
 

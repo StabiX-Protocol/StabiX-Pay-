@@ -26,16 +26,17 @@ export default function AppShell({
   //bottom navigation hide unhide logic
   const hideBottomNav = pathname.startsWith("/send")|| 
   pathname.startsWith("/receive") ||
-  pathname.startsWith("/dw") || 
+  pathname.startsWith("/dw")&& pathname !== "/dw" || 
   pathname.startsWith("/profile") ||
   pathname.startsWith("/primary") ||
-  pathname.startsWith("/history") ||
+  pathname.startsWith("/history")&& pathname !== "/history" ||
   pathname.startsWith("/settings") ||
   pathname.startsWith("/create-account") ||
   pathname.startsWith("/forgot-password") ||
   pathname.startsWith("/login") ||
   pathname.startsWith("/search") ||
-  pathname.startsWith("/user")
+  pathname.startsWith("/user")||
+  pathname.startsWith("more")&& pathname !== "/more" 
   ;
 
 

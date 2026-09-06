@@ -172,8 +172,12 @@ export default function PrimaryAssetPage() {
 
             <div className="flex items-center gap-4">
 
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-600">
-                ₮
+              <div className="flex h-14 w-14 items-center justify-center rounded-full">
+  <img
+    src="/media/tether-usdt-logo.png"
+    alt="USDT"
+    className="h-14 w-14 rounded-full object-contain"
+  />
               </div>
 
               <div>
@@ -212,8 +216,12 @@ export default function PrimaryAssetPage() {
 
             <div className="flex items-center gap-4">
 
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-2xl font-bold text-blue-600">
-                $
+             <div className="flex h-14 w-14 items-center justify-center rounded-full">
+  <img
+    src="/media/usd-coin-usdc-logo.png"
+    alt="USDC"
+    className="h-14 w-14 rounded-full object-contain"
+  />
               </div>
 
               <div>
