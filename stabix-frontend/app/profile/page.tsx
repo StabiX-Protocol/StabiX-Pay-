@@ -348,7 +348,7 @@ export default function ProfilePage() {
       {copied && (
         <div className="fixed bottom-28 left-1/2 z-50 -translate-x-1/2 animate-[fadeIn_0.15s_ease-out]">
 
-          <div className="flex items-center gap-2 rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white shadow-xl">
+          <div className="flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-xl">
 
             <svg
               xmlns="http://www.w3.org/2000/svg"

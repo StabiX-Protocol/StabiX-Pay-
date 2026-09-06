@@ -28,6 +28,12 @@ export default function QuickActions() {
     if (action.label === "Send") {
       router.push("/send");
     }
+    if (action.label === "Receive") {
+      router.push("/receive");
+    }
+    if (action.label === "QR") {
+      router.push("/qr");
+    }
   }}
   className="flex flex-col items-center justify-center rounded-[24px] bg-white py-4 shadow-sm ring-1 ring-slate-100 transition-all active:scale-95 dark:bg-[#18181b] dark:ring-white/10"
 >
