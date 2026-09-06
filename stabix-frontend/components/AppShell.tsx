@@ -24,8 +24,10 @@ export default function AppShell({
   const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
 
   //bottom navigation hide unhide logic
-  const hideBottomNav = pathname.startsWith("/send");
-  const hideBottomNavReceive = pathname.startsWith("/receive");
+  const hideBottomNav = pathname.startsWith("/send")|| 
+  pathname.startsWith("/receive") || 
+  pathname.startsWith("/profile") ||
+  pathname.startsWith("/primary");
 
 
   
@@ -73,7 +75,7 @@ export default function AppShell({
     <div className="min-h-screen bg-slate-100">
       <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#f5f7fb] shadow-xl">
         {children}
-        {!hideBottomNav && !hideBottomNavReceive && <BottomNav />}
+        {!hideBottomNav && <BottomNav />}
       </main>
     </div>
   );
