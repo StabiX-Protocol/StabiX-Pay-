@@ -27,7 +27,12 @@ export default function AppShell({
   const hideBottomNav = pathname.startsWith("/send")|| 
   pathname.startsWith("/receive") || 
   pathname.startsWith("/profile") ||
-  pathname.startsWith("/primary");
+  pathname.startsWith("/primary") ||
+  pathname.startsWith("/history") ||
+  pathname.startsWith("/settings") ||
+  pathname.startsWith("/create-account") ||
+  pathname.startsWith("/forgot-password") ||
+  pathname.startsWith("/login");
 
 
   

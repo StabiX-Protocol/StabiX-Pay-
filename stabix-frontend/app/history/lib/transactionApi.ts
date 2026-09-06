@@ -8,7 +8,7 @@ function getToken() {
     return null;
   }
 
-  return localStorage.getItem("token");
+  return localStorage.getItem("jwt_token");
 }
 
 export async function getTransactionBySTRId(

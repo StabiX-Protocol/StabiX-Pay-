@@ -10,7 +10,7 @@ export default function HistoryFilterBar({
   onOpenFilter,
 }: HistoryFilterBarProps) {
   return (
-    <div className="my-3 flex gap-2 overflow-x-auto">
+    <div className="my-3 flex gap-2">
       <button
         type="button"
         onClick={() => onOpenFilter("date")}

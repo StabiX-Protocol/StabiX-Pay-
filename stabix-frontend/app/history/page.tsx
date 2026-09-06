@@ -54,7 +54,9 @@ export default function HistoryPage() {
     useState<Transaction[]>([]);
 
   const [filters, setFilters] =
-    useState<HistoryFilters>(DEFAULT_HISTORY_FILTERS);
+    useState<HistoryFilters>(
+      DEFAULT_HISTORY_FILTERS
+    );
 
   const [search, setSearch] = useState("");
 
@@ -195,12 +197,24 @@ export default function HistoryPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
-      <div className="mx-auto w-full max-w-md px-4 pb-28">
+    <main className="min-h-screen bg-background text-foreground">
+  <div className="mx-auto w-full max-w-md px-4 pb-28">
 
-        <h1 className="pt-6 text-2xl font-bold">
-          Transaction History
-        </h1>
+    {/* Back Button */}
+    <div className="flex items-center gap-3 pt-4">
+      <button
+        type="button"
+        onClick={() => window.history.back()}
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-lg text-slate-800 shadow-sm dark:bg-[#18181b] dark:text-white"
+        aria-label="Go back"
+      >
+        ←
+      </button>
+
+      <h1 className="m-0 text-xl font-bold leading-none text-foreground">
+        Transaction History
+      </h1>
+    </div>
 
         <HistorySearch
           value={search}
@@ -212,7 +226,7 @@ export default function HistoryPage() {
         />
 
         {loading ? (
-          <div className="py-8 text-sm text-[var(--muted)]">
+          <div className="py-8 text-sm text-muted">
             Loading...
           </div>
         ) : (
@@ -226,7 +240,6 @@ export default function HistoryPage() {
             }
           />
         )}
-
       </div>
 
       {activeFilter === "date" && (
@@ -267,7 +280,6 @@ export default function HistoryPage() {
           onClose={closeFilter}
         />
       )}
-
     </main>
   );
 }

@@ -35,10 +35,7 @@ export default function HistoryList({
   const groups: Record<string, Transaction[]> = {};
 
   transactions.forEach((transaction) => {
-    /*
-     * Legacy logic:
-     * Withdraw sirf APPROVED status mein show hota hai.
-     */
+    
     if (
       transaction.type === "withdraw" &&
       String(transaction.status || "").toUpperCase() !== "APPROVED"
@@ -93,9 +90,7 @@ export default function HistoryList({
       }
     }
 
-    /*
-     * Amount filter
-     */
+  
     if (
       filters.minAmount != null ||
       filters.maxAmount != null
@@ -112,17 +107,12 @@ export default function HistoryList({
       }
     }
 
-    /*
-     * Legacy code:
-     * created_at missing ho to transaction render nahi hota.
-     */
+   
     if (!transaction.created_at) {
       return;
     }
 
-    /*
-     * Month grouping
-     */
+   
     const date = new Date(transaction.created_at);
 
     const monthKey = date.toLocaleString("en-IN", {
@@ -137,9 +127,7 @@ export default function HistoryList({
     groups[monthKey].push(transaction);
   });
 
-  /*
-   * Month groups ko newest month first sort karna.
-   */
+  
   const sortedGroups = Object.entries(groups).sort(
     ([, transactionsA], [, transactionsB]) => {
       const timeA = new Date(
@@ -300,15 +288,15 @@ export default function HistoryList({
                           </div>
 
                           {/* User + date */}
-                          <div className="min-w-0">
-                            <div className="truncate text-sm font-semibold text-slate-900 dark:text-white">
-                              {userId}
-                            </div>
+                <div className="min-w-0">
+                <div className="truncate text-sm font-semibold text-foreground">
+                {userId}
+                </div>
 
-                            <div className="text-[11px] text-slate-500 dark:text-white/50">
-                              {dateString}
-                            </div>
-                          </div>
+              <div className="text-[11px] text-muted">
+              {dateString}
+             </div>
+            </div>
                         </div>
 
                         {/* RIGHT SIDE */}

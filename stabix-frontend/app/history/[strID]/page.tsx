@@ -1,29 +1,70 @@
-import { notFound } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
 import TransactionDetail from "../components/TransactionDetails";
 import { getTransactionBySTRId } from "../lib/transactionApi";
 
-type TransactionDetailPageProps = {
-  params: Promise<{
-    strId: string;
-  }>;
-};
+import type { Transaction } from "../lib/historyApi";
 
-export default async function TransactionDetailPage({
-  params,
-}: TransactionDetailPageProps) {
-  const { strId } = await params;
+export default function TransactionDetailPage() {
+  const params = useParams();
 
-  try {
-    const transaction =
-      await getTransactionBySTRId(strId);
+  const strID = params.strID as string;
 
+  const [transaction, setTransaction] =
+    useState<Transaction | null>(null);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState(false);
+
+  useEffect(() => {
+    async function loadTransaction() {
+      try {
+        const data =
+          await getTransactionBySTRId(strID);
+
+        setTransaction(data);
+      } catch (error) {
+        console.error(error);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (strID) {
+      loadTransaction();
+    }
+  }, [strID]);
+
+  if (loading) {
     return (
-      <TransactionDetail
-        transaction={transaction}
-      />
+      <main className="min-h-screen bg-background text-foreground">
+        <div className="px-4 py-8 text-center text-sm text-muted">
+          Loading transaction...
+        </div>
+      </main>
     );
-  } catch {
-    notFound();
   }
+
+  if (error || !transaction) {
+    return (
+      <main className="min-h-screen bg-background text-foreground">
+        <div className="px-4 py-8 text-center text-sm text-muted">
+          Transaction not found
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <TransactionDetail
+      transaction={transaction}
+    />
+  );
 }
