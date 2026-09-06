@@ -11,6 +11,11 @@ import AssetFilter from "./components/filters/AssetFilter";
 import AmountFilter from "./components/filters/AmountFilter";
 import TypeFilter from "./components/filters/TypeFilter";
 
+import {
+  loadHistory,
+  type Transaction,
+} from "./lib/historyApi";
+
 type HistoryFilterType =
   | "date"
   | "asset"
@@ -41,16 +46,11 @@ const DEFAULT_HISTORY_FILTERS: HistoryFilters = {
   tempMax: null,
 };
 
-import {
-  loadHistory,
-  loadHistoryByDate,
-  type Transaction,
-} from "./lib/historyApi";
-
-import { searchHistory } from "./lib/historySearch";
-
 export default function HistoryPage() {
   const [transactions, setTransactions] =
+    useState<Transaction[]>([]);
+
+  const [allTransactions, setAllTransactions] =
     useState<Transaction[]>([]);
 
   const [filters, setFilters] =
@@ -69,9 +69,12 @@ export default function HistoryPage() {
     async function load() {
       try {
         const data = await loadHistory();
+
+        setAllTransactions(data);
         setTransactions(data);
       } catch (error) {
         console.error(error);
+        setAllTransactions([]);
         setTransactions([]);
       } finally {
         setLoading(false);
@@ -81,26 +84,36 @@ export default function HistoryPage() {
     load();
   }, []);
 
-  async function handleSearch(value: string) {
+  function handleSearch(value: string) {
     setSearch(value);
 
-    try {
-      if (!value.trim()) {
-        const data = await loadHistoryByDate(
-          filters.date || undefined
-        );
+    const query = value.trim().toLowerCase();
 
-        setTransactions(data);
-        return;
-      }
-
-      const data = await searchHistory(value);
-
-      setTransactions(data);
-    } catch (error) {
-      console.error(error);
-      setTransactions([]);
+    if (!query) {
+      setTransactions(allTransactions);
+      return;
     }
+
+    const results = allTransactions.filter(
+      (transaction) => {
+        return (
+          transaction.STRId
+            ?.toLowerCase()
+            .includes(query) ||
+          transaction.counterparty
+            ?.toLowerCase()
+            .includes(query) ||
+          transaction.asset
+            ?.toLowerCase()
+            .includes(query) ||
+          transaction.type
+            ?.toLowerCase()
+            .includes(query)
+        );
+      }
+    );
+
+    setTransactions(results);
   }
 
   function openFilter(type: HistoryFilterType) {
@@ -137,7 +150,9 @@ export default function HistoryPage() {
     closeFilter();
   }
 
-  function applyAssetFilter(asset: string | null) {
+  function applyAssetFilter(
+    asset: string | null
+  ) {
     setFilters((current) => ({
       ...current,
       asset,
@@ -178,7 +193,9 @@ export default function HistoryPage() {
     closeFilter();
   }
 
-  function applyTypeFilter(type: string | null) {
+  function applyTypeFilter(
+    type: string | null
+  ) {
     setFilters((current) => ({
       ...current,
       type,
@@ -198,23 +215,25 @@ export default function HistoryPage() {
 
   return (
     <main className="min-h-screen bg-background text-foreground">
-  <div className="mx-auto w-full max-w-md px-4 pb-28">
+      <div className="mx-auto w-full max-w-md px-4 pb-28">
 
-    {/* Back Button */}
-    <div className="flex items-center gap-3 pt-4">
-      <button
-        type="button"
-        onClick={() => window.history.back()}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-lg text-slate-800 shadow-sm dark:bg-[#18181b] dark:text-white"
-        aria-label="Go back"
-      >
-        ←
-      </button>
+        {/* Back Button */}
+        <div className="flex items-center gap-3 pt-4">
+          <button
+            type="button"
+            onClick={() =>
+              (window.location.href = "/")
+            }
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-lg text-slate-800 shadow-sm dark:bg-[#18181b] dark:text-white"
+            aria-label="Go back"
+          >
+            ←
+          </button>
 
-      <h1 className="m-0 text-xl font-bold leading-none text-foreground">
-        Transaction History
-      </h1>
-    </div>
+          <h1 className="m-0 text-xl font-bold leading-none text-foreground">
+            Transaction History
+          </h1>
+        </div>
 
         <HistorySearch
           value={search}

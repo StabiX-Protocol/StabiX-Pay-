@@ -1,4 +1,3 @@
-import { loadHistoryByDate } from "./historyApi";
 import type { Transaction } from "./historyApi";
 
 const API_URL =
@@ -9,42 +8,40 @@ function getToken() {
     return null;
   }
 
-  return localStorage.getItem("token");
+  return localStorage.getItem("jwt_token");
 }
 
 export async function searchHistory(
   query: string
 ): Promise<Transaction[]> {
-  const q = query.trim();
+  const url =
+    `${API_URL}/api/transactions/search?q=${encodeURIComponent(query)}&_=${Date.now()}`;
 
-  /*
-   * Legacy behavior:
-   * Agar search empty hai,
-   * normal history load hoti hai.
-   */
-  if (!q) {
-    return loadHistoryByDate();
-  }
+  console.log("SEARCH QUERY:", query);
+  console.log("SEARCH URL:", url);
+  console.log("TOKEN EXISTS:", !!getToken());
 
-  const response = await fetch(
-    `${API_URL}/api/transactions/search?q=${encodeURIComponent(
-      q
-    )}&_=${Date.now()}`,
-    {
-      cache: "no-store",
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    }
-  );
+  const response = await fetch(url, {
+    method: "GET",
+    cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+
+  console.log("SEARCH STATUS:", response.status);
 
   const data = await response.json();
 
-  const transactions = Array.isArray(
-    data.transactions
-  )
+  console.log("SEARCH RESPONSE:", data);
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || "Transaction search failed"
+    );
+  }
+
+  return Array.isArray(data.transactions)
     ? data.transactions
     : [];
-
-  return transactions;
 }

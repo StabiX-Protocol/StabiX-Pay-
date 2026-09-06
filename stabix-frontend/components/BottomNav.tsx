@@ -18,36 +18,6 @@ export default function BottomNav() {
 
   return (
     <>
-      {/* More Menu */}
-      {moreOpen && (
-        <>
-          {/* Backdrop */}
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={() => setMoreOpen(false)}
-            className="fixed inset-0 z-[55] bg-black/10 backdrop-blur-[2px]"
-          />
-
-          <div className="fixed bottom-[94px] left-1/2 z-[60] w-[calc(100%-40px)] max-w-md -translate-x-1/2 overflow-hidden rounded-[24px] border border-slate-200 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-[#18181b]">
-
-            <MoreLink
-              icon="▣"
-              label="Security"
-              href="/security"
-              onClick={() => setMoreOpen(false)}
-            />
-
-            <MoreLink
-              icon="◆"
-              label="Business Account"
-              href="/business"
-              onClick={() => setMoreOpen(false)}
-            />
-          </div>
-        </>
-      )}
-
       {/* Floating Bottom Navigation */}
       <nav className="fixed bottom-4 left-1/2 z-50 w-[calc(100%-24px)] max-w-md -translate-x-1/2 rounded-[28px] border border-slate-200 bg-white/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-white/10 dark:bg-[#151518]/95 dark:shadow-black/40">
         <div className="grid grid-cols-5 items-center">

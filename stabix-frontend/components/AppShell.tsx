@@ -25,7 +25,8 @@ export default function AppShell({
 
   //bottom navigation hide unhide logic
   const hideBottomNav = pathname.startsWith("/send")|| 
-  pathname.startsWith("/receive") || 
+  pathname.startsWith("/receive") ||
+  pathname.startsWith("/dw") || 
   pathname.startsWith("/profile") ||
   pathname.startsWith("/primary") ||
   pathname.startsWith("/history") ||
