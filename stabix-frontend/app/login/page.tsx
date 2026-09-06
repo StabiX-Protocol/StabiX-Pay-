@@ -291,53 +291,55 @@ export default function LoginPage() {
         </div>
 
         {/* PASSWORD */}
-        <div className="relative w-full">
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="h-[76px] w-full rounded-[28px] bg-input px-9 pr-[72px] text-[22px] text-foreground outline-none ring-1 ring-border shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition-all duration-300 placeholder:text-muted focus:bg-surface focus:ring-[8px] focus:ring-blue-600/10 focus:translate-y-[-1px]"
-          />
+<div className="relative w-full">
+  <input
+    type={showPassword ? "text" : "password"}
+    placeholder="Password"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    className="h-[76px] w-full rounded-[28px] bg-input px-9 pr-[72px] text-[22px] text-foreground outline-none ring-1 ring-border shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition-all duration-300 placeholder:text-muted focus:bg-surface focus:ring-[8px] focus:ring-blue-600/10 focus:translate-y-[-1px]"
+  />
 
-          {/* PASSWORD TOGGLE */}
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-[12px] top-1/2 grid h-[48px] w-[48px] -translate-y-1/2 place-items-center rounded-full bg-surface/70 text-muted shadow-sm backdrop-blur-md transition-all hover:bg-surface active:scale-[0.96]"
-          >
-            {showPassword ? (
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                <line x1="2" y1="2" x2="22" y2="22" />
-              </svg>
-            ) : (
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            )}
-          </button>
-        </div>
+  {/* PASSWORD TOGGLE */}
+  <button
+    type="button"
+    onClick={() => setShowPassword(!showPassword)}
+    className="absolute right-[12px] top-1/2 grid h-[48px] w-[48px] -translate-y-1/2 place-items-center rounded-full bg-surface/70 text-muted shadow-sm backdrop-blur-md transition-all hover:bg-surface active:scale-[0.96]"
+  >
+    {showPassword ? (
+      /* Password currently visible → eye-off icon */
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+        <line x1="2" y1="2" x2="22" y2="22" />
+      </svg>
+    ) : (
+      /* Password hidden → eye icon */
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    )}
+  </button>
+</div>
 
         {/* LOGIN BUTTON */}
         <button

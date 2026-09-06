@@ -27,7 +27,9 @@ export default function CreateAccountPage() {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-
+  
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   /*
    * ==========================================
    * GOOGLE SCRIPT READY
@@ -454,210 +456,235 @@ export default function CreateAccountPage() {
         }}
       />
 
-      <main className="min-h-screen bg-[#f5f7fb] px-5 pb-10 text-[#111827]">
+<main className="min-h-screen w-full overflow-x-hidden bg-background px-5 pb-10 text-foreground transition-colors relative">
 
-        <div className="mx-auto max-w-[430px] pt-6">
+  {/* BACKGROUND GLOW */}
 
-          {/* BACK BUTTON */}
+  <div className="pointer-events-none absolute -top-12 left-1/2 h-[400px] w-[100vw] max-w-[700px] -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,_rgba(59,130,246,0.10),transparent_65%)] dark:bg-[radial-gradient(ellipse_at_center,_rgba(59,130,246,0.16),transparent_65%)]" />
+
+  <div className="mx-auto w-full max-w-[430px] pt-12 relative">
+
+    {/* BACK BUTTON */}
+
+    <button
+      type="button"
+      onClick={handleBack}
+      className="mb-8 flex h-[52px] items-center rounded-[18px] bg-surface px-5 text-[18px] font-semibold text-foreground shadow-sm ring-1 ring-border hover:bg-background active:scale-[0.98] transition-all"
+    >
+      ←
+    </button>
+
+    {!showSignupForm ? (
+      <>
+        {/* LOGO */}
+
+        <h1 className="text-[56px] sm:text-[64px] font-extrabold leading-none tracking-[-0.06em] text-foreground antialiased">
+          StabiX
+        </h1>
+
+        {/* TAGLINE */}
+
+        <p className="mt-8 sm:mt-10 text-[24px] sm:text-[28px] font-medium leading-tight tracking-[-0.02em] text-muted">
+          Pay Stablecoins Instant, Free & Secure
+        </p>
+
+        {/* TITLE */}
+
+        <h2 className="mt-20 sm:mt-28 text-[40px] sm:text-[48px] font-extrabold tracking-[-0.04em] text-foreground antialiased">
+          Create Account
+        </h2>
+
+        {/* GOOGLE BUTTON */}
+
+        <div className="mt-8 sm:mt-10 flex w-full justify-center">
+
+          <div
+            ref={googleRef}
+            className="flex min-h-[60px] w-full max-w-[360px] justify-center overflow-hidden rounded-[20px] bg-surface p-1.5 ring-1 ring-border shadow-sm"
+          />
+
+        </div>
+
+        {/* DESCRIPTION */}
+
+        <p className="mt-4 text-center text-[16px] sm:text-[18px] text-muted">
+          Create your StabiX account with google.
+        </p>
+
+        {/* LOADING */}
+
+        {loading && (
+          <p className="mt-6 text-center text-[16px] text-muted animate-pulse">
+            Checking Google account...
+          </p>
+        )}
+
+        {/* ERROR */}
+
+        {message && (
+          <div className="mt-6 rounded-[20px] bg-red-50 dark:bg-red-950/30 px-5 py-4 text-center text-[16px] font-medium text-red-600 ring-1 ring-red-200 dark:ring-red-900/50">
+            {message}
+          </div>
+        )}
+      </>
+    ) : (
+      <>
+        {/* LOGO */}
+
+        <h1 className="text-[56px] sm:text-[64px] font-extrabold leading-none tracking-[-0.06em] text-foreground antialiased">
+          StabiX<span className="text-blue-600">.</span>
+        </h1>
+
+        {/* TAGLINE */}
+
+        <p className="mt-8 sm:mt-10 text-[24px] sm:text-[28px] font-medium leading-tight tracking-[-0.02em] text-muted">
+          Pay Stablecoins Instant, Free & Secure
+        </p>
+
+        {/* TITLE */}
+
+        <h2 className="mt-16 sm:mt-20 text-[38px] sm:text-[42px] font-extrabold tracking-[-0.04em] text-foreground">
+          Finish Account
+        </h2>
+
+        <p className="mt-3 text-[16px] sm:text-[18px] text-muted">
+          Choose your username and password.
+        </p>
+
+        {/* FORM */}
+
+        <div className="mt-8 sm:mt-10 space-y-3 sm:space-y-4">
+
+          {/* USERNAME */}
+
+          <input
+            type="text"
+            placeholder="Choose Username"
+            value={username}
+            onChange={(e) =>
+              setUsername(e.target.value)
+            }
+            className="h-[68px] sm:h-[76px] w-full rounded-[24px] sm:rounded-[28px] bg-input px-7 sm:px-9 text-[19px] sm:text-[22px] text-foreground outline-none ring-1 ring-border placeholder:text-muted focus:bg-surface focus:ring-[6px] focus:ring-blue-600/10 focus:translate-y-[-1px] transition-all"
+          />
+
+          {/* PASSWORD */}
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            className="h-[68px] sm:h-[76px] w-full rounded-[24px] sm:rounded-[28px] bg-input px-7 sm:px-9 text-[19px] sm:text-[22px] text-foreground outline-none ring-1 ring-border placeholder:text-muted focus:bg-surface focus:ring-[6px] focus:ring-blue-600/10 focus:translate-y-[-1px] transition-all"
+          />
+
+          {/* CONFIRM PASSWORD */}
+
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) =>
+              setConfirmPassword(e.target.value)
+            }
+            className="h-[68px] sm:h-[76px] w-full rounded-[24px] sm:rounded-[28px] bg-input px-7 sm:px-9 text-[19px] sm:text-[22px] text-foreground outline-none ring-1 ring-border placeholder:text-muted focus:bg-surface focus:ring-[6px] focus:ring-blue-600/10 focus:translate-y-[-1px] transition-all"
+          />
+
+          {/* ERROR */}
+
+          {message && (
+            <div className="rounded-[20px] bg-red-50 dark:bg-red-950/30 px-5 py-4 text-center text-[16px] font-medium text-red-600 ring-1 ring-red-200 dark:ring-red-900/50">
+              {message}
+            </div>
+          )}
+
+          {/* CREATE ACCOUNT BUTTON */}
 
           <button
             type="button"
-            onClick={handleBack}
-            className="mb-8 flex h-[52px] items-center rounded-[18px] bg-white px-5 text-[18px] font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200"
+            onClick={handleCreateAccount}
+            disabled={loading}
+            className="mt-3 h-[74px] sm:h-[82px] w-full rounded-[26px] sm:rounded-[30px] bg-gradient-to-b from-[#3b82f6] to-[#1d4ed8] text-[21px] sm:text-[24px] font-bold text-white shadow-[0_12px_24px_-8px_rgba(37,99,235,0.5)] active:scale-[0.99] disabled:opacity-50 transition-all relative overflow-hidden"
           >
-            ← Back
+
+            <span className="relative z-10">
+              {loading
+                ? "Creating Account..."
+                : "Create Account"}
+            </span>
+
+            <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+
           </button>
 
-          {!showSignupForm ? (
-            <>
-              {/* LOGO */}
-
-              <h1 className="text-[64px] font-extrabold leading-none tracking-[-0.06em]">
-                StabiX
-              </h1>
-
-              <p className="mt-10 text-[28px] leading-tight text-slate-500">
-                Pay Stablecoins Instant, Free & Secure
-              </p>
-
-              {/* TITLE */}
-
-              <h2 className="mt-28 text-[42px] font-extrabold">
-                Create Account
-              </h2>
-
-              {/* GOOGLE BUTTON */}
-
-              <div className="mt-10 flex w-full justify-center">
-                <div
-                  ref={googleRef}
-                  className="flex min-h-[44px] w-full max-w-[360px] justify-center"
-                />
-              </div>
-
-              <p className="mt-4 text-center text-[18px] text-slate-500">
-                 Create your StabiX account with google.
-              </p>
-
-              {/* LOADING */}
-
-              {loading && (
-                <p className="mt-6 text-center text-slate-500">
-                  Checking Google account...
-                </p>
-              )}
-
-              {/* ERROR */}
-
-              {message && (
-                <div className="mt-6 rounded-2xl bg-red-50 px-5 py-4 text-center text-[16px] font-medium text-red-600">
-                  {message}
-                </div>
-              )}
-              
-            </>
-          ) : (
-            <>
-              {/* FINISH ACCOUNT */}
-
-              <h1 className="text-[64px] font-extrabold leading-none tracking-[-0.06em]">
-                StabiX
-              </h1>
-
-              <p className="mt-10 text-[28px] leading-tight text-slate-500">
-                Pay Stablecoins Instant, Free & Secure
-              </p>
-
-              <h2 className="mt-20 text-[42px] font-extrabold">
-                Finish Account
-              </h2>
-
-              <p className="mt-4 text-[18px] text-slate-500">
-                Choose your username and password.
-              </p>
-
-              {/* FORM */}
-
-              <div className="mt-10 space-y-4">
-
-                <input
-                  type="text"
-                  placeholder="Choose Username"
-                  value={username}
-                  onChange={(e) =>
-                    setUsername(
-                      e.target.value
-                    )
-                  }
-                  className="h-[76px] w-full rounded-[28px] bg-[#eaf1ff] px-9 text-[22px] outline-none ring-1 ring-slate-200"
-                />
-
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) =>
-                    setPassword(
-                      e.target.value
-                    )
-                  }
-                  className="h-[76px] w-full rounded-[28px] bg-[#eaf1ff] px-9 text-[22px] outline-none ring-1 ring-slate-200"
-                />
-
-                <input
-                  type="password"
-                  placeholder="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) =>
-                    setConfirmPassword(
-                      e.target.value
-                    )
-                  }
-                  className="h-[76px] w-full rounded-[28px] bg-[#eaf1ff] px-9 text-[22px] outline-none ring-1 ring-slate-200"
-                />
-
-                {message && (
-                  <div className="rounded-2xl bg-red-50 px-5 py-4 text-center text-[16px] font-medium text-red-600">
-                    {message}
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  onClick={
-                    handleCreateAccount
-                  }
-                  disabled={loading}
-                  className="mt-3 h-[82px] w-full rounded-[30px] bg-blue-600 text-[24px] font-bold text-white disabled:opacity-50"
-                >
-                  {loading
-                    ? "Creating Account..."
-                    : "Create Account"}
-                </button>
-
-              </div>
-            </>
-          )}
-
         </div>
-      </main>
+      </>
+    )}
 
-      {/* ======================================
-          EXISTING GOOGLE ACCOUNT MODAL
-          ====================================== */}
+  </div>
+</main>
 
-      {showExistingModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-5 backdrop-blur-sm">
 
-          <div className="w-full max-w-[390px] rounded-[30px] bg-white p-7 shadow-2xl">
+{/* EXISTING GOOGLE ACCOUNT MODAL */}
 
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-2xl">
-              G
-            </div>
+{showExistingModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 px-4 backdrop-blur-sm">
 
-            <h3 className="mt-5 text-[26px] font-extrabold text-slate-900">
-              Google Account Already Registered
-            </h3>
+    <div className="w-full max-w-[390px] rounded-[28px] sm:rounded-[30px] bg-surface border border-black/[0.06] dark:border-white/[0.08] p-6 sm:p-7 shadow-[0_32px_80px_-16px_rgba(0,0,0,0.35)]">
 
-            <p className="mt-3 text-[17px] leading-relaxed text-slate-500">
-              This Google account is already linked to a StabiX account.
-            </p>
+      {/* GOOGLE ICON */}
 
-            <p className="mt-2 text-[17px] leading-relaxed text-slate-500">
-              Please use Login to access your account.
-            </p>
+      <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-500/15 text-xl sm:text-2xl font-bold text-blue-600">
+        G
+      </div>
 
-            <div className="mt-7 flex gap-3">
+      {/* TITLE */}
 
-              <button
-                type="button"
-                onClick={() =>
-                  setShowExistingModal(
-                    false
-                  )
-                }
-                className="h-[58px] flex-1 rounded-[20px] bg-slate-100 text-[17px] font-bold text-slate-700"
-              >
-                Cancel
-              </button>
+      <h3 className="mt-5 text-[23px] sm:text-[26px] font-extrabold leading-tight tracking-tight text-foreground">
+        Google Account Already Registered
+      </h3>
 
-              <button
-                type="button"
-                onClick={() =>
-                  router.push(
-                    "/login"
-                  )
-                }
-                className="h-[58px] flex-1 rounded-[20px] bg-blue-600 text-[17px] font-bold text-white"
-              >
-                Try Login
-              </button>
+      {/* MESSAGE */}
 
-            </div>
+      <p className="mt-3 text-[16px] sm:text-[17px] leading-relaxed text-muted">
+        This Google account is already linked to a StabiX account.
+      </p>
 
-          </div>
-        </div>
-      )}
+      <p className="mt-2 text-[16px] sm:text-[17px] leading-relaxed text-muted">
+        Please use Login to access your account.
+      </p>
+
+      {/* BUTTONS */}
+
+      <div className="mt-7 flex gap-3">
+
+        <button
+          type="button"
+          onClick={() =>
+            setShowExistingModal(false)
+          }
+          className="h-[56px] sm:h-[58px] flex-1 rounded-[18px] sm:rounded-[20px] bg-background text-[16px] sm:text-[17px] font-bold text-foreground ring-1 ring-border hover:bg-input active:scale-[0.98] transition-all"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          onClick={() =>
+            router.push("/login")
+          }
+          className="h-[56px] sm:h-[58px] flex-1 rounded-[18px] sm:rounded-[20px] bg-gradient-to-b from-[#3b82f6] to-[#1d4ed8] text-[16px] sm:text-[17px] font-bold text-white shadow-[0_8px_16px_-6px_rgba(37,99,235,0.5)] active:scale-[0.98] transition-all"
+        >
+          Try Login
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
     </>
   );
 }
