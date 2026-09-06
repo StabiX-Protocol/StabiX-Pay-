@@ -33,7 +33,10 @@ export default function AppShell({
   pathname.startsWith("/settings") ||
   pathname.startsWith("/create-account") ||
   pathname.startsWith("/forgot-password") ||
-  pathname.startsWith("/login");
+  pathname.startsWith("/login") ||
+  pathname.startsWith("/search") ||
+  pathname.startsWith("/user")
+  ;
 
 
   

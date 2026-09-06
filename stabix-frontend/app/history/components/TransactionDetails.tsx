@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams} from "next/navigation";
 
 type Transaction = {
   STRId: string;
@@ -20,6 +21,15 @@ type TransactionDetailProps = {
 export default function TransactionDetail({
   transaction: t,
 }: TransactionDetailProps) {
+  const searchParams = useSearchParams();
+
+ const backSource = searchParams.get("from");
+const userUid = searchParams.get("user");
+
+const backHref =
+  backSource === "user" && userUid
+    ? `/user/${encodeURIComponent(userUid)}`
+    : "/history";
   const displayAmount = Number(t.amount).toFixed(2);
 
   const isCredit =
@@ -82,7 +92,7 @@ export default function TransactionDetail({
       <div className="relative px-4 pb-28 pt-5">
         {/* Back */}
         <Link
-          href="/history"
+          href={backHref}
           aria-label="Back to transaction history"
           className="absolute left-4 top-5 flex h-9 w-9 items-center justify-center rounded-[10px] bg-white text-xl shadow-sm dark:bg-[#18181b]"
         >

@@ -135,10 +135,17 @@ export default function SearchPage() {
 
         {/* User Result */}
         {user && (
-          <button
-            type="button"
-            className="mt-5 flex w-full items-center rounded-2xl bg-surface p-4 text-left shadow-sm ring-1 ring-[var(--border)] transition active:scale-[0.99]"
-          >
+         <button
+  type="button"
+  onClick={() => {
+    if (user?.stbx_uid) {
+      router.push(
+        `/user/${encodeURIComponent(user.stbx_uid)}`
+      );
+    }
+  }}
+  className="mt-5 flex w-full items-center rounded-2xl bg-surface p-4 text-left shadow-sm ring-1 ring-[var(--border)] transition active:scale-[0.99]"
+>
             {profileImageUrl ? (
               <img
                 src={profileImageUrl}

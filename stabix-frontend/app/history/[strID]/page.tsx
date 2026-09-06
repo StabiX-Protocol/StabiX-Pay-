@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams,useRouter,useSearchParams, } from "next/navigation";
 
 import TransactionDetail from "../components/TransactionDetails";
 import { getTransactionBySTRId } from "../lib/transactionApi";
@@ -10,6 +10,9 @@ import type { Transaction } from "../lib/historyApi";
 
 export default function TransactionDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
+  const userUid = searchParams.get("user");
 
   const strID = params.strID as string;
 
