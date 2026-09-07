@@ -84,7 +84,7 @@ export default function SearchPage() {
             type="button"
             onClick={() => router.back()}
             aria-label="Go back"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-2xl text-slate-800 dark:text-white"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-2xl text-foreground"
           >
             ←
           </button>
@@ -95,7 +95,7 @@ export default function SearchPage() {
         </div>
 
         {/* Search Box */}
-        <div className="mt-5 flex items-center rounded-full bg-slate-100 px-4 py-3 dark:bg-[#202124]">
+        <div className="mt-5 flex items-center rounded-full bg-input border border-border">
 
           <svg
             width="21"
@@ -106,7 +106,7 @@ export default function SearchPage() {
             strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="mr-3 shrink-0 text-slate-500 dark:text-slate-400"
+            className="mr-3 shrink-0 text-muted"
           >
             <circle
               cx="11"
@@ -125,11 +125,11 @@ export default function SearchPage() {
             placeholder="Search by StabiX UID"
             autoFocus
             autoComplete="off"
-            className="min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-slate-500 dark:placeholder:text-slate-400"
+            className="min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-muted text-foreground"
           />
 
           {loading && (
-            <div className="ml-2 h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-slate-300 border-t-blue-600" />
+            <div className="ml-2 h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-border border-t-blue-600" />
           )}
         </div>
 
@@ -144,7 +144,7 @@ export default function SearchPage() {
       );
     }
   }}
-  className="mt-5 flex w-full items-center rounded-2xl bg-surface p-4 text-left shadow-sm ring-1 ring-[var(--border)] transition active:scale-[0.99]"
+  className="mt-5 flex w-full items-center rounded-2xl bg-surface p-4 text-left shadow-sm border border-border transition active:scale-[0.99]"
 >
             {profileImageUrl ? (
               <img

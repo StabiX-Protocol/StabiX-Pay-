@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter,useSearchParams, } from "next/navigation";
+import {
+  useParams,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { apiFetch } from "@/lib/api";
 
 type User = {
@@ -13,13 +17,18 @@ type User = {
 
 type Transaction = {
   STRId: string;
-  type: "sent" | "received" | "deposit" | "withdraw";
+  type:
+    | "sent"
+    | "received"
+    | "deposit"
+    | "withdraw";
   status?: string;
   asset: string;
   amount: string | number;
   counterparty?: string | null;
   created_at: string;
   stbx_uid?: string;
+  eoa_address?: string | null;
 };
 
 export default function UserPage() {
@@ -29,37 +38,61 @@ export default function UserPage() {
 
   const stbx_uid = params.stbx_uid as string;
 
-  const [user, setUser] = useState<User | null>(null);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] =
+    useState<User | null>(null);
+
+  const [transactions, setTransactions] =
+    useState<Transaction[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  /*
+   * LOAD USER + TRANSACTIONS
+   */
 
   useEffect(() => {
     async function loadUserAndTransactions() {
       try {
-        // User
         const userData = await apiFetch(
-          `/api/users/${encodeURIComponent(stbx_uid)}`
+          `/api/users/${encodeURIComponent(
+            stbx_uid
+          )}`
         );
 
-        const foundUser = userData?.user || userData;
+        const foundUser =
+          userData?.user || userData;
 
         setUser(foundUser);
 
-        // Current user's history
         const historyData = await apiFetch(
-          `/api/transactions/history`
+          "/api/transactions/history"
         );
 
         const history: Transaction[] =
           historyData?.transactions || [];
 
-        // Only transactions involving this user
-        const filtered = history.filter((transaction) => {
-          return (
-            transaction.counterparty === stbx_uid ||
-            transaction.stbx_uid === stbx_uid
+        /*
+         * Keep existing filtering logic.
+         */
+
+        const filtered = history
+          .filter((transaction) => {
+            return (
+              transaction.counterparty ===
+                stbx_uid ||
+              transaction.stbx_uid === stbx_uid
+            );
+          })
+          /*
+           * Conversation order:
+           * OLD → NEW
+           */
+          .sort(
+            (a, b) =>
+              new Date(a.created_at).getTime() -
+              new Date(b.created_at).getTime()
           );
-        });
 
         setTransactions(filtered);
       } catch (error) {
@@ -80,6 +113,10 @@ export default function UserPage() {
     }
   }, [stbx_uid]);
 
+  /*
+   * PROFILE IMAGE
+   */
+
   const profileImage =
     user?.profile_image ||
     user?.profileImage ||
@@ -93,18 +130,84 @@ export default function UserPage() {
     : null;
 
   const firstLetter =
-    user?.username?.trim().charAt(0).toUpperCase() ||
-    "S";
+    user?.username
+      ?.trim()
+      .charAt(0)
+      .toUpperCase() || "S";
+
+  /*
+   * BACK ROUTING
+   *
+   * People → User → Home
+   * Search → User → Search
+   */
+
+  const handleBack = () => {
+    if (searchParams.get("from") === "home") {
+      router.replace("/");
+      return;
+    }
+
+    router.back();
+  };
+
+  /*
+   * ASSET LOGO
+   */
+
+  const getAssetLogo = (asset: string) => {
+    if (
+      asset.toUpperCase() === "USDT"
+    ) {
+      return "/media/tether-usdt-logo.png";
+    }
+
+    return "/media/usd-coin-usdc-logo.png";
+  };
+
+  /*
+   * FORMAT DATE
+   */
+
+  const formatDateLabel = (date: string) => {
+    return new Date(
+      date
+    ).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+    });
+  };
+
+  /*
+   * FORMAT TIME
+   */
+
+  const formatTime = (date: string) => {
+    return new Date(
+      date
+    ).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  /*
+   * LOADING
+   */
 
   if (loading) {
     return (
-<main className="h-[100dvh] overflow-hidden bg-background text-foreground">
-            <div className="mx-auto w-full max-w-md px-4 py-8 text-center text-sm text-muted">
+      <main className="min-h-screen bg-background text-foreground">
+        <div className="mx-auto w-full max-w-md px-4 py-8 text-center text-sm text-muted">
           Loading...
         </div>
       </main>
     );
   }
+
+  /*
+   * USER NOT FOUND
+   */
 
   if (!user) {
     return (
@@ -113,156 +216,306 @@ export default function UserPage() {
           <div className="text-sm text-muted">
             User not found
           </div>
+
+          <button
+            type="button"
+            onClick={() => router.replace("/")}
+            aria-label="Go back"
+            className="mt-4 flex h-10 w-10 items-center justify-center rounded-full text-2xl text-slate-800 dark:text-white"
+          >
+            ←
+          </button>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto flex h-full w-full max-w-md flex-col px-4">
+    <main className="h-[100dvh] overflow-hidden bg-[#f6f7f9] text-slate-900 dark:bg-[#0b0b0d] dark:text-white">
 
-        {/* Header */}
-        <div className="flex items-center pt-5">
-         <button
-  type="button"
-  onClick={() => {
-  if (searchParams.get("from") === "home") {
-    router.replace("/");
-    return;
-  }
+      <div className="mx-auto flex h-full w-full max-w-md flex-col">
 
-  router.back();
-}}
-  aria-label="Go back"
-  className="flex h-10 w-10 items-center justify-center rounded-full text-2xl text-slate-800 dark:text-white"
->
-  ←
-</button>
+        {/* =========================
+            FIXED USER HEADER
+        ========================= */}
 
-          <h1 className="ml-2 text-xl font-bold">
-            User
-          </h1>
-        </div>
+        <header className="z-40 flex shrink-0 items-center border-b border-slate-200 bg-[#f6f7f9] px-4 py-4 dark:border-white/10 dark:bg-[#0b0b0d]">
 
-        {/* User Profile */}
-        <div className="flex flex-col items-center pt-8">
+          <button
+            type="button"
+            onClick={handleBack}
+            aria-label="Go back"
+            className="mr-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-3xl transition active:scale-90"
+          >
+            ←
+          </button>
+
+          {/* Profile */}
+
           {profileImageUrl ? (
             <img
               src={profileImageUrl}
               alt="Profile"
-              className="h-24 w-24 rounded-full object-cover shadow-sm"
+              className="h-14 w-14 shrink-0 rounded-full object-cover ring-1 ring-slate-200 dark:ring-white/10"
             />
           ) : (
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-3xl font-bold text-white">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-blue-600 text-2xl font-bold text-white ring-1 ring-slate-200 dark:ring-white/10">
               {firstLetter}
             </div>
           )}
 
-          <div className="mt-4 text-xl font-bold">
-            {user.username || "Unknown User"}
+          {/* User information */}
+
+          <div className="ml-3 min-w-0">
+            <div className="truncate text-[20px] font-bold">
+              {user.username ||
+                "Unknown User"}
+            </div>
+
+            <div className="mt-0.5 truncate text-sm text-muted">
+              {user.stbx_uid || stbx_uid}
+            </div>
           </div>
 
-          <div className="mt-1 text-sm text-muted">
-            {user.stbx_uid || stbx_uid}
-          </div>
-        </div>
+        </header>
 
-        {/* Transactions */}
-<div className="mt-10 min-h-0 flex-1 overflow-y-auto pb-24">
-          <h2 className="text-lg font-bold">
-            Transactions
-          </h2>
+        {/* =========================
+            TRANSACTION CONVERSATION
+            ONLY THIS AREA SCROLLS
+        ========================= */}
+
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-5 pt-5">
 
           {transactions.length === 0 ? (
-            <div className="mt-4 rounded-2xl bg-surface p-5 text-center text-sm text-muted ring-1 ring-[var(--border)]">
+            <div className="flex h-full items-center justify-center text-center text-sm text-muted">
               No transactions with this user
             </div>
           ) : (
-            <div className="mt-4 overflow-hidden rounded-2xl bg-surface ring-1 ring-[var(--border)]">
-              {transactions.map((transaction) => {
-                const isReceived =
-                  transaction.type === "received";
+            <div className="flex flex-col gap-3">
 
-                const isSent =
-                  transaction.type === "sent";
+              {transactions.map(
+                (transaction, index) => {
 
-                return (
-                  <button
-                    key={transaction.STRId}
-                    type="button"
-                    onClick={() =>
-                     router.push(
-  `/history/${encodeURIComponent(
-    transaction.STRId
-  )}?from=user&user=${encodeURIComponent(stbx_uid)}`
-)
-                    }
-                    className="flex w-full items-center border-b border-[var(--border)] px-4 py-4 text-left last:border-b-0 active:bg-slate-50 dark:active:bg-slate-800"
-                  >
-                    {/* Icon */}
-                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-  <img
-    src={
-      transaction.asset.toUpperCase() === "USDC"
-        ? "/media/usd-coin-usdc-logo.png"
-        : "/media/tether-usdt-logo.png"
-    }
-    alt={transaction.asset}
-    className="h-8 w-8 rounded-full object-contain"
-  />
-  
-</div>
+                  const isReceived =
+                    transaction.type ===
+                    "received";
 
+                  const isSent =
+                    transaction.type ===
+                    "sent";
 
+                  /*
+                   * Ignore anything that isn't
+                   * a person-to-person payment.
+                   */
 
-                    {/* Details */}
-                    <div className="ml-3 min-w-0 flex-1">
-                      <div className="font-semibold">
-                        {isReceived
-                          ? "Received"
-                          : isSent
-                          ? "Sent"
-                          : transaction.type}
-                      </div>
+                  if (
+                    !isReceived &&
+                    !isSent
+                  ) {
+                    return null;
+                  }
 
-                      <div className="mt-1 text-xs text-muted">
-  {new Date(
-    transaction.created_at
-  ).toLocaleDateString()}
-  {" • "}
-  {new Date(
-    transaction.created_at
-  ).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  })}
-</div>
-                    </div>
+                  const asset =
+                    transaction.asset.toUpperCase();
 
-                    {/* Amount */}
+                  /*
+                   * IMPORTANT:
+                   * Do NOT use Number() or toFixed().
+                   * Show amount exactly as received.
+                   */
+
+                  const amount =
+                    String(transaction.amount);
+
+                  /*
+                   * Show date separator only when
+                   * this transaction is the first
+                   * transaction of a new date.
+                   */
+
+                  const currentDate =
+                    new Date(
+                      transaction.created_at
+                    ).toDateString();
+
+                  const previousTransaction =
+                    transactions[index - 1];
+
+                  const previousDate =
+                    previousTransaction
+                      ? new Date(
+                          previousTransaction.created_at
+                        ).toDateString()
+                      : null;
+
+                  const showDate =
+                    index === 0 ||
+                    currentDate !== previousDate;
+
+                  /*
+                   * GPay style title
+                   */
+
+                  const title = isReceived
+                    ? "Payment to you"
+                    : `Payment to ${
+                        user.username ||
+                        "User"
+                      }`;
+
+                  return (
                     <div
-                      className={`ml-3 text-right font-semibold ${
-  isReceived
-    ? "text-green-600"
-    : "text-red-600"
-}`}
+                      key={transaction.STRId}
+                      className="w-full"
                     >
-                      {isReceived ? "+" : "-"}
-                      {transaction.amount}{" "}
-                      {transaction.asset}
+
+                      {/* =====================
+                          DATE SEPARATOR
+                      ===================== */}
+
+                      {showDate && (
+                        <div className="mb-3 mt-2 flex items-center gap-3">
+                          <div className="h-px flex-1 bg-slate-300 dark:bg-white/10" />
+
+                          <span className="shrink-0 text-sm font-medium text-slate-500 dark:text-slate-400">
+                            {formatDateLabel(
+                              transaction.created_at
+                            )}
+                          </span>
+
+                          <div className="h-px flex-1 bg-slate-300 dark:bg-white/10" />
+                        </div>
+                      )}
+
+                      {/* =====================
+                          PAYMENT CARD
+                      ===================== */}
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          router.push(
+                            `/history/${encodeURIComponent(
+                              transaction.STRId
+                            )}?from=user&user=${encodeURIComponent(
+                              stbx_uid
+                            )}`
+                          )
+                        }
+                        className={`flex w-full ${
+                          isReceived
+                            ? "justify-start"
+                            : "justify-end"
+                        }`}
+                      >
+
+                        <div
+                          className={`w-[78%] rounded-[28px] px-5 py-4 text-left shadow-sm ${
+                            isReceived
+                              ? "bg-white dark:bg-[#303030]"
+                              : "bg-blue-50 dark:bg-[#1d2942]"
+                          }`}
+                        >
+
+                          {/* TITLE */}
+
+                          <div className="text-[18px] font-semibold">
+                            {title}
+                          </div>
+
+                          {/* EXACT AMOUNT */}
+
+                         <div className="mt-3 flex items-center gap-2 text-[34px] font-medium tracking-tight">
+  <span>{amount}</span>
+
+  <span className="text-[22px] font-semibold">
+    {asset}
+  </span>
+
+  <img
+    src={getAssetLogo(asset)}
+    alt={asset}
+    className="h-6 w-6 rounded-full object-contain"
+  />
+</div>
+
+                          {/* =================
+                              PAID + ASSET + TIME
+                          ================= */}
+
+                          <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-300">
+
+                            {/* PAID CHECK */}
+
+                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-400 text-[14px] font-bold text-slate-900">
+                              ✓
+                            </span>
+
+                            <span>
+                              Paid
+                            </span>
+
+                            {/* ASSET LOGO */}
+
+                            <img
+                              src={getAssetLogo(
+                                asset
+                              )}
+                              alt={asset}
+                              className="h-[18px] w-[18px] shrink-0 rounded-full object-contain"
+                            />
+
+                            {/* ASSET */}
+
+                            <span>
+                              {asset}
+                            </span>
+
+                            {/* DOT */}
+
+                            <span>
+                              •
+                            </span>
+
+                            {/* TIME ONLY */}
+
+                            <span>
+                              {formatTime(
+                                transaction.created_at
+                              )}
+                            </span>
+
+                            {/* ARROW */}
+
+                            <span className="ml-auto text-xl leading-none">
+                              ›
+                            </span>
+
+                          </div>
+
+                        </div>
+
+                      </button>
+
                     </div>
-                  </button>
-                );
-              })}
+                  );
+                }
+              )}
+
             </div>
-         )}
+          )}
+
         </div>
 
-        {/* Bottom Payment Bar */}
-        <div className="fixed bottom-0 left-1/2 z-50 flex w-full max-w-md -translate-x-1/2 items-center gap-2 border-t border-[var(--border)] bg-background px-4 py-3">
-          
-          {/* Pay */}
+        {/* =========================
+            FIXED BOTTOM PAYMENT BAR
+        ========================= */}
+
+        <div className="z-50 flex shrink-0 items-center gap-2 border-t border-slate-200 bg-[#f6f7f9] px-4 py-3 dark:border-white/10 dark:bg-[#0b0b0d]">
+
+          {/* PAY */}
+
           <button
             type="button"
             onClick={() =>
@@ -272,20 +525,23 @@ export default function UserPage() {
                 )}`
               )
             }
-            className="h-12 shrink-0 rounded-full bg-blue-600 px-6 text-[16px] font-bold text-white transition active:scale-95"
+            className="h-12 shrink-0 rounded-full bg-blue-600 px-7 text-[16px] font-bold text-white transition active:scale-95"
           >
             Pay
           </button>
 
-          {/* Message */}
-          <div className="flex h-12 min-w-0 flex-1 items-center rounded-full bg-slate-100 px-4 dark:bg-[#202124]">
+          {/* MESSAGE */}
+
+          <div className="flex h-12 min-w-0 flex-1 items-center rounded-full bg-slate-200 px-4 dark:bg-[#202124]">
+
             <input
               type="text"
               placeholder="Message..."
               className="min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-slate-500 dark:placeholder:text-slate-400"
             />
 
-            {/* Send */}
+            {/* SEND */}
+
             <button
               type="button"
               aria-label="Send message"
@@ -305,11 +561,13 @@ export default function UserPage() {
                 <path d="M22 2 11 13" />
               </svg>
             </button>
+
           </div>
 
         </div>
 
       </div>
+
     </main>
   );
 }
