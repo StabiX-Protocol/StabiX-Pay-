@@ -219,16 +219,7 @@ export default function HistoryPage() {
 
         {/* Back Button */}
         <div className="flex items-center gap-3 pt-4">
-          <button
-            type="button"
-            onClick={() =>
-              (window.location.href = "/")
-            }
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-lg text-slate-800 shadow-sm dark:bg-[#18181b] dark:text-white"
-            aria-label="Go back"
-          >
-            ←
-          </button>
+       
 
           <h1 className="m-0 text-xl font-bold leading-none text-foreground">
             Transaction History

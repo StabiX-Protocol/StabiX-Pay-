@@ -25,14 +25,7 @@ export default function DWPage() {
 
         {/* Header */}
         <header className="flex items-center gap-3 py-6">
-          <Link
-       href="/"
-       aria-label="Go to Home"
-      className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-2xl shadow-sm ring-1 ring-slate-100 transition active:scale-90 dark:bg-[#18181b] dark:ring-white/10"
-          >
-       ←
-      </Link>
-
+         
           <div>
             <h1 className="text-xl font-bold tracking-tight">
               Deposit & Withdraw

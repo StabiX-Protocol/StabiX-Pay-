@@ -113,7 +113,7 @@ export default function ProfilePage() {
             type="button"
             onClick={() => router.back()}
             aria-label="Go back"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-3xl transition active:scale-90"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-3xl text-slate-800 transition active:scale-90 dark:text-white"
           >
             ←
           </button>
@@ -138,7 +138,7 @@ export default function ProfilePage() {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="h-5 w-5"
+              className="h-5 w-5 text-slate-700 dark:text-white"
             >
               <path d="M12 20h9" />
               <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
@@ -151,7 +151,7 @@ export default function ProfilePage() {
 
           /* LOADING */
 
-          <div className="mt-16 text-center text-slate-400">
+          <div className="mt-16 text-center text-slate-500 dark:text-slate-400">
             Loading profile...
           </div>
 
@@ -205,7 +205,7 @@ export default function ProfilePage() {
 
               <div className="px-5 py-5">
 
-                <p className="text-xs font-medium text-slate-400">
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                   StabiX UID
                 </p>
 

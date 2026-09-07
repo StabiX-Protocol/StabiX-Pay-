@@ -593,7 +593,7 @@ if (!data?.allowed) {
             type="button"
             onClick={handleBack}
             aria-label="Go back"
-            className="flex h-11 w-11 items-center justify-center rounded-full text-3xl transition active:scale-90"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-3xl text-slate-800 transition active:scale-90 dark:text-white"
           >
             ←
           </button>
@@ -604,7 +604,7 @@ if (!data?.allowed) {
         </header>
 
         {loading ? (
-          <div className="mt-16 text-center text-slate-400">
+          <div className="mt-16 text-center text-slate-500 dark:text-slate-400">
             Loading profile...
           </div>
         ) : (
@@ -679,7 +679,7 @@ if (!data?.allowed) {
                 />
               </div>
 
-              <p className="mt-4 text-sm text-slate-400">
+             <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
                 Profile photo can be changed once every 7 days
               </p>
 
@@ -714,12 +714,12 @@ if (!data?.allowed) {
                   onChange={(e) =>
                     setUsername(e.target.value)
                   }
-                  className="w-full bg-transparent text-[17px] font-medium outline-none"
+                 className="w-full bg-transparent text-[17px] font-medium text-slate-900 outline-none placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
                   placeholder="Username"
                 />
               </div>
 
-              <p className="mt-2 px-1 text-xs text-slate-400">
+              <p className="mt-2 px-1 text-xs text-slate-500 dark:text-slate-400">
                 Username can be changed once every 90 days.
               </p>
 
@@ -748,7 +748,7 @@ if (!data?.allowed) {
                     setEoaAddress(e.target.value)
                   }
                   rows={1}
-                  className="w-full resize-none bg-transparent text-[15px] font-medium outline-none"                
+                  className="w-full resize-none bg-transparent text-[15px] font-medium text-slate-900 outline-none placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"                
                   placeholder="Enter Wallet Address"
                 />
               </div>

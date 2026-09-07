@@ -93,7 +93,7 @@ export default function AppHeader() {
           type="button"
           onClick={() => router.push("/search")}
           aria-label="Search users"
-          className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full bg-slate-100 px-4 text-left transition active:scale-[0.98] dark:bg-[#202124]"
+          className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full bg-input px-4 text-left transition active:scale-[0.98]"
         >
           <svg
             width="20"
@@ -104,7 +104,7 @@ export default function AppHeader() {
             strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="shrink-0 text-slate-500 dark:text-slate-400"
+            className="shrink-0 text-muted"
           >
             <circle
               cx="11"
@@ -114,7 +114,7 @@ export default function AppHeader() {
             <path d="m20 20-4-4" />
           </svg>
 
-          <span className="truncate text-[14px] text-slate-500 dark:text-slate-400">
+          <span className="truncate text-[14px] text-muted">
             Search friends & merchants
           </span>
         </button>
@@ -137,12 +137,13 @@ export default function AppHeader() {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              className="text-slate-700 dark:text-white"
             >
               <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
               <path d="M10 21h4" />
             </svg>
 
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-blue-600 ring-2 ring-[#f6f7f9] dark:ring-[#0b0b0d]" />
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-blue-600 ring-2 ring-[var(--background)]" />
           </button>
 
           {/* Settings */}
@@ -168,6 +169,7 @@ export default function AppHeader() {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              className="text-slate-700 dark:text-white"
             >
               <circle
                 cx="12"

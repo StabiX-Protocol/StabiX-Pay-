@@ -106,7 +106,7 @@ export default function SearchPage() {
             strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="mr-3 shrink-0 text-muted"
+            className="mr-3 shrink-0 text-slate-500 dark:text-slate-300"
           >
             <circle
               cx="11"
@@ -125,7 +125,7 @@ export default function SearchPage() {
             placeholder="Search by StabiX UID"
             autoFocus
             autoComplete="off"
-            className="min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-muted text-foreground"
+           className="min-w-0 flex-1 bg-transparent text-[16px] text-slate-900 outline-none placeholder:text-slate-500 dark:text-white dark:placeholder:text-slate-400"
           />
 
           {loading && (
@@ -144,7 +144,7 @@ export default function SearchPage() {
       );
     }
   }}
-  className="mt-5 flex w-full items-center rounded-2xl bg-surface p-4 text-left shadow-sm border border-border transition active:scale-[0.99]"
+  className="mt-5 flex w-full items-center rounded-2xl border border-border bg-surface p-4 text-left shadow-sm transition active:scale-[0.99]"
 >
             {profileImageUrl ? (
               <img
@@ -159,16 +159,16 @@ export default function SearchPage() {
             )}
 
             <div className="ml-4 min-w-0">
-              <div className="truncate text-[17px] font-bold">
+              <div className="truncate text-[17px] font-bold text-slate-900 dark:text-white">
                 {user.username || "Unknown User"}
               </div>
 
-              <div className="mt-1 truncate text-[13px] text-muted">
+              <div className="mt-1 truncate text-[13px] text-slate-500 dark:text-slate-400">
                 {user.stbx_uid || query.trim()}
               </div>
             </div>
 
-            <div className="ml-auto text-xl text-muted">
+            <div className="ml-auto text-xl text-slate-500 dark:text-slate-300">
               ›
             </div>
           </button>
@@ -176,7 +176,7 @@ export default function SearchPage() {
 
         {/* Not Found */}
         {searched && !user && !loading && (
-          <div className="mt-6 text-center text-sm text-muted">
+          <div className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
             User not found
           </div>
         )}

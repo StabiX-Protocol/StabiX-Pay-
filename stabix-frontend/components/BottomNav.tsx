@@ -58,6 +58,7 @@ export default function BottomNav() {
                 strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                className="text-white"
               >
                 <circle cx="12" cy="8" r="3.5" />
                 <path d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5" />
@@ -80,14 +81,14 @@ export default function BottomNav() {
             className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl py-2 transition active:scale-95 ${
               moreOpen
                 ? "text-blue-600"
-                : "text-slate-500 dark:text-slate-400"
+                : "text-slate-600 dark:text-slate-300"
             }`}
           >
             <span
               className={`flex h-8 w-8 items-center justify-center rounded-xl text-xl ${
                 moreOpen
                   ? "bg-blue-50 dark:bg-blue-950/40"
-                  : ""
+                  : "text-slate-700 dark:text-slate-200"
               }`}
             >
               ☰
@@ -121,14 +122,14 @@ function NavLink({
       className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl py-2 transition active:scale-95 ${
         active
           ? "text-blue-600"
-          : "text-slate-500 dark:text-slate-400"
+          : "text-slate-600 dark:text-slate-300"
       }`}
     >
       <span
         className={`flex h-8 w-8 items-center justify-center rounded-xl text-xl ${
           active
             ? "bg-blue-50 dark:bg-blue-950/40"
-            : ""
+            : "text-slate-700 dark:text-slate-200"
         }`}
       >
         {icon}
@@ -156,9 +157,9 @@ function MoreLink({
     <Link
       href={href}
       onClick={onClick}
-      className="flex w-full items-center gap-4 rounded-2xl px-4 py-3.5 text-left transition active:bg-slate-100 dark:active:bg-white/5"
+      className="flex w-full items-center gap-4 rounded-2xl px-4 py-3.5 text-left text-slate-900 transition active:bg-slate-100 dark:text-white dark:active:bg-white/5"
     >
-      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-lg dark:bg-[#242428]">
+      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-lg text-slate-700 dark:bg-[#242428] dark:text-slate-200">
         {icon}
       </span>
 
