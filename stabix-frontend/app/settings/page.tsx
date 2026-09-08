@@ -82,23 +82,16 @@ export default function SettingsPage() {
 
           <div className="overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-[#151518]">
 
-            <button
-              type="button"
-              className="flex w-full items-center justify-between px-5 py-4 text-left"
-            >
-              <span>Notifications</span>
-              <span className="text-slate-400">›</span>
-            </button>
-
             <div className="mx-5 border-t border-slate-100 dark:border-white/10" />
 
-            <button
-              type="button"
-              className="flex w-full items-center justify-between px-5 py-4 text-left"
-            >
-              <span>Appearance</span>
-              <span className="text-slate-400">›</span>
-            </button>
+           <button
+  type="button"
+  onClick={() => router.push("/settings/theme")}
+  className="flex w-full items-center justify-between px-5 py-4 text-left transition active:bg-slate-100 dark:active:bg-white/5"
+>
+  <span>Theme</span>
+  <span className="text-slate-400">›</span>
+</button>
 
           </div>
         </section>

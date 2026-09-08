@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
 import AppShell from "@/components/AppShell";
+import ThemeManager from "@/components/ThemeManager";
 
 export const metadata: Metadata = {
   title: "StabiX",
@@ -28,6 +29,7 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
 
+        <ThemeManager />
         <AppShell>{children}</AppShell>
       </body>
     </html>
