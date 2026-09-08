@@ -200,7 +200,7 @@ export default function SendPage() {
               }}
               placeholder="Receiver StabiX UID"
               autoComplete="off"
-              className="min-w-0 flex-1 bg-transparent py-4 text-[16px] font-medium text-slate-900 outline-none placeholder:text-slate-400 dark:text-white"
+              className="min-w-0 flex-1 bg-transparent py-4 text-[16px] font-medium text-slate-900 outline-none placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
             />
 
             {loadingRecipient && (

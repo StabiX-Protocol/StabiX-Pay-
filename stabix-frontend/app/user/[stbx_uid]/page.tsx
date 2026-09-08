@@ -537,7 +537,7 @@ export default function UserPage() {
             <input
               type="text"
               placeholder="Message..."
-              className="min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-slate-500 dark:placeholder:text-slate-400"
+              className="min-w-0 flex-1 bg-transparent text-[16px] text-slate-900 outline-none placeholder:text-slate-500 dark:text-white dark:placeholder:text-slate-400"
             />
 
             {/* SEND */}

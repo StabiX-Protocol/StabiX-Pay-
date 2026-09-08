@@ -84,8 +84,8 @@ export default async function NetworkPage({
                   <div>
                     <h2 className="text-xl font-bold">
                       {network.name}{" "}
-                      <span className="font-medium text-slate-400">
-                        {network.type}
+                      <span className="font-medium text-slate-500 dark:text-slate-400">
+                     {network.type}
                       </span>
                     </h2>
 
@@ -98,9 +98,9 @@ export default async function NetworkPage({
                     </p>
                   </div>
 
-                  <span className="text-2xl text-slate-400">
-                    →
-                  </span>
+                 <span className="text-2xl text-slate-500 dark:text-slate-400">
+                     →
+               </span>
 
                 </div>
               </Link>

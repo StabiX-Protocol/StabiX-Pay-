@@ -59,15 +59,17 @@ export default function AssetPage() {
             ←
           </Link>
 
-          <div
-            className={`mx-auto flex h-24 w-24 items-center justify-center text-7xl font-bold ${
-              asset === "USDT"
-                ? "text-emerald-500"
-                : "text-blue-600"
-            }`}
-          >
-            {asset === "USDT" ? "₮" : "$"}
-          </div>
+         <div className="mx-auto flex h-24 w-24 items-center justify-center overflow-hidden rounded-full">
+        <img
+         src={
+         asset === "USDT"
+        ? "/media/tether-usdt-logo.png"
+        : "/media/usd-coin-usdc-logo.png"
+        } 
+    alt={asset}
+    className="h-24 w-24 rounded-full object-contain"
+  />
+</div>
 
           <h1 className="mt-3 text-3xl font-bold">
             {asset}

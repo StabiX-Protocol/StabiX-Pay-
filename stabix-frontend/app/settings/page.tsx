@@ -128,17 +128,17 @@ export default function SettingsPage() {
       {logoutOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-5 backdrop-blur-sm">
 
-          <div className="w-full max-w-md rounded-[28px] border border-white/10 bg-[#151518] p-6 shadow-2xl">
+          <div className="w-full max-w-md rounded-[28px] border border-slate-200 bg-white p-6 text-slate-900 shadow-2xl dark:border-white/10 dark:bg-[#151518] dark:text-white">
 
-            <p className="text-sm font-medium text-slate-400">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
               Session
             </p>
 
-            <h2 className="mt-2 text-2xl font-semibold text-white">
+            <h2 className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">
               Log out?
             </h2>
 
-            <p className="mt-3 text-sm leading-6 text-slate-400">
+            <p className="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
               Are you sure you want to log out of your StabiX account?
             </p>
 
@@ -147,7 +147,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => setLogoutOpen(false)}
-                className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 font-medium text-white transition active:scale-95"
+               className="flex-1 rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 font-medium text-slate-900 transition active:scale-95 dark:border-white/10 dark:bg-white/5 dark:text-white"
               >
                 Cancel
               </button>

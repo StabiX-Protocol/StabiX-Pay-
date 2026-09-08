@@ -94,7 +94,7 @@ const backHref =
         <Link
           href={backHref}
           aria-label="Back to transaction history"
-          className="absolute left-4 top-5 flex h-9 w-9 items-center justify-center rounded-[10px] bg-white text-xl shadow-sm dark:bg-[#18181b]"
+          className="absolute left-4 top-5 flex h-9 w-9 items-center justify-center rounded-[10px] bg-white text-xl text-slate-800 shadow-sm dark:bg-[#18181b] dark:text-white"
         >
           ←
         </Link>

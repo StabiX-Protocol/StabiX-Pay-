@@ -58,7 +58,8 @@ export default function DateFilter({
   };
 
   return (
-<div className="fixed bottom-0 left-1/2 z-[60] w-[calc(100%-24px)] max-w-md -translate-x-1/2 rounded-t-[24px] bg-white p-4 shadow-2xl dark:bg-[#18181b]">      <div className="w-full rounded-t-3xl bg-[var(--surface)] p-5">
+<div className="fixed bottom-0 left-1/2 z-[60] w-[calc(100%-24px)] max-w-md -translate-x-1/2 rounded-t-[24px] bg-[var(--surface)] p-4 text-foreground shadow-2xl">
+<div className="w-full rounded-t-3xl p-5">
 
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-bold">

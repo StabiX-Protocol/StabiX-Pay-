@@ -141,7 +141,7 @@ export default function PrimaryAssetPage() {
             type="button"
             onClick={() => router.back()}
             aria-label="Go back"
-            className="flex h-11 w-11 items-center justify-center rounded-full text-3xl transition active:scale-90"
+           className="flex h-11 w-11 items-center justify-center rounded-full text-3xl text-slate-800 transition active:scale-90 dark:text-white"
           >
             ←
           </button>
@@ -165,8 +165,8 @@ export default function PrimaryAssetPage() {
             onClick={() => selectAsset("USDT")}
             className={`flex w-full items-center justify-between rounded-[22px] border px-5 py-5 text-left transition-all active:scale-[0.985] ${
               primary === "USDT"
-                ? "border-blue-500/60 bg-[#080b20] shadow-[0_0_0_1px_rgba(59,130,246,0.15)]"
-                : "border-white/10 bg-[#080b20]"
+            ? "border-blue-500/60 bg-white shadow-[0_0_0_1px_rgba(59,130,246,0.15)] dark:bg-[#080b20]"
+             : "border-slate-200 bg-white dark:border-white/10 dark:bg-[#080b20]"
             }`}
           >
 
@@ -209,8 +209,8 @@ export default function PrimaryAssetPage() {
             onClick={() => selectAsset("USDC")}
             className={`flex w-full items-center justify-between rounded-[22px] border px-5 py-5 text-left transition-all active:scale-[0.985] ${
               primary === "USDC"
-                ? "border-blue-500/60 bg-[#080b20] shadow-[0_0_0_1px_rgba(59,130,246,0.15)]"
-                : "border-white/10 bg-[#080b20]"
+             ? "border-blue-500/60 bg-white shadow-[0_0_0_1px_rgba(59,130,246,0.15)] dark:bg-[#080b20]"
+             : "border-slate-200 bg-white dark:border-white/10 dark:bg-[#080b20]"
             }`}
           >
 
@@ -256,11 +256,11 @@ export default function PrimaryAssetPage() {
 
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-5 backdrop-blur-sm">
 
-          <div className="w-full max-w-sm rounded-[28px] border border-white/10 bg-[#101326] p-6 shadow-2xl">
+         <div className="w-full max-w-sm rounded-[28px] border border-slate-200 bg-white p-6 text-slate-900 shadow-2xl dark:border-white/10 dark:bg-[#101326] dark:text-white">
 
             <div className="mb-5">
 
-              <p className="text-sm font-medium text-slate-400">
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
                 Primary Asset
               </p>
 
@@ -268,7 +268,7 @@ export default function PrimaryAssetPage() {
                 Set {pendingAsset} as Primary?
               </h2>
 
-              <p className="mt-3 text-sm leading-6 text-slate-400">
+              <p className="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
                 Your selected primary asset will be displayed in the main
                 balance on the Home page.
               </p>
@@ -280,7 +280,7 @@ export default function PrimaryAssetPage() {
               <button
                 type="button"
                 onClick={() => setPendingAsset(null)}
-                className="flex-1 rounded-2xl border border-white/10 bg-white/5 py-3.5 font-semibold transition active:scale-[0.98]"
+                className="flex-1 rounded-2xl border border-slate-200 bg-slate-100 py-3.5 font-semibold text-slate-900 transition active:scale-[0.98] dark:border-white/10 dark:bg-white/5 dark:text-white"
               >
                 Cancel
               </button>

@@ -123,10 +123,6 @@ export default function ReceivePage() {
             <h2 className="mt-3 text-[22px] font-bold">
               Receive {asset}
             </h2>
-
-            <p className="mt-2 text-center text-[14px] text-muted">
-              Only Send Your Assets To This QR Code.
-            </p>
           </div>
         </section>
 
@@ -156,13 +152,16 @@ export default function ReceivePage() {
         {/* UID Label */}
         <div className="mt-7 text-center">
           <div className="text-[14px] font-semibold text-muted">
-            StabiX UID
+
+            <p className="mt-2 text-center text-[14px] text-muted">
+              Only Send Your Assets To This QR Code.
+            </p>
           </div>
         </div>
 
         {/* UID + Copy */}
         <div className="mt-3 flex min-h-[58px] items-center rounded-[18px] bg-input px-4 ring-1 ring-border">
-          <span className="min-w-0 flex-1 break-all text-[16px] font-semibold">
+          <span className="min-w-0 flex-1 break-all text-[16px] font-semibold text-foreground">
             {loading
               ? "Loading..."
               : uid || "Unavailable"}

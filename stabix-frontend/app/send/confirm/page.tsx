@@ -150,7 +150,7 @@ export default function SendConfirmPage() {
 };
 
   return (
-    <main className="min-h-screen bg-black px-5 pb-6 pt-6 text-white">
+    <main className="min-h-screen bg-[#f6f7f9] px-5 pb-6 pt-6 text-slate-900 dark:bg-black dark:text-white">
       {/* Back */}
        <button
             type="button"
@@ -163,7 +163,7 @@ export default function SendConfirmPage() {
 
       {/* Heading */}
       <div className="mt-8">
-        <h1 className="text-[42px] font-bold leading-none tracking-[-2px]">
+        <h1 className="text-[42px] font-bold leading-none tracking-[-2px] text-slate-900 dark:text-white">
           Confirm{" "}
           <span className="text-green-500">
             Send
@@ -171,7 +171,7 @@ export default function SendConfirmPage() {
         </h1>
       </div>
 
-      <div className="mt-12 border-t border-white/20 pt-7">
+      <div className="mt-12 border-t border-slate-200 dark:border-white/20 pt-7">
         {/* Asset + Amount */}
         <div className="flex items-center justify-center gap-3">
           <img
@@ -181,41 +181,41 @@ export default function SendConfirmPage() {
           />
 
           <div className="flex items-center justify-center gap-3">
-            <span className="text-[34px] font-medium text-white">
+            <span className="text-[34px] font-medium text-slate-900 dark:text-white">
               -{amount}
             </span>
 
-            <span className="text-[30px] font-medium text-slate-400">
+            <span className="text-[30px] font-medium text-slate-500 dark:text-slate-400">
               {asset}
             </span>
           </div>
         </div>
 
-        <div className="mt-7 border-b border-white/20" />
+        <div className="mt-7 border-b border-slate-200 dark:border-white/20" />
 
         {/* Fee */}
         <div className="mt-7 flex items-center justify-between">
-          <span className="text-[18px] font-medium text-white">
+         <span className="text-[18px] font-medium text-slate-900 dark:text-white">
             Fee
           </span>
 
-          <span className="text-[18px] text-slate-400">
+          <span className="text-[18px] text-slate-500 dark:text-slate-400">
             0 {asset}
           </span>
         </div>
 
         {/* From */}
         <div className="mt-8 flex items-start justify-between gap-5">
-          <span className="shrink-0 text-[18px] font-medium text-white">
-            From
+          <span className="shrink-0 text-[18px] font-medium text-slate-900 dark:text-white">
+          From
           </span>
 
           <div className="min-w-0 text-right">
-            <p className="break-all text-[16px] text-slate-400">
+            <p className="break-all text-[16px] text-slate-500 dark:text-slate-400">
               {myUser?.stbx_uid || "Loading..."}
             </p>
 
-            <p className="mt-1 text-[16px] font-medium text-white">
+            <p className="mt-1 text-[16px] font-medium text-slate-900 dark:text-white">
               ({myUser?.username || "Loading..."})
             </p>
           </div>
@@ -223,17 +223,16 @@ export default function SendConfirmPage() {
 
         {/* To */}
         <div className="mt-8 flex items-start justify-between gap-5">
-          <span className="shrink-0 text-[18px] font-medium text-white">
-            To
-          </span>
-
+         <span className="shrink-0 text-[18px] font-medium text-slate-900 dark:text-white">
+         To
+        </span>        
           <div className="min-w-0 text-right">
-            <p className="break-all text-[16px] text-slate-400">
+            <p className="break-all text-[16px] text-slate-500 dark:text-slate-400">
               {recipient?.stbx_uid ||
                 recipientUid}
             </p>
 
-            <p className="mt-1 text-[16px] font-medium text-white">
+            <p className="mt-1 text-[16px] font-medium text-slate-900 dark:text-white">
               ({recipient?.username || "Loading..."})
             </p>
           </div>
@@ -245,7 +244,7 @@ export default function SendConfirmPage() {
         <button
           type="button"
           onClick={handleReject}
-          className="flex-1 rounded-full bg-[#222222] py-5 text-[18px] font-bold text-white transition active:scale-[0.98]"
+         className="flex-1 rounded-full bg-slate-200 py-5 text-[18px] font-bold text-slate-900 transition active:scale-[0.98] dark:bg-[#222222] dark:text-white"
         >
           Reject
         </button>

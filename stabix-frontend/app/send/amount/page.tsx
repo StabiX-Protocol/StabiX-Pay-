@@ -136,7 +136,7 @@ export default function SendAmountPage() {
 };
 
   return (
-    <main className="min-h-screen bg-black px-5 pb-6 pt-6 text-white">
+    <main className="min-h-screen bg-[#f6f7f9] px-5 pb-6 pt-6 text-slate-900 dark:bg-black dark:text-white">
       {/* Header */}
       <div className="flex items-center">
         <button
@@ -151,11 +151,11 @@ export default function SendAmountPage() {
 
       {/* Available Balance */}
       <div className="mt-12 flex items-center gap-2 text-[20px]">
-        <span className="text-slate-400">
+       <span className="text-slate-500 dark:text-slate-400">
           Available:
         </span>
 
-        <span className="text-slate-300">
+       <span className="text-slate-700 dark:text-slate-300">
           {loadingBalance
             ? "0.00"
             : balance.toFixed(4)}{" "}
@@ -176,11 +176,13 @@ export default function SendAmountPage() {
       <div className="mt-5 flex items-center justify-center">
         <div className="flex w-full items-center justify-center gap-2 px-2">
   <span
-    className={`whitespace-nowrap text-center font-medium leading-none tracking-[-3px] ${
-      amount
-        ? "text-white"
-        : "text-slate-300"
+    className={`whitespace-nowrap text-center font-medium leading-none tracking-[-3px] 
+     ${
+     amount
+    ? "text-slate-900 dark:text-white"
+    : "text-slate-400 dark:text-slate-300"
     }`}
+
     style={{
       fontSize: `${Math.max(
         48,
@@ -192,7 +194,7 @@ export default function SendAmountPage() {
   </span>
 
   <span
-    className="shrink-0 whitespace-nowrap font-medium leading-none tracking-[-3px] text-slate-400"
+   className="shrink-0 whitespace-nowrap font-medium leading-none tracking-[-3px] text-slate-500 dark:text-slate-400"
     style={{
       fontSize: `${Math.max(
         42,
@@ -225,7 +227,7 @@ export default function SendAmountPage() {
             key={key}
             type="button"
             onClick={() => handleKeyPress(key)}
-            className="flex h-14 items-center justify-center text-[32px] font-medium text-white active:opacity-50"
+            className="flex h-14 items-center justify-center text-[32px] font-medium text-slate-900 active:opacity-50 dark:text-white"
             aria-label={
               key === "backspace"
                 ? "Delete"
@@ -249,8 +251,7 @@ export default function SendAmountPage() {
           type="button"
           onClick={handleConfirm}
           disabled={!isValidAmount}
-          className="w-full rounded-full bg-blue-600 py-5 text-[18px] font-bold text-white shadow-lg transition active:scale-[0.98] disabled:bg-slate-700 disabled:text-slate-500 disabled:shadow-none"
-        >
+          className="w-full rounded-full bg-blue-600 py-5 text-[18px] font-bold text-white shadow-lg transition active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none dark:disabled:bg-slate-700 dark:disabled:text-slate-500"        >
           Confirm
         </button>
       </div>
