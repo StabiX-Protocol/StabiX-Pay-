@@ -203,20 +203,7 @@ const handleStbxUidChange = (
     console.log(
       "GOOGLE CALLBACK RECEIVED"
     );
-    const uid = stbxUid.trim();
-
-if (
-  uid !== "STBX-FOUNDER" &&
-  !/^STBX\d{12}$/.test(uid)
-) {
-  showPopup(
-    "Login",
-    "Invalid STBX UID",
-    "STBX UID must contain STBX followed by exactly 12 digits."
-  );
-  return;
-}
-
+    
    if (!response?.credential) {
   console.error(
     "Google credential missing"
