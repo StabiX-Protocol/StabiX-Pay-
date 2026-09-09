@@ -19,6 +19,55 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleReady, setGoogleReady] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [popup, setPopup] = useState({
+  open: false,
+  label: "",
+  title: "",
+  message: "",
+});
+const showPopup = (
+  label: string,
+  title: string,
+  message: string
+) => {
+  setPopup({
+    open: true,
+    label,
+    title,
+    message,
+  });
+};
+
+
+const handleStbxUidChange = (
+  e: React.ChangeEvent<HTMLInputElement>
+) => {
+  const raw = e.target.value;
+  const value = raw.toUpperCase();
+  const legacyUid = "STBX100FOUNDER";
+  if (legacyUid.startsWith(value)) {
+    setStbxUid(value);
+    return;
+  }
+  const prefixInput = value.slice(0, 4);
+  if (value.length <= 4) {
+    const expected = "STBX";
+    if (expected.startsWith(prefixInput)) {
+      setStbxUid(prefixInput);
+    }
+    return;
+  }
+  if (prefixInput !== "STBX") {
+    return;
+  }
+  const numbers = value
+    .slice(4)
+    .replace(/\D/g, "")
+    .slice(0, 12);
+
+  setStbxUid(`STBX${numbers}`);
+};
+
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -67,10 +116,14 @@ export default function LoginPage() {
   }, [googleReady]);
 
   async function handleLogin() {
-    if (!stbxUid.trim() || !password) {
-      alert("Please enter STBX UID and password.");
-      return;
-    }
+   if (!stbxUid.trim() || !password) {
+  showPopup(
+    "Login",
+    "Missing Information",
+    "Please enter STBX UID and password."
+  );
+  return;
+}
 
     try {
       setLoading(true);
@@ -92,15 +145,18 @@ export default function LoginPage() {
       const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        alert(
-          data?.message ||
-          "Login failed. Please check your STBX UID and password."
-        );
-        return;
-      }
+  showPopup(
+    "Login",
+    "Login Failed",
+      "Invalid STBX UID or password."
+  );
+  return;
+}
 
       if (!data?.token) {
-        alert(
+        showPopup(
+          "Login",
+          "Login Failed",
           "Login successful response did not contain a token."
         );
         return;
@@ -132,10 +188,11 @@ export default function LoginPage() {
         error
       );
 
-      alert(
-        "Unable to connect to StabiX.\n\n" +
-        "Check that the backend is running and reachable."
-      );
+     showPopup(
+  "Login",
+  "Connection Error",
+  "Unable to connect to StabiX.\n\nCheck that the backend is running and reachable."
+);
     } finally {
       setLoading(false);
     }
@@ -145,19 +202,33 @@ export default function LoginPage() {
     console.log(
       "GOOGLE CALLBACK RECEIVED"
     );
+    const uid = stbxUid.trim();
 
-    if (!response?.credential) {
-      console.error(
-        "Google credential missing"
-      );
+if (
+  uid !== "STBX100FOUNDER" &&
+  !/^STBX\d{12}$/.test(uid)
+) {
+  showPopup(
+    "Login",
+    "Invalid STBX UID",
+    "STBX UID must contain STBX followed by exactly 12 digits."
+  );
+  return;
+}
 
-      alert(
-        "Google authentication failed."
-      );
+   if (!response?.credential) {
+  console.error(
+    "Google credential missing"
+  );
 
-      return;
-    }
+  showPopup(
+    "Google Login",
+    "Authentication Failed",
+    "Google authentication failed."
+  );
 
+  return;
+}
     try {
       setLoading(true);
 
@@ -194,12 +265,14 @@ export default function LoginPage() {
 
       if (apiResponse.ok) {
         if (!data?.token) {
-          alert(
-            "Login successful response did not contain a token."
-          );
+  showPopup(
+    "Google Login",
+    "Login Error",
+    "Login successful response did not contain a token."
+  );
 
-          return;
-        }
+  return;
+}
 
         localStorage.setItem(
           "jwt_token",
@@ -225,16 +298,18 @@ export default function LoginPage() {
       }
 
       if (apiResponse.status === 404) {
-        alert(
-          "Google Account Not Registered\n\n" +
-          "This Google account is not linked to a StabiX account.\n\n" +
-          "Please create a new account to continue."
-        );
+  showPopup(
+    "Google Login",
+    "Google Account Not Registered",
+    "This Google account is not linked to a StabiX account.\n\nPlease create a new account to continue."
+  );
 
-        return;
-      }
+  return;
+}
 
-      alert(
+      showPopup(
+        "Google Login",
+        "Login Failed",
         data?.message ||
         "Google login failed. Please try again."
       );
@@ -244,10 +319,11 @@ export default function LoginPage() {
         error
       );
 
-      alert(
-        "Unable to connect to StabiX.\n\n" +
-        "Please try again."
-      );
+      showPopup(
+  "Google Login",
+  "Connection Error",
+  "Unable to connect to StabiX.\n\nPlease try again."
+);
     } finally {
       setLoading(false);
     }
@@ -283,9 +359,11 @@ export default function LoginPage() {
         <div className="relative w-full">
           <input
             type="text"
+            inputMode={stbxUid.length >= 4 ? "numeric" : "text"}
             placeholder="STBX UID"
             value={stbxUid}
-            onChange={(e) => setStbxUid(e.target.value)}
+            onChange={handleStbxUidChange}
+            maxLength={16}
             className="h-[76px] w-full rounded-[28px] bg-input px-9 text-[22px] text-foreground outline-none ring-1 ring-border shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition-all duration-300 placeholder:text-muted focus:bg-surface focus:ring-[8px] focus:ring-blue-600/10 focus:translate-y-[-1px]"
           />
         </div>
@@ -393,6 +471,47 @@ export default function LoginPage() {
 
     </div>
   </div>
+
+  {popup.open && (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-5 backdrop-blur-sm">
+
+    <div className="w-full max-w-sm rounded-[28px] border border-slate-200 bg-white p-6 text-slate-900 shadow-2xl dark:border-white/10 dark:bg-[#101326] dark:text-white">
+
+      <div className="mb-5">
+
+        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+          {popup.label}
+        </p>
+
+        <h2 className="mt-1 text-2xl font-bold">
+          {popup.title}
+        </h2>
+
+        <p className="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
+          {popup.message}
+        </p>
+
+      </div>
+
+      <button
+        type="button"
+        onClick={() =>
+          setPopup({
+            open: false,
+            label: "",
+            title: "",
+            message: "",
+          })
+        }
+        className="w-full rounded-2xl bg-blue-600 py-3.5 font-semibold text-white shadow-lg shadow-blue-950/40 transition active:scale-[0.98]"
+      >
+        OK
+      </button>
+
+    </div>
+
+  </div>
+)}
 </main>
   );
 }
