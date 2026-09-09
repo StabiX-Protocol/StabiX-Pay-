@@ -44,7 +44,8 @@ const handleStbxUidChange = (
 ) => {
   const raw = e.target.value;
   const value = raw.toUpperCase();
-  const legacyUid = "STBX100FOUNDER";
+  const legacyUid = "STBX-FOUNDER";
+
   if (legacyUid.startsWith(value)) {
     setStbxUid(value);
     return;
@@ -205,7 +206,7 @@ const handleStbxUidChange = (
     const uid = stbxUid.trim();
 
 if (
-  uid !== "STBX100FOUNDER" &&
+  uid !== "STBX-FOUNDER" &&
   !/^STBX\d{12}$/.test(uid)
 ) {
   showPopup(
