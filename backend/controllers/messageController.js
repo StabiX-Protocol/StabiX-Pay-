@@ -1,4 +1,19 @@
 const pool = require("../config/db");
+const emitNewMessage = (req, message) => {
+  const io = req.app.get("io");
+
+  if (!io) return;
+
+  io.to(`user:${message.receiver_id}`).emit(
+    "message:new",
+    message
+  );
+
+  io.to(`user:${message.sender_id}`).emit(
+    "message:new",
+    message
+  );
+};
 
 const sendMessage = async (req, res) => {
   try {
@@ -95,6 +110,8 @@ const sendMessage = async (req, res) => {
       success: true,
       message: result.rows[0]
     });
+
+    emitNewMessage(req, result.rows[0]);
 
   } catch (err) {
     console.error("SEND MESSAGE ERROR:", err);

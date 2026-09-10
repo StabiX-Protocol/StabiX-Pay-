@@ -7,6 +7,7 @@ import {
   useSearchParams,
 } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { io } from "socket.io-client";
 
 type User = {
   id?: number;
@@ -69,6 +70,49 @@ const [sendingMessage, setSendingMessage] =
 
 const messagesEndRef =
   useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+  const token = localStorage.getItem("jwt_token");
+
+  if (!token) return;
+
+  const socket = io(
+    process.env.NEXT_PUBLIC_API_URL || "",
+    {
+      auth: {
+        token,
+      },
+      transports: ["websocket"],
+    }
+  );
+
+  socket.on("connect", () => {
+    console.log("🟢 Socket connected");
+  });
+
+  socket.on("message:new", (message: Message) => {
+    setMessages((prev) => {
+      const exists = prev.some(
+        (item) => item.id === message.id
+      );
+
+      if (exists) return prev;
+
+      return [...prev, message];
+    });
+  });
+
+  socket.on("connect_error", (error:Error) => {
+    console.error(
+      "Socket connection error:",
+      error.message
+    );
+  });
+
+  return () => {
+    socket.disconnect();
+  };
+}, []);
 
   const handleSendMessage = async () => {
   const text = messageText.trim();
