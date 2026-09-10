@@ -223,13 +223,13 @@ useEffect(() => {
 
                 </div>
 
-               <span>
+               <span
   className={`flex h-5 w-5 items-center justify-center rounded-full border transition-all ${
     selectedTheme === theme.mode
       ? "border-blue-600 dark:border-blue-400"
       : "border-slate-300 dark:border-white/20"
   }`}
-
+>
   {selectedTheme === theme.mode && (
     <span className="h-2.5 w-2.5 rounded-full bg-blue-600 dark:bg-blue-400" />
   )}

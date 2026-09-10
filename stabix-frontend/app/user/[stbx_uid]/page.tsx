@@ -291,8 +291,7 @@ export default function UserPage() {
               No transactions with this user
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
-
+            <div className="flex min-h-full flex-col justify-end space-y-4">
               {transactions.map(
                 (transaction, index) => {
 

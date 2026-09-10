@@ -17,6 +17,7 @@ export default function LoginPage() {
   const [stbxUid, setStbxUid] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoginActive, setGoogleLoginActive] = useState(false);
   const [googleReady, setGoogleReady] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [popup, setPopup] = useState({
@@ -197,6 +198,7 @@ const handleStbxUidChange = (
 );
     } finally {
       setLoading(false);
+      setGoogleLoginActive
     }
   }
 
@@ -416,7 +418,7 @@ const handleStbxUidChange = (
           className="relative mt-3 h-[82px] w-full overflow-hidden rounded-[30px] bg-gradient-to-b from-[#3b82f6] to-[#1d4ed8] text-[24px] font-bold text-white shadow-[0_12px_24px_-8px_rgba(37,99,235,0.5)] transition-all duration-300 hover:translate-y-[-1px] active:translate-y-0 active:scale-[0.99] disabled:opacity-50"
         >
           <span className="relative z-10">
-            {loading ? "Please wait..." : "Log In"}
+           {loading && !googleLoginActive ? "Please wait..." : "Log In"}
           </span>
 
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/20 to-transparent" />
@@ -444,7 +446,7 @@ const handleStbxUidChange = (
     className="
       absolute inset-0 z-20
       overflow-hidden rounded-2xl
-      opacity-[0.01]
+      opacity-[0.0001]
       [&>div]:!h-full
       [&>div]:!w-full
       [&>div]:!flex

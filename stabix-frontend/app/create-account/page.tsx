@@ -507,7 +507,7 @@ export default function CreateAccountPage() {
     className="
       absolute inset-0 z-20
       overflow-hidden rounded-2xl
-      opacity-[0.01]
+      opacity-[0.0001]
       [&>div]:!h-full
       [&>div]:!w-full
       [&>div]:!flex
