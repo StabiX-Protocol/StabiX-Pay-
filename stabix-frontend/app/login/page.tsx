@@ -112,6 +112,7 @@ const handleStbxUidChange = (
         size: "large",
         width: 360,
         text: "continue_with",
+        shape:"pill",
       }
     );
   }, [googleReady]);
@@ -434,11 +435,79 @@ const handleStbxUidChange = (
         <div className="h-px flex-1 bg-border" />
       </div>
 
-      {/* GOOGLE */}
-      <div
-        ref={googleRef}
-        className="relative flex w-full justify-center overflow-hidden rounded-[20px] bg-surface p-[6px] shadow-sm ring-1 ring-border"
-      />
+
+   {/* GOOGLE */}
+<div className="group relative w-full">
+
+  <div
+    ref={googleRef}
+    className="
+      absolute inset-0 z-20
+      overflow-hidden rounded-2xl
+      opacity-[0.01]
+      [&>div]:!h-full
+      [&>div]:!w-full
+      [&>div]:!flex
+      [&>div]:!items-center
+      [&>div]:!justify-center
+      [&>iframe]:!h-full
+      [&>iframe]:!w-full
+    "
+  />
+
+  <div
+    className="
+      relative z-10
+      flex h-[68px] w-full items-center justify-center gap-3
+      overflow-hidden rounded-2xl
+      border border-black/5
+      bg-white
+      shadow-[0_8px_24px_-12px_rgba(0,0,0,0.25)]
+      transition-all duration-300
+      group-hover:scale-[1.01]
+      group-hover:shadow-[0_12px_30px_-12px_rgba(0,0,0,0.35)]
+      dark:border-white/10
+      dark:bg-[#1A1A1A]
+      dark:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.8)]
+      dark:group-hover:shadow-[0_12px_30px_-12px_rgba(0,0,0,0.95)]
+    "
+  >
+    <div
+      className="
+        pointer-events-none absolute inset-0
+        -translate-x-full
+        skew-x-[-20deg]
+        bg-gradient-to-r
+        from-transparent
+        via-white/20
+        to-transparent
+        transition-transform duration-1000
+        group-hover:translate-x-full
+      "
+    />
+
+    <img
+      src="https://www.svgrepo.com/show/475656/google-color.svg"
+      alt="Google"
+      className="relative z-10 h-5 w-5"
+    />
+    <span
+      className="
+        relative z-10
+        text-[17px]
+        font-semibold
+        tracking-tight
+        text-slate-800
+        dark:text-white
+      "
+    >
+      Continue with Google
+    </span>
+
+  </div>
+</div>
+
+
 
       {/* LINKS */}
       <div className="relative mt-10 flex justify-between px-2 text-[19px] font-semibold">
