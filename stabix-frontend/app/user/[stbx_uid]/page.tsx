@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect,useRef, useState } from "react";
 import {
   useParams,
   useRouter,
@@ -9,6 +9,7 @@ import {
 import { apiFetch } from "@/lib/api";
 
 type User = {
+  id?: number;
   stbx_uid?: string;
   username?: string;
   profile_image?: string | null;
@@ -31,6 +32,16 @@ type Transaction = {
   eoa_address?: string | null;
 };
 
+type Message = {
+  id: number;
+  sender_id: number;
+  receiver_id: number;
+  message: string;
+  created_at: string;
+  seen_at?: string | null;
+  deleted_at?: string | null;
+};
+
 export default function UserPage() {
   const router = useRouter();
   const params = useParams();
@@ -46,6 +57,50 @@ export default function UserPage() {
 
   const [loading, setLoading] =
     useState(true);
+
+    const [messages, setMessages] =
+  useState<Message[]>([]);
+
+const [messageText, setMessageText] =
+  useState("");
+
+const [sendingMessage, setSendingMessage] =
+  useState(false);
+
+const messagesEndRef =
+  useRef<HTMLDivElement | null>(null);
+
+  const handleSendMessage = async () => {
+  const text = messageText.trim();
+  if (!text || sendingMessage) return;
+  setSendingMessage(true);
+
+  try {
+    const data = await apiFetch("/api/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        receiver_stbx_uid: stbx_uid,
+        message: text,
+      }),
+    });
+
+    if (data?.success && data?.message) {
+      setMessages((prev) => [
+        ...prev,
+        data.message,
+      ]);
+
+      setMessageText("");
+    }
+  } catch (error) {
+    console.error(
+      "Send message error:",
+      error
+    );
+  } finally {
+    setSendingMessage(false);
+  }
+};
 
   /*
    * LOAD USER + TRANSACTIONS
@@ -95,6 +150,22 @@ export default function UserPage() {
           );
 
         setTransactions(filtered);
+        const messageData = await apiFetch(
+  `/api/messages/${encodeURIComponent(stbx_uid)}`
+);
+            if (
+  messageData?.success &&
+  Array.isArray(messageData.messages)
+) {
+  setMessages(
+    [...messageData.messages].sort(
+      (a, b) =>
+        new Date(a.created_at).getTime() -
+        new Date(b.created_at).getTime()
+    )
+  );
+}                  
+           
       } catch (error) {
         console.error(
           "User/transaction load error:",
@@ -112,6 +183,14 @@ export default function UserPage() {
       loadUserAndTransactions();
     }
   }, [stbx_uid]);
+
+useEffect(() => {
+  messagesEndRef.current?.scrollIntoView({
+    behavior: "smooth",
+  });
+}, [messages]);
+
+
 
   /*
    * PROFILE IMAGE
@@ -190,6 +269,30 @@ export default function UserPage() {
       minute: "2-digit",
     });
   };
+
+  const conversationItems = [
+  ...transactions
+    .filter(
+      (transaction) =>
+        transaction.type === "sent" ||
+        transaction.type === "received"
+    )
+    .map((transaction) => ({
+      kind: "transaction" as const,
+      data: transaction,
+      time: new Date(
+        transaction.created_at
+      ).getTime(),
+    })),
+
+  ...messages.map((message) => ({
+    kind: "message" as const,
+    data: message,
+    time: new Date(
+      message.created_at
+    ).getTime(),
+  })),
+].sort((a, b) => a.time - b.time);
 
   /*
    * LOADING
@@ -279,293 +382,402 @@ export default function UserPage() {
 
         </header>
 
-        {/* =========================
-            TRANSACTION CONVERSATION
-            ONLY THIS AREA SCROLLS
-        ========================= */}
+       {/* =========================
+    TRANSACTION CONVERSATION
+    ONLY THIS AREA SCROLLS
+========================= */}
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-5 pt-5">
+<div className="min-h-0 flex-1 overflow-y-auto px-4 pb-5 pt-5">
 
-          {transactions.length === 0 ? (
-            <div className="flex h-full items-center justify-center text-center text-sm text-muted">
-              No transactions with this user
-            </div>
-          ) : (
-            <div className="flex min-h-full flex-col justify-end space-y-4">
-              {transactions.map(
-                (transaction, index) => {
+  {conversationItems.length === 0 ? (
+    <div className="flex h-full items-center justify-center text-center text-sm text-muted">
+      No transactions with this user
+    </div>
+  ) : (
+    <div className="flex min-h-full flex-col justify-end space-y-4">
 
-                  const isReceived =
-                    transaction.type ===
-                    "received";
+      {conversationItems.map((item, index) => {
 
-                  const isSent =
-                    transaction.type ===
-                    "sent";
+        /* =====================
+           MESSAGE
+        ===================== */
 
-                  /*
-                   * Ignore anything that isn't
-                   * a person-to-person payment.
-                   */
+        if (item.kind === "message") {
+          const message = item.data;
 
-                  if (
-                    !isReceived &&
-                    !isSent
-                  ) {
-                    return null;
-                  }
+          const previousItem =
+            conversationItems[index - 1];
 
-                  const asset =
-                    transaction.asset.toUpperCase();
+          const currentDate =
+            new Date(
+              message.created_at
+            ).toDateString();
 
-                  /*
-                   * IMPORTANT:
-                   * Do NOT use Number() or toFixed().
-                   * Show amount exactly as received.
-                   */
+          const previousDate =
+            previousItem
+              ? new Date(
+                  previousItem.data.created_at
+                ).toDateString()
+              : null;
 
-                  const amount =
-                    String(transaction.amount);
+          const showDate =
+            index === 0 ||
+            currentDate !== previousDate;
 
-                  /*
-                   * Show date separator only when
-                   * this transaction is the first
-                   * transaction of a new date.
-                   */
+          const isMine =
+            message.sender_id !== user.id;
 
-                  const currentDate =
-                    new Date(
-                      transaction.created_at
-                    ).toDateString();
+          return (
+            <div
+              key={`message-${message.id}`}
+              className="w-full"
+            >
 
-                  const previousTransaction =
-                    transactions[index - 1];
+              {/* DATE SEPARATOR */}
 
-                  const previousDate =
-                    previousTransaction
-                      ? new Date(
-                          previousTransaction.created_at
-                        ).toDateString()
-                      : null;
+              {showDate && (
+                <div className="mb-3 mt-2 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-slate-300 dark:bg-white/10" />
 
-                  const showDate =
-                    index === 0 ||
-                    currentDate !== previousDate;
+                  <span className="shrink-0 text-sm font-medium text-slate-500 dark:text-slate-400">
+                    {formatDateLabel(
+                      message.created_at
+                    )}
+                  </span>
 
-                  /*
-                   * GPay style title
-                   */
-
-                  const title = isReceived
-                    ? "Payment to you"
-                    : `Payment to ${
-                        user.username ||
-                        "User"
-                      }`;
-
-                  return (
-                    <div
-                      key={transaction.STRId}
-                      className="w-full"
-                    >
-
-                      {/* =====================
-                          DATE SEPARATOR
-                      ===================== */}
-
-                      {showDate && (
-                        <div className="mb-3 mt-2 flex items-center gap-3">
-                          <div className="h-px flex-1 bg-slate-300 dark:bg-white/10" />
-
-                          <span className="shrink-0 text-sm font-medium text-slate-500 dark:text-slate-400">
-                            {formatDateLabel(
-                              transaction.created_at
-                            )}
-                          </span>
-
-                          <div className="h-px flex-1 bg-slate-300 dark:bg-white/10" />
-                        </div>
-                      )}
-
-                      {/* =====================
-                          PAYMENT CARD
-                      ===================== */}
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          router.push(
-                            `/history/${encodeURIComponent(
-                              transaction.STRId
-                            )}?from=user&user=${encodeURIComponent(
-                              stbx_uid
-                            )}`
-                          )
-                        }
-                        className={`flex w-full ${
-                          isReceived
-                            ? "justify-start"
-                            : "justify-end"
-                        }`}
-                      >
-
-                        <div
-                          className={`w-[78%] rounded-[28px] px-5 py-4 text-left shadow-sm ${
-                            isReceived
-                              ? "bg-white dark:bg-[#303030]"
-                              : "bg-blue-50 dark:bg-[#1d2942]"
-                          }`}
-                        >
-
-                          {/* TITLE */}
-
-                          <div className="text-[18px] font-semibold">
-                            {title}
-                          </div>
-
-                          {/* EXACT AMOUNT */}
-
-                         <div className="mt-3 flex items-center gap-2 text-[34px] font-medium tracking-tight">
-  <span>{amount}</span>
-
-  <span className="text-[22px] font-semibold">
-    {asset}
-  </span>
-
-  <img
-    src={getAssetLogo(asset)}
-    alt={asset}
-    className="h-6 w-6 rounded-full object-contain"
-  />
-</div>
-
-                          {/* =================
-                              PAID + ASSET + TIME
-                          ================= */}
-
-                          <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-300">
-
-                            {/* PAID CHECK */}
-
-                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-400 text-[14px] font-bold text-slate-900">
-                              ✓
-                            </span>
-
-                            <span>
-                              Paid
-                            </span>
-
-                            {/* ASSET LOGO */}
-
-                            <img
-                              src={getAssetLogo(
-                                asset
-                              )}
-                              alt={asset}
-                              className="h-[18px] w-[18px] shrink-0 rounded-full object-contain"
-                            />
-
-                            {/* ASSET */}
-
-                            <span>
-                              {asset}
-                            </span>
-
-                            {/* DOT */}
-
-                            <span>
-                              •
-                            </span>
-
-                            {/* TIME ONLY */}
-
-                            <span>
-                              {formatTime(
-                                transaction.created_at
-                              )}
-                            </span>
-
-                            {/* ARROW */}
-
-                            <span className="ml-auto text-xl leading-none">
-                              ›
-                            </span>
-
-                          </div>
-
-                        </div>
-
-                      </button>
-
-                    </div>
-                  );
-                }
+                  <div className="h-px flex-1 bg-slate-300 dark:bg-white/10" />
+                </div>
               )}
 
+              {/* MESSAGE BUBBLE */}
+
+              <div
+                className={`flex w-full ${
+                  isMine
+                    ? "justify-end"
+                    : "justify-start"
+                }`}
+              >
+                <div
+                  className={`max-w-[78%] rounded-[24px] px-4 py-3 shadow-sm ${
+                    isMine
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-slate-900 dark:bg-[#303030] dark:text-white"
+                  }`}
+                >
+
+                  <p className="whitespace-pre-wrap break-words text-[16px] leading-6">
+                    {message.deleted_at
+                      ? "Message deleted"
+                      : message.message}
+                  </p>
+
+                  <div
+                    className={`mt-1 text-right text-[11px] ${
+                      isMine
+                        ? "text-blue-100"
+                        : "text-slate-400"
+                    }`}
+                  >
+                    {formatTime(
+                      message.created_at
+                    )}
+                  </div>
+
+                </div>
+              </div>
+
             </div>
-          )}
+          );
+        }
 
-        </div>
+        /* =====================
+           TRANSACTION
+        ===================== */
 
-        {/* =========================
-            FIXED BOTTOM PAYMENT BAR
-        ========================= */}
+        const transaction = item.data;
 
-        <div className="z-50 flex shrink-0 items-center gap-2 border-t border-slate-200 bg-[#f6f7f9] px-4 py-3 dark:border-white/10 dark:bg-[#0b0b0d]">
+        const isReceived =
+          transaction.type ===
+          "received";
 
-          {/* PAY */}
+        const isSent =
+          transaction.type ===
+          "sent";
 
-          <button
-            type="button"
-            onClick={() =>
-              router.push(
-                `/send/amount?asset=USDC&recipient=${encodeURIComponent(
-                  stbx_uid
-                )}`
-              )
-            }
-            className="h-12 shrink-0 rounded-full bg-blue-600 px-7 text-[16px] font-bold text-white transition active:scale-95"
+        /*
+         * Ignore anything that isn't
+         * a person-to-person payment.
+         */
+
+        if (
+          !isReceived &&
+          !isSent
+        ) {
+          return null;
+        }
+
+        const asset =
+          transaction.asset.toUpperCase();
+
+        /*
+         * IMPORTANT:
+         * Do NOT use Number() or toFixed().
+         * Show amount exactly as received.
+         */
+
+        const amount =
+          String(transaction.amount);
+
+        /*
+         * Show date separator only when
+         * this conversation item is the
+         * first item of a new date.
+         */
+
+        const currentDate =
+          new Date(
+            transaction.created_at
+          ).toDateString();
+
+        const previousItem =
+          conversationItems[index - 1];
+
+        const previousDate =
+          previousItem
+            ? new Date(
+                previousItem.data.created_at
+              ).toDateString()
+            : null;
+
+        const showDate =
+          index === 0 ||
+          currentDate !== previousDate;
+
+        /*
+         * GPay style title
+         */
+
+        const title = isReceived
+          ? "Payment to you"
+          : `Payment to ${
+              user.username ||
+              "User"
+            }`;
+
+        return (
+          <div
+            key={transaction.STRId}
+            className="w-full"
           >
-            Pay
-          </button>
 
-          {/* MESSAGE */}
+            {/* =====================
+                DATE SEPARATOR
+            ===================== */}
 
-          <div className="flex h-12 min-w-0 flex-1 items-center rounded-full bg-slate-200 px-4 dark:bg-[#202124]">
+            {showDate && (
+              <div className="mb-3 mt-2 flex items-center gap-3">
+                <div className="h-px flex-1 bg-slate-300 dark:bg-white/10" />
 
-            <input
-              type="text"
-              placeholder="Message..."
-              className="min-w-0 flex-1 bg-transparent text-[16px] text-slate-900 outline-none placeholder:text-slate-500 dark:text-white dark:placeholder:text-slate-400"
-            />
+                <span className="shrink-0 text-sm font-medium text-slate-500 dark:text-slate-400">
+                  {formatDateLabel(
+                    transaction.created_at
+                  )}
+                </span>
 
-            {/* SEND */}
+                <div className="h-px flex-1 bg-slate-300 dark:bg-white/10" />
+              </div>
+            )}
+
+            {/* =====================
+                PAYMENT CARD
+            ===================== */}
 
             <button
               type="button"
-              aria-label="Send message"
-              className="ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-700 dark:text-white"
+              onClick={() =>
+                router.push(
+                  `/history/${encodeURIComponent(
+                    transaction.STRId
+                  )}?from=user&user=${encodeURIComponent(
+                    stbx_uid
+                  )}`
+                )
+              }
+              className={`flex w-full ${
+                isReceived
+                  ? "justify-start"
+                  : "justify-end"
+              }`}
             >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+
+              <div
+                className={`w-[78%] rounded-[28px] px-5 py-4 text-left shadow-sm ${
+                  isReceived
+                    ? "bg-white dark:bg-[#303030]"
+                    : "bg-blue-50 dark:bg-[#1d2942]"
+                }`}
               >
-                <path d="m22 2-7 20-4-9-9-4Z" />
-                <path d="M22 2 11 13" />
-              </svg>
+
+                {/* TITLE */}
+
+                <div className="text-[18px] font-semibold">
+                  {title}
+                </div>
+
+                {/* EXACT AMOUNT */}
+
+                <div className="mt-3 flex items-center gap-2 text-[34px] font-medium tracking-tight">
+
+                  <span>
+                    {amount}
+                  </span>
+
+                  <span className="text-[22px] font-semibold">
+                    {asset}
+                  </span>
+
+                  <img
+                    src={getAssetLogo(asset)}
+                    alt={asset}
+                    className="h-6 w-6 rounded-full object-contain"
+                  />
+
+                </div>
+
+                {/* =================
+                    PAID + ASSET + TIME
+                ================= */}
+
+                <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-300">
+
+                  {/* PAID CHECK */}
+
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-400 text-[14px] font-bold text-slate-900">
+                    ✓
+                  </span>
+
+                  <span>
+                    Paid
+                  </span>
+
+                  {/* ASSET */}
+
+                  <span>
+                    {asset}
+                  </span>
+
+                  {/* DOT */}
+
+                  <span>
+                    •
+                  </span>
+
+                  {/* TIME ONLY */}
+
+                  <span>
+                    {formatTime(
+                      transaction.created_at
+                    )}
+                  </span>
+
+                  {/* ARROW */}
+
+                  <span className="ml-auto text-xl leading-none">
+                    ›
+                  </span>
+
+                </div>
+
+              </div>
+
             </button>
 
           </div>
+        );
+      })}
 
-        </div>
+      <div ref={messagesEndRef} />
 
-      </div>
+    </div>
+  )}
+
+</div>
+
+
+{/* =========================
+    FIXED BOTTOM PAYMENT BAR
+========================= */}
+
+<div className="z-50 flex shrink-0 items-center gap-2 border-t border-slate-200 bg-[#f6f7f9] px-4 py-3 dark:border-white/10 dark:bg-[#0b0b0d]">
+
+  {/* PAY */}
+
+  <button
+    type="button"
+    onClick={() =>
+      router.push(
+        `/send/amount?asset=USDC&recipient=${encodeURIComponent(
+          stbx_uid
+        )}`
+      )
+    }
+    className="h-12 shrink-0 rounded-full bg-blue-600 px-7 text-[16px] font-bold text-white transition active:scale-95"
+  >
+    Pay
+  </button>
+
+  {/* MESSAGE */}
+
+  <div className="flex h-12 min-w-0 flex-1 items-center rounded-full bg-slate-200 px-4 dark:bg-[#202124]">
+
+    <input
+      type="text"
+      value={messageText}
+      onChange={(e) =>
+        setMessageText(e.target.value)
+      }
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleSendMessage();
+        }
+      }}
+      placeholder="Message..."
+      className="min-w-0 flex-1 bg-transparent text-[16px] text-slate-900 outline-none placeholder:text-slate-500 dark:text-white dark:placeholder:text-slate-400"
+    />
+
+    {/* SEND */}
+
+    <button
+      type="button"
+      onClick={handleSendMessage}
+      disabled={
+        sendingMessage ||
+        !messageText.trim()
+      }
+      aria-label="Send message"
+      className="ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-700 dark:text-white"
+    >
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="m22 2-7 20-4-9-9-4Z" />
+        <path d="M22 2 11 13" />
+      </svg>
+    </button>
+
+  </div>
+
+</div>
+</div>
 
     </main>
   );

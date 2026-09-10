@@ -18,11 +18,13 @@ const balanceRoutes = require("./routes/balanceRoutes");
 const depositRoutes = require("./routes/depostRoutes");
 const withdrawRoutes = require("./routes/withdrawRoutes");
 const validatorRoutes = require("./routes/validatorRoutes");
+const messageRoutes = require("./routes/messageRoutes");
 
 app.use("/api", healthRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/deposits", depositRoutes);
+app.use("/api/messages", messageRoutes);
 app.use("/api/withdraws", withdrawRoutes);
 app.use("/api/balance", balanceRoutes);
 app.use("/api/validator", validatorRoutes);
