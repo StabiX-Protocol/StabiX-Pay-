@@ -72,7 +72,7 @@ app.use("/api/withdraws", withdrawRoutes);
 app.use("/api/balance", balanceRoutes);
 app.use("/api/validator", validatorRoutes);
 app.use("/api/blocks", blockRoutes);
-app.use("/api/chat", chatRoutes);
+app.use("/api/chat-settings", chatRoutes);
 
 
 io.on("connection", (socket) => {

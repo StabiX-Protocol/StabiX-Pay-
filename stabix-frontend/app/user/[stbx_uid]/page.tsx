@@ -101,6 +101,24 @@ const messagesEndRef =
   });
 
   socket.on("message:new", (message: Message) => {
+    socket.on(
+  "chat:status",
+  ({
+    chat_enabled,
+    disabled_by,
+    disabled_by_username,
+  }: {
+    chat_enabled: boolean;
+    disabled_by: "you" | "other" | null;
+    disabled_by_username?: string | null;
+  }) => {
+    setChatEnabled(chat_enabled);
+    setChatDisabledBy(disabled_by);
+    setChatDisabledByUsername(
+      disabled_by_username || ""
+    );
+  }
+);
     setMessages((prev) => {
       const exists = prev.some(
         (item) => item.id === message.id

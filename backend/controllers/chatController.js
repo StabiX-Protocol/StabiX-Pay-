@@ -165,6 +165,30 @@ const setChatStatus = async (req, res) => {
       ]
     );
 
+    const io = req.app.get("io");
+
+if (io) {
+  io.to(`user:${currentUser.id}`).emit(
+    "chat:status",
+    {
+      chat_enabled: enabled,
+      disabled_by: enabled ? null : "you",
+      disabled_by_username: null,
+    }
+  );
+
+  io.to(`user:${otherUser.id}`).emit(
+    "chat:status",
+    {
+      chat_enabled: enabled,
+      disabled_by: enabled ? null : "other",
+      disabled_by_username: enabled
+        ? null
+        : currentUser.username,
+    }
+  );
+}
+
     return res.status(200).json({
       success: true,
       enabled,
