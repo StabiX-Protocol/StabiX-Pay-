@@ -226,15 +226,28 @@ const markMessagesSeen = async (req, res) => {
     const currentUserId = currentUserResult.rows[0].id;
     const otherUserId = otherUserResult.rows[0].id;
 
-    await pool.query(
-      `UPDATE messages
-       SET seen_at = CURRENT_TIMESTAMP
-       WHERE sender_id = $1
-       AND receiver_id = $2
-       AND seen_at IS NULL
-       AND deleted_at IS NULL`,
-      [otherUserId, currentUserId]
-    );
+    const seenResult = await pool.query(
+  `UPDATE messages
+   SET seen_at = CURRENT_TIMESTAMP
+   WHERE sender_id = $1
+   AND receiver_id = $2
+   AND seen_at IS NULL
+   AND deleted_at IS NULL
+   RETURNING id, seen_at`,
+  [otherUserId, currentUserId]
+);
+const io = req.app.get("io");
+if (io && seenResult.rows.length > 0) {
+io.to(`user:${otherUserId}`).emit(
+"messages:seen",
+{
+message_ids: seenResult.rows.map(
+        (row) => row.id
+      ),
+      seen_at: seenResult.rows[0].seen_at,
+    }
+  );
+}
 
     return res.status(200).json({
       success: true,

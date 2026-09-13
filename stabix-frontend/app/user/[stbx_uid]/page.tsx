@@ -102,6 +102,28 @@ const messagesEndRef =
     });
   });
 
+  socket.on(
+  "messages:seen",
+  ({
+    message_ids,
+    seen_at,
+  }: {
+    message_ids: number[];
+    seen_at: string;
+  }) => {
+    setMessages((prev) =>
+      prev.map((message) =>
+        message_ids.includes(message.id)
+          ? {
+              ...message,
+              seen_at,
+            }
+          : message
+      )
+    );
+  }
+);
+
   socket.on("connect_error", (error:Error) => {
     console.error(
       "Socket connection error:",
@@ -143,6 +165,29 @@ const messagesEndRef =
     );
   } finally {
     setSendingMessage(false);
+  }
+};
+
+const handleDeleteMessage = async (messageId: number) => {
+  try {
+    const data = await apiFetch(`/api/messages/${messageId}`, {
+      method: "DELETE",
+    });
+
+    if (data?.success && data?.deleted_message) {
+      setMessages((prev) =>
+        prev.map((message) =>
+          message.id === messageId
+            ? {
+                ...message,
+                deleted_at: data.deleted_message.deleted_at,
+              }
+            : message
+        )
+      );
+    }
+  } catch (error) {
+    console.error("Delete message error:", error);
   }
 };
 
@@ -208,7 +253,13 @@ const messagesEndRef =
         new Date(b.created_at).getTime()
     )
   );
-}                  
+} 
+await apiFetch(
+  `/api/messages/${encodeURIComponent(stbx_uid)}/seen`,
+  {
+    method: "PATCH",
+  }
+);                 
            
       } catch (error) {
         console.error(
@@ -515,18 +566,39 @@ useEffect(() => {
                       ? "Message deleted"
                       : message.message}
                   </p>
+    {isMine && !message.deleted_at && (
+  <button
+    type="button"
+    onClick={() => handleDeleteMessage(message.id)}
+    className="mt-1 text-[11px] text-blue-100/80"
+  >
+    Delete
+  </button>
+)}
 
                   <div
-                    className={`mt-1 text-right text-[11px] ${
-                      isMine
-                        ? "text-blue-100"
-                        : "text-slate-400"
-                    }`}
-                  >
-                    {formatTime(
-                      message.created_at
-                    )}
-                  </div>
+  className={`mt-1 flex items-center justify-end gap-1 text-[11px] ${
+    isMine
+      ? "text-blue-100"
+      : "text-slate-400"
+  }`}
+>
+  <span>
+    {formatTime(message.created_at)}
+  </span>
+
+  {isMine && (
+    <span
+      className={
+        message.seen_at
+          ? "font-semibold text-blue-200"
+          : "text-blue-100"
+      }
+    >
+      {message.seen_at ? "Seen" : "Sent"}
+    </span>
+  )}
+</div>
 
                 </div>
               </div>
