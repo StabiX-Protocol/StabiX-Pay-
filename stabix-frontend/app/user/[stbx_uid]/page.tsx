@@ -71,7 +71,12 @@ const [sendingMessage, setSendingMessage] =
   const [deleteMessageId, setDeleteMessageId] =
   useState<number | null>(null);
 
-  const [chatEnabled, setChatEnabled] = useState(true);
+ const [chatEnabled, setChatEnabled] = useState(true);
+const [chatDisabledBy, setChatDisabledBy] = useState<
+"you" | "other" | null
+>(null);
+const [chatDisabledByUsername, setChatDisabledByUsername] =
+  useState("");
 
   const deletePressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -80,9 +85,7 @@ const messagesEndRef =
 
   useEffect(() => {
   const token = localStorage.getItem("jwt_token");
-
   if (!token) return;
-
   const socket = io(
     process.env.NEXT_PUBLIC_API_URL || "",
     {
@@ -288,13 +291,28 @@ useEffect(() => {
 }, [messages]);
 
 useEffect(() => {
-  const saved = localStorage.getItem(
-    `chat-enabled-${stbx_uid}`
-  );
+  const loadChatStatus = async () => {
+    try {
+      const data = await apiFetch(
+        `/api/chat-settings/${encodeURIComponent(stbx_uid)}`
+      );
 
-  if (saved !== null) {
-    setChatEnabled(saved === "true");
-  }
+      if (data?.success) {
+        setChatEnabled(data.chat_enabled);
+        setChatDisabledBy(data.disabled_by);
+        setChatDisabledByUsername(
+          data.disabled_by_username || ""
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Load chat status error:",
+        error
+      );
+    }
+  };
+
+  loadChatStatus();
 }, [stbx_uid]);
 
 
@@ -903,7 +921,14 @@ onPointerLeave={() => {
           handleSendMessage();
         }
       }}
-     placeholder={chatEnabled? "Message...": "Chat disabled by user"}
+     placeholder={
+  chatEnabled
+    ? "Message..."
+    : chatDisabledBy === "you"
+    ? "Chat disabled by you"
+    : `Chat disabled by ${
+        chatDisabledByUsername || "user"
+      }`}
       className="min-w-0 flex-1 bg-transparent text-[16px] text-slate-900 outline-none placeholder:text-slate-500 dark:text-white dark:placeholder:text-slate-400"
     />
 

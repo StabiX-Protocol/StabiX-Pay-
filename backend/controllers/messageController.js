@@ -91,6 +91,48 @@ const sendMessage = async (req, res) => {
       });
     }
 
+    const chatSettingResult = await pool.query(
+      `SELECT
+         user_id,
+         other_user_id,
+         enabled
+       FROM user_chat_settings
+       WHERE
+         (user_id = $1 AND other_user_id = $2)
+         OR
+         (user_id = $2 AND other_user_id = $1)
+       AND enabled = false
+       LIMIT 1`,
+      [senderId, receiverId]
+    );
+
+    if (chatSettingResult.rows.length > 0) {
+      const disabledByUserId =
+        chatSettingResult.rows[0].user_id;
+
+      if (disabledByUserId === senderId) {
+        return res.status(403).json({
+          success: false,
+          message: "Chat disabled by you"
+        });
+      }
+
+      const disabledByUserResult = await pool.query(
+        `SELECT username
+         FROM users
+         WHERE id = $1`,
+        [disabledByUserId]
+      );
+
+      const disabledByUsername =
+        disabledByUserResult.rows[0]?.username || "user";
+
+      return res.status(403).json({
+        success: false,
+        message: `Chat disabled by ${disabledByUsername}`
+      });
+    }
+
     const result = await pool.query(
       `INSERT INTO messages
        (sender_id, receiver_id, message)
@@ -106,12 +148,12 @@ const sendMessage = async (req, res) => {
       [senderId, receiverId, message.trim()]
     );
 
+    emitNewMessage(req, result.rows[0]);
     return res.status(201).json({
       success: true,
       message: result.rows[0]
     });
 
-    emitNewMessage(req, result.rows[0]);
 
   } catch (err) {
     console.error("SEND MESSAGE ERROR:", err);

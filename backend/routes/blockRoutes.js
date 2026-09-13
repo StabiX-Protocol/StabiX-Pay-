@@ -5,7 +5,8 @@ const {
   blockUser,
   unblockUser,
 getBlockStatus
-} = require("../controllers/blockController");
+} = 
+require("../controllers/blockController");
 
 router.post(
   "/",

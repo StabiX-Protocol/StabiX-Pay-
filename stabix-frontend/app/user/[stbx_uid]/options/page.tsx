@@ -38,25 +38,20 @@ export default function UserOptionsPage() {
         if (blockData?.success) {
           setBlocked(blockData.blocked);
         }
-      } catch (error) {
-        console.error(
-          "Load user options error:",
-          error
-        );
+        const chatData = await apiFetch(
+      `/api/chat-settings/${encodeURIComponent(stbx_uid)}`
+      );
+      if (chatData?.success) {
+      setChatEnabled(!chatData.you_disabled);
       }
-    };
-
-    loadUser();
-  }, [stbx_uid]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(
-      `chat-enabled-${stbx_uid}`
+      } catch (error) {
+    console.error(
+    "Load user options error:",
+    error
     );
-
-    if (saved !== null) {
-      setChatEnabled(saved === "true");
     }
+    };
+    loadUser();
   }, [stbx_uid]);
 
   return (
@@ -112,18 +107,26 @@ export default function UserOptionsPage() {
 
               <button
                 type="button"
-                onClick={() => {
-                  setChatEnabled((value) => {
-                    const next = !value;
+                onClick={async () => {
+        const next = !chatEnabled;
 
-                    localStorage.setItem(
-                      `chat-enabled-${stbx_uid}`,
-                      String(next)
-                    );
+       try {
+          await apiFetch("/api/chat-settings", {
+        method: "PATCH",
+        body: JSON.stringify({
+        other_stbx_uid: stbx_uid,
+        enabled: next,
+        }),
+        });
 
-                    return next;
-                  });
-                }}
+       setChatEnabled(next);
+       } catch (error) {
+       console.error(
+      "Chat toggle error:",
+      error
+    );
+  }
+}}
                 aria-label="Toggle chat"
                 className={`relative h-10 w-20 rounded-full transition ${
                   chatEnabled

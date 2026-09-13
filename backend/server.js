@@ -6,38 +6,35 @@ const http = require("http");
 const { Server } = require("socket.io");
 const app = express();
 const server = http.createServer(app);
+
+
+
 const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST", "PATCH", "DELETE"],
-  },
+cors: {
+origin: "*",
+methods: ["GET", "POST", "PATCH", "DELETE"],
+},
 });
 io.use(async (socket, next) => {
-  try {
-    const token = socket.handshake.auth?.token;
-
-    if (!token) {
-      return next(new Error("Authentication required"));
-    }
-
-    const jwt = require("jsonwebtoken");
-
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
-
-    const result = await pool.query(
-      `SELECT id
-       FROM users
-       WHERE stbx_uid = $1`,
-      [decoded.stbx_uid]
-    );
-
-    if (result.rows.length === 0) {
-      return next(new Error("User not found"));
-    }
-
+try {
+const token = socket.handshake.auth?.token;
+if (!token) {
+return next(new Error("Authentication required"));
+}
+const jwt = require("jsonwebtoken");
+const decoded = jwt.verify(
+token,
+process.env.JWT_SECRET
+);
+const result = await pool.query(
+`SELECT id
+FROM users
+WHERE stbx_uid = $1`,
+[decoded.stbx_uid]
+);
+if (result.rows.length === 0) {
+return next(new Error("User not found"));
+}
 socket.userId = result.rows[0].id;
 next();
 } catch (err) {
@@ -63,6 +60,8 @@ const withdrawRoutes = require("./routes/withdrawRoutes");
 const validatorRoutes = require("./routes/validatorRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const blockRoutes = require("./routes/blockRoutes");
+const chatRoutes = require("./routes/chatRoutes");
+
 
 app.use("/api", healthRoutes);
 app.use("/api/users", userRoutes);
@@ -73,15 +72,17 @@ app.use("/api/withdraws", withdrawRoutes);
 app.use("/api/balance", balanceRoutes);
 app.use("/api/validator", validatorRoutes);
 app.use("/api/blocks", blockRoutes);
-io.on("connection", (socket) => {
-  console.log("🔵 Socket connected:", socket.id);
+app.use("/api/chat", chatRoutes);
 
-  socket.on("disconnect", () => {
-    console.log(
-      "🔴 Socket disconnected:",
-      socket.id
-    );
-  });
+
+io.on("connection", (socket) => {
+console.log(" Socket connected:", socket.id);
+socket.on("disconnect", () => {
+console.log(
+" Socket disconnected:",
+socket.id
+);
+});
 });
 
 pool.connect()
