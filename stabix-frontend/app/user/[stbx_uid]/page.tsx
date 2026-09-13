@@ -71,6 +71,8 @@ const [sendingMessage, setSendingMessage] =
   const [deleteMessageId, setDeleteMessageId] =
   useState<number | null>(null);
 
+  const [chatEnabled, setChatEnabled] = useState(true);
+
   const deletePressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 const messagesEndRef =
@@ -285,6 +287,16 @@ useEffect(() => {
   });
 }, [messages]);
 
+useEffect(() => {
+  const saved = localStorage.getItem(
+    `chat-enabled-${stbx_uid}`
+  );
+
+  if (saved !== null) {
+    setChatEnabled(saved === "true");
+  }
+}, [stbx_uid]);
+
 
 
   /*
@@ -437,7 +449,8 @@ useEffect(() => {
             FIXED USER HEADER
         ========================= */}
 
-        <header className="z-40 flex shrink-0 items-center border-b border-slate-200 bg-[#f6f7f9] px-4 py-4 dark:border-white/10 dark:bg-[#0b0b0d]">
+        <header 
+       className="relative z-40 flex shrink-0 items-center border-b border-slate-200 bg-[#f6f7f9] px-4 py-4 pr-14 dark:border-white/10 dark:bg-[#0b0b0d]"        >
 
           <button
             type="button"
@@ -473,8 +486,19 @@ useEffect(() => {
             <div className="mt-0.5 truncate text-sm text-muted">
               {user.stbx_uid || stbx_uid}
             </div>
+            <button
+            type="button"
+            onClick={() =>
+              router.push(
+                `/user/${encodeURIComponent(stbx_uid)}/options`
+              )
+            }
+            aria-label="More options"
+           className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-2xl font-bold text-slate-700 transition active:scale-90 dark:text-white"          >
+            ⋮
+          </button>
           </div>
-
+          
         </header>
 
        {/* =========================
@@ -594,7 +618,7 @@ onPointerLeave={() => {
                       : "bg-white text-slate-900 dark:bg-[#303030] dark:text-white"
                   }`}
                 >
-
+      
                   <p className="whitespace-pre-wrap break-words text-[16px] leading-6">
                     {message.deleted_at
                       ? "Message deleted"
@@ -868,6 +892,7 @@ onPointerLeave={() => {
 
     <input
       type="text"
+      disabled={!chatEnabled}                               
       value={messageText}
       onChange={(e) =>
         setMessageText(e.target.value)
@@ -878,7 +903,7 @@ onPointerLeave={() => {
           handleSendMessage();
         }
       }}
-      placeholder="Message..."
+     placeholder={chatEnabled? "Message...": "Chat disabled by user"}
       className="min-w-0 flex-1 bg-transparent text-[16px] text-slate-900 outline-none placeholder:text-slate-500 dark:text-white dark:placeholder:text-slate-400"
     />
 
@@ -888,8 +913,9 @@ onPointerLeave={() => {
       type="button"
       onClick={handleSendMessage}
       disabled={
+         !chatEnabled ||
         sendingMessage ||
-        !messageText.trim()
+        !messageText.trim() 
       }
       aria-label="Send message"
       className="ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-700 dark:text-white"

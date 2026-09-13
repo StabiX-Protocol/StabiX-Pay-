@@ -38,14 +38,12 @@ io.use(async (socket, next) => {
       return next(new Error("User not found"));
     }
 
-    socket.userId = result.rows[0].id;
-
-    next();
-
-  } catch (err) {
-    console.error("SOCKET AUTH ERROR:", err.message);
-    next(new Error("Invalid socket authentication"));
-  }
+socket.userId = result.rows[0].id;
+next();
+} catch (err) {
+console.error("SOCKET AUTH ERROR:", err.message);
+next(new Error("Invalid socket authentication"));
+}
 });
 app.set("io", io);
 app.use(express.json({
@@ -64,6 +62,7 @@ const depositRoutes = require("./routes/depostRoutes");
 const withdrawRoutes = require("./routes/withdrawRoutes");
 const validatorRoutes = require("./routes/validatorRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const blockRoutes = require("./routes/blockRoutes");
 
 app.use("/api", healthRoutes);
 app.use("/api/users", userRoutes);
@@ -73,7 +72,7 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/withdraws", withdrawRoutes);
 app.use("/api/balance", balanceRoutes);
 app.use("/api/validator", validatorRoutes);
-
+app.use("/api/blocks", blockRoutes);
 io.on("connection", (socket) => {
   console.log("🔵 Socket connected:", socket.id);
 
