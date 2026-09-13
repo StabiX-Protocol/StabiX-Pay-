@@ -78,6 +78,8 @@ const [chatDisabledBy, setChatDisabledBy] = useState<
 const [chatDisabledByUsername, setChatDisabledByUsername] =
   useState("");
 
+  const [blocked, setBlocked] = useState(false);
+
   const deletePressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 const messagesEndRef =
@@ -226,10 +228,8 @@ setDeleteMessageId(null);
             stbx_uid
           )}`
         );
-
         const foundUser =
           userData?.user || userData;
-
         setUser(foundUser);
 
         const historyData = await apiFetch(
@@ -238,6 +238,13 @@ setDeleteMessageId(null);
 
         const history: Transaction[] =
           historyData?.transactions || [];
+
+          const blockData = await apiFetch(
+  `/api/blocks/${encodeURIComponent(stbx_uid)}`
+);
+if (blockData?.success) {
+  setBlocked(blockData.blocked);
+}
 
         /*
          * Keep existing filtering logic.
@@ -922,13 +929,16 @@ onPointerLeave={() => {
     Pay
   </button>
 
+
+
   {/* MESSAGE */}
 
+  {!blocked && (
   <div className="flex h-12 min-w-0 flex-1 items-center rounded-full bg-slate-200 px-4 dark:bg-[#202124]">
 
     <input
       type="text"
-      disabled={!chatEnabled}                               
+      disabled={!chatEnabled}
       value={messageText}
       onChange={(e) =>
         setMessageText(e.target.value)
@@ -939,14 +949,15 @@ onPointerLeave={() => {
           handleSendMessage();
         }
       }}
-     placeholder={
-  chatEnabled
-    ? "Message..."
-    : chatDisabledBy === "you"
-    ? "Chat disabled by you"
-    : `Chat disabled by ${
-        chatDisabledByUsername || "user"
-      }`}
+      placeholder={
+        chatEnabled
+          ? "Message..."
+          : chatDisabledBy === "you"
+          ? "Chat disabled by you"
+          : `Chat disabled by ${
+              chatDisabledByUsername || "user"
+            }`
+      }
       className="min-w-0 flex-1 bg-transparent text-[16px] text-slate-900 outline-none placeholder:text-slate-500 dark:text-white dark:placeholder:text-slate-400"
     />
 
@@ -956,9 +967,9 @@ onPointerLeave={() => {
       type="button"
       onClick={handleSendMessage}
       disabled={
-         !chatEnabled ||
+        !chatEnabled ||
         sendingMessage ||
-        !messageText.trim() 
+        !messageText.trim()
       }
       aria-label="Send message"
       className="ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-700 dark:text-white"
@@ -979,6 +990,7 @@ onPointerLeave={() => {
     </button>
 
   </div>
+)}
 
 </div>
 </div>
