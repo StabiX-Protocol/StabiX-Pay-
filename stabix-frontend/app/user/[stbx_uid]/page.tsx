@@ -68,6 +68,11 @@ const [messageText, setMessageText] =
 const [sendingMessage, setSendingMessage] =
   useState(false);
 
+  const [deleteMessageId, setDeleteMessageId] =
+  useState<number | null>(null);
+
+  const deletePressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
 const messagesEndRef =
   useRef<HTMLDivElement | null>(null);
 
@@ -176,15 +181,10 @@ const handleDeleteMessage = async (messageId: number) => {
 
     if (data?.success && data?.deleted_message) {
       setMessages((prev) =>
-        prev.map((message) =>
-          message.id === messageId
-            ? {
-                ...message,
-                deleted_at: data.deleted_message.deleted_at,
-              }
-            : message
-        )
-      );
+  prev.filter((message) => message.id !== messageId)
+);
+
+setDeleteMessageId(null);
     }
   } catch (error) {
     console.error("Delete message error:", error);
@@ -554,6 +554,40 @@ useEffect(() => {
                 }`}
               >
                 <div
+                onClick={() => {
+  if (isMine && !message.deleted_at) {
+    setDeleteMessageId(message.id);
+  }
+}}
+onContextMenu={(e) => {
+  e.preventDefault();
+  if (isMine && !message.deleted_at) {
+    setDeleteMessageId(message.id);
+  }
+}}
+
+onPointerDown={() => {
+  if (isMine && !message.deleted_at) {
+    deletePressTimer.current = setTimeout(() => {
+      setDeleteMessageId(message.id);
+    }, 600);
+  }
+}}
+onPointerUp={() => {
+  if (deletePressTimer.current) {
+    clearTimeout(deletePressTimer.current);
+    deletePressTimer.current = null;
+  }
+}}
+onPointerLeave={() => {
+  if (deletePressTimer.current) {
+    clearTimeout(deletePressTimer.current);
+    deletePressTimer.current = null;
+  }
+}}
+
+  
+
                   className={`max-w-[78%] rounded-[24px] px-4 py-3 shadow-sm ${
                     isMine
                       ? "bg-blue-600 text-white"
@@ -566,15 +600,6 @@ useEffect(() => {
                       ? "Message deleted"
                       : message.message}
                   </p>
-    {isMine && !message.deleted_at && (
-  <button
-    type="button"
-    onClick={() => handleDeleteMessage(message.id)}
-    className="mt-1 text-[11px] text-blue-100/80"
-  >
-    Delete
-  </button>
-)}
 
                   <div
   className={`mt-1 flex items-center justify-end gap-1 text-[11px] ${
@@ -588,15 +613,9 @@ useEffect(() => {
   </span>
 
   {isMine && (
-    <span
-      className={
-        message.seen_at
-          ? "font-semibold text-blue-200"
-          : "text-blue-100"
-      }
-    >
-      {message.seen_at ? "Seen" : "Sent"}
-    </span>
+    <span className="font-bold text-white">
+    {message.seen_at ? "✓✓" : "✓"}
+  </span>
   )}
 </div>
 
@@ -894,6 +913,46 @@ useEffect(() => {
 
 </div>
 </div>
+
+{deleteMessageId !== null && (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-5 backdrop-blur-sm">
+    <div className="w-full max-w-sm rounded-[28px] border border-slate-200 bg-white p-6 shadow-2xl dark:border-white/10 dark:bg-[#101326]">
+      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+        Message
+      </p>
+
+      <h2 className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
+        Delete message?
+      </h2>
+
+      <p className="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
+        This message will be removed from the conversation.
+      </p>
+
+      <div className="mt-6 flex gap-3">
+        <button
+          type="button"
+          onClick={() => setDeleteMessageId(null)}
+          className="flex-1 rounded-2xl bg-slate-100 py-3.5 font-semibold text-slate-900 dark:bg-white/10 dark:text-white"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            if (deleteMessageId !== null) {
+              handleDeleteMessage(deleteMessageId);
+            }
+          }}
+          className="flex-1 rounded-2xl bg-red-600 py-3.5 font-semibold text-white"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
     </main>
   );
