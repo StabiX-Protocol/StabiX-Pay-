@@ -210,6 +210,8 @@ const getTransactionBySTRId = async (req, res) => {
         blockchain_tx_hash,
         created_at,
         NULL::text AS eoa_address
+        NULL::text AS mode,
+        NULL::text AS network
       FROM transactions
       WHERE str_id = $1
       AND (
@@ -235,6 +237,8 @@ const getTransactionBySTRId = async (req, res) => {
         blockchain_tx_hash,
         created_at,
         NULL::text AS eoa_address
+        mode,
+        network
       FROM deposits
       WHERE "STRId" = $1
       AND stbx_uid = $2
@@ -257,6 +261,8 @@ const getTransactionBySTRId = async (req, res) => {
         NULL AS blockchain_tx_hash,
         created_at,
         wallet_address AS eoa_address
+        mode,
+        network
       FROM withdraws
       WHERE "STRId" = $1
       AND stbx_uid = $2

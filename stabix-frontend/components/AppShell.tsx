@@ -30,7 +30,6 @@ export default function AppShell({
   pathname.startsWith("/profile") ||
   pathname.startsWith("/primary") ||
   pathname.startsWith("/history")&& pathname !== "/history" ||
-  pathname.startsWith("/history") ||
   pathname.startsWith("/settings") ||
   pathname.startsWith("/create-account") ||
   pathname.startsWith("/forgot-password") ||

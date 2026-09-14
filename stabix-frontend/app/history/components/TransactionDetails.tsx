@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams} from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 type Transaction = {
   STRId: string;
@@ -12,6 +12,9 @@ type Transaction = {
   counterparty?: string | null;
   eoa_address?: string | null;
   created_at: string;
+  network?: string | null;
+  mode?: string | null;
+  blockchain_tx_hash?: string | null;
 };
 
 type TransactionDetailProps = {
@@ -23,14 +26,15 @@ export default function TransactionDetail({
 }: TransactionDetailProps) {
   const searchParams = useSearchParams();
 
- const backSource = searchParams.get("from");
-const userUid = searchParams.get("user");
+  const backSource = searchParams.get("from");
+  const userUid = searchParams.get("user");
 
-const backHref =
-  backSource === "user" && userUid
-    ? `/user/${encodeURIComponent(userUid)}`
-    : "/history";
-  const displayAmount = Number(t.amount).toFixed(2);
+  const backHref =
+    backSource === "user" && userUid
+      ? `/user/${encodeURIComponent(userUid)}`
+      : "/history";
+
+  const displayAmount = Number(t.amount).toString ();
 
   const isCredit =
     t.type === "received" ||
@@ -39,29 +43,13 @@ const backHref =
   let from = "";
   let to = "";
 
-  /*
-   * Deposit:
-   * External wallet → StabiX UID
-   */
   if (t.type === "deposit") {
     from = t.eoa_address || "External";
     to = t.stbx_uid || "";
-  }
-
-  /*
-   * Withdraw:
-   * StabiX UID → External wallet
-   */
-  else if (t.type === "withdraw") {
+  } else if (t.type === "withdraw") {
     from = t.stbx_uid || "";
     to = t.eoa_address || "External";
-  }
-
-  /*
-   * Send / Received:
-   * Counterparty ↔ authenticated user's StabiX UID
-   */
-  else {
+  } else {
     from = isCredit
       ? t.counterparty || "System"
       : t.stbx_uid || "";
@@ -81,75 +69,222 @@ const backHref =
     label = "Received";
   }
 
-  const labelClass =
+  const isBlockchainTransaction =
     t.type === "deposit" ||
-    t.type === "received"
-      ? "text-emerald-600 dark:text-emerald-400"
-      : "text-red-600 dark:text-red-400";
+    t.type === "withdraw";
 
   return (
-    <main className="min-h-screen bg-[#f6f7f9] text-slate-900 dark:bg-[#0b0b0d] dark:text-white">
-      <div className="relative px-4 pb-28 pt-5">
+    <main className="min-h-screen bg-[#f5f7fb] text-slate-900 dark:bg-[#050507] dark:text-white">
+      <div className="relative mx-auto min-h-screen w-full max-w-[430px] overflow-hidden px-4 pb-32 pt-5">
+
+        {/* Ambient blue glow */}
+        <div className="pointer-events-none absolute left-1/2 top-[-90px] h-72 w-72 -translate-x-1/2 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-500/15" />
+
         {/* Back */}
         <Link
           href={backHref}
-          aria-label="Back to transaction history"
-          className="absolute left-4 top-5 flex h-9 w-9 items-center justify-center rounded-[10px] bg-white text-xl text-slate-800 shadow-sm dark:bg-[#18181b] dark:text-white"
+          aria-label="Back"
+          className="relative z-10 flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-xl text-slate-800 shadow-sm transition active:scale-95 dark:border-white/10 dark:bg-white/[0.06] dark:text-white"
         >
-          ←
+          <svg
+            viewBox="0 0 24 24"
+            className="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
         </Link>
 
-        {/* Amount + basic information */}
-        <div className="mt-10 text-center">
-          <div className="text-[36px] font-bold tracking-[0.5px]">
-            {displayAmount} {t.asset}
+        {/* Main success section */}
+        <div className="relative mt-8 text-center">
+
+          {/* Blue check */}
+          <div className="mx-auto flex h-[76px] w-[76px] items-center justify-center rounded-full border border-blue-500/20 bg-blue-500/10 shadow-[0_0_45px_rgba(37,99,235,0.18)] dark:border-blue-400/20 dark:bg-blue-500/10 dark:shadow-[0_0_55px_rgba(59,130,246,0.20)]">
+            <div className="flex h-[58px] w-[58px] items-center justify-center rounded-full bg-blue-600 shadow-lg shadow-blue-600/30 dark:bg-blue-500">
+              <svg
+                viewBox="0 0 24 24"
+                className="h-8 w-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m5 12 4.2 4.2L19 6.5" />
+              </svg>
+            </div>
           </div>
 
-          <div
-            className={`mt-1.5 text-[15px] font-semibold ${labelClass}`}
-          >
+          {/* Status */}
+          <div className="mt-5 text-[15px] font-semibold text-blue-600 dark:text-blue-400">
             {label}
           </div>
 
-          <div className="mt-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
-            ✔ Completed
-          </div>
+         <span className="inline-flex w-fit rounded-full border border-emerald-400/25 bg-emerald-500/10 px-1.5 py-[2px] text-[10px] font-semibold leading-none text-emerald-600 dark:border-emerald-400/25 dark:bg-emerald-400/10 dark:text-emerald-400">       
+         Completed
+          </span>
 
-          <div className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+          {/* Amount */}
+         <div className="mt-4 flex items-center justify-center gap-2 text-[38px] font-bold tracking-[-1px] text-slate-950 dark:text-white">
+  <span>{displayAmount}</span>
+
+  <span className="text-[21px] font-semibold text-slate-500 dark:text-slate-400">
+    {t.asset}
+  </span>
+
+  <img
+    src={
+      t.asset.toUpperCase() === "USDC"
+        ? "/media/usd-coin-usdc-logo.png"
+        : "/media/tether-usdt-logo.png"
+    }
+    alt={t.asset}
+    className="h-6 w-6 shrink-0"
+  />
+</div>
+
+          {/* Date */}
+          <div className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-500">
             {new Date(t.created_at).toLocaleString()}
           </div>
+        </div>
 
-          <div className="mt-2 break-all text-xs font-semibold text-blue-600 dark:text-blue-400">
-            STR ID : {t.STRId}
+        {/* Details card */}
+        <div className="relative mt-8 overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/80 p-5 shadow-xl shadow-slate-200/40 backdrop-blur-2xl dark:border-white/[0.08] dark:bg-white/[0.045] dark:shadow-black/20">
+
+          {/* subtle top highlight */}
+          <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
+
+          <div className="space-y-5">
+
+            {/* From */}
+            <div>
+              <div className="text-[12px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
+                From
+              </div>
+
+              <div className="mt-1.5 break-all text-[14px] font-semibold leading-6 text-slate-900 dark:text-white">
+                {from}
+              </div>
+            </div>
+
+            {/* To */}
+            <div>
+              <div className="text-[12px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
+                To
+              </div>
+
+              <div className="mt-1.5 break-all text-[14px] font-semibold leading-6 text-slate-900 dark:text-white">
+                {to}
+              </div>
+            </div>
+
+            {/* STR ID */}
+            <div>
+              <div className="text-[12px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
+                STR ID
+              </div>
+
+              <div className="mt-1.5 break-all text-[14px] font-semibold leading-6 text-blue-600 dark:text-blue-400">
+                {t.STRId}
+              </div>
+            </div>
+
+            {/* Network + Mode only for Deposit / Withdraw */}
+            {isBlockchainTransaction && (
+              <>
+                {/* Network */}
+                <div>
+                  <div className="text-[12px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
+                    Network
+                  </div>
+
+                  <div className="mt-1.5 break-all text-[14px] font-semibold leading-6 text-slate-900 dark:text-white">
+                    {t.network || "—"}
+                  </div>
+                </div>
+
+                {/* Mode */}
+                <div>
+                  <div className="text-[12px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
+                    Mode
+                  </div>
+
+                  <div className="mt-1.5 break-all text-[14px] font-semibold leading-6 text-slate-900 dark:text-white">
+                    {t.mode || "—"}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="my-5 h-px bg-slate-200 dark:bg-white/10" />
+        {/* Bottom actions */}
+        <div className="relative mt-6 space-y-3">
 
-        {/* From / To */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-[#18181b]">
-          <div className="mb-3.5">
-            <div className="text-xs text-slate-500 dark:text-slate-400">
-              From
-            </div>
+          {/* Explorer */}
+          <button
+            type="button"
+            disabled={!t.blockchain_tx_hash}
+            onClick={() => {
+              if (!t.blockchain_tx_hash) return;
 
-            <div className="break-all text-sm font-semibold">
-              {from}
-            </div>
-          </div>
+              // Explorer URL should be supplied by the transaction flow.
+              // This button intentionally does not fabricate an explorer URL.
+              window.open(
+                t.blockchain_tx_hash,
+                "_blank",
+                "noopener,noreferrer"
+              );
+            }}
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white font-semibold text-slate-900 shadow-sm transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:bg-white/[0.06] dark:text-white"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M14 3h7v7" />
+              <path d="M10 14 21 3" />
+              <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" />
+            </svg>
 
-          <div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">
-              To
-            </div>
+            View on Explorer
+          </button>
 
-            <div className="break-all text-sm font-semibold">
-              {to}
-            </div>
-          </div>
+          {/* Done */}
+          <Link
+            href={backHref}
+            className="flex h-14 w-full items-center justify-center rounded-2xl bg-blue-600 font-semibold text-white shadow-lg shadow-blue-600/20 transition active:scale-[0.98] dark:bg-blue-500 dark:shadow-blue-500/20"
+          >
+            Done
+          </Link>
         </div>
       </div>
+      
+      {/* Powered by StabiX */}
+<div className="mt-10 flex flex-col items-center justify-center text-center">
+  <div className="text-[11px] font-semibold tracking-[0.18em] text-slate-400 dark:text-slate-500">
+    POWERED BY
+  </div>
+
+  {/* StabiX Logo — replace this blank box with your logo */}
+  <div className="mt-3 flex h-14 w-32 items-center justify-center">
+    {/* YOUR STABIX LOGO HERE */}
+  </div>
+
+  <div className="mt-2 text-[10px] font-medium tracking-[0.16em] text-slate-400 dark:text-slate-500">
+    STABLECOIN PAYMENT INFRASTRUCTURE
+  </div>
+</div>
     </main>
   );
 }
