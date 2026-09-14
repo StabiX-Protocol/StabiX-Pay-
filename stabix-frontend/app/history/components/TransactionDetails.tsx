@@ -270,15 +270,17 @@ export default function TransactionDetail({
         </div>
       </div>
       
-      {/* Powered by StabiX */}
-<div className="mt-10 flex flex-col items-center justify-center text-center">
+<div className="mt-1 flex flex-col items-center justify-center text-center">
   <div className="text-[11px] font-semibold tracking-[0.18em] text-slate-400 dark:text-slate-500">
     POWERED BY
   </div>
 
-  {/* StabiX Logo — replace this blank box with your logo */}
   <div className="mt-3 flex h-14 w-32 items-center justify-center">
-    {/* YOUR STABIX LOGO HERE */}
+    <img
+  src="/media/stabix-logo.png"
+  alt="StabiX"
+  className="h-14 w-auto object-contain"
+/>
   </div>
 
   <div className="mt-2 text-[10px] font-medium tracking-[0.16em] text-slate-400 dark:text-slate-500">
