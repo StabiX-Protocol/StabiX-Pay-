@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 import AppHeader from "@/components/AppHeader";
 import BalanceCard from "@/components/BalanceCard";
 import QuickActions from "@/components/QuickActions";
@@ -7,6 +11,13 @@ import ValidatorPanel from "@/components/ValidatorPanel";
 
 
 export default function Home() {
+  const [isValidator, setIsValidator] = useState(false);
+
+useEffect(() => {
+  setIsValidator(
+    localStorage.getItem("stbx_uid") === "STBX-FOUNDER"
+  );
+}, []);
   return (
     <main className="min-h-screen bg-[#f6f7f9] text-slate-900 dark:bg-[#0b0b0d] dark:text-white">
       <div className="mx-auto min-h-screen w-full max-w-md pb-28">
@@ -17,7 +28,7 @@ export default function Home() {
         <QuickActions />
         <Assets />
         <People />
-        <ValidatorPanel />
+        {isValidator && <ValidatorPanel />}
       </div>
 
     </main>
