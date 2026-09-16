@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 
 type PendingRequest = {
@@ -18,8 +18,8 @@ type PendingRequest = {
 };
 
 type UserBalance = {
-  asset:string;
-  balance:string | number;
+  asset: string;
+  balance: string | number;
 }
 
 export default function ValidatorPanel() {
@@ -50,9 +50,19 @@ const checkBalance = async () => {
   )}/balance?asset=${encodeURIComponent(asset)}`
 );
 
-    if (data?.success) {
-      setBalance(data.balance);
-    } else {
+   if (data?.success && Array.isArray(data.balances)) {
+  const userBalance = data.balances.find(
+    (item: UserBalance) =>
+      item.asset?.toUpperCase() === asset.toUpperCase()
+  );
+
+  if (userBalance) {
+    setBalance(userBalance);
+  } else {
+    setMessage(`No ${asset} balance found`);
+  }
+}
+    else {
       setMessage(
         data?.message || "Unable to load balance"
       );
@@ -64,47 +74,6 @@ const checkBalance = async () => {
     setLoadingBalance(false);
   }
 };
-
-const requestBalance = async () => {
-  if (!uid.trim()) {
-    setMessage("Enter STBX UID");
-    return;
-  }
-
-  if (!balance) {
-    setMessage("Check balance first");
-    return;
-  }
-
-  try {
-    setMessage("");
-
-    const data = await apiFetch("/api/validator/request", {
-      method: "POST",
-      body: JSON.stringify({
-        stbx_uid: uid.trim(),
-        asset,
-      }),
-    });
-
-    if (!data?.success) {
-      setMessage(
-        data?.message || "Request failed"
-      );
-      return;
-    }
-
-    setMessage("Request submitted successfully");
-  } catch (error) {
-    console.error(
-      "Validator request error:",
-      error
-    );
-
-    setMessage("Unable to submit request");
-  }
-};
-
 
 
   const loadPendingRequests = async () => {
@@ -136,6 +105,10 @@ const requestBalance = async () => {
     }
   };
 
+  useEffect(() => {
+  loadPendingRequests();
+}, []);
+
   const processRequest = async (
     type: "deposit" | "withdraw",
     STRId: string,
@@ -158,22 +131,25 @@ const requestBalance = async () => {
         method: "PATCH",
       });
 
-      if (!data?.success) {
-        setMessage(
-          data?.message ||
-            `${action === "approve" ? "Approval" : "Rejection"} failed`
-        );
-        return;
-      }
+     if (!data?.success) {
+  setMessage(
+    data?.message ||
+      (action === "approve"
+        ? "Approval failed"
+        : "Reject failed")
+  );
+  return;
+}
 
-      setMessage(
-        action === "approve"
-          ? "Request approved successfully"
-          : "Request rejected successfully"
-      );
+setMessage(
+  action === "approve"
+    ? "Request approved"
+    : "Request rejected"
+);
 
-      await loadPendingRequests();
-    } catch (error) {
+await loadPendingRequests();
+
+} catch (error) {
       console.error(
         "Process validator request error:",
         error
@@ -254,29 +230,41 @@ const requestBalance = async () => {
           </button>
         </div>
 
-        {/* Balance Result */}
-        {balance && (
-          <div className="mt-4 rounded-xl bg-slate-50 px-4 py-3 dark:bg-[#111113]">
+       {/* Balance Result */}
+{balance && (
+  <div className="mt-4 flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 dark:bg-[#111113]">
 
-            <div className="text-xs text-slate-500 dark:text-slate-400">
-              {balance.asset}
-            </div>
+    {/* Balance */}
+    <div>
+      <div className="text-xs text-slate-500 dark:text-slate-400">
+        Available Balance
+      </div>
 
-            <div className="mt-1 text-2xl font-bold">
-              {balance.balance}
-            </div>
-          </div>
-        )}
+      <div className="mt-1 text-2xl font-bold">
+        {balance.balance}
+      </div>
+    </div>
 
-        {/* Request */}
-        <button
-          type="button"
-          onClick={requestBalance}
-          disabled={!balance}
-          className="mt-3 w-full rounded-xl border border-blue-200 bg-blue-50 py-3 text-sm font-semibold text-blue-700 transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 dark:border-blue-400/20 dark:bg-blue-500/10 dark:text-blue-400"
-        >
-          Request
-        </button>
+    {/* Asset */}
+    <div className="flex items-center gap-2">
+
+      <span className="text-sm font-semibold">
+        {balance.asset}
+      </span>
+
+      <img
+        src={
+          balance.asset.toUpperCase() === "USDC"
+            ? "/media/usd-coin-usdc-logo.png"
+            : "/media/tether-usdt-logo.png"
+        }
+        alt={balance.asset}
+        className="h-7 w-7 shrink-0 object-contain"
+      />
+    </div>
+
+  </div>
+)}
       </div>
 
 
