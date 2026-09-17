@@ -128,6 +128,57 @@ client.release();
 }
 };
 
+
+const getDepositAddress = async (req, res) => {
+  try {
+    const stbx_uid = req.user.stbx_uid;
+
+    const userResult = await pool.query(
+      `SELECT id
+       FROM users
+       WHERE stbx_uid = $1`,
+      [stbx_uid]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    const userId = userResult.rows[0].id;
+
+    const {
+      getOrCreateDepositAddress
+    } = require("../services/depositAddressService");
+
+    const depositAddress =
+      await getOrCreateDepositAddress(
+        userId,
+        "evm"
+      );
+
+    return res.status(200).json({
+      success: true,
+      network: "sepolia",
+      address: depositAddress.address
+    });
+
+  } catch (err) {
+    console.error(
+      "GET DEPOSIT ADDRESS ERROR:",
+      err
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to get deposit address"
+    });
+  }
+};
+
+
 const getDepositHistory = async (req, res) => {
 try {
 const stbx_uid = req.user.stbx_uid;
@@ -198,6 +249,7 @@ message: "Internal Server Error"
 
 module.exports = {
 createDeposit,
+getDepositAddress,
 getDepositHistory,
 getDepositById,
 };

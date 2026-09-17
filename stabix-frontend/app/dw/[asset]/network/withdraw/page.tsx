@@ -10,6 +10,7 @@ const networkNames: Record<string, string> = {
   base: "Base L2",
 };
 
+
 export default function WithdrawPage() {
   const params = useParams();
   const searchParams = useSearchParams();

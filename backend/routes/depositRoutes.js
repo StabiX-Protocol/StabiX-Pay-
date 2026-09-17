@@ -5,6 +5,7 @@ const {verifyToken} = require("../middleware/authMiddleware");
 
 const {
   createDeposit,
+  getDepositAddress,
   getDepositHistory,
   getDepositById
 } = require("../controllers/depositController");
@@ -31,6 +32,12 @@ const validate = (req, res, next) => {
   next();
 
 };
+
+router.get(
+  "/address",
+  verifyToken,
+  getDepositAddress
+)
 
 router.post(
   "/",
