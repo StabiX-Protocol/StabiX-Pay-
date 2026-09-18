@@ -35,14 +35,16 @@ export default function AssetPage() {
     setPopup(null);
   };
 
-  const handleTransaction = (action: "deposit" | "withdraw") => {
-    if (!selectedMode) {
-      setPopup("select");
-      return;
-    }
+const handleTransaction = (action: "deposit" | "withdraw") => {
+  if (!selectedMode) {
+    setPopup("select");
+    return;
+  }
 
-   window.location.href = `/dw/${asset.toLowerCase()}/network?mode=${action}`;
-  };
+  window.location.href =
+    `/dw/${asset.toLowerCase()}/network?mode=${selectedMode}&action=${action}`;
+};
+
 
   return (
     <main className="min-h-screen bg-[#f6f7f9] px-5 pb-10 text-slate-900 dark:bg-[#0b0b0d] dark:text-white">
