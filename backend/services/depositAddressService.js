@@ -33,14 +33,25 @@ const derivationIndex = Number(
 );
 
   const wallet = generateDepositWallet(
-    network,
-    derivationIndex
-  );
+  network,
+  derivationIndex
+);
 
-  const chainId =
-    network === "evm"
-      ? Number(process.env.BLOCKCHAIN_CHAIN_ID)
-      : null;
+if (
+  network === "evm" &&
+  process.env.EVM_DEPOSIT_WALLET_ADDRESS &&
+  wallet.address.toLowerCase() ===
+    process.env.EVM_DEPOSIT_WALLET_ADDRESS.toLowerCase()
+) {
+  throw new Error(
+    "Derived deposit address matches master wallet address"
+  );
+}
+
+const chainId =
+  network === "evm"
+    ? Number(process.env.BLOCKCHAIN_CHAIN_ID)
+    : null;
 
   const result = await pool.query(
     `INSERT INTO deposit_addresses (

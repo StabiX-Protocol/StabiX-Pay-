@@ -6,6 +6,9 @@ const http = require("http");
 const { Server } = require("socket.io");
 const app = express();
 const server = http.createServer(app);
+const {
+  startEvmDepositListener
+} = require("./services/evmDepositListener");
 
 
 
@@ -97,4 +100,12 @@ console.error(err.message);
 const PORT = 3000;
 server.listen(PORT, "0.0.0.0", () => {
 console.log(`Server running on http://0.0.0.0:${PORT}`);
+
+startEvmDepositListener().catch((err) => {
+console.error(
+"FAILED TO START EVM DEPOSIT LISTENER:",
+err
+);
+});
+
 });
