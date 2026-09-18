@@ -15,36 +15,55 @@ export default function AssetPage() {
       : "USDT";
 
   const [selectedMode, setSelectedMode] = useState<Mode>(null);
-  const [popup, setPopup] = useState<"select" | "instant" | "advanced" | null>(
-    null
-  );
+
+  const [popup, setPopup] = useState<
+    "select" | "instant" | "advanced" | null
+  >(null);
 
   const chooseMode = (mode: "instant" | "advanced") => {
+    setSelectedMode(mode);
     setPopup(mode);
+  };
+
+  const handleTransaction = (
+    action: "deposit" | "withdraw"
+  ) => {
+    // Mode compulsory
+    if (!selectedMode) {
+      setPopup("select");
+      return;
+    }
+
+    // Instant flow
+    if (selectedMode === "instant") {
+      window.location.href =
+        `/dw/${asset.toLowerCase()}/instant/network?mode=${action}`;
+      return;
+    }
+
+    // Advanced flow
+    if (selectedMode === "advanced") {
+      window.location.href =
+        `/dw/${asset.toLowerCase()}/advanced/network?mode=${action}`;
+      return;
+    }
   };
 
   const confirmMode = () => {
     if (popup === "instant") {
       setSelectedMode("instant");
+      setPopup(null);
+      return;
     }
 
     if (popup === "advanced") {
       setSelectedMode("advanced");
+      setPopup(null);
+      return;
     }
 
     setPopup(null);
   };
-
-const handleTransaction = (action: "deposit" | "withdraw") => {
-  if (!selectedMode) {
-    setPopup("select");
-    return;
-  }
-
-  window.location.href =
-    `/dw/${asset.toLowerCase()}/network?mode=${selectedMode}&action=${action}`;
-};
-
 
   return (
     <main className="min-h-screen bg-[#f6f7f9] px-5 pb-10 text-slate-900 dark:bg-[#0b0b0d] dark:text-white">
@@ -61,17 +80,17 @@ const handleTransaction = (action: "deposit" | "withdraw") => {
             ←
           </Link>
 
-         <div className="mx-auto flex h-24 w-24 items-center justify-center overflow-hidden rounded-full">
-        <img
-         src={
-         asset === "USDT"
-        ? "/media/tether-usdt-logo.png"
-        : "/media/usd-coin-usdc-logo.png"
-        } 
-    alt={asset}
-    className="h-24 w-24 rounded-full object-contain"
-  />
-</div>
+          <div className="mx-auto flex h-24 w-24 items-center justify-center overflow-hidden rounded-full">
+            <img
+              src={
+                asset === "USDT"
+                  ? "/media/tether-usdt-logo.png"
+                  : "/media/usd-coin-usdc-logo.png"
+              }
+              alt={asset}
+              className="h-24 w-24 rounded-full object-contain"
+            />
+          </div>
 
           <h1 className="mt-3 text-3xl font-bold">
             {asset}
@@ -80,6 +99,7 @@ const handleTransaction = (action: "deposit" | "withdraw") => {
 
         {/* Select Mode */}
         <section className="mt-8">
+
           <p className="mb-5 text-[22px] font-medium text-slate-500 dark:text-slate-400">
             Select Mode
           </p>
@@ -142,6 +162,7 @@ const handleTransaction = (action: "deposit" | "withdraw") => {
         {/* Deposit / Withdraw */}
         <section className="mt-10 grid grid-cols-2 gap-5">
 
+          {/* Deposit */}
           <button
             type="button"
             onClick={() => handleTransaction("deposit")}
@@ -150,6 +171,7 @@ const handleTransaction = (action: "deposit" | "withdraw") => {
             Deposit
           </button>
 
+          {/* Withdraw */}
           <button
             type="button"
             onClick={() => handleTransaction("withdraw")}

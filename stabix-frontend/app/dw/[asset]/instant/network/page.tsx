@@ -31,7 +31,7 @@ const networks = [
   },
 ];
 
-export default async function NetworkPage({
+export default async function InstantNetworkPage({
   params,
   searchParams,
 }: {
@@ -41,16 +41,17 @@ export default async function NetworkPage({
   const { asset } = await params;
   const { mode } = await searchParams;
 
-  const selectedMode = mode === "withdraw" ? "withdraw" : "deposit";
-
   const assetName = asset.toUpperCase();
+
+  const selectedMode =
+    mode === "withdraw" ? "withdraw" : "deposit";
 
   return (
     <main className="min-h-screen bg-[#f6f7f9] px-5 pb-10 text-slate-900 dark:bg-[#0b0b0d] dark:text-white">
       <div className="mx-auto w-full max-w-md">
 
         {/* Header */}
-        <header className="relative flex items-center gap-3 py-7">
+        <header className="flex items-center gap-3 py-7">
 
           <Link
             href={`/dw/${asset}`}
@@ -61,22 +62,32 @@ export default async function NetworkPage({
           </Link>
 
           <div>
-
             <h1 className="text-xl font-bold">
               Select Network
             </h1>
+
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              Instant · {assetName} ·{" "}
+              {selectedMode === "deposit"
+                ? "Deposit"
+                : "Withdraw"}
+            </p>
           </div>
 
         </header>
 
         {/* Networks */}
         <section className="mt-3">
-
           <div className="space-y-4">
+
             {networks.map((network) => (
               <Link
-                key={network.slug}          
-                             href={`/dw/${asset}/network/${selectedMode}?network=${network.slug}`}
+                key={network.slug}
+                href={
+                  selectedMode === "deposit"
+                    ? `/dw/${asset}/instant/deposit?network=${network.slug}`
+                    : `/dw/${asset}/instant/withdraw?network=${network.slug}`
+                }
                 className="block rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm transition active:scale-[0.985] dark:border-white/10 dark:bg-[#18181b]"
               >
                 <div className="flex items-center justify-between">
@@ -85,7 +96,7 @@ export default async function NetworkPage({
                     <h2 className="text-xl font-bold">
                       {network.name}{" "}
                       <span className="font-medium text-slate-500 dark:text-slate-400">
-                     {network.type}
+                        {network.type}
                       </span>
                     </h2>
 
@@ -98,15 +109,15 @@ export default async function NetworkPage({
                     </p>
                   </div>
 
-                 <span className="text-2xl text-slate-500 dark:text-slate-400">
-                     →
-               </span>
+                  <span className="text-2xl text-slate-500 dark:text-slate-400">
+                    →
+                  </span>
 
                 </div>
               </Link>
             ))}
-          </div>
 
+          </div>
         </section>
 
       </div>
