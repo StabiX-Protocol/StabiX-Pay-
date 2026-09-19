@@ -30,30 +30,47 @@ const [copied, setCopied] = useState(false);
 useEffect(() => {
   const loadDepositAddress = async () => {
     try {
-      const intentData = await apiFetch("/api/deposits/intent", {
-        method: "POST",
-        body: JSON.stringify({
-          asset,
-          mode,
-          network,
-        }),
-      });
+      // 1. FIRST: Load the deposit address
+      const data = await apiFetch(
+        `/api/deposits/address?network=${encodeURIComponent(network)}`
+      );
+
+      console.log(
+        "Deposit address response:",
+        data
+      );
+
+      if (!data?.success || !data?.address) {
+        throw new Error(
+          data?.message ||
+          "Deposit address not available"
+        );
+      }
+
+      setDepositAddress(data.address);
+
+      // 2. SECOND: Create deposit intent
+      const intentData = await apiFetch(
+        "/api/deposits/intent",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            asset,
+            mode,
+            network,
+          }),
+        }
+      );
 
       console.log(
         "Deposit intent created:",
         intentData
       );
 
-      const data = await apiFetch("/api/deposits/address");
-
-      if (data?.success && data?.address) {
-        setDepositAddress(data.address);
-      }
-
+      // 3. THIRD: Attach the exact address to the intent
       if (
         intentData?.success &&
         intentData?.intent?.id &&
-        data?.success &&
         data?.addressId
       ) {
         const attachData = await apiFetch(
@@ -74,7 +91,7 @@ useEffect(() => {
       }
     } catch (error) {
       console.error(
-        "Failed to load deposit address:",
+        "DEPOSIT FLOW ERROR:",
         error
       );
     } finally {
@@ -83,7 +100,7 @@ useEffect(() => {
   };
 
   loadDepositAddress();
-}, []);
+}, [asset, mode, network]);
 
 const handleCopyAddress = async () => {
   if (!depositAddress) return;

@@ -316,34 +316,35 @@ const createDepositIntent = async (req, res) => {
 
 const chainId = chainIds[network];
 
-    const result = await pool.query(
-      `INSERT INTO deposit_intents
-       (
-         user_id,
-         asset,
-         mode,
-         network,
-         status
-       )
-       VALUES ($1, $2, $3, $4, $5, 'pending')
-       RETURNING
-         id,
-         user_id,
-         asset,
-         mode,
-         network,
-         chain_id,
-         deposit_address_id,
-         status,
-         created_at`,
-      [
-        userId,
-        asset,
-        mode,
-        network,
-        chainId
-      ]
-    );
+   const result = await pool.query(
+  `INSERT INTO deposit_intents
+   (
+     user_id,
+     asset,
+     mode,
+     network,
+     chain_id,
+     status
+   )
+   VALUES ($1, $2, $3, $4, $5, 'pending')
+   RETURNING
+     id,
+     user_id,
+     asset,
+     mode,
+     network,
+     chain_id,
+     deposit_address_id,
+     status,
+     created_at`,
+  [
+    userId,
+    asset,
+    mode,
+    network,
+    chainId
+  ]
+);
 
     return res.status(201).json({
       success: true,

@@ -62,7 +62,7 @@ router.get(
 );
 
 router.get(
-  "/:intent",
+  "/intent",
   verifyToken,
   createDepositIntent
 );

@@ -172,10 +172,13 @@ const intentResult = await pool.query(
      id,
      mode,
      network,
-     chain_id
+     chain_id,
+     asset
    FROM deposit_intents
    WHERE deposit_address_id = $1
      AND asset = $2
+     AND network = 'ethereum'
+     AND mode = 'instant'
      AND status = 'pending'
    ORDER BY created_at DESC
    LIMIT 1`,
