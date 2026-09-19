@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { ComponentProps, useEffect, useState } from "react";
 import { useParams,useRouter,useSearchParams, } from "next/navigation";
 
 import TransactionDetail from "../components/TransactionDetails";
@@ -45,6 +45,14 @@ export default function TransactionDetailPage() {
     }
   }, [strID]);
 
+  const normalizedTransaction: ComponentProps<typeof TransactionDetail>["transaction"] | null =
+    transaction
+      ? {
+          ...transaction,
+          stbx_uid: transaction.stbx_uid ?? undefined,
+        }
+      : null;
+
   if (loading) {
     return (
       <main className="min-h-screen bg-background text-foreground">
@@ -55,7 +63,7 @@ export default function TransactionDetailPage() {
     );
   }
 
-  if (error || !transaction) {
+  if (error || !normalizedTransaction) {
     return (
       <main className="min-h-screen bg-background text-foreground">
         <div className="px-4 py-8 text-center text-sm text-muted">
@@ -67,7 +75,7 @@ export default function TransactionDetailPage() {
 
   return (
     <TransactionDetail
-      transaction={transaction}
+      transaction={normalizedTransaction}
     />
   );
 }

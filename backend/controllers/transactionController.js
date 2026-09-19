@@ -245,14 +245,24 @@ const getTransactionBySTRId = async (req, res) => {
         str_id AS "STRId",
         sender_stbx_uid,
         receiver_stbx_uid,
-        CASE
-          WHEN sender_stbx_uid = $2 THEN 'sent'
-          WHEN receiver_stbx_uid = $2 THEN 'received'
-        END AS type,
-        CASE
-          WHEN sender_stbx_uid = $2 THEN receiver_stbx_uid
-          WHEN receiver_stbx_uid = $2 THEN sender_stbx_uid
-        END AS counterparty,
+       CASE
+  WHEN tx_type = 'DEPOSIT'
+    AND receiver_stbx_uid = $2
+    THEN 'deposit'
+  WHEN sender_stbx_uid = $2
+    THEN 'sent'
+  WHEN receiver_stbx_uid = $2
+    THEN 'received'
+END AS type,
+       CASE
+  WHEN tx_type = 'DEPOSIT'
+    AND receiver_stbx_uid = $2
+    THEN blockchain_from_address
+  WHEN sender_stbx_uid = $2
+    THEN receiver_stbx_uid
+  WHEN receiver_stbx_uid = $2
+    THEN sender_stbx_uid
+END AS counterparty,
         sender_stbx_uid AS sender,
         receiver_stbx_uid AS receiver,
         $2 AS stbx_uid,
