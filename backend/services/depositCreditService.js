@@ -4,6 +4,7 @@ const creditConfirmedDeposit = async ({
   blockchainDepositId,
   asset,
   amount,
+  fromAddress,
 }) => {
   const client = await pool.connect();
 
@@ -13,13 +14,15 @@ const creditConfirmedDeposit = async ({
     // 1. Lock blockchain deposit row
     const depositResult = await client.query(
       `SELECT
-         id,
-         network,
-         tx_hash,
-         event_index,
-         deposit_address_id,
-         status,
-         credited_at
+  id,
+  network,
+  tx_hash,
+  event_index,
+  deposit_address_id,
+  from_address,
+  to_address,
+  status,
+  credited_at
        FROM blockchain_deposits
        WHERE id = $1
        FOR UPDATE`,
@@ -111,19 +114,20 @@ const creditConfirmedDeposit = async ({
       Math.floor(Math.random() * 1000);
 
     await client.query(
-      `INSERT INTO transactions
-       (
-         str_id,
-         sender_stbx_uid,
-         receiver_stbx_uid,
-         asset,
-         amount,
-         tx_type,
-         status,
-         note,
-         blockchain_tx_hash,
-         idempotency_key
-       )
+  `INSERT INTO transactions
+   (
+     str_id,
+     sender_stbx_uid,
+     receiver_stbx_uid,
+     asset,
+     amount,
+     tx_type,
+     status,
+     note,
+     blockchain_tx_hash,
+     idempotency_key,
+     blockchain_from_address
+   )
        VALUES
        (
          $1,
@@ -135,7 +139,8 @@ const creditConfirmedDeposit = async ({
          $7,
          $8,
          $9,
-         $10
+         $10,
+         $11
        )`,
       [
         STRId,
@@ -147,6 +152,7 @@ const creditConfirmedDeposit = async ({
         "SUCCESS",
         "Automated blockchain deposit",
         deposit.tx_hash,
+        fromAddress,
         idempotencyKey,
       ]
     );

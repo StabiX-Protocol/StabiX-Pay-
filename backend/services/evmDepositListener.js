@@ -264,12 +264,12 @@ const startEvmDepositListener = async () => {
       );
 
       // Credit StabiX wallet
-      const creditResult =
-        await creditConfirmedDeposit({
-          blockchainDepositId,
-          asset,
-          amount,
-        });
+     const creditResult = await creditConfirmedDeposit({
+  blockchainDepositId,
+  asset,
+  amount,
+  fromAddress,
+});
 
       console.log(
         "DEPOSIT CREDITED:",

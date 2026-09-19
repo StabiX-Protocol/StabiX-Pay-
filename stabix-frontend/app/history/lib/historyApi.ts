@@ -5,6 +5,11 @@ export type Transaction = {
   asset: string;
   amount: string | number;
   counterparty?: string | null;
+  stbx_uid?: string | null;
+  eoa_address?: string | null;
+  network?: string | null;
+  mode?: string | null;
+  blockchain_tx_hash?: string | null;
   created_at: string;
 };
 

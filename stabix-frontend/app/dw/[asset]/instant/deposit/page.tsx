@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
+import { apiFetch } from "@/lib/api";
+import { QRCodeSVG} from "qrcode.react";
 
 export default function InstantDepositPage() {
   const params = useParams();
@@ -17,6 +20,34 @@ export default function InstantDepositPage() {
 
   const networkName =
     network.charAt(0).toUpperCase() + network.slice(1);
+
+const [depositAddress, setDepositAddress] = useState("");
+const [loadingAddress, setLoadingAddress] = useState(true);
+const [copied, setCopied] = useState(false);
+
+useEffect(() => {
+  const loadDepositAddress = async () => {
+    try {
+      const data = await apiFetch("/api/deposits/address");
+
+      if (data?.success && data?.address) {
+        setDepositAddress(data.address);
+      }
+    } catch (error) {
+      console.error("Failed to load deposit address:", error);
+    } finally {
+      setLoadingAddress(false);
+    }
+  };
+
+  loadDepositAddress();
+}, []);
+
+const handleCopyAddress = async () => {
+  if (!depositAddress) return;
+
+  await navigator.clipboard.writeText(depositAddress);
+};
 
   return (
     <main className="min-h-screen bg-[#f6f7f9] px-5 pb-10 text-slate-900 dark:bg-[#0b0b0d] dark:text-white">
@@ -76,20 +107,40 @@ export default function InstantDepositPage() {
             to the deposit address below.
           </p>
 
-          <div className="mt-5 rounded-[18px] bg-slate-100 p-4 dark:bg-[#0f172a]">
+          <div className="mt-5 flex flex-col items-center rounded-[18px] bg-slate-100 p-5 dark:bg-[#0f172a]">
 
-            <p className="break-all text-sm font-medium text-slate-700 dark:text-slate-300">
-              Deposit address will appear here
-            </p>
+  {depositAddress && (
+    <div className="rounded-2xl bg-white p-4">
+      <QRCodeSVG
+        value={depositAddress}
+        size={190}
+        level="M"
+      />
+    </div>
+  )}
 
-          </div>
+  <p className="mt-4 w-full break-all text-center text-sm font-medium text-slate-700 dark:text-slate-300">
+    {depositAddress}
+  </p>
 
+</div>
           <button
-            type="button"
-            className="mt-4 w-full rounded-[18px] bg-blue-600 py-4 font-bold text-white transition active:scale-[0.98]"
-          >
-            Copy Address
-          </button>
+  type="button"
+  disabled={!depositAddress}
+  onClick={async () => {
+    if (!depositAddress) return;
+
+    await navigator.clipboard.writeText(depositAddress);
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 1500);
+  }}
+  className="mt-4 w-full rounded-[18px] bg-blue-600 py-4 font-bold text-white transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+>
+  {copied ? "Copied ✓" : "Copy Address"}
+</button>
 
         </section>
 

@@ -97,67 +97,122 @@ client.release();
 
 const getTransactionHistory = async (req, res) => {
   try {
-
     const stbx_uid = req.user.stbx_uid;
 
     const result = await pool.query(
       `
       SELECT
-    str_id As "STRId",
+        str_id AS "STRId",
         sender_stbx_uid,
         receiver_stbx_uid,
+
         CASE
-          WHEN sender_stbx_uid = $1 THEN 'sent'
-          WHEN receiver_stbx_uid = $1 THEN 'received'
+          WHEN tx_type = 'DEPOSIT'
+            AND receiver_stbx_uid = $1
+            THEN 'deposit'
+          WHEN sender_stbx_uid = $1
+            THEN 'sent'
+          WHEN receiver_stbx_uid = $1
+            THEN 'received'
         END AS type,
+
         CASE
-          WHEN sender_stbx_uid = $1 THEN receiver_stbx_uid
-          WHEN receiver_stbx_uid = $1 THEN sender_stbx_uid
+          WHEN tx_type = 'DEPOSIT'
+            AND receiver_stbx_uid = $1
+            THEN blockchain_from_address
+          WHEN sender_stbx_uid = $1
+            THEN receiver_stbx_uid
+          WHEN receiver_stbx_uid = $1
+            THEN sender_stbx_uid
         END AS counterparty,
+
         asset,
         amount,
         status,
         note,
         blockchain_tx_hash,
+
+        CASE
+          WHEN tx_type = 'DEPOSIT'
+            THEN blockchain_from_address
+          ELSE NULL
+        END AS eoa_address,
+
+        CASE
+          WHEN tx_type = 'DEPOSIT'
+            THEN 'evm'
+          ELSE NULL
+        END AS network,
+
+        CASE
+          WHEN tx_type = 'DEPOSIT'
+            THEN 'instant'
+          ELSE NULL
+        END AS mode,
+
         created_at
+
       FROM transactions
-      WHERE sender_stbx_uid = $1
-      OR receiver_stbx_uid = $1
+
+      WHERE
+        sender_stbx_uid = $1
+        OR receiver_stbx_uid = $1
+
 
       UNION ALL
 
+
       SELECT
-       "STRId" As "STRId",
+        "STRId" AS "STRId",
         NULL AS sender_stbx_uid,
         stbx_uid AS receiver_stbx_uid,
+
         'deposit' AS type,
+
         'Deposit' AS counterparty,
+
         asset,
         amount,
         status,
         NULL AS note,
         blockchain_tx_hash,
+        NULL::text AS eoa_address,
+        network,
+        mode,
         created_at
+
       FROM deposits
+
       WHERE stbx_uid = $1
+
 
       UNION ALL
 
+
       SELECT
-         "STRId" As "STRId",
+        "STRId" AS "STRId",
         stbx_uid AS sender_stbx_uid,
         NULL AS receiver_stbx_uid,
+
         'withdraw' AS type,
+
         'Withdraw' AS counterparty,
+
         asset,
         amount,
         status,
         NULL AS note,
         blockchain_tx_hash,
+        wallet_address AS eoa_address,
+        network,
+        mode,
         created_at
+
       FROM withdraws
+
       WHERE stbx_uid = $1
-      AND status = 'APPROVED'
+        AND status = 'APPROVED'
+
 
       ORDER BY created_at DESC
       `,
@@ -170,20 +225,18 @@ const getTransactionHistory = async (req, res) => {
     });
 
   } catch (err) {
-
     console.error(err);
 
     return res.status(500).json({
       success: false,
       message: "Internal Server Error"
     });
-
   }
 };
 
 const getTransactionBySTRId = async (req, res) => {
   try {
-    const{str_id} = req.params;
+    const { str_id } = req.params;
     const stbx_uid = req.user.stbx_uid;
 
     const result = await pool.query(
@@ -208,16 +261,16 @@ const getTransactionBySTRId = async (req, res) => {
         status,
         note,
         blockchain_tx_hash,
-        created_at,
-        NULL::text AS eoa_address,
+        blockchain_from_address AS eoa_address,
+        NULL::text AS network,
         NULL::text AS mode,
-        NULL::text AS network
+        created_at
       FROM transactions
       WHERE str_id = $1
-      AND (
-        sender_stbx_uid = $2
-        OR receiver_stbx_uid = $2
-      )
+        AND (
+          sender_stbx_uid = $2
+          OR receiver_stbx_uid = $2
+        )
 
       UNION ALL
 
@@ -235,13 +288,13 @@ const getTransactionBySTRId = async (req, res) => {
         status,
         NULL AS note,
         blockchain_tx_hash,
-        created_at,
         NULL::text AS eoa_address,
+        network,
         mode,
-        network
+        created_at
       FROM deposits
       WHERE "STRId" = $1
-      AND stbx_uid = $2
+        AND stbx_uid = $2
 
       UNION ALL
 
@@ -259,13 +312,13 @@ const getTransactionBySTRId = async (req, res) => {
         status,
         NULL AS note,
         NULL AS blockchain_tx_hash,
-        created_at,
         wallet_address AS eoa_address,
+        network,
         mode,
-        network
+        created_at
       FROM withdraws
       WHERE "STRId" = $1
-      AND stbx_uid = $2
+        AND stbx_uid = $2
 
       LIMIT 1
       `,
@@ -285,14 +338,12 @@ const getTransactionBySTRId = async (req, res) => {
     });
 
   } catch (err) {
-
     console.error(err);
 
     return res.status(500).json({
       success: false,
       message: "Internal Server Error"
     });
-
   }
 };
 
