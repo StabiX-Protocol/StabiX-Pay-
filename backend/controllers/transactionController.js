@@ -138,17 +138,17 @@ const getTransactionHistory = async (req, res) => {
           ELSE NULL
         END AS eoa_address,
 
-        CASE
-          WHEN tx_type = 'DEPOSIT'
-            THEN 'evm'
-          ELSE NULL
-        END AS network,
+       CASE
+  WHEN tx_type = 'DEPOSIT'
+    THEN network
+  ELSE NULL
+END AS network,
 
-        CASE
-          WHEN tx_type = 'DEPOSIT'
-            THEN 'instant'
-          ELSE NULL
-        END AS mode,
+CASE
+  WHEN tx_type = 'DEPOSIT'
+    THEN mode
+  ELSE NULL
+END AS mode,
 
         created_at
 
@@ -272,9 +272,9 @@ END AS counterparty,
         note,
         blockchain_tx_hash,
         blockchain_from_address AS eoa_address,
-        NULL::text AS network,
-        NULL::text AS mode,
-        created_at
+network,
+mode,
+created_at
       FROM transactions
       WHERE str_id = $1
         AND (

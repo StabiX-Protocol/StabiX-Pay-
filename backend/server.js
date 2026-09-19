@@ -8,7 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const {
   startEvmDepositListener
-} = require("./services/evmDepositListener");
+} = require("./services/ethereumDepositListener");
 
 
 

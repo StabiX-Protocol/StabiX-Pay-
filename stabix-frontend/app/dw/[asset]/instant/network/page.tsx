@@ -83,11 +83,11 @@ export default async function InstantNetworkPage({
             {networks.map((network) => (
               <Link
                 key={network.slug}
-                href={
-                  selectedMode === "deposit"
-                    ? `/dw/${asset}/instant/deposit?network=${network.slug}`
-                    : `/dw/${asset}/instant/withdraw?network=${network.slug}`
-                }
+               href={
+  selectedMode === "deposit"
+    ? `/dw/${asset}/instant/deposit?network=${network.slug}&mode=deposit`
+    : `/dw/${asset}/instant/withdraw?network=${network.slug}&mode=withdraw`
+}
                 className="block rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm transition active:scale-[0.985] dark:border-white/10 dark:bg-[#18181b]"
               >
                 <div className="flex items-center justify-between">

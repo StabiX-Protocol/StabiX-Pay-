@@ -12,22 +12,33 @@ const creditConfirmedDeposit = async ({
     await client.query("BEGIN");
 
     // 1. Lock blockchain deposit row
-    const depositResult = await client.query(
-      `SELECT
-  id,
-  network,
-  tx_hash,
-  event_index,
-  deposit_address_id,
-  from_address,
-  to_address,
-  status,
-  credited_at
-       FROM blockchain_deposits
-       WHERE id = $1
-       FOR UPDATE`,
-      [blockchainDepositId]
-    );
+   const depositResult = await client.query(
+  `SELECT
+     bd.id,
+     bd.network,
+     bd.chain_id,
+     bd.tx_hash,
+     bd.event_index,
+     bd.deposit_address_id,
+     bd.deposit_intent_id,
+     bd.from_address,
+     bd.to_address,
+     bd.status,
+     bd.credited_at,
+
+     di.mode,
+     di.asset AS intent_asset,
+     di.network AS intent_network
+
+   FROM blockchain_deposits bd
+
+   LEFT JOIN deposit_intents di
+     ON di.id = bd.deposit_intent_id
+
+   WHERE bd.id = $1
+   FOR UPDATE`,
+  [blockchainDepositId]
+);
 
     if (depositResult.rows.length === 0) {
       throw new Error("Blockchain deposit not found");
@@ -152,48 +163,54 @@ const creditConfirmedDeposit = async ({
       Math.floor(Math.random() * 1000);
 
     await client.query(
-      `INSERT INTO transactions
-       (
-         str_id,
-         sender_stbx_uid,
-         receiver_stbx_uid,
-         asset,
-         amount,
-         tx_type,
-         status,
-         note,
-         blockchain_tx_hash,
-         idempotency_key,
-         blockchain_from_address
-       )
-       VALUES
-       (
-         $1,
-         $2,
-         $3,
-         $4,
-         $5,
-         $6,
-         $7,
-         $8,
-         $9,
-         $10,
-         $11
-       )`,
-      [
-        STRId,
-        "STBX-SYSTEM",
-        stbx_uid,
-        asset,
-        String(amount),
-        "DEPOSIT",
-        "SUCCESS",
-        "Automated blockchain deposit",
-        deposit.tx_hash,
-        idempotencyKey,
-        fromAddress,
-      ]
-    );
+  `INSERT INTO transactions
+   (
+     str_id,
+     sender_stbx_uid,
+     receiver_stbx_uid,
+     asset,
+     amount,
+     tx_type,
+     status,
+     note,
+     blockchain_tx_hash,
+     idempotency_key,
+     blockchain_from_address,
+     network,
+     mode
+   )
+   VALUES
+   (
+     $1,
+     $2,
+     $3,
+     $4,
+     $5,
+     $6,
+     $7,
+     $8,
+     $9,
+     $10,
+     $11,
+     $12,
+     $13
+   )`,
+  [
+    STRId,
+    "STBX-SYSTEM",
+    stbx_uid,
+    asset,
+    String(amount),
+    "DEPOSIT",
+    "SUCCESS",
+    "Automated blockchain deposit",
+    deposit.tx_hash,
+    idempotencyKey,
+    fromAddress,
+    deposit.intent_network,
+    deposit.mode,
+  ]
+);
 
     // 11. Mark blockchain deposit as credited
     await client.query(
@@ -205,7 +222,7 @@ const creditConfirmedDeposit = async ({
       [blockchainDepositId]
     );
 
-    
+
     await client.query("COMMIT");
 
     return {

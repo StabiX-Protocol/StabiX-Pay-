@@ -18,6 +18,8 @@ export default function InstantDepositPage() {
   const network =
     searchParams.get("network")?.toLowerCase() || "ethereum";
 
+    const mode = "instant";
+
   const networkName =
     network.charAt(0).toUpperCase() + network.slice(1);
 
@@ -28,13 +30,53 @@ const [copied, setCopied] = useState(false);
 useEffect(() => {
   const loadDepositAddress = async () => {
     try {
+      const intentData = await apiFetch("/api/deposits/intent", {
+        method: "POST",
+        body: JSON.stringify({
+          asset,
+          mode,
+          network,
+        }),
+      });
+
+      console.log(
+        "Deposit intent created:",
+        intentData
+      );
+
       const data = await apiFetch("/api/deposits/address");
 
       if (data?.success && data?.address) {
         setDepositAddress(data.address);
       }
+
+      if (
+        intentData?.success &&
+        intentData?.intent?.id &&
+        data?.success &&
+        data?.addressId
+      ) {
+        const attachData = await apiFetch(
+          "/api/deposits/intent/address",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              intentId: intentData.intent.id,
+              depositAddressId: data.addressId,
+            }),
+          }
+        );
+
+        console.log(
+          "Deposit intent address attached:",
+          attachData
+        );
+      }
     } catch (error) {
-      console.error("Failed to load deposit address:", error);
+      console.error(
+        "Failed to load deposit address:",
+        error
+      );
     } finally {
       setLoadingAddress(false);
     }

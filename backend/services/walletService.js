@@ -53,13 +53,17 @@ const generateDepositWallet = (network, index) => {
     throw new Error("Invalid derivation index");
   }
 
-  if (network === "evm") {
-    return deriveEvmWallet(index);
-  }
+  if (
+  network === "ethereum" ||
+  network === "arbitrum" ||
+  network === "bnb"
+) {
+  return deriveEvmWallet(index);
+}
 
-  if (network === "tron") {
-    return deriveTronWallet(index);
-  }
+if (network === "tron") {
+  return deriveTronWallet(index);
+}
 
   throw new Error(`Unsupported network: ${network}`);
 };

@@ -117,7 +117,7 @@ const startEvmDepositListener = async () => {
            chain_id,
            address
          FROM deposit_addresses
-         WHERE network = 'evm'
+         WHERE network = 'ethereum'
            AND status = 'active'
            AND LOWER(address) = LOWER($1)
          LIMIT 1`,
@@ -166,66 +166,110 @@ const startEvmDepositListener = async () => {
         }
       );
 
-      // Store blockchain deposit.
-      // Unique constraint prevents duplicate events.
-      const insertResult = await pool.query(
-        `INSERT INTO blockchain_deposits (
-           network,
-           chain_id,
-           tx_hash,
-           block_number,
-           event_index,
-           token_contract,
-           from_address,
-           to_address,
-           amount,
-           deposit_address_id,
-           status
-         )
-         VALUES (
-           $1,
-           $2,
-           $3,
-           $4,
-           $5,
-           $6,
-           $7,
-           $8,
-           $9,
-           $10,
-           'detected'
-         )
-         ON CONFLICT (
-           network,
-           tx_hash,
-           event_index
-         )
-         DO NOTHING
-         RETURNING id`,
-        [
-          "evm",
-          Number(process.env.BLOCKCHAIN_CHAIN_ID),
-          log.transactionHash,
-          blockNumber,
-          eventIndex,
-          tokenAddress,
-          fromAddress,
-          toAddress,
-          rawAmount.toString(),
-          depositAddress.id,
-        ]
-      );
+     // Find the deposit intent linked to this deposit address
+const intentResult = await pool.query(
+  `SELECT
+     id,
+     mode,
+     network,
+     chain_id
+   FROM deposit_intents
+   WHERE deposit_address_id = $1
+     AND asset = $2
+     AND status = 'pending'
+   ORDER BY created_at DESC
+   LIMIT 1`,
+  [
+    depositAddress.id,
+    asset,
+  ]
+);
 
-      // Already processed
-      if (insertResult.rows.length === 0) {
-        console.log(
-          "Duplicate blockchain event ignored:",
-          log.transactionHash,
-          eventIndex
-        );
+if (intentResult.rows.length === 0) {
+  console.log(
+    "No pending deposit intent found for address:",
+    depositAddress.id
+  );
 
-        return;
-      }
+  return;
+}
+
+const depositIntent =
+  intentResult.rows[0];
+
+console.log(
+  "Deposit intent matched:",
+  {
+    intentId: depositIntent.id,
+    mode: depositIntent.mode,
+    network: depositIntent.network,
+    chainId: depositIntent.chain_id,
+  }
+);
+
+// Store blockchain deposit.
+// Unique constraint prevents duplicate events.
+const insertResult = await pool.query(
+  `INSERT INTO blockchain_deposits (
+     network,
+     chain_id,
+     tx_hash,
+     block_number,
+     event_index,
+     token_contract,
+     from_address,
+     to_address,
+     amount,
+     deposit_address_id,
+     deposit_intent_id,
+     status
+   )
+   VALUES (
+     $1,
+     $2,
+     $3,
+     $4,
+     $5,
+     $6,
+     $7,
+     $8,
+     $9,
+     $10,
+     $11,
+     'detected'
+   )
+   ON CONFLICT (
+     network,
+     tx_hash,
+     event_index
+   )
+   DO NOTHING
+   RETURNING id`,
+  [
+    depositIntent.network,
+    depositIntent.chain_id,
+    log.transactionHash,
+    blockNumber,
+    eventIndex,
+    tokenAddress,
+    fromAddress,
+    toAddress,
+    rawAmount.toString(),
+    depositAddress.id,
+    depositIntent.id,
+  ]
+);
+
+// Already processed
+if (insertResult.rows.length === 0) {
+  console.log(
+    "Duplicate blockchain event ignored:",
+    log.transactionHash,
+    eventIndex
+  );
+
+  return;
+}
 
       const blockchainDepositId =
         insertResult.rows[0].id;
@@ -234,6 +278,21 @@ const startEvmDepositListener = async () => {
         "Blockchain deposit recorded:",
         blockchainDepositId
       );
+
+      await pool.query(
+  `UPDATE deposit_intents
+   SET
+     status = 'matched',
+     updated_at = CURRENT_TIMESTAMP
+   WHERE id = $1
+     AND status = 'pending'`,
+  [depositIntent.id]
+);
+
+console.log(
+  "Deposit intent matched:",
+  depositIntent.id
+);
 
       // Wait for required confirmations
       await provider.waitForTransaction(

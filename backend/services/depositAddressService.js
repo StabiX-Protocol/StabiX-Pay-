@@ -24,8 +24,18 @@ const getOrCreateDepositAddress = async (userId, network) => {
     return existing.rows[0];
   }
 
- const indexResult = await pool.query(
-  `SELECT nextval('deposit_address_evm_index_seq') AS next_index`
+const sequenceMap = {
+  ethereum: "deposit_address_ethereum_index_seq",
+  arbitrum: "deposit_address_arbitrum_index_seq",
+  bnb: "deposit_address_bnb_index_seq",
+  tron: "deposit_address_tron_index_seq",
+};
+const sequenceName = sequenceMap[network];
+if (!sequenceName) {
+  throw new Error(`Unsupported deposit network: ${network}`);
+}
+const indexResult = await pool.query(
+  `SELECT nextval('${sequenceName}') AS next_index`
 );
 
 const derivationIndex = Number(
@@ -48,10 +58,20 @@ if (
   );
 }
 
-const chainId =
-  network === "evm"
-    ? Number(process.env.BLOCKCHAIN_CHAIN_ID)
-    : null;
+const chainIds = {
+  ethereum: Number(process.env.ETHEREUM_CHAIN_ID),
+  arbitrum: Number(process.env.ARBITRUM_CHAIN_ID),
+  bnb: Number(process.env.BNB_CHAIN_ID),
+  tron: null,
+};
+const chainId = chainIds[network];
+if (
+  chainId === undefined
+) {
+  throw new Error(
+    `Unsupported deposit network: ${network}`
+  );
+}
 
   const result = await pool.query(
     `INSERT INTO deposit_addresses (

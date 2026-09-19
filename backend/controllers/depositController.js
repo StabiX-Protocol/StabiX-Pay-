@@ -133,6 +133,17 @@ const getDepositAddress = async (req, res) => {
   try {
     const stbx_uid = req.user.stbx_uid;
 
+  const network =
+  req.query.network?.toLowerCase() || "ethereum";
+if (
+  !["ethereum", "arbitrum", "bnb", "tron"].includes(network)
+) {
+  return res.status(400).json({
+    success: false,
+    message: "Unsupported network"
+  });
+}
+
     const userResult = await pool.query(
       `SELECT id
        FROM users
@@ -154,16 +165,17 @@ const getDepositAddress = async (req, res) => {
     } = require("../services/depositAddressService");
 
     const depositAddress =
-      await getOrCreateDepositAddress(
-        userId,
-        "evm"
-      );
+  await getOrCreateDepositAddress(
+    userId,
+    network
+  );
 
-    return res.status(200).json({
-      success: true,
-      network: "sepolia",
-      address: depositAddress.address
-    });
+   return res.status(200).json({
+  success: true,
+  network,
+  address: depositAddress.address,
+  addressId: depositAddress.id
+});
 
   } catch (err) {
     console.error(
@@ -247,9 +259,181 @@ message: "Internal Server Error"
 }
 };
 
+const createDepositIntent = async (req, res) => {
+  try {
+    const stbx_uid = req.user.stbx_uid;
+
+    const {
+      asset,
+      mode,
+      network
+    } = req.body;
+
+    if (!["USDT", "USDC"].includes(asset)) {
+      return res.status(400).json({
+        success: false,
+        message: "Unsupported asset"
+      });
+    }
+
+    if (!["instant", "advanced"].includes(mode)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid deposit mode"
+      });
+    }
+
+    if (!["ethereum", "bnb", "arbitrum", "tron"].includes(network)) {
+      return res.status(400).json({
+        success: false,
+        message: "Unsupported network"
+      });
+    }
+
+    const userResult = await pool.query(
+      `SELECT id
+       FROM users
+       WHERE stbx_uid = $1
+       LIMIT 1`,
+      [stbx_uid]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    const userId = userResult.rows[0].id;
+
+    const chainIds = {
+    ethereum: 11155111,
+    bnb: 97,
+    arbitrum: 421614,
+    tron: 3448148188,
+    };
+
+const chainId = chainIds[network];
+
+    const result = await pool.query(
+      `INSERT INTO deposit_intents
+       (
+         user_id,
+         asset,
+         mode,
+         network,
+         status
+       )
+       VALUES ($1, $2, $3, $4, $5, 'pending')
+       RETURNING
+         id,
+         user_id,
+         asset,
+         mode,
+         network,
+         chain_id,
+         deposit_address_id,
+         status,
+         created_at`,
+      [
+        userId,
+        asset,
+        mode,
+        network,
+        chainId
+      ]
+    );
+
+    return res.status(201).json({
+      success: true,
+      intent: result.rows[0]
+    });
+
+  } catch (err) {
+    console.error(
+      "CREATE DEPOSIT INTENT ERROR:",
+      err
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to create deposit intent"
+    });
+  }
+};
+
+const attachDepositIntentAddress = async (req, res) => {
+  try {
+    const stbx_uid = req.user.stbx_uid;
+    const { intentId, depositAddressId } = req.body;
+
+    if (!intentId || !depositAddressId) {
+      return res.status(400).json({
+        success: false,
+        message: "intentId and depositAddressId are required"
+      });
+    }
+
+    const result = await pool.query(
+      `UPDATE deposit_intents di
+       SET
+         deposit_address_id = da.id,
+         updated_at = CURRENT_TIMESTAMP
+       FROM deposit_addresses da
+       INNER JOIN users u
+         ON u.id = da.user_id
+       WHERE di.id = $1
+         AND da.id = $2
+         AND u.stbx_uid = $3
+         AND da.status = 'active'
+         AND da.network = di.network
+       RETURNING
+         di.id,
+         di.user_id,
+         di.asset,
+         di.mode,
+         di.network,
+         di.chain_id,
+         di.deposit_address_id,
+         di.status`,
+      [
+        intentId,
+        depositAddressId,
+        stbx_uid
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Deposit intent or matching address not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      intent: result.rows[0]
+    });
+
+  } catch (err) {
+    console.error(
+      "ATTACH DEPOSIT INTENT ADDRESS ERROR:",
+      err
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to attach deposit address"
+    });
+  }
+};
+
 module.exports = {
 createDeposit,
 getDepositAddress,
 getDepositHistory,
 getDepositById,
+createDepositIntent,
+attachDepositIntentAddress,
 };

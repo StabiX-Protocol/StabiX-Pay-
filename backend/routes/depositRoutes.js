@@ -7,7 +7,9 @@ const {
   createDeposit,
   getDepositAddress,
   getDepositHistory,
-  getDepositById
+  getDepositById,
+  createDepositIntent,
+  attachDepositIntentAddress
 } = require("../controllers/depositController");
 
 const {
@@ -58,6 +60,19 @@ router.get(
   verifyToken,
   getDepositById
 );
+
+router.get(
+  "/:intent",
+  verifyToken,
+  createDepositIntent
+);
+
+router.post(
+  "/intent/address",
+  verifyToken,
+  attachDepositIntentAddress
+);
+
 
 
 module.exports = router;
