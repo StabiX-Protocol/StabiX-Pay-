@@ -76,7 +76,50 @@ const creditConfirmedDeposit = async ({
       throw new Error(`Unsupported asset: ${asset}`);
     }
 
-    // 6. Create wallet balance row if it does not exist
+   // 6. Unique idempotency key for this blockchain event
+    const idempotencyKey =
+      `deposit:${deposit.network}:` +
+      `${deposit.tx_hash}:${deposit.event_index}`;
+
+    // 7. Check if this blockchain deposit was already processed
+    const existingTransaction = await client.query(
+      `SELECT
+         str_id,
+         receiver_stbx_uid,
+         asset,
+         amount
+       FROM transactions
+       WHERE idempotency_key = $1
+       LIMIT 1`,
+      [idempotencyKey]
+    );
+
+    if (existingTransaction.rows.length > 0) {
+      await client.query(
+        `UPDATE blockchain_deposits
+         SET
+           status = 'credited',
+           credited_at = COALESCE(
+             credited_at,
+             CURRENT_TIMESTAMP
+           )
+         WHERE id = $1`,
+        [blockchainDepositId]
+      );
+
+      await client.query("COMMIT");
+
+      return {
+        success: true,
+        alreadyCredited: true,
+        stbx_uid: existingTransaction.rows[0].receiver_stbx_uid,
+        asset: existingTransaction.rows[0].asset,
+        amount: String(existingTransaction.rows[0].amount),
+        STRId: existingTransaction.rows[0].str_id,
+      };
+    }
+
+    // 8. Create wallet balance row if it does not exist
     await client.query(
       `INSERT INTO wallet_balances
        (stbx_uid, asset, balance)
@@ -86,7 +129,7 @@ const creditConfirmedDeposit = async ({
       [stbx_uid, asset]
     );
 
-    // 7. Credit user balance
+    // 9. Credit user balance
     const balanceResult = await client.query(
       `UPDATE wallet_balances
        SET
@@ -102,32 +145,27 @@ const creditConfirmedDeposit = async ({
       throw new Error("Unable to credit wallet balance");
     }
 
-    // 8. Unique idempotency key for this blockchain event
-    const idempotencyKey =
-      `deposit:${deposit.network}:` +
-      `${deposit.tx_hash}:${deposit.event_index}`;
-
-    // 9. Create StabiX transaction
+    // 10. Create StabiX transaction
     const STRId =
       "STR" +
       Date.now() +
       Math.floor(Math.random() * 1000);
 
     await client.query(
-  `INSERT INTO transactions
-   (
-     str_id,
-     sender_stbx_uid,
-     receiver_stbx_uid,
-     asset,
-     amount,
-     tx_type,
-     status,
-     note,
-     blockchain_tx_hash,
-     idempotency_key,
-     blockchain_from_address
-   )
+      `INSERT INTO transactions
+       (
+         str_id,
+         sender_stbx_uid,
+         receiver_stbx_uid,
+         asset,
+         amount,
+         tx_type,
+         status,
+         note,
+         blockchain_tx_hash,
+         idempotency_key,
+         blockchain_from_address
+       )
        VALUES
        (
          $1,
@@ -152,12 +190,12 @@ const creditConfirmedDeposit = async ({
         "SUCCESS",
         "Automated blockchain deposit",
         deposit.tx_hash,
-        fromAddress,
         idempotencyKey,
+        fromAddress,
       ]
     );
 
-    // 10. Mark blockchain deposit as credited
+    // 11. Mark blockchain deposit as credited
     await client.query(
       `UPDATE blockchain_deposits
        SET
@@ -167,6 +205,7 @@ const creditConfirmedDeposit = async ({
       [blockchainDepositId]
     );
 
+    
     await client.query("COMMIT");
 
     return {
