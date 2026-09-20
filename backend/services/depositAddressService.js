@@ -103,6 +103,7 @@ VALUES ($1, $2, $3, $4, $5, 'active', $6, $7)
     [
       userId,
       network,
+      mode,
       chainId,
       wallet.address,
       wallet.keyReference,

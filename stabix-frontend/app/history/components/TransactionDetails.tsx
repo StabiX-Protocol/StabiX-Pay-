@@ -226,39 +226,65 @@ export default function TransactionDetail({
         {/* Bottom actions */}
         <div className="relative mt-6 space-y-3">
 
-          {/* Explorer */}
-          <button
-            type="button"
-            disabled={!t.blockchain_tx_hash}
-            onClick={() => {
-              if (!t.blockchain_tx_hash) return;
+         {/* Explorer */}
+<button
+  type="button"
+  disabled={!t.blockchain_tx_hash}
+  onClick={() => {
+    if (!t.blockchain_tx_hash) return;
 
-              // Explorer URL should be supplied by the transaction flow.
-              // This button intentionally does not fabricate an explorer URL.
-              window.open(
-                t.blockchain_tx_hash,
-                "_blank",
-                "noopener,noreferrer"
-              );
-            }}
-            className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white font-semibold text-slate-900 shadow-sm transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:bg-white/[0.06] dark:text-white"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M14 3h7v7" />
-              <path d="M10 14 21 3" />
-              <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" />
-            </svg>
+    const explorerUrls: Record<string, string> = {
+      ethereum: "https://sepolia.etherscan.io/tx/",
+      bnb: "https://testnet.bscscan.com/tx/",
+      arbitrum: "https://sepolia.arbiscan.io/tx/",
+      tron: "https://nile.tronscan.org/#/transaction/",
+    };
 
-            View on Explorer
-          </button>
+    const network =
+      t.network?.toLowerCase() || "";
+
+    const baseUrl = explorerUrls[network];
+
+    if (!baseUrl) return;
+
+    window.open(
+      `${baseUrl}${t.blockchain_tx_hash}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  }}
+  className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white font-semibold text-slate-900 shadow-sm transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:bg-white/[0.06] dark:text-white"
+>
+  <svg
+    viewBox="0 0 24 24"
+    className="h-5 w-5"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M14 3h7v7" />
+    <path d="M10 14 21 3" />
+    <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" />
+  </svg>
+
+  {(() => {
+  const explorerNames: Record<string, string> = {
+    ethereum: "View on Etherscan",
+    bnb: "View on BscScan",
+    arbitrum: "View on Arbiscan",
+    tron: "View on TronScan",
+  };
+
+  return (
+    <>
+      {explorerNames[t.network?.toLowerCase() || ""] ||
+        "View on Explorer"}
+    </>
+  );
+})()}
+</button>
 
           {/* Done */}
           <Link
