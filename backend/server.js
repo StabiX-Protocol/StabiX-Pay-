@@ -12,6 +12,9 @@ const {
 const {
   scanEthereumDeposits,
 } = require("./services/ethereumDepositScanner");
+const {
+  processEthereumDeposits,
+} = require("./services/ethereumDepositProcessor");
 
 
 
@@ -124,6 +127,22 @@ const runEthereumDepositScanner = async () => {
 runEthereumDepositScanner();
 setInterval(
   runEthereumDepositScanner,
+  30 * 1000
+);
+
+const runEthereumDepositProcessor = async () => {
+  try {
+    await processEthereumDeposits();
+  } catch (err) {
+    console.error(
+      "ETHEREUM DEPOSIT PROCESSOR ERROR:",
+      err
+    );
+  }
+};
+runEthereumDepositProcessor();
+setInterval(
+  runEthereumDepositProcessor,
   30 * 1000
 );
 

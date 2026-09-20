@@ -35,8 +35,8 @@ const creditConfirmedDeposit = async ({
    LEFT JOIN deposit_intents di
      ON di.id = bd.deposit_intent_id
 
-   WHERE bd.id = $1
-   FOR UPDATE`,
+  WHERE bd.id = $1
+FOR UPDATE OF bd`,
   [blockchainDepositId]
 );
 
