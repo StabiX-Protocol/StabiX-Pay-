@@ -97,7 +97,125 @@ const validateSweepAddresses = ({
   }
 };
 
+const reconcileBroadcastSweepJobs = async () => {
+  const result = await pool.query(
+    `SELECT
+       id,
+       tx_hash,
+       attempts
+     FROM sweep_jobs
+     WHERE status = 'broadcast'
+       AND tx_hash IS NOT NULL
+     ORDER BY updated_at ASC
+     LIMIT 20`
+  );
+
+  if (result.rows.length === 0) {
+    return;
+  }
+
+  const currentBlock =
+    await provider.getBlockNumber();
+
+  for (const job of result.rows) {
+    try {
+      const receipt =
+        await provider.getTransactionReceipt(
+          job.tx_hash
+        );
+
+      if (!receipt) {
+        console.log(
+          "SWEEP BROADCAST TX STILL PENDING:",
+          {
+            jobId: job.id,
+            txHash: job.tx_hash,
+          }
+        );
+
+        continue;
+      }
+
+      const txConfirmations =
+        currentBlock -
+        receipt.blockNumber +
+        1;
+
+      if (receipt.status !== 1) {
+        await pool.query(
+          `UPDATE sweep_jobs
+           SET
+             status = CASE
+               WHEN attempts >= 10
+                 THEN 'failed'
+               ELSE 'queued'
+             END,
+             last_error = $1,
+             next_attempt_at = CASE
+               WHEN attempts >= 10
+                 THEN NULL
+               ELSE CURRENT_TIMESTAMP +
+                    INTERVAL '5 minutes'
+             END,
+             updated_at = CURRENT_TIMESTAMP
+           WHERE id = $2
+             AND status = 'broadcast'`,
+          [
+            "Sweep transaction failed on blockchain",
+            job.id,
+          ]
+        );
+
+        console.log(
+          "SWEEP BROADCAST TX FAILED:",
+          {
+            jobId: job.id,
+            txHash: job.tx_hash,
+          }
+        );
+
+        continue;
+      }
+
+      if (txConfirmations < confirmations) {
+        continue;
+      }
+
+      await pool.query(
+        `UPDATE sweep_jobs
+         SET
+           status = 'confirmed',
+           confirmed_at = CURRENT_TIMESTAMP,
+           updated_at = CURRENT_TIMESTAMP,
+           last_error = NULL
+         WHERE id = $1
+           AND status = 'broadcast'`,
+        [job.id]
+      );
+
+      console.log(
+        "SWEEP BROADCAST TX RECONCILED:",
+        {
+          jobId: job.id,
+          txHash: job.tx_hash,
+          confirmations: txConfirmations,
+        }
+      );
+    } catch (err) {
+      console.error(
+        "SWEEP BROADCAST RECONCILIATION ERROR:",
+        {
+          jobId: job.id,
+          error: err,
+        }
+      );
+    }
+  }
+};
+
 const processEvmSweepJobs = async () => {
+  await reconcileBroadcastSweepJobs();
+
   const jobs = await getPendingSweepJobs(10);
 
   if (jobs.length === 0) {
