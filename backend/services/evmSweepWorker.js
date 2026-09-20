@@ -8,9 +8,23 @@ const {
   getDepositWallet,
 } = require("./walletService");
 
-
-
 const provider = getProvider();
+
+const HOT_WALLET_ADDRESS =
+  process.env.EVM_DEPOSIT_WALLET_ADDRESS;
+
+if (!HOT_WALLET_ADDRESS) {
+  throw new Error(
+    "EVM_DEPOSIT_WALLET_ADDRESS is not configured"
+  );
+}
+
+if (!ethers.isAddress(HOT_WALLET_ADDRESS)) {
+  throw new Error(
+    "EVM_DEPOSIT_WALLET_ADDRESS is invalid"
+  );
+}
+
 const confirmations = Number(
   process.env.BLOCKCHAIN_CONFIRMATIONS || 3
 );
@@ -23,29 +37,18 @@ if (!HOT_WALLET_PRIVATE_KEY) {
     "EVM_HOT_WALLET_PRIVATE_KEY is not configured"
   );
 }
+
 const hotWallet = new ethers.Wallet(
   HOT_WALLET_PRIVATE_KEY,
   provider
 );
+
 if (
   hotWallet.address.toLowerCase() !==
   HOT_WALLET_ADDRESS.toLowerCase()
 ) {
   throw new Error(
     "Hot wallet private key does not match EVM_DEPOSIT_WALLET_ADDRESS"
-  );
-}
-
-const HOT_WALLET_ADDRESS =
-  process.env.EVM_DEPOSIT_WALLET_ADDRESS;
-if (!HOT_WALLET_ADDRESS) {
-  throw new Error(
-    "EVM_DEPOSIT_WALLET_ADDRESS is not configured"
-  );
-}
-if (!ethers.isAddress(HOT_WALLET_ADDRESS)) {
-  throw new Error(
-    "EVM_DEPOSIT_WALLET_ADDRESS is invalid"
   );
 }
 
@@ -60,6 +63,7 @@ const getTokenBalance = async ({
     ],
     provider
   );
+
   return await token.balanceOf(walletAddress);
 };
 
@@ -76,11 +80,13 @@ const validateSweepAddresses = ({
       `Invalid source address: ${sourceAddress}`
     );
   }
+
   if (!ethers.isAddress(destinationAddress)) {
     throw new Error(
       `Invalid destination address: ${destinationAddress}`
     );
   }
+
   if (
     sourceAddress.toLowerCase() ===
     destinationAddress.toLowerCase()
@@ -111,7 +117,7 @@ const processEvmSweepJobs = async () => {
            attempts = attempts + 1,
            updated_at = CURRENT_TIMESTAMP
          WHERE id = $1
-           AND status IN ('queued', 'processing')
+           AND status = 'queued'
            AND (
              next_attempt_at IS NULL
              OR next_attempt_at <= CURRENT_TIMESTAMP
@@ -133,300 +139,635 @@ const processEvmSweepJobs = async () => {
 
       if (lockResult.rows.length === 0) {
         await client.query("ROLLBACK");
+        client.release();
         continue;
       }
 
       const lockedJob = lockResult.rows[0];
 
-      validateSweepAddresses({
-  sourceAddress: lockedJob.source_address,
-  destinationAddress: lockedJob.destination_address,
-});
-
-const tokenBalance = await getTokenBalance({
-  tokenContract: lockedJob.token_contract,
-  walletAddress: lockedJob.source_address,
-});
-
-const nativeBalance = await getNativeBalance(
-  lockedJob.source_address
-);
-const addressResult = await pool.query(
-  `SELECT derivation_index
-   FROM deposit_addresses
-   WHERE id = $1
-   LIMIT 1`,
-  [lockedJob.deposit_address_id]
-);
-if (addressResult.rows.length === 0) {
-  throw new Error("Deposit address not found");
-}
-const derivationIndex =
-  Number(addressResult.rows[0].derivation_index);
-
-  const sourceWallet = getDepositWallet(
-  lockedJob.network,
-  derivationIndex
-);
-if (
-  sourceWallet.address.toLowerCase() !==
-  lockedJob.source_address.toLowerCase()
-) {
-  throw new Error(
-    "Derived deposit wallet does not match sweep source address"
-  );
-}
-
-console.log("SWEEP SOURCE BALANCE:", {
-  jobId: lockedJob.id,
-  network: lockedJob.network,
-  asset: lockedJob.asset,
-  sourceAddress: lockedJob.source_address,
-  tokenBalance: tokenBalance.toString(),
-  nativeBalance: nativeBalance.toString(),
-});
-
-console.log("SWEEP SOURCE WALLET VERIFIED:", {
-  jobId: lockedJob.id,
-  address: sourceWallet.address,
-  derivationIndex,
-});
-
-const tokenContract = new ethers.Contract(
-  lockedJob.token_contract,
-  [
-    "function balanceOf(address owner) view returns (uint256)",
-    "function transfer(address to, uint256 amount) returns (bool)",
-  ],
-  sourceWallet.connect(provider)
-);
-
-
-const MIN_NATIVE_GAS = ethers.parseEther("0.0001");
-
-if (nativeBalance < MIN_NATIVE_GAS) {
-  console.log("SOURCE WALLET NEEDS GAS:", {
-    jobId: lockedJob.id,
-    sourceAddress: lockedJob.source_address,
-    nativeBalance: nativeBalance.toString(),
-  });
-}
-
-if (tokenBalance <= 0n) {
-  throw new Error(
-    "No token balance available for sweep"
-  );
-}
-
-const sweepAmount = BigInt(lockedJob.amount);
-if (sweepAmount <= 0n) {
-  throw new Error(
-    "Invalid sweep amount"
-  );
-}
-if (tokenBalance < sweepAmount) {
-  throw new Error(
-    `Insufficient token balance. Required: ${sweepAmount.toString()}, Available: ${tokenBalance.toString()}`
-  );
-}
-const gasLimit = await tokenContract.transfer.estimateGas(
-  lockedJob.destination_address,
-  sweepAmount
-);
-
-const feeData = await provider.getFeeData();
-const gasPrice =
-  feeData.maxFeePerGas ||
-  feeData.gasPrice;
-if (!gasPrice) {
-  throw new Error(
-    "Unable to determine current gas price"
-  );
-}
-const estimatedGasCost =
-  gasLimit * gasPrice;
-
-if (nativeBalance < estimatedGasCost) {
-  const gasFundingAmount =
-    estimatedGasCost * 120n / 100n;
-
-  const finalGasFundingAmount =
-    gasFundingAmount > MIN_NATIVE_GAS
-      ? gasFundingAmount
-      : MIN_NATIVE_GAS;
-
-  const hotWalletBalance =
-    await provider.getBalance(
-      hotWallet.address
-    );
-
-  if (
-    hotWalletBalance <
-    finalGasFundingAmount
-  ) {
-    throw new Error(
-      `Hot wallet has insufficient ETH for gas funding. Required: ${finalGasFundingAmount.toString()}, Available: ${hotWalletBalance.toString()}`
-    );
-  }
-
-  console.log("FUNDING SOURCE WALLET WITH GAS:", {
-    jobId: lockedJob.id,
-    sourceAddress: lockedJob.source_address,
-    amount: finalGasFundingAmount.toString(),
-  });
-
-  const gasFundingTx =
-    await hotWallet.sendTransaction({
-      to: lockedJob.source_address,
-      value: finalGasFundingAmount,
-    });
-
-  console.log("GAS FUNDING BROADCAST:", {
-    jobId: lockedJob.id,
-    txHash: gasFundingTx.hash,
-  });
-
-  const gasFundingReceipt =
-    await gasFundingTx.wait(1);
-
-  if (!gasFundingReceipt) {
-    throw new Error(
-      "Gas funding transaction was not confirmed"
-    );
-  }
-
-  console.log("SOURCE WALLET GAS FUNDED:", {
-    jobId: lockedJob.id,
-    txHash: gasFundingTx.hash,
-  });
-}
-
-console.log("SWEEP GAS ESTIMATE:", {
-  jobId: lockedJob.id,
-  gasLimit: gasLimit.toString(),
-  gasPrice: gasPrice.toString(),
-  estimatedGasCost: estimatedGasCost.toString(),
-});
-
-const sweepTx = await tokenContract.transfer.populateTransaction(
-  lockedJob.destination_address,
-  sweepAmount
-);
-
-sweepTx.gasLimit = gasLimit;
-
-if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
-  sweepTx.maxFeePerGas = feeData.maxFeePerGas;
-  sweepTx.maxPriorityFeePerGas =
-    feeData.maxPriorityFeePerGas;
-} else if (feeData.gasPrice) {
-  sweepTx.gasPrice = feeData.gasPrice;
-}
-
-console.log("SWEEP TRANSACTION PREPARED:", {
-  jobId: lockedJob.id,
-  from: sourceWallet.address,
-  to: lockedJob.destination_address,
-  tokenContract: lockedJob.token_contract,
-  amount: sweepAmount.toString(),
-  gasLimit: gasLimit.toString(),
-});
-
-const txResponse = await sourceWallet.sendTransaction(
-  sweepTx
-);
-console.log("SWEEP TRANSACTION BROADCAST:", {
-  jobId: lockedJob.id,
-  txHash: txResponse.hash,
-});
-
-await pool.query(
-  `UPDATE sweep_jobs
-   SET
-     status = 'broadcast',
-     tx_hash = $1,
-     broadcast_at = CURRENT_TIMESTAMP,
-     updated_at = CURRENT_TIMESTAMP,
-     last_error = NULL
-   WHERE id = $2`,
-  [
-    txResponse.hash,
-    lockedJob.id,
-  ]
-);
-
-const receipt = await provider.waitForTransaction(
-  txResponse.hash,
-  confirmations
-);
-
-if (!receipt) {
-  throw new Error(
-    "Sweep transaction confirmation timeout"
-  );
-}
-
-if (receipt.status !== 1) {
-  throw new Error(
-    "Sweep transaction failed on blockchain"
-  );
-}
-
-await pool.query(
-  `UPDATE sweep_jobs
-   SET
-     status = 'confirmed',
-     confirmed_at = CURRENT_TIMESTAMP,
-     updated_at = CURRENT_TIMESTAMP,
-     last_error = NULL
-   WHERE id = $1
-     AND status = 'broadcast'`,
-  [lockedJob.id]
-);
-
-console.log("SWEEP CONFIRMED:", {
-  jobId: lockedJob.id,
-  txHash: txResponse.hash,
-  confirmations,
-});
-
       await client.query("COMMIT");
+      client.release();
+
+      validateSweepAddresses({
+        sourceAddress: lockedJob.source_address,
+        destinationAddress:
+          lockedJob.destination_address,
+      });
+
+      if (
+        !lockedJob.token_contract
+      ) {
+        throw new Error(
+          "Sweep token contract is missing"
+        );
+      }
+
+      if (
+        lockedJob.amount === null ||
+        lockedJob.amount === undefined
+      ) {
+        throw new Error(
+          "Sweep amount is missing"
+        );
+      }
+
+      const sweepAmount =
+        BigInt(lockedJob.amount);
+
+      if (sweepAmount <= 0n) {
+        throw new Error(
+          "Invalid sweep amount"
+        );
+      }
+
+      const tokenBalance =
+        await getTokenBalance({
+          tokenContract:
+            lockedJob.token_contract,
+          walletAddress:
+            lockedJob.source_address,
+        });
+
+      const nativeBalance =
+        await getNativeBalance(
+          lockedJob.source_address
+        );
 
       console.log(
-        "SWEEP JOB QUEUED FOR PROCESSING:",
+        "SWEEP SOURCE BALANCE:",
         {
-          id: lockedJob.id,
+          jobId: lockedJob.id,
           network: lockedJob.network,
           asset: lockedJob.asset,
-          source: lockedJob.source_address,
-          destination: lockedJob.destination_address,
-          amount: lockedJob.amount,
-          attempts: lockedJob.attempts,
+          sourceAddress:
+            lockedJob.source_address,
+          tokenBalance:
+            tokenBalance.toString(),
+          nativeBalance:
+            nativeBalance.toString(),
         }
       );
-    } catch (err) {
-      await client.query("ROLLBACK");
+
+      if (tokenBalance <= 0n) {
+        throw new Error(
+          "No token balance available for sweep"
+        );
+      }
+
+      if (
+        tokenBalance < sweepAmount
+      ) {
+        throw new Error(
+          `Insufficient token balance. Required: ${sweepAmount.toString()}, Available: ${tokenBalance.toString()}`
+        );
+      }
+
+      const addressResult =
+        await pool.query(
+          `SELECT
+             derivation_index
+           FROM deposit_addresses
+           WHERE id = $1
+           LIMIT 1`,
+          [
+            lockedJob.deposit_address_id,
+          ]
+        );
+
+      if (
+        addressResult.rows.length === 0
+      ) {
+        throw new Error(
+          "Deposit address not found"
+        );
+      }
+
+      const derivationIndex =
+        Number(
+          addressResult.rows[0]
+            .derivation_index
+        );
+
+      if (
+        !Number.isInteger(
+          derivationIndex
+        ) ||
+        derivationIndex < 0
+      ) {
+        throw new Error(
+          "Invalid deposit derivation index"
+        );
+      }
+
+     const sourceWallet =
+  getDepositWallet(
+    lockedJob.network,
+    derivationIndex
+  ).connect(provider);
+
+      if (
+        sourceWallet.address.toLowerCase() !==
+        lockedJob.source_address.toLowerCase()
+      ) {
+        throw new Error(
+          "Derived deposit wallet does not match sweep source address"
+        );
+      }
+
+      console.log(
+        "SWEEP SOURCE WALLET VERIFIED:",
+        {
+          jobId: lockedJob.id,
+          address:
+            sourceWallet.address,
+          derivationIndex,
+        }
+      );
+
+      const tokenContract =
+        new ethers.Contract(
+          lockedJob.token_contract,
+          [
+            "function balanceOf(address owner) view returns (uint256)",
+            "function transfer(address to, uint256 amount) returns (bool)",
+          ],
+          sourceWallet.connect(
+            provider
+          )
+        );
+
+      const gasLimit =
+        await tokenContract.transfer.estimateGas(
+          lockedJob.destination_address,
+          sweepAmount
+        );
+
+      let feeData =
+        await provider.getFeeData();
+
+      let gasPrice =
+        feeData.maxFeePerGas ||
+        feeData.gasPrice;
+
+      if (!gasPrice) {
+        throw new Error(
+          "Unable to determine current gas price"
+        );
+      }
+
+      let estimatedGasCost =
+        gasLimit * gasPrice;
+
+      let currentNativeBalance =
+        nativeBalance;
+
+      /*
+       * GAS STATION
+       *
+       * If source deposit address does not
+       * have enough native gas, the Hot Wallet
+       * funds it automatically.
+       */
+      if (
+        currentNativeBalance <
+        estimatedGasCost
+      ) {
+        const gasFundingAmount =
+          estimatedGasCost * 120n / 100n;
+
+        const MIN_NATIVE_GAS =
+          ethers.parseEther(
+            "0.0001"
+          );
+
+        const finalGasFundingAmount =
+          gasFundingAmount >
+          MIN_NATIVE_GAS
+            ? gasFundingAmount
+            : MIN_NATIVE_GAS;
+
+        const hotWalletBalance =
+          await getNativeBalance(
+            hotWallet.address
+          );
+
+        if (
+          hotWalletBalance <
+          finalGasFundingAmount
+        ) {
+          throw new Error(
+            `Hot wallet has insufficient ETH for gas funding. Required: ${finalGasFundingAmount.toString()}, Available: ${hotWalletBalance.toString()}`
+          );
+        }
+
+        console.log(
+          "FUNDING SOURCE WALLET WITH GAS:",
+          {
+            jobId: lockedJob.id,
+            sourceAddress:
+              lockedJob.source_address,
+            amount:
+              finalGasFundingAmount.toString(),
+          }
+        );
+
+        const gasFundingTx =
+          await hotWallet.sendTransaction({
+            to:
+              lockedJob.source_address,
+            value:
+              finalGasFundingAmount,
+          });
+
+        console.log(
+          "GAS FUNDING BROADCAST:",
+          {
+            jobId: lockedJob.id,
+            txHash:
+              gasFundingTx.hash,
+          }
+        );
+
+        const gasFundingReceipt =
+          await gasFundingTx.wait(1);
+
+        if (!gasFundingReceipt) {
+          throw new Error(
+            "Gas funding transaction was not confirmed"
+          );
+        }
+
+        console.log(
+          "SOURCE WALLET GAS FUNDED:",
+          {
+            jobId: lockedJob.id,
+            txHash:
+              gasFundingTx.hash,
+          }
+        );
+
+        /*
+         * Refresh native balance and fee data
+         * after gas funding.
+         */
+        currentNativeBalance =
+          await getNativeBalance(
+            lockedJob.source_address
+          );
+
+        feeData =
+          await provider.getFeeData();
+
+        gasPrice =
+          feeData.maxFeePerGas ||
+          feeData.gasPrice;
+
+        if (!gasPrice) {
+          throw new Error(
+            "Unable to determine current gas price after gas funding"
+          );
+        }
+
+        /*
+         * Re-estimate gas after funding.
+         */
+        const refreshedGasLimit =
+          await tokenContract.transfer.estimateGas(
+            lockedJob.destination_address,
+            sweepAmount
+          );
+
+        estimatedGasCost =
+          refreshedGasLimit *
+          gasPrice;
+
+        if (
+          currentNativeBalance <
+          estimatedGasCost
+        ) {
+          throw new Error(
+            `Insufficient gas after funding. Required: ${estimatedGasCost.toString()}, Available: ${currentNativeBalance.toString()}`
+          );
+        }
+
+        console.log(
+          "SOURCE WALLET GAS VERIFIED:",
+          {
+            jobId: lockedJob.id,
+            nativeBalance:
+              currentNativeBalance.toString(),
+            requiredGas:
+              estimatedGasCost.toString(),
+          }
+        );
+      }
+
+      /*
+       * Final token balance check immediately
+       * before creating/broadcasting the sweep.
+       */
+      const currentTokenBalance =
+        await getTokenBalance({
+          tokenContract:
+            lockedJob.token_contract,
+          walletAddress:
+            sourceWallet.address,
+        });
+
+      if (
+        currentTokenBalance <
+        sweepAmount
+      ) {
+        throw new Error(
+          `Source token balance changed. Required: ${sweepAmount.toString()}, Available: ${currentTokenBalance.toString()}`
+        );
+      }
+
+      /*
+       * Final gas refresh even when the source
+       * already had enough gas.
+       */
+      feeData =
+        await provider.getFeeData();
+
+      gasPrice =
+        feeData.maxFeePerGas ||
+        feeData.gasPrice;
+
+      if (!gasPrice) {
+        throw new Error(
+          "Unable to determine final gas price"
+        );
+      }
+
+      const finalGasLimit =
+        await tokenContract.transfer.estimateGas(
+          lockedJob.destination_address,
+          sweepAmount
+        );
+
+      const finalGasCost =
+        finalGasLimit * gasPrice;
+
+      currentNativeBalance =
+        await getNativeBalance(
+          lockedJob.source_address
+        );
+
+      if (
+        currentNativeBalance <
+        finalGasCost
+      ) {
+        throw new Error(
+          `Insufficient native gas before sweep. Required: ${finalGasCost.toString()}, Available: ${currentNativeBalance.toString()}`
+        );
+      }
+
+      console.log(
+        "SWEEP GAS ESTIMATE:",
+        {
+          jobId: lockedJob.id,
+          gasLimit:
+            finalGasLimit.toString(),
+          gasPrice:
+            gasPrice.toString(),
+          estimatedGasCost:
+            finalGasCost.toString(),
+        }
+      );
+
+      /*
+       * Prevent accidental self-transfer.
+       */
+      if (
+        lockedJob.destination_address
+          .toLowerCase() ===
+        sourceWallet.address
+          .toLowerCase()
+      ) {
+        throw new Error(
+          "Sweep destination cannot be the source wallet"
+        );
+      }
+
+      const sweepTx =
+        await tokenContract.transfer.populateTransaction(
+          lockedJob.destination_address,
+          sweepAmount
+        );
+
+      sweepTx.gasLimit =
+        finalGasLimit;
+
+      if (
+        feeData.maxFeePerGas &&
+        feeData.maxPriorityFeePerGas
+      ) {
+        sweepTx.maxFeePerGas =
+          feeData.maxFeePerGas;
+
+        sweepTx.maxPriorityFeePerGas =
+          feeData.maxPriorityFeePerGas;
+      } else if (
+        feeData.gasPrice
+      ) {
+        sweepTx.gasPrice =
+          feeData.gasPrice;
+      }
+
+      console.log(
+        "SWEEP TRANSACTION PREPARED:",
+        {
+          jobId: lockedJob.id,
+          from:
+            sourceWallet.address,
+          to:
+            lockedJob.destination_address,
+          tokenContract:
+            lockedJob.token_contract,
+          amount:
+            sweepAmount.toString(),
+          gasLimit:
+            finalGasLimit.toString(),
+        }
+      );
+
+      /*
+       * IMPORTANT:
+       * Final balance check happens BEFORE
+       * sendTransaction().
+       */
+      const preBroadcastTokenBalance =
+        await getTokenBalance({
+          tokenContract:
+            lockedJob.token_contract,
+          walletAddress:
+            sourceWallet.address,
+        });
+
+      if (
+        preBroadcastTokenBalance <
+        sweepAmount
+      ) {
+        throw new Error(
+          `Source token balance changed before broadcast. Required: ${sweepAmount.toString()}, Available: ${preBroadcastTokenBalance.toString()}`
+        );
+      }
+
+      const txResponse =
+        await sourceWallet.sendTransaction(
+          sweepTx
+        );
+
+      console.log(
+        "SWEEP TRANSACTION BROADCAST:",
+        {
+          jobId: lockedJob.id,
+          txHash:
+            txResponse.hash,
+        }
+      );
+
+      /*
+       * Save tx hash immediately after
+       * successful broadcast.
+       */
+      await pool.query(
+        `UPDATE sweep_jobs
+         SET
+           status = 'broadcast',
+           tx_hash = $1,
+           broadcast_at = CURRENT_TIMESTAMP,
+           updated_at = CURRENT_TIMESTAMP,
+           last_error = NULL
+         WHERE id = $2
+           AND status = 'processing'`,
+        [
+          txResponse.hash,
+          lockedJob.id,
+        ]
+      );
+
+      /*
+       * Wait for required confirmations.
+       */
+      const receipt =
+        await provider.waitForTransaction(
+          txResponse.hash,
+          confirmations
+        );
+
+      if (!receipt) {
+        throw new Error(
+          "Sweep transaction confirmation timeout"
+        );
+      }
+
+      if (
+        receipt.status !== 1
+      ) {
+        throw new Error(
+          "Sweep transaction failed on blockchain"
+        );
+      }
 
       await pool.query(
         `UPDATE sweep_jobs
          SET
-           status = CASE
-             WHEN attempts >= 10 THEN 'failed'
-             ELSE 'queued'
-           END,
-           last_error = $1,
-           next_attempt_at = CASE
-             WHEN attempts >= 10 THEN NULL
-             ELSE CURRENT_TIMESTAMP + INTERVAL '5 minutes'
-           END,
-           updated_at = CURRENT_TIMESTAMP
-         WHERE id = $2
-           AND status = 'processing'`,
-        [
-          err.message || String(err),
-          job.id,
-        ]
+           status = 'confirmed',
+           confirmed_at = CURRENT_TIMESTAMP,
+           updated_at = CURRENT_TIMESTAMP,
+           last_error = NULL
+         WHERE id = $1
+           AND status = 'broadcast'`,
+        [lockedJob.id]
       );
+
+      console.log(
+        "SWEEP CONFIRMED:",
+        {
+          jobId: lockedJob.id,
+          txHash:
+            txResponse.hash,
+          confirmations,
+        }
+      );
+
+    } catch (err) {
+      /*
+       * If the transaction was already broadcast,
+       * DO NOT put the job back into queued.
+       *
+       * It must remain broadcast so that a
+       * reconciliation process can inspect it.
+       */
+      try {
+        const currentJob =
+          await pool.query(
+            `SELECT
+               status,
+               tx_hash,
+               attempts
+             FROM sweep_jobs
+             WHERE id = $1
+             LIMIT 1`,
+            [job.id]
+          );
+
+        if (
+          currentJob.rows.length > 0 &&
+          currentJob.rows[0].status ===
+            "broadcast"
+        ) {
+          await pool.query(
+            `UPDATE sweep_jobs
+             SET
+               last_error = $1,
+               updated_at = CURRENT_TIMESTAMP
+             WHERE id = $2
+               AND status = 'broadcast'`,
+            [
+              err.message ||
+                String(err),
+              job.id,
+            ]
+          );
+        } else {
+          await pool.query(
+            `UPDATE sweep_jobs
+             SET
+               status = CASE
+                 WHEN attempts >= 10
+                   THEN 'failed'
+                 ELSE 'queued'
+               END,
+               last_error = $1,
+               next_attempt_at = CASE
+                 WHEN attempts >= 10
+                   THEN NULL
+                 ELSE CURRENT_TIMESTAMP +
+                      INTERVAL '5 minutes'
+               END,
+               updated_at =
+                 CURRENT_TIMESTAMP
+             WHERE id = $2
+               AND status = 'processing'`,
+            [
+              err.message ||
+                String(err),
+              job.id,
+            ]
+          );
+        }
+      } catch (dbError) {
+        console.error(
+          "SWEEP JOB ERROR-STATE UPDATE FAILED:",
+          {
+            jobId: job.id,
+            error: dbError,
+          }
+        );
+      }
 
       console.error(
         "SWEEP JOB WORKER ERROR:",
@@ -436,11 +777,8 @@ console.log("SWEEP CONFIRMED:", {
         }
       );
 
-      client.release();
       continue;
     }
-
-    client.release();
   }
 };
 
