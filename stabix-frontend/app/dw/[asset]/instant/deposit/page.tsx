@@ -50,22 +50,33 @@ useEffect(() => {
       setDepositAddress(data.address);
 
       // 2. SECOND: Create deposit intent
-      const intentData = await apiFetch(
-        "/api/deposits/intent",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            asset,
-            mode,
-            network,
-          }),
-        }
-      );
+     let intentData;
 
-      console.log(
-        "Deposit intent created:",
-        intentData
-      );
+try {
+  intentData = await apiFetch(
+    "/api/deposits/intent",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        asset,
+        mode,
+        network,
+      }),
+    }
+  );
+
+  console.log(
+    "Deposit intent created:",
+    intentData
+  );
+} catch (error) {
+  console.error(
+    "CREATE DEPOSIT INTENT FAILED:",
+    error
+  );
+
+  return;
+}
 
       // 3. THIRD: Attach the exact address to the intent
       if (

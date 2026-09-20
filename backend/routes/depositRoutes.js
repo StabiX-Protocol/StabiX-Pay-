@@ -61,7 +61,7 @@ router.get(
   getDepositById
 );
 
-router.get(
+router.post(
   "/intent",
   verifyToken,
   createDepositIntent

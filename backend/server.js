@@ -9,6 +9,9 @@ const server = http.createServer(app);
 const {
   startEvmDepositListener
 } = require("./services/ethereumDepositListener");
+const {
+  scanEthereumDeposits,
+} = require("./services/ethereumDepositScanner");
 
 
 
@@ -107,5 +110,21 @@ console.error(
 err
 );
 });
+
+const runEthereumDepositScanner = async () => {
+  try {
+    await scanEthereumDeposits();
+  } catch (err) {
+    console.error(
+      "ETHEREUM DEPOSIT SCANNER ERROR:",
+      err
+    );
+  }
+};
+runEthereumDepositScanner();
+setInterval(
+  runEthereumDepositScanner,
+  30 * 1000
+);
 
 });
