@@ -101,31 +101,44 @@ const processEthereumDeposits = async () => {
             decimals
           );
 
-        const confirmResult =
-          await pool.query(
-            `UPDATE blockchain_deposits
-             SET
-               status = 'confirmed',
-               confirmed_at = CURRENT_TIMESTAMP
-             WHERE id = $1
-               AND status = 'detected'
-             RETURNING id`,
-            [deposit.id]
-          );
+       if (deposit.status === "detected") {
+  const confirmResult =
+    await pool.query(
+      `UPDATE blockchain_deposits
+       SET
+         status = 'confirmed',
+         confirmed_at = CURRENT_TIMESTAMP
+       WHERE id = $1
+         AND status = 'detected'
+       RETURNING id`,
+      [deposit.id]
+    );
 
-        if (confirmResult.rows.length === 0) {
-          continue;
-        }
+  if (confirmResult.rows.length === 0) {
+    continue;
+  }
 
-        console.log(
-          "DEPOSIT CONFIRMED:",
-          {
-            id: deposit.id,
-            asset,
-            amount,
-            block: deposit.block_number,
-          }
-        );
+  console.log(
+    "DEPOSIT CONFIRMED:",
+    {
+      id: deposit.id,
+      asset,
+      amount,
+      block: deposit.block_number,
+    }
+  );
+}
+
+if (deposit.status === "confirmed") {
+  console.log(
+    "DEPOSIT ALREADY CONFIRMED - PROCESSING CREDIT:",
+    {
+      id: deposit.id,
+      asset,
+      amount,
+    }
+  );
+}
 
         const creditResult =
           await creditConfirmedDeposit({
