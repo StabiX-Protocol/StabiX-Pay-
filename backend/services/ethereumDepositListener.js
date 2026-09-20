@@ -188,28 +188,26 @@ const intentResult = await pool.query(
   ]
 );
 
-if (intentResult.rows.length === 0) {
+const depositIntent =
+  intentResult.rows[0] || null;
+
+if (!depositIntent) {
   console.log(
     "No pending deposit intent found for address:",
-    depositAddress.id
+    depositAddress.id,
+    "- recording blockchain deposit without intent"
   );
-
-  return;
+} else {
+  console.log(
+    "Deposit intent matched:",
+    {
+      intentId: depositIntent.id,
+      mode: depositIntent.mode,
+      network: depositIntent.network,
+      chainId: depositIntent.chain_id,
+    }
+  );
 }
-
-const depositIntent =
-  intentResult.rows[0];
-
-console.log(
-  "Deposit intent matched:",
-  {
-    intentId: depositIntent.id,
-    mode: depositIntent.mode,
-    network: depositIntent.network,
-    chainId: depositIntent.chain_id,
-  }
-);
-
 // Store blockchain deposit.
 // Unique constraint prevents duplicate events.
 const insertResult = await pool.query(
@@ -248,19 +246,19 @@ const insertResult = await pool.query(
    )
    DO NOTHING
    RETURNING id`,
-  [
-    depositIntent.network,
-    depositIntent.chain_id,
-    log.transactionHash,
-    blockNumber,
-    eventIndex,
-    tokenAddress,
-    fromAddress,
-    toAddress,
-    rawAmount.toString(),
-    depositAddress.id,
-    depositIntent.id,
-  ]
+ [
+  depositIntent?.network || "ethereum",
+  depositIntent?.chain_id || Number(process.env.ETHEREUM_CHAIN_ID),
+  log.transactionHash,
+  blockNumber,
+  eventIndex,
+  tokenAddress,
+  fromAddress,
+  toAddress,
+  rawAmount.toString(),
+  depositAddress.id,
+  depositIntent?.id || null,
+]
 );
 
 // Already processed
@@ -282,21 +280,22 @@ if (insertResult.rows.length === 0) {
         blockchainDepositId
       );
 
-      await pool.query(
-  `UPDATE deposit_intents
-   SET
-     status = 'matched',
-     updated_at = CURRENT_TIMESTAMP
-   WHERE id = $1
-     AND status = 'pending'`,
-  [depositIntent.id]
-);
+     if (depositIntent) {
+  await pool.query(
+    `UPDATE deposit_intents
+     SET
+       status = 'matched',
+       updated_at = CURRENT_TIMESTAMP
+     WHERE id = $1
+       AND status = 'pending'`,
+    [depositIntent.id]
+  );
 
-console.log(
-  "Deposit intent matched:",
-  depositIntent.id
-);
-
+  console.log(
+    "Deposit intent matched:",
+    depositIntent.id
+  );
+}
       // Wait for required confirmations
       await provider.waitForTransaction(
         log.transactionHash,

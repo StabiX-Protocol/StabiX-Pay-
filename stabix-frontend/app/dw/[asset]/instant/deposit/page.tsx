@@ -32,7 +32,7 @@ useEffect(() => {
     try {
       // 1. FIRST: Load the deposit address
       const data = await apiFetch(
-        `/api/deposits/address?network=${encodeURIComponent(network)}`
+        `/api/deposits/address?network=${encodeURIComponent(network)}&mode=instant`
       );
 
       console.log(

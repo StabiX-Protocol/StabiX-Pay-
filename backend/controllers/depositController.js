@@ -135,6 +135,14 @@ const getDepositAddress = async (req, res) => {
 
   const network =
   req.query.network?.toLowerCase() || "ethereum";
+  const mode =
+  req.query.mode?.toLowerCase() || "instant";
+if (!["instant", "advanced"].includes(mode)) {
+  return res.status(400).json({
+    success: false,
+    message: "Invalid deposit mode"
+  });
+}
 if (
   !["ethereum", "arbitrum", "bnb", "tron"].includes(network)
 ) {
@@ -164,15 +172,17 @@ if (
       getOrCreateDepositAddress
     } = require("../services/depositAddressService");
 
-    const depositAddress =
+   const depositAddress =
   await getOrCreateDepositAddress(
     userId,
-    network
+    network,
+    mode
   );
 
    return res.status(200).json({
   success: true,
   network,
+  mode,
   address: depositAddress.address,
   addressId: depositAddress.id
 });

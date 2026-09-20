@@ -1,8 +1,12 @@
 const pool = require("../config/db");
 const { generateDepositWallet } = require("./walletService");
 
-const getOrCreateDepositAddress = async (userId, network) => {
-  const existing = await pool.query(
+const getOrCreateDepositAddress = async (
+  userId,
+  network,
+  mode = "instant"
+) => {
+    const existing = await pool.query(
     `SELECT
        id,
        user_id,
@@ -13,11 +17,12 @@ const getOrCreateDepositAddress = async (userId, network) => {
        key_reference,
        derivation_index
      FROM deposit_addresses
-     WHERE user_id = $1
-       AND network = $2
-       AND status = 'active'
+   WHERE user_id = $1
+  AND network = $2
+  AND mode = $3
+  AND status = 'active'
      LIMIT 1`,
-    [userId, network]
+    [userId, network, mode]
   );
 
   if (existing.rows.length > 0) {
@@ -75,19 +80,21 @@ if (
 
   const result = await pool.query(
     `INSERT INTO deposit_addresses (
-       user_id,
-       network,
-       chain_id,
-       address,
-       status,
-       key_reference,
-       derivation_index
-     )
-     VALUES ($1, $2, $3, $4, 'active', $5, $6)
+   user_id,
+   network,
+   mode,
+   chain_id,
+   address,
+   status,
+   key_reference,
+   derivation_index
+)
+VALUES ($1, $2, $3, $4, $5, 'active', $6, $7)
      RETURNING
        id,
        user_id,
        network,
+       mode,
        chain_id,
        address,
        status,

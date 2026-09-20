@@ -65,23 +65,26 @@ FOR UPDATE OF bd`,
 
     // 4. Find the user through deposit address
     const userResult = await client.query(
-      `SELECT
-         da.user_id,
-         u.stbx_uid
-       FROM deposit_addresses da
-       INNER JOIN users u
-         ON u.id = da.user_id
-       WHERE da.id = $1
-       LIMIT 1`,
-      [deposit.deposit_address_id]
-    );
+  `SELECT
+     da.user_id,
+     da.network AS address_network,
+     da.mode AS address_mode,
+     u.stbx_uid
+   FROM deposit_addresses da
+   INNER JOIN users u
+     ON u.id = da.user_id
+   WHERE da.id = $1
+   LIMIT 1`,
+  [deposit.deposit_address_id]
+);
 
     if (userResult.rows.length === 0) {
       throw new Error("User for deposit address not found");
     }
 
     const stbx_uid = userResult.rows[0].stbx_uid;
-
+   const addressNetwork = userResult.rows[0].address_network;
+   const addressMode = userResult.rows[0].address_mode;
     // 5. Validate asset
     if (!["USDT", "USDC"].includes(asset)) {
       throw new Error(`Unsupported asset: ${asset}`);
@@ -207,8 +210,8 @@ FOR UPDATE OF bd`,
     deposit.tx_hash,
     idempotencyKey,
     fromAddress,
-    deposit.intent_network,
-    deposit.mode,
+   addressNetwork,
+   addressMode,
   ]
 );
 
