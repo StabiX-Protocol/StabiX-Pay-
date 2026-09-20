@@ -1,5 +1,7 @@
 const pool = require("../config/db");
 
+const { createSweepJob } = require("./sweepJobService");
+
 const creditConfirmedDeposit = async ({
   blockchainDepositId,
   asset,
@@ -21,6 +23,8 @@ const creditConfirmedDeposit = async ({
      bd.event_index,
      bd.deposit_address_id,
      bd.deposit_intent_id,
+     bd.token_contract,
+     bd.amount,
      bd.from_address,
      bd.to_address,
      bd.status,
@@ -214,6 +218,18 @@ FOR UPDATE OF bd`,
    addressMode,
   ]
 );
+
+await createSweepJob({
+  network: addressNetwork,
+  chainId: deposit.chain_id,
+  asset,
+  tokenContract: deposit.token_contract,
+  depositAddressId: deposit.deposit_address_id,
+  sourceAddress: deposit.to_address,
+  destinationAddress:
+    process.env.EVM_DEPOSIT_WALLET_ADDRESS,
+  amount: deposit.amount,
+});
 
     // 11. Mark blockchain deposit as credited
     await client.query(

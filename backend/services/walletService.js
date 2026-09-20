@@ -68,6 +68,47 @@ if (network === "tron") {
   throw new Error(`Unsupported network: ${network}`);
 };
 
+const getDepositWallet = (network, index) => {
+  if (!Number.isInteger(index) || index < 0) {
+    throw new Error("Invalid derivation index");
+  }
+
+  if (
+    network === "ethereum" ||
+    network === "arbitrum" ||
+    network === "bnb"
+  ) {
+    if (!EVM_MNEMONIC) {
+      throw new Error("EVM_DEPOSIT_MNEMONIC is not configured");
+    }
+
+    const path = `m/44'/60'/0'/0/${index}`;
+
+    return HDNodeWallet.fromPhrase(
+      EVM_MNEMONIC,
+      undefined,
+      path
+    );
+  }
+
+  if (network === "tron") {
+    if (!TRON_MNEMONIC) {
+      throw new Error("TRON_DEPOSIT_MNEMONIC is not configured");
+    }
+
+    const path = `m/44'/195'/0'/0/${index}`;
+
+    return HDNodeWallet.fromPhrase(
+      TRON_MNEMONIC,
+      undefined,
+      path
+    );
+  }
+
+  throw new Error(`Unsupported deposit network: ${network}`);
+};
+
 module.exports = {
   generateDepositWallet,
+  getDepositWallet,
 };

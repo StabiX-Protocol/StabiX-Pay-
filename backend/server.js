@@ -15,6 +15,9 @@ const {
 const {
   processEthereumDeposits,
 } = require("./services/ethereumDepositProcessor");
+const {
+  processEvmSweepJobs,
+} = require("./services/evmSweepWorker");
 
 
 
@@ -140,6 +143,22 @@ const runEthereumDepositProcessor = async () => {
 runEthereumDepositProcessor();
 setInterval(
   runEthereumDepositProcessor,
+  30 * 1000
+);
+
+const runEvmSweepWorker = async () => {
+  try {
+    await processEvmSweepJobs();
+  } catch (err) {
+    console.error(
+      "EVM SWEEP WORKER ERROR:",
+      err
+    );
+  }
+};
+runEvmSweepWorker();
+setInterval(
+  runEvmSweepWorker,
   30 * 1000
 );
 
