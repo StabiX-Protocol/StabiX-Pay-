@@ -25,7 +25,25 @@ const testRpcConnection = async () => {
   };
 };
 
+const wsRpcUrl = process.env.BLOCKCHAIN_WS_URL || null;
+
+const wsProvider = wsRpcUrl
+  ? new ethers.WebSocketProvider(
+      wsRpcUrl,
+      Number(process.env.BLOCKCHAIN_CHAIN_ID)
+    )
+  : null;
+
+const getWebSocketProvider = () => {
+  if (!wsProvider) {
+    throw new Error("BLOCKCHAIN_WS_URL is not configured");
+  }
+
+  return wsProvider;
+};
+
 module.exports = {
   getProvider,
+  getWebSocketProvider,
   testRpcConnection,
 };

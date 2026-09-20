@@ -1,12 +1,15 @@
 const { ethers } = require("ethers");
 
-const { getProvider } = require("./blockchainService");
+const {
+  getProvider,
+  getWebSocketProvider,
+} = require("./blockchainService");
 const { getTokenAddress } = require("../config/tokenConfig");
 const { creditConfirmedDeposit } = require("./depositCreditService");
 const pool = require("../config/db");
 
 const provider = getProvider();
-
+const wsProvider = getWebSocketProvider();
 const TRANSFER_ABI = [
   "event Transfer(address indexed from, address indexed to, uint256 value)",
   "function decimals() view returns (uint8)",
@@ -74,7 +77,7 @@ const startEvmDepositListener = async () => {
     ],
   };
 
-  provider.on(filter, async (log) => {
+ wsProvider.on(filter, async (log) => {
     try {
       if (log.removed) {
         return;

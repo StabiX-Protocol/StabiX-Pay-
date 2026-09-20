@@ -125,10 +125,7 @@ const runEthereumDepositScanner = async () => {
   }
 };
 runEthereumDepositScanner();
-setInterval(
-  runEthereumDepositScanner,
-  30 * 1000
-);
+
 
 const runEthereumDepositProcessor = async () => {
   try {
