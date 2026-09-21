@@ -19,6 +19,10 @@ const {
   processEvmSweepJobs,
 } = require("./services/evmSweepWorker");
 
+const {
+  processPendingEthereumWithdrawals,
+} = require("./services/ethereumWithdrawService");
+
 
 
 const io = new Server(server, {
@@ -159,6 +163,12 @@ const runEvmSweepWorker = async () => {
 runEvmSweepWorker();
 setInterval(
   runEvmSweepWorker,
+  30 * 1000
+);
+
+processPendingEthereumWithdrawals();
+setInterval(
+  processPendingEthereumWithdrawals,
   30 * 1000
 );
 
