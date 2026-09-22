@@ -173,6 +173,16 @@ const processEthereumWithdrawal = async (
   }
 
   const hotWallet = getHotWallet();
+ const hotWalletEthBalance =
+  await provider.getBalance(
+    hotWallet.address
+  );
+
+if (hotWalletEthBalance === 0n) {
+  throw new Error(
+    "Hot Wallet has insufficient ETH for withdrawal gas"
+  );
+}
 
   if (
     HOT_WALLET_ADDRESS &&
@@ -230,6 +240,33 @@ const amountToSend =
       `Insufficient ${asset} balance in Hot Wallet`
     );
   }
+
+  const gasEstimate =
+  await tokenContract.transfer.estimateGas(
+    withdrawal.destination_address,
+    amountToSend
+  );
+
+const feeData =
+  await provider.getFeeData();
+
+if (!feeData.maxFeePerGas) {
+  throw new Error(
+    "Ethereum gas fee data unavailable"
+  );
+}
+
+const estimatedGasCost =
+  gasEstimate * feeData.maxFeePerGas;
+
+if (
+  hotWalletEthBalance <
+  estimatedGasCost
+) {
+  throw new Error(
+    "Hot Wallet has insufficient ETH for withdrawal gas"
+  );
+}
 
  const tx =
   await tokenContract.transfer(
