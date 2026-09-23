@@ -43,21 +43,21 @@ export default function TransactionDetail({
   let from = "";
   let to = "";
 
-  if (t.type === "deposit") {
-    from = t.eoa_address || "External";
-    to = t.stbx_uid || "";
-  } else if (t.type === "withdraw") {
-    from = t.stbx_uid || "";
-    to = t.eoa_address || "External";
-  } else {
-    from = isCredit
-      ? t.counterparty || "System"
-      : t.stbx_uid || "";
+ if (t.type === "deposit") {
+  from = t.eoa_address || "External";
+  to = t.stbx_uid || "";
+} else if (t.type === "withdraw") {
+  from = t.stbx_uid || "";
+  to = t.eoa_address || "External";
+} else {
+  from = isCredit
+    ? t.counterparty || "System"
+    : t.stbx_uid || "";
 
-    to = isCredit
-      ? t.stbx_uid || ""
-      : t.counterparty || "System";
-  }
+  to = isCredit
+    ? t.stbx_uid || ""
+    : t.counterparty || "System";
+}
 
   let label = "Sent";
 
