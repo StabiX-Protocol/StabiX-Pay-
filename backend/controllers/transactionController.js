@@ -190,7 +190,7 @@ END AS mode,
 
 
      SELECT
-  id::text AS "STRId",
+  "STRId" AS "STRId",
   stbx_uid AS sender_stbx_uid,
   NULL AS receiver_stbx_uid,
 
@@ -307,7 +307,7 @@ created_at
       UNION ALL
 
       SELECT
-  id::text AS "STRId",
+  "STRId" AS "STRId",
   stbx_uid AS sender_stbx_uid,
   NULL AS receiver_stbx_uid,
   'withdraw' AS type,
@@ -325,7 +325,7 @@ created_at
   mode,
   created_at
 FROM withdrawals
-WHERE id::text = $1
+WHERE "STRId" = $1
   AND stbx_uid = $2
 
       LIMIT 1

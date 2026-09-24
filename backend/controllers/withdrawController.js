@@ -203,8 +203,14 @@ const balanceResult = await client.query(
      * Blockchain execution is NOT performed here.
      * A separate withdrawal worker will process it.
      */
+    const STRId =
+"STR" +
+Date.now() +
+Math.floor(Math.random() * 1000);
+
     const withdrawalResult = await client.query(
       `INSERT INTO withdrawals (
+         "STRId",
          user_id,
          stbx_uid,
          asset,
@@ -224,10 +230,12 @@ const balanceResult = await client.query(
          $6,
          $7,
          $8,
+         $9,
          'pending'
        )
        RETURNING
          id,
+         "STRId",
          stbx_uid,
          asset,
          amount,
@@ -239,6 +247,7 @@ const balanceResult = await client.query(
          blockchain_tx_hash,
          created_at`,
       [
+        STRId,
         userId,
         stbx_uid,
         asset,
@@ -294,6 +303,7 @@ const getWithdrawHistory = async (req, res) => {
     const result = await pool.query(
       `SELECT
          id,
+         STRId,
          stbx_uid,
          asset,
          amount,
@@ -341,6 +351,7 @@ const getWithdrawById = async (req, res) => {
     const result = await pool.query(
       `SELECT
          id,
+         STRId,
          stbx_uid,
          asset,
          amount,
