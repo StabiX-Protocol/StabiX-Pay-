@@ -18,7 +18,7 @@ type Transaction = {
 };
 
 type TransactionDetailProps = {
-  transaction: Transaction;
+transaction: Transaction;
 };
 
 export default function TransactionDetail({

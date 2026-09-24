@@ -20,7 +20,6 @@ type Transaction = {
 };
 
 
-
 type HistoryListProps = {
   transactions: Transaction[];
   filters: HistoryFilters;
@@ -35,13 +34,6 @@ export default function HistoryList({
   const groups: Record<string, Transaction[]> = {};
 
   transactions.forEach((transaction) => {
-    
-    if (
-      transaction.type === "withdraw" &&
-      String(transaction.status || "").toUpperCase() !== "APPROVED"
-    ) {
-      return;
-    }
 
     /*
      * Type filter

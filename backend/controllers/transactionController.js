@@ -189,30 +189,28 @@ END AS mode,
       UNION ALL
 
 
-      SELECT
-        "STRId" AS "STRId",
-        stbx_uid AS sender_stbx_uid,
-        NULL AS receiver_stbx_uid,
+     SELECT
+  id::text AS "STRId",
+  stbx_uid AS sender_stbx_uid,
+  NULL AS receiver_stbx_uid,
 
-        'withdraw' AS type,
+  'withdraw' AS type,
 
-        'Withdraw' AS counterparty,
+  'Withdraw' AS counterparty,
 
-        asset,
-        amount,
-        status,
-        NULL AS note,
-        blockchain_tx_hash,
-        wallet_address AS eoa_address,
-        network,
-        mode,
-        created_at
+  asset,
+  amount,
+  status,
+  NULL AS note,
+  blockchain_tx_hash,
+  destination_address AS eoa_address,
+  network,
+  mode,
+  created_at
 
-      FROM withdraws
+FROM withdrawals
 
-      WHERE stbx_uid = $1
-        AND status = 'APPROVED'
-
+WHERE stbx_uid = $1
 
       ORDER BY created_at DESC
       `,
@@ -309,26 +307,26 @@ created_at
       UNION ALL
 
       SELECT
-        "STRId",
-        stbx_uid AS sender_stbx_uid,
-        NULL AS receiver_stbx_uid,
-        'withdraw' AS type,
-        'Withdraw' AS counterparty,
-        stbx_uid AS sender,
-        NULL AS receiver,
-        stbx_uid,
-        asset,
-        amount::numeric(18,2) AS amount,
-        status,
-        NULL AS note,
-        NULL AS blockchain_tx_hash,
-        wallet_address AS eoa_address,
-        network,
-        mode,
-        created_at
-      FROM withdraws
-      WHERE "STRId" = $1
-        AND stbx_uid = $2
+  id::text AS "STRId",
+  stbx_uid AS sender_stbx_uid,
+  NULL AS receiver_stbx_uid,
+  'withdraw' AS type,
+  'Withdraw' AS counterparty,
+  stbx_uid AS sender,
+  NULL AS receiver,
+  stbx_uid,
+  asset,
+  amount::numeric(18,2) AS amount,
+  status,
+  NULL AS note,
+  blockchain_tx_hash,
+  destination_address AS eoa_address,
+  network,
+  mode,
+  created_at
+FROM withdrawals
+WHERE id::text = $1
+  AND stbx_uid = $2
 
       LIMIT 1
       `,
@@ -448,39 +446,37 @@ const searchTransactions = async (req, res) => {
       UNION ALL
 
 
-      SELECT
-        "STRId" AS "STRId",
+     SELECT
+  id::text AS "STRId",
 
-        stbx_uid AS sender_stbx_uid,
-        NULL AS receiver_stbx_uid,
+  stbx_uid AS sender_stbx_uid,
+  NULL AS receiver_stbx_uid,
 
-        'withdraw' AS type,
+  'withdraw' AS type,
+  'Withdraw' AS counterparty,
 
-        'Withdraw' AS counterparty,
+  asset,
+  amount,
+  status,
 
-        asset,
-        amount,
-        status,
+  NULL AS note,
 
-        NULL AS note,
+  blockchain_tx_hash,
+  created_at
 
-        blockchain_tx_hash,
-        created_at
+FROM withdrawals
 
-      FROM withdraws
+WHERE
+  stbx_uid = $1
+  AND
+  (
+    id::text ILIKE '%' || $2 || '%'
+    OR stbx_uid ILIKE '%' || $2 || '%'
+    OR destination_address ILIKE '%' || $2 || '%'
+    OR COALESCE(blockchain_tx_hash, '') ILIKE '%' || $2 || '%'
+  )
 
-      WHERE
-        stbx_uid = $1
-        AND status = 'APPROVED'
-        AND
-        (
-          "STRId" ILIKE '%' || $2 || '%'
-          OR stbx_uid ILIKE '%' || $2 || '%'
-          OR wallet_address ILIKE '%' || $2 || '%'
-          OR COALESCE(blockchain_tx_hash, '') ILIKE '%' || $2 || '%'
-        )
-
-      ORDER BY created_at DESC
+ORDER BY created_at DESC
       `,
       [stbx_uid, q]
     );
