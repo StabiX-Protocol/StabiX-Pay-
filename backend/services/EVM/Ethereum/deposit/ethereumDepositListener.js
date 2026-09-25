@@ -3,10 +3,10 @@ const { ethers } = require("ethers");
 const {
   getProvider,
   getWebSocketProvider,
-} = require("./blockchainService");
-const { getTokenAddress } = require("../config/tokenConfig");
-const { creditConfirmedDeposit } = require("./depositCreditService");
-const pool = require("../config/db");
+} = require("../../../blockchainService");
+const { getTokenAddress } = require("../../../../config/tokenConfig");
+const { creditConfirmedDeposit } = require("../../../depositCreditService");
+const pool = require("../../../../config/db");
 
 const provider = getProvider();
 const wsProvider = getWebSocketProvider();

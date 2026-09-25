@@ -1,7 +1,7 @@
-const pool = require("../config/db");
+const pool = require("../../../../config/db");
 const { ethers } = require("ethers");
 
-const { getProvider } = require("./blockchainService");
+const { getProvider } = require("../../../blockchainService");
 
 const HOT_WALLET_PRIVATE_KEY =
   process.env.EVM_HOT_WALLET_PRIVATE_KEY;

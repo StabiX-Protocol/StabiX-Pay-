@@ -1,8 +1,8 @@
 const { ethers } = require("ethers");
 
-const { getProvider } = require("./blockchainService");
-const { creditConfirmedDeposit } = require("./depositCreditService");
-const pool = require("../config/db");
+const { getProvider } = require("../../../blockchainService");
+const { creditConfirmedDeposit } = require("../../../depositCreditService");
+const pool = require("../../../../config/db");
 
 const provider = getProvider();
 

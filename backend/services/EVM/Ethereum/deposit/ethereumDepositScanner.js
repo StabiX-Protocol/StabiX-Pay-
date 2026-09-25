@@ -1,13 +1,13 @@
 const { ethers } = require("ethers");
 
-const { getProvider } = require("./blockchainService");
-const { getTokenAddress } = require("../config/tokenConfig");
-const pool = require("../config/db");
+const { getProvider } = require("../../../blockchainService");
+const { getTokenAddress } = require("../../../../config/tokenConfig");
+const pool = require("../../../../config/db");
 
 const {
   getScannerState,
   saveScannerState,
-} = require("./blockchainScannerStateService");
+} = require("../../../blockchainScannerStateService");
 
 const provider = getProvider();
 

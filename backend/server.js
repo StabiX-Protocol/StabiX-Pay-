@@ -6,24 +6,25 @@ const http = require("http");
 const { Server } = require("socket.io");
 const app = express();
 const server = http.createServer(app);
+
 const {
-  startEvmDepositListener
-} = require("./services/ethereumDepositListener");
+  startEvmDepositListener,
+} = require("./services/EVM/Ethereum/deposit/ethereumDepositListener");
+
 const {
   scanEthereumDeposits,
-} = require("./services/ethereumDepositScanner");
+} = require("./services/EVM/Ethereum/deposit/ethereumDepositScanner");
+
 const {
   processEthereumDeposits,
-} = require("./services/ethereumDepositProcessor");
-const {
-  processEvmSweepJobs,
-} = require("./services/evmSweepWorker");
+} = require("./services/EVM/Ethereum/deposit/ethereumDepositProcessor");
 
 const {
   processPendingEthereumWithdrawals,
-} = require("./services/ethereumWithdrawService");
+} = require("./services/EVM/Ethereum/withdraw/ethereumWithdrawService");
 
-
+const { processEvmSweepJobs } =
+require("./services/EVM/Ethereum/sweep/sweepJobService");
 
 const io = new Server(server, {
 cors: {
