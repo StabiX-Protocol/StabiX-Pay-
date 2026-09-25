@@ -33,9 +33,15 @@ export default function InstantWithdrawPage() {
   fee !== null && amount
     ? Math.max(0, Number(amount) - Number(fee))
     : null;
+ 
+  const [withdrawalStatus, setWithdrawalStatus] = useState<
+  "idle" | "processing" | "success" | "failed"
+>("idle");
+const [withdrawal, setWithdrawal] = useState<any>(null);
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [createdWithdrawalId, setCreatedWithdrawalId] = useState("");
+
 
   useEffect(() => {
   const loadWithdrawFee = async () => {
@@ -133,83 +139,403 @@ export default function InstantWithdrawPage() {
   -------------------------------- */
 
   const handleConfirmWithdraw = async () => {
-    if (submitting) {
-      return;
-    }
+  if (submitting) {
+    return;
+  }
 
-    setSubmitting(true);
-    setError("");
+  setSubmitting(true);
+  setError("");
+  setWithdrawalStatus("processing");
+  setWithdrawal(null);
 
-    try {
-      const cleanAddress = address.trim();
-      const cleanAmount = amount.trim();
+  try {
+    const cleanAddress = address.trim();
+    const cleanAmount = amount.trim();
 
-      const response = await fetch("/api/withdraws", {
-        method: "POST",
-        headers: {
+    const response = await fetch("/api/withdraws", {
+      method: "POST",
+      headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
-        },
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        asset,
+        mode: "instant",
+        network,
+        amount: cleanAmount,
+        destination_address: cleanAddress,
+      }),
+    });
 
-        credentials: "include",
+    let data = null;
 
-        body: JSON.stringify({
-          asset,
-          mode: "instant",
-          network,
-          amount: cleanAmount,
-          destination_address: cleanAddress,
-        }),
-      });
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
+    }
 
-      let data = null;
+    if (!response.ok) {
+      throw new Error(
+        data?.message ||
+          `Withdrawal request failed (${response.status}).`
+      );
+    }
 
-      try {
-        data = await response.json();
-      } catch {
-        data = null;
-      }
+    if (!data?.success) {
+      throw new Error(
+        data?.message ||
+          "Unable to create withdrawal request."
+      );
+    }
 
-      if (!response.ok) {
+    const withdrawalId = data?.withdrawal?.id;
+
+    if (!withdrawalId) {
+      throw new Error(
+        "Withdrawal ID was not returned."
+      );
+    }
+
+    setShowConfirmation(false);
+    setWithdrawalStatus("processing");
+
+    // Wait for blockchain withdrawal to finish
+    let finished = false;
+
+    while (!finished) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 2000)
+      );
+
+      const statusResponse = await fetch(
+        `/api/withdraws/${withdrawalId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              "jwt_token"
+            )}`,
+          },
+          credentials: "include",
+          cache: "no-store",
+        }
+      );
+
+      const statusData =
+        await statusResponse.json();
+
+      if (!statusResponse.ok) {
         throw new Error(
-          data?.message ||
-            `Withdrawal request failed (${response.status}).`
+          statusData?.message ||
+            "Unable to check withdrawal status."
         );
       }
 
-      if (!data?.success) {
+      const currentWithdrawal =
+        statusData?.withdrawal;
+
+      if (!currentWithdrawal) {
         throw new Error(
-          data?.message ||
-            "Unable to create withdrawal request."
+          "Withdrawal status was not returned."
         );
       }
 
-      const withdrawalId = data?.withdrawal?.id;
-if (withdrawalId) {
-  setShowConfirmation(false);
-  setError("");
+      setWithdrawal(currentWithdrawal);
 
-  alert(
-    `Withdrawal request created successfully.\n\nWithdrawal ID: ${withdrawalId}`
+      if (
+        currentWithdrawal.status ===
+        "confirmed"
+      ) {
+        finished = true;
+        setWithdrawalStatus("success");
+      }
+
+      if (
+        currentWithdrawal.status ===
+        "failed"
+      ) {
+        finished = true;
+        setWithdrawalStatus("failed");
+      }
+    }
+
+  } catch (err) {
+    console.error(
+      "WITHDRAW SUBMIT ERROR:",
+      err
+    );
+
+    const message =
+      err instanceof Error
+        ? err.message
+        : "Something went wrong while processing withdrawal.";
+
+    setError(message);
+    setWithdrawalStatus("failed");
+
+  } finally {
+    setSubmitting(false);
+  }
+};
+
+if (withdrawalStatus !== "idle") {
+  const explorerUrls: Record<string, string> = {
+    ethereum:
+      "https://sepolia.etherscan.io/tx/",
+    bnb:
+      "https://testnet.bscscan.com/tx/",
+    arbitrum:
+      "https://sepolia.arbiscan.io/tx/",
+    tron:
+      "https://nile.tronscan.org/#/transaction/",
+  };
+
+  const explorerBase =
+    withdrawal?.network
+      ? explorerUrls[
+          withdrawal.network.toLowerCase()
+        ]
+      : null;
+
+  const explorerUrl =
+    explorerBase &&
+    withdrawal?.blockchain_tx_hash
+      ? `${explorerBase}${withdrawal.blockchain_tx_hash}`
+      : null;
+
+  const receivedAmount =
+    withdrawal
+      ? Number(withdrawal.amount) -
+        Number(withdrawal.fee || 0)
+      : Number(amount) -
+        Number(fee || 0);
+
+  return (
+    <main className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 px-5 backdrop-blur-sm">
+      <section className="w-full max-w-md rounded-[28px] border border-white/10 bg-[#18181b] p-6 text-white shadow-2xl">
+
+        {/* PROCESSING */}
+        {withdrawalStatus === "processing" && (
+          <div className="py-8 text-center">
+
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-500/10">
+
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500/20 border-t-blue-500" />
+
+            </div>
+
+            <h2 className="mt-6 text-2xl font-bold">
+              Withdrawal Processing
+            </h2>
+
+            <p className="mt-3 text-sm leading-6 text-slate-400">
+              Your withdrawal is being processed
+              on the {networkName} network.
+            </p>
+
+            <div className="mt-6 rounded-[18px] bg-white/[0.05] p-4 text-left">
+
+              <div className="flex justify-between">
+                <span className="text-sm text-slate-400">
+                  Amount
+                </span>
+
+                <span className="text-sm font-semibold">
+                  {amount} {asset}
+                </span>
+              </div>
+
+              <div className="mt-3 flex justify-between">
+                <span className="text-sm text-slate-400">
+                  Status
+                </span>
+
+                <span className="text-sm font-semibold text-blue-400">
+                  Processing...
+                </span>
+              </div>
+
+            </div>
+
+            <p className="mt-5 text-xs text-slate-500">
+              Please keep this screen open until
+              the withdrawal is confirmed.
+            </p>
+
+          </div>
+        )}
+
+        {/* SUCCESS */}
+        {withdrawalStatus === "success" && (
+          <div>
+
+            <div className="py-4 text-center">
+
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/10 text-4xl">
+                ✓
+              </div>
+
+              <h2 className="mt-5 text-2xl font-bold">
+                Withdrawal Successful
+              </h2>
+
+              <p className="mt-2 text-sm text-slate-400">
+                Your withdrawal has been confirmed.
+              </p>
+
+            </div>
+
+            {/* Amount */}
+            <div className="mt-6 rounded-[20px] bg-white/[0.05] p-5 text-center">
+
+              <p className="text-sm text-slate-400">
+                You received
+              </p>
+
+              <p className="mt-2 text-4xl font-bold">
+                {Number(
+                  receivedAmount
+                ).toString()}
+              </p>
+
+              <p className="mt-1 font-semibold text-slate-400">
+                {asset}
+              </p>
+
+            </div>
+
+            {/* Details */}
+            <div className="mt-5 space-y-4">
+
+              <div className="flex justify-between gap-4">
+                <span className="text-sm text-slate-400">
+                  Withdrawal amount
+                </span>
+
+                <span className="text-right text-sm font-semibold">
+                  {Number(
+                    withdrawal.amount
+                  ).toString()}{" "}
+                  {asset}
+                </span>
+              </div>
+
+              <div className="flex justify-between gap-4">
+                <span className="text-sm text-slate-400">
+                  Fee
+                </span>
+
+                <span className="text-sm font-semibold">
+                  {Number(
+                    withdrawal.fee || 0
+                  ).toString()}{" "}
+                  {asset}
+                </span>
+              </div>
+
+              <div className="flex justify-between gap-4">
+                <span className="text-sm text-slate-400">
+                  Network
+                </span>
+
+                <span className="text-sm font-semibold">
+                  {networkName}
+                </span>
+              </div>
+
+              <div className="flex justify-between gap-4">
+                <span className="text-sm text-slate-400">
+                  STRId
+                </span>
+
+                <span className="max-w-[190px] break-all text-right text-sm font-semibold">
+                  {withdrawal.STRId}
+                </span>
+              </div>
+
+              <div className="flex justify-between gap-4">
+                <span className="text-sm text-slate-400">
+                  Status
+                </span>
+
+                <span className="text-sm font-semibold text-emerald-400">
+                  Confirmed
+                </span>
+              </div>
+
+            </div>
+
+            {/* Explorer */}
+            {explorerUrl && (
+              <button
+                type="button"
+                onClick={() => {
+                  window.open(
+                    explorerUrl,
+                    "_blank",
+                    "noopener,noreferrer"
+                  );
+                }}
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-[18px] border border-white/10 bg-white/[0.06] py-4 font-semibold transition active:scale-[0.98]"
+              >
+                View Transaction on Explorer
+                <span>↗</span>
+              </button>
+            )}
+
+            {/* Done */}
+            <button
+              type="button"
+              onClick={() => {
+                router.push("/");
+              }}
+              className="mt-3 w-full rounded-[18px] bg-blue-600 py-4 font-bold text-white shadow-lg shadow-blue-950 transition active:scale-[0.98]"
+            >
+              Done
+            </button>
+
+          </div>
+        )}
+
+        {/* FAILED */}
+        {withdrawalStatus === "failed" && (
+          <div className="py-6 text-center">
+
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-red-500/10 text-4xl text-red-400">
+              !
+            </div>
+
+            <h2 className="mt-5 text-2xl font-bold">
+              Withdrawal Failed
+            </h2>
+
+            <p className="mt-3 text-sm leading-6 text-slate-400">
+              {withdrawal?.error_message ||
+                error ||
+                "The withdrawal could not be completed."}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                setWithdrawalStatus("idle");
+                setError("");
+              }}
+              className="mt-7 w-full rounded-[18px] bg-blue-600 py-4 font-bold text-white"
+            >
+              Back
+            </button>
+
+          </div>
+        )}
+
+      </section>
+    </main>
   );
-
-  return;
 }
 
-    } catch (err) {
-      console.error("WITHDRAW SUBMIT ERROR:", err);
-
-      const message =
-        err instanceof Error
-          ? err.message
-          : "Something went wrong while creating withdrawal.";
-
-      setError(message);
-
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   /* ===========================================
      CONFIRMATION SCREEN

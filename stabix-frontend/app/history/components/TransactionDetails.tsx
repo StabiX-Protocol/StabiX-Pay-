@@ -14,6 +14,7 @@ type Transaction = {
   created_at: string;
   network?: string | null;
   mode?: string | null;
+  fee?: string | number | null;
   blockchain_tx_hash?: string | null;
 };
 
@@ -217,6 +218,20 @@ export default function TransactionDetail({
                   <div className="mt-1.5 break-all text-[14px] font-semibold leading-6 text-slate-900 dark:text-white">
                     {t.mode || "—"}
                   </div>
+
+                   {/* Fee — Withdraw only */}
+                   {t.type === "withdraw" && (
+                   <div>
+                  <div className="text-[12px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
+                    Fee
+                    </div>
+
+                   <div className="mt-1.5 break-all text-[14px] font-semibold leading-6 text-slate-900 dark:text-white">
+                    {Number(t.fee || 0).toString()} {t.asset}
+                    </div>
+                    </div>
+                    )}
+
                 </div>
               </>
             )}

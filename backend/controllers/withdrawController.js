@@ -371,7 +371,7 @@ const getWithdrawHistory = async (req, res) => {
     const result = await pool.query(
       `SELECT
          id,
-         STRId,
+         "STRId",
          stbx_uid,
          asset,
          amount,
@@ -419,7 +419,7 @@ const getWithdrawById = async (req, res) => {
     const result = await pool.query(
       `SELECT
          id,
-         STRId,
+         "STRId",
          stbx_uid,
          asset,
          amount,

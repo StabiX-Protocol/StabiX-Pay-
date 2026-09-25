@@ -9,6 +9,7 @@ export type Transaction = {
   eoa_address?: string | null;
   network?: string | null;
   mode?: string | null;
+  fee?: string | number | null;
   blockchain_tx_hash?: string | null;
   created_at: string;
 };
