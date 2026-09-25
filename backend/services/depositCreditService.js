@@ -278,5 +278,5 @@ await createSweepJob({
 };
 
 module.exports = {
-  creditConfirmedDeposit,
+creditConfirmedDeposit,
 };

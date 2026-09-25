@@ -21,6 +21,11 @@ export default function SendSuccessPage() {
   const [strId, setStrId] = useState("");
   const [time, setTime] = useState("");
 
+  // 0 = center
+  // 1 = move tick upward
+  // 2 = show transaction details
+  const [stage, setStage] = useState(0);
+
   useEffect(() => {
     const selectedAsset = searchParams.get("asset");
     const selectedAmount = searchParams.get("amount");
@@ -71,6 +76,19 @@ export default function SendSuccessPage() {
         minute: "2-digit",
       })
     );
+
+    const timer1 = setTimeout(() => {
+      setStage(1);
+    }, 1200);
+
+    const timer2 = setTimeout(() => {
+      setStage(2);
+    }, 1800);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
   }, [searchParams]);
 
   const assetLogo =
@@ -83,155 +101,180 @@ export default function SendSuccessPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black px-5 py-6 text-white">
-      <div className="flex min-h-[calc(100vh-48px)] items-center justify-center">
-        <div className="w-full max-w-[390px] rounded-[30px] border border-white/10 bg-[#111111] px-6 py-8 text-center shadow-2xl">
-
-          {/* Success Animation */}
-          <div className="mx-auto mb-6 flex h-[125px] w-[125px] items-center justify-center">
-            <svg
-              viewBox="0 0 120 120"
-              className="h-full w-full"
-            >
-              <circle
-                cx="60"
-                cy="60"
-                r="52"
-                fill="none"
-                stroke="#2a2a2a"
-                strokeWidth="9"
-              />
-
-              <circle
-                cx="60"
-                cy="60"
-                r="52"
-                fill="none"
-                stroke="#22c55e"
-                strokeWidth="9"
-                strokeLinecap="round"
-                strokeDasharray="327"
-                strokeDashoffset="0"
-                transform="rotate(-90 60 60)"
-                className="animate-[successRing_.9s_ease-out]"
-              />
-
-              <polyline
-                points="38,63 54,78 83,45"
-                fill="none"
-                stroke="#22c55e"
-                strokeWidth="9"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeDasharray="70"
-                strokeDashoffset="0"
-                className="animate-[successTick_.45s_ease-out_.65s_both]"
-              />
-            </svg>
-          </div>
-
-          {/* Title */}
-          <h1 className="text-[25px] font-bold text-green-500">
-            Transaction Successful
-          </h1>
-
-          {/* Amount */}
-          <div className="mt-5 flex items-center justify-center gap-2">
-            <img
-              src={assetLogo}
-              alt={asset}
-              className="h-9 w-9 rounded-full object-contain"
-            />
-
-            <span className="text-[25px] font-semibold text-white">
-              {amount} {asset}
-            </span>
-          </div>
-
-          {/* Divider */}
-          <div className="my-6 h-px bg-white/10" />
-
-          {/* From */}
-          <div className="flex items-start justify-between gap-4 text-left">
-            <span className="shrink-0 text-[15px] font-medium text-slate-400">
-              From
-            </span>
-
-            <div className="min-w-0 text-right">
-              <p className="break-all text-[14px] text-white">
-                {fromUid || "—"}
-              </p>
-
-              {fromUsername && (
-                <p className="mt-1 text-[13px] text-slate-400">
-                  ({fromUsername})
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* To */}
-          <div className="mt-5 flex items-start justify-between gap-4 text-left">
-            <span className="shrink-0 text-[15px] font-medium text-slate-400">
-              To
-            </span>
-
-            <div className="min-w-0 text-right">
-              <p className="break-all text-[14px] text-white">
-                {toUid || "—"}
-              </p>
-
-              {toUsername && (
-                <p className="mt-1 text-[13px] text-slate-400">
-                  ({toUsername})
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* STR ID */}
-          <div className="mt-5 flex items-start justify-between gap-4 text-left">
-            <span className="shrink-0 text-[15px] font-medium text-slate-400">
-              STR ID
-            </span>
-
-            <span className="min-w-0 break-all text-right text-[13px] font-medium text-blue-400">
-              {strId || "—"}
-            </span>
-          </div>
-
-          {/* Time */}
-          {time && (
-            <p className="mt-5 text-[12px] text-slate-500">
-              {time}
-            </p>
-          )}
-
-          {/* Done */}
-          <button
-            type="button"
-            onClick={handleDone}
-            className="mt-7 w-full rounded-full bg-blue-600 py-4 text-[17px] font-bold text-white shadow-lg transition active:scale-[0.98]"
+    <main className="min-h-screen w-full bg-white px-6 py-8 text-black dark:bg-black dark:text-white">
+  <div className="flex min-h-screen w-full items-center justify-center">
+    <div className="relative flex min-h-screen w-full max-w-2xl flex-col justify-center overflow-hidden text-center">
+          {/* SUCCESS ICON */}
+          <div
+            className="relative mx-auto flex h-[150px] w-full items-center justify-center"
+            style={{
+              transform:
+                stage === 0
+                  ? "translateY(110px)"
+                  : "translateY(0px)",
+              transition:
+                "transform 600ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+            }}
           >
-            Done
-          </button>
+            {/* Ripple 1 */}
+            <div className="absolute h-[105px] w-[105px] rounded-full bg-blue-500/20 animate-[stbxRipple_1.4s_ease-out_infinite]" />
+
+            {/* Ripple 2 */}
+            <div className="absolute h-[105px] w-[105px] rounded-full bg-blue-500/15 animate-[stbxRipple_1.4s_ease-out_0.4s_infinite]" />
+
+            {/* Blue success circle */}
+            <div className="relative flex h-[105px] w-[105px] items-center justify-center rounded-full bg-blue-600 shadow-[0_0_45px_rgba(37,99,235,0.45)] animate-[stbxPop_0.6s_cubic-bezier(0.34,1.56,0.64,1)_both]">
+              <svg
+                viewBox="0 0 24 24"
+                className="h-14 w-14"
+              >
+                <polyline
+                  points="5,12.5 10,17 19,7"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeDasharray="30"
+                  strokeDashoffset="30"
+                  className="animate-[stbxTick_0.4s_ease-out_0.5s_forwards]"
+                />
+              </svg>
+            </div>
+          </div>
+
+          {/* CONTENT */}
+          <div
+            className="flex-1"
+            style={{
+              opacity: stage === 2 ? 1 : 0,
+              transform:
+                stage === 2
+                  ? "translateY(0px)"
+                  : "translateY(24px)",
+              transition:
+                "opacity 500ms ease, transform 500ms ease",
+              pointerEvents:
+                stage === 2 ? "auto" : "none",
+            }}
+          >
+            {/* Title */}
+            <h1 className="text-[25px] font-bold text-blue-500">
+              Transaction Successful
+            </h1>
+
+            {/* Amount */}
+            <div className="mt-5 flex items-center justify-center gap-2">
+  <span className="text-[25px] font-semibold text-black dark:text-white">
+    {amount} {asset}
+  </span>
+
+  <img
+    src={assetLogo}
+    alt={asset}
+    className="h-9 w-9 rounded-full object-contain"
+  />
+</div>
+
+            {/* Divider */}
+            <div className="my-6 h-px bg-black/10 dark:bg-white/10" />
+
+            {/* From */}
+            <div className="flex items-start justify-between gap-4 text-left">
+              <span className="shrink-0 text-[15px] font-medium text-slate-500 dark:text-slate-400">
+                From
+              </span>
+
+              <div className="min-w-0 text-right">
+                <p className="break-all text-[14px] text-black dark:text-white">
+                  {fromUid || "—"}
+                </p>
+
+                {fromUsername && (
+                  <p className="mt-1 text-[13px] text-slate-500 dark:text-slate-400">
+                    ({fromUsername})
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* To */}
+            <div className="mt-5 flex items-start justify-between gap-4 text-left">
+              <span className="shrink-0 text-[15px] font-medium text-slate-500 dark:text-slate-400">
+                To
+              </span>
+
+              <div className="min-w-0 text-right">
+                <p className="break-all text-[14px] text-black dark:text-white">
+                  {toUid || "—"}
+                </p>
+
+                {toUsername && (
+                  <p className="mt-1 text-[13px] text-slate-500 dark:text-slate-400">
+                    ({toUsername})
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* STR ID */}
+            <div className="mt-5 flex items-start justify-between gap-4 text-left">
+              <span className="shrink-0 text-[15px] font-medium text-slate-500 dark:text-slate-400">
+                STR ID
+              </span>
+
+              <span className="min-w-0 break-all text-right text-[13px] font-medium text-blue-500">
+                {strId || "—"}
+              </span>
+            </div>
+
+            {/* Time */}
+            {time && (
+              <p className="mt-5 text-[12px] text-slate-500 dark:text-slate-500">
+                {time}
+              </p>
+            )}
+
+            {/* Done */}
+            <button
+              type="button"
+              onClick={handleDone}
+              className="mt-7 w-full rounded-full bg-blue-600 py-4 text-[17px] font-bold text-white shadow-lg transition hover:bg-blue-700 active:scale-[0.98]"
+            >
+              Done
+            </button>
+          </div>
         </div>
       </div>
 
       <style jsx global>{`
-        @keyframes successRing {
-          from {
-            stroke-dashoffset: 327;
+        @keyframes stbxPop {
+          0% {
+            transform: scale(0);
           }
-          to {
-            stroke-dashoffset: 0;
+
+          60% {
+            transform: scale(1.2);
+          }
+
+          100% {
+            transform: scale(1);
           }
         }
 
-        @keyframes successTick {
-          from {
-            stroke-dashoffset: 70;
+        @keyframes stbxRipple {
+          0% {
+            transform: scale(0.85);
+            opacity: 0.8;
           }
+
+          100% {
+            transform: scale(1.7);
+            opacity: 0;
+          }
+        }
+
+        @keyframes stbxTick {
           to {
             stroke-dashoffset: 0;
           }
