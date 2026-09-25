@@ -295,6 +295,74 @@ Math.floor(Math.random() * 1000);
   }
 };
 
+const getWithdrawFee = async (req, res) => {
+  try {
+    const { asset, network, mode } = req.query;
+
+    if (!SUPPORTED_ASSETS.includes(asset)) {
+      return res.status(400).json({
+        success: false,
+        message: "Unsupported asset",
+      });
+    }
+
+    if (!SUPPORTED_MODES.includes(mode)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid withdraw mode",
+      });
+    }
+
+    if (!SUPPORTED_NETWORKS.includes(network)) {
+      return res.status(400).json({
+        success: false,
+        message: "Unsupported network",
+      });
+    }
+
+    const result = await pool.query(
+      `SELECT fee
+       FROM withdrawal_fees
+       WHERE asset = $1
+         AND network = $2
+         AND mode = $3
+         AND active = TRUE
+       LIMIT 1`,
+      [
+        asset,
+        network,
+        mode,
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Withdrawal fee configuration not available",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      asset,
+      network,
+      mode,
+      fee: result.rows[0].fee,
+    });
+
+  } catch (err) {
+    console.error(
+      "GET WITHDRAW FEE ERROR:",
+      err
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to get withdrawal fee",
+    });
+  }
+};
+
 
 const getWithdrawHistory = async (req, res) => {
   try {
@@ -406,4 +474,5 @@ module.exports = {
   createWithdraw,
   getWithdrawHistory,
   getWithdrawById,
+  getWithdrawFee,
 };

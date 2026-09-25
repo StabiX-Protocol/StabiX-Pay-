@@ -7,6 +7,7 @@ const {
   createWithdraw,
   getWithdrawHistory,
   getWithdrawById,
+  getWithdrawFee,
 } = require("../controllers/withdrawController");
 
 router.post(
@@ -19,6 +20,12 @@ router.get(
   "/history",
   verifyToken,
   getWithdrawHistory
+);
+
+router.get(
+  "/fee",
+  verifyToken,
+  getWithdrawFee
 );
 
 router.get(

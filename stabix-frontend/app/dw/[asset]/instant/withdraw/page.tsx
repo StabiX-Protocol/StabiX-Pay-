@@ -2,7 +2,7 @@
 
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function InstantWithdrawPage() {
   const params = useParams();
@@ -26,8 +26,64 @@ export default function InstantWithdrawPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  const [fee, setFee] = useState<string | null>(null);
+  const [feeLoading, setFeeLoading] = useState(true);
+  const receivedAmount =
+  fee !== null && amount
+    ? Math.max(0, Number(amount) - Number(fee))
+    : null;
+
   const [showSuccess, setShowSuccess] = useState(false);
   const [createdWithdrawalId, setCreatedWithdrawalId] = useState("");
+
+  useEffect(() => {
+  const loadWithdrawFee = async () => {
+    setFeeLoading(true);
+
+    try {
+      const response = await fetch(
+        `/api/withdraws/fee?asset=${encodeURIComponent(
+          asset
+        )}&network=${encodeURIComponent(
+          network
+        )}&mode=instant`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              "jwt_token"
+            )}`,
+          },
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data?.success) {
+        throw new Error(
+          data?.message || "Unable to load withdrawal fee"
+        );
+      }
+
+      setFee(String(data.fee));
+
+    } catch (err) {
+      console.error(
+        "WITHDRAW FEE LOAD ERROR:",
+        err
+      );
+
+      setFee(null);
+
+    } finally {
+      setFeeLoading(false);
+    }
+  };
+
+  loadWithdrawFee();
+}, [asset, network]);
 
   /* --------------------------------
      CONTINUE
@@ -241,17 +297,36 @@ if (withdrawalId) {
               </div>
 
               {/* Fee */}
-              <div className="flex items-start justify-between gap-5">
+             <div className="flex items-start justify-between gap-5">
 
-                <span className="text-sm text-slate-500 dark:text-slate-400">
-                  Withdrawal fee
-                </span>
+             <span className="text-sm text-slate-500 dark:text-slate-400">
+             Withdrawal fee
+              </span>
 
-                <span className="text-right text-sm font-semibold">
-                  Calculated by StabiX
-                </span>
+             <span className="text-right text-sm font-semibold">
+              {feeLoading
+              ? "Calculating..."
+                 : fee !== null
+                ? `${Number(fee)} ${asset}`
+                : "Unavailable"}
+              </span>
+             </div>
 
-              </div>
+             {/* You will receive */}
+            <div className="flex items-start justify-between gap-5 mt-4">
+
+             <span className="text-sm text-slate-500 dark:text-slate-400">
+                You will receive
+             </span>
+
+               <span className="text-right text-sm font-semibold text-emerald-500">
+                 {feeLoading
+               ? "Calculating..."
+                : receivedAmount !== null
+                ? `${receivedAmount} ${asset}`
+                  : "—"}
+               </span> 
+                 </div>
 
               {/* Processing */}
               <div className="flex items-center justify-between">
