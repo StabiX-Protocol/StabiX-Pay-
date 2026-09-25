@@ -6,9 +6,6 @@ const { getProvider } = require("../../../blockchainService");
 const HOT_WALLET_PRIVATE_KEY =
   process.env.EVM_HOT_WALLET_PRIVATE_KEY;
 
-const HOT_WALLET_ADDRESS =
-  process.env.EVM_DEPOSIT_WALLET_ADDRESS;
-
 const ETHEREUM_CHAIN_ID =
   Number(process.env.ETHEREUM_CHAIN_ID);
 
@@ -250,23 +247,16 @@ const processEthereumWithdrawal = async (
   }
 
 
-  /* -------------------------------------------------------
-     HOT WALLET
-  ------------------------------------------------------- */
 
-  const hotWallet = getHotWallet();
+ /* -------------------------------------------------------
+   HOT WALLET
+------------------------------------------------------- */
 
-  if (
-    HOT_WALLET_ADDRESS &&
-    hotWallet.address.toLowerCase() !==
-      HOT_WALLET_ADDRESS.toLowerCase()
-  ) {
-
-    throw new Error(
-      "Hot wallet address mismatch"
-    );
-
-  }
+const hotWallet = getHotWallet();
+console.log(
+  "ETHEREUM HOT WALLET:",
+  hotWallet.address
+);
 
 
   /* -------------------------------------------------------

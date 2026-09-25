@@ -1,7 +1,22 @@
 const pool = require("../config/db");
+const { ethers }= require("ethers");
 
 const { createSweepJob } =
   require("./EVM/Ethereum/sweep/sweepJobService");
+
+const HOT_WALLET_PRIVATE_KEY =
+  process.env.EVM_HOT_WALLET_PRIVATE_KEY;
+
+if (!HOT_WALLET_PRIVATE_KEY) {
+  throw new Error(
+    "EVM_HOT_WALLET_PRIVATE_KEY is not configured"
+  );
+}
+
+const HOT_WALLET_ADDRESS =
+  new ethers.Wallet(
+    HOT_WALLET_PRIVATE_KEY
+  ).address;
 
 const creditConfirmedDeposit = async ({
   blockchainDepositId,
@@ -227,8 +242,8 @@ await createSweepJob({
   tokenContract: deposit.token_contract,
   depositAddressId: deposit.deposit_address_id,
   sourceAddress: deposit.to_address,
-  destinationAddress:
-    process.env.EVM_DEPOSIT_WALLET_ADDRESS,
+ destinationAddress:
+  HOT_WALLET_ADDRESS,
   amount: deposit.amount,
 });
 

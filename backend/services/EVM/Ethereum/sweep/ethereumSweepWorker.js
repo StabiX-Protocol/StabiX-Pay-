@@ -10,25 +10,9 @@ const {
 
 const provider = getProvider();
 
-const HOT_WALLET_ADDRESS =
-  process.env.EVM_DEPOSIT_WALLET_ADDRESS;
-
-if (!HOT_WALLET_ADDRESS) {
-  throw new Error(
-    "EVM_DEPOSIT_WALLET_ADDRESS is not configured"
-  );
-}
-
-if (!ethers.isAddress(HOT_WALLET_ADDRESS)) {
-  throw new Error(
-    "EVM_DEPOSIT_WALLET_ADDRESS is invalid"
-  );
-}
-
-const confirmations = Number(
-  process.env.BLOCKCHAIN_CONFIRMATIONS || 3
-);
-
+// ============================================================
+// HOT WALLET
+// ============================================================
 const HOT_WALLET_PRIVATE_KEY =
   process.env.EVM_HOT_WALLET_PRIVATE_KEY;
 
@@ -38,19 +22,21 @@ if (!HOT_WALLET_PRIVATE_KEY) {
   );
 }
 
+// Create Hot Wallet from its private key
 const hotWallet = new ethers.Wallet(
   HOT_WALLET_PRIVATE_KEY,
   provider
 );
 
-if (
-  hotWallet.address.toLowerCase() !==
-  HOT_WALLET_ADDRESS.toLowerCase()
-) {
-  throw new Error(
-    "Hot wallet private key does not match EVM_DEPOSIT_WALLET_ADDRESS"
-  );
-}
+// Hot Wallet address is automatically derived from the private key.
+// No separate EVM_HOT_WALLET_ADDRESS variable is required.
+const HOT_WALLET_ADDRESS = hotWallet.address;
+
+
+const confirmations = Number(
+  process.env.BLOCKCHAIN_CONFIRMATIONS || 3
+);
+
 
 const getTokenBalance = async ({
   tokenContract,
