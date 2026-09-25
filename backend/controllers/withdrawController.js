@@ -88,13 +88,6 @@ const createWithdraw = async (req, res) => {
     });
   }
 
-  /*
-   * Current blockchain withdrawal implementation
-   * starts with EVM networks.
-   *
-   * TRON validation/execution will be handled by
-   * the TRON withdrawal worker.
-   */
   if (
     network !== "tron" &&
     !isValidEvmAddress(destination_address)

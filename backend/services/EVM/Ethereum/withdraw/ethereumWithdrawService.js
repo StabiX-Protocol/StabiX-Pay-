@@ -535,6 +535,36 @@ const processEthereumWithdrawal = async (
     [withdrawal.id]
   );
 
+    await pool.query(
+    `
+    INSERT INTO withdrawal_fee_revenue (
+      withdrawal_id,
+      "STRId",
+      stbx_uid,
+      asset,
+      network,
+      mode,
+      fee,
+      blockchain_tx_hash,
+      status
+    )
+    SELECT
+      id,
+      "STRId",
+      stbx_uid,
+      asset,
+      network,
+      mode,
+      fee,
+      blockchain_tx_hash,
+      'collected'
+    FROM withdrawals
+    WHERE id = $1
+    ON CONFLICT (withdrawal_id) DO NOTHING
+    `,
+    [withdrawal.id]
+  );
+
   console.log(
     "ETHEREUM WITHDRAWAL CONFIRMED:",
     {
@@ -974,7 +1004,35 @@ const reconcileBroadcastEthereumWithdrawals =
              AND status = 'broadcast'`,
           [withdrawal.id]
         );
-
+                  
+  await pool.query(
+  `INSERT INTO withdrawal_fee_revenue (
+    withdrawal_id,
+    "STRId",
+    stbx_uid,
+    asset,
+    network,
+    mode,
+    fee,
+    blockchain_tx_hash,
+    status
+  )
+  SELECT
+    id,
+    "STRId",
+    stbx_uid,
+    asset,
+    network,
+    mode,
+    fee,
+    blockchain_tx_hash,
+    'collected'
+  FROM withdrawals
+  WHERE id = $1
+  ON CONFLICT (withdrawal_id) DO NOTHING
+  `,
+  [withdrawal.id]
+);
 
         console.log(
           "ETHEREUM WITHDRAWAL RECONCILED:",
