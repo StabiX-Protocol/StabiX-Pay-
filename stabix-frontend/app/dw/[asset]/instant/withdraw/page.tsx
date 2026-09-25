@@ -39,9 +39,6 @@ export default function InstantWithdrawPage() {
 >("idle");
 const [withdrawal, setWithdrawal] = useState<any>(null);
 
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [createdWithdrawalId, setCreatedWithdrawalId] = useState("");
-
 
   useEffect(() => {
   const loadWithdrawFee = async () => {
