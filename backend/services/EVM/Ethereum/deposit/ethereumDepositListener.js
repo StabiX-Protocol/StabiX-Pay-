@@ -41,7 +41,7 @@ for (const token of tokens) {
 
 const iface = new ethers.Interface(TRANSFER_ABI);
 
-const startEvmDepositListener = async () => {
+const startEthereumDepositListener = async () => {
   if (tokens.length === 0) {
     throw new Error(
       "No Sepolia token contracts configured"
@@ -49,7 +49,7 @@ const startEvmDepositListener = async () => {
   }
 
   console.log(
-    `EVM deposit listener starting with ${tokens.length} token(s)`
+    `Ethereum deposit listener starting with ${tokens.length} token(s)`
   );
 
   for (const token of tokens) {
@@ -158,7 +158,7 @@ const startEvmDepositListener = async () => {
         log.index;
 
       console.log(
-        "EVM DEPOSIT DETECTED:",
+        "ETHEREUM DEPOSIT DETECTED:",
         {
           asset,
           amount,
@@ -341,17 +341,17 @@ if (insertResult.rows.length === 0) {
       );
     } catch (err) {
       console.error(
-        "EVM DEPOSIT LISTENER ERROR:",
+        "ETHEREUM DEPOSIT LISTENER ERROR:",
         err
       );
     }
   });
 
   console.log(
-    "EVM deposit listener is ACTIVE"
+    "ETHEREUM deposit listener is ACTIVE"
   );
 };
 
 module.exports = {
-  startEvmDepositListener,
+  startEthereumDepositListener,
 };

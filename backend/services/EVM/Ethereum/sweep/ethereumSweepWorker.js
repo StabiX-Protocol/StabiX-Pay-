@@ -3,10 +3,10 @@ const {
   getPendingSweepJobs,
 } = require("./sweepJobService");
 const { ethers } = require("ethers");
-const { getProvider } = require("./blockchainService");
+const { getProvider } = require("../../../blockchainService");
 const {
   getDepositWallet,
-} = require("./walletService");
+} = require("../../../walletService");
 
 const provider = getProvider();
 
@@ -213,7 +213,7 @@ const reconcileBroadcastSweepJobs = async () => {
   }
 };
 
-const processEvmSweepJobs = async () => {
+const processEthereumSweepJobs = async () => {
   await reconcileBroadcastSweepJobs();
 
   const jobs = await getPendingSweepJobs(10);
@@ -901,5 +901,5 @@ const processEvmSweepJobs = async () => {
 };
 
 module.exports = {
-  processEvmSweepJobs,
+  processEthereumSweepJobs,
 };

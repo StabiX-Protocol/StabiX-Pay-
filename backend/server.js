@@ -8,7 +8,7 @@ const app = express();
 const server = http.createServer(app);
 
 const {
-  startEvmDepositListener,
+  startEthereumDepositListener,
 } = require("./services/EVM/Ethereum/deposit/ethereumDepositListener");
 
 const {
@@ -23,8 +23,8 @@ const {
   processPendingEthereumWithdrawals,
 } = require("./services/EVM/Ethereum/withdraw/ethereumWithdrawService");
 
-const { processEvmSweepJobs } =
-require("./services/EVM/Ethereum/sweep/sweepJobService");
+const { processEthereumSweepJobs } =
+  require("./services/EVM/Ethereum/sweep/ethereumSweepWorker");
 
 const io = new Server(server, {
 cors: {
@@ -115,9 +115,9 @@ const PORT = 3000;
 server.listen(PORT, "0.0.0.0", () => {
 console.log(`Server running on http://0.0.0.0:${PORT}`);
 
-startEvmDepositListener().catch((err) => {
+startEthereumDepositListener().catch((err) => {
 console.error(
-"FAILED TO START EVM DEPOSIT LISTENER:",
+"FAILED TO START ETHEREUM DEPOSIT LISTENER:",
 err
 );
 });
@@ -151,19 +151,19 @@ setInterval(
   30 * 1000
 );
 
-const runEvmSweepWorker = async () => {
+const runEthereumSweepWorker = async () => {
   try {
-    await processEvmSweepJobs();
+    await processEthereumSweepJobs();
   } catch (err) {
     console.error(
-      "EVM SWEEP WORKER ERROR:",
+      "Ethereum SWEEP WORKER ERROR:",
       err
     );
   }
 };
-runEvmSweepWorker();
+runEthereumSweepWorker();
 setInterval(
-  runEvmSweepWorker,
+  runEthereumSweepWorker,
   30 * 1000
 );
 

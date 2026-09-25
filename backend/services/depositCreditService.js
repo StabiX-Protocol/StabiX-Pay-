@@ -1,6 +1,7 @@
 const pool = require("../config/db");
 
-const { createSweepJob } = require("./sweepJobService");
+const { createSweepJob } =
+  require("./EVM/Ethereum/sweep/sweepJobService");
 
 const creditConfirmedDeposit = async ({
   blockchainDepositId,
