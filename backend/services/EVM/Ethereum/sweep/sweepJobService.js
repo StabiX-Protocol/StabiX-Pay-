@@ -1,6 +1,7 @@
 const pool = require("../../../../config/db");
 
 const createSweepJob = async ({
+  blockchainDepositId, // NEW
   network,
   chainId,
   asset,
@@ -12,6 +13,7 @@ const createSweepJob = async ({
 }) => {
   const result = await pool.query(
     `INSERT INTO sweep_jobs (
+       blockchain_deposit_id,
        network,
        chain_id,
        asset,
@@ -32,12 +34,15 @@ const createSweepJob = async ({
        $6,
        $7,
        $8,
+       $9,
        'queued',
        CURRENT_TIMESTAMP
      )
-     ON CONFLICT DO NOTHING
+     ON CONFLICT (blockchain_deposit_id)
+     DO NOTHING
      RETURNING
        id,
+       blockchain_deposit_id,
        network,
        chain_id,
        asset,
@@ -55,14 +60,15 @@ const createSweepJob = async ({
        confirmed_at,
        next_attempt_at`,
     [
-      network,
-      chainId,
-      asset,
-      tokenContract,
-      depositAddressId,
-      sourceAddress,
-      destinationAddress,
-      amount,
+      blockchainDepositId, // $1
+      network,             // $2
+      chainId,             // $3
+      asset,               // $4
+      tokenContract,       // $5
+      depositAddressId,    // $6
+      sourceAddress,       // $7
+      destinationAddress,  // $8
+      amount,              // $9
     ]
   );
 
@@ -73,6 +79,7 @@ const getPendingSweepJobs = async (limit = 20) => {
   const result = await pool.query(
     `SELECT
        id,
+       blockchain_deposit_id,
        network,
        chain_id,
        asset,

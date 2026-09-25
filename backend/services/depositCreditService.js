@@ -236,6 +236,7 @@ FOR UPDATE OF bd`,
 );
 
 await createSweepJob({
+  blockchainDepositId,
   network: addressNetwork,
   chainId: deposit.chain_id,
   asset,
