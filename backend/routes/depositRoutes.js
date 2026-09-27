@@ -14,7 +14,7 @@ const {
 
 const {
   depositValidation
-} = require("../validators/transactionValidator");
+} = require("../validation/transactionValidation.js");
 
 const {
   validationResult

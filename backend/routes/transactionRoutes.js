@@ -9,7 +9,7 @@ const {
   searchTransactions
 } = require("../controllers/transactionController");
 
-const { transactionValidation } = require("../validators/transactionValidator");
+const { transactionValidation } = require("../validation/transactionValidation.js");
 const { validationResult } = require("express-validator");
 const validate = (req, res, next) => {
 const errors = validationResult(req);
