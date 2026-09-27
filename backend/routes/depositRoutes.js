@@ -4,7 +4,6 @@ const router = express.Router();
 const {verifyToken} = require("../middleware/authMiddleware");
 
 const {
-  createDeposit,
   getDepositAddress,
   getDepositHistory,
   getDepositById,
@@ -41,14 +40,6 @@ router.get(
   getDepositAddress
 )
 
-router.post(
-  "/",
-  verifyToken,
-  depositValidation,
-  validate,
-  createDeposit
-);
-
 router.get(
   "/history",
   verifyToken,
@@ -72,7 +63,6 @@ router.post(
   verifyToken,
   attachDepositIntentAddress
 );
-
 
 
 module.exports = router;

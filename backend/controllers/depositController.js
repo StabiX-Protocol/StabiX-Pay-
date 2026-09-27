@@ -1,6 +1,6 @@
 const pool = require("../config/db");
 
-/* old deposit manual flow
+ /*old deposit manual flow
 const createDeposit = async (req, res) => {
 
 const client = await pool.connect();
@@ -127,8 +127,8 @@ message: "Internal Server Error"
 } finally {
 client.release();
 }
-};
-*/
+};*/
+
 
 const getDepositAddress = async (req, res) => {
   try {
@@ -442,7 +442,6 @@ const attachDepositIntentAddress = async (req, res) => {
 };
 
 module.exports = {
-createDeposit,
 getDepositAddress,
 getDepositHistory,
 getDepositById,
