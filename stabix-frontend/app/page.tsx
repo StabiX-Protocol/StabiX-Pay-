@@ -7,17 +7,9 @@ import BalanceCard from "@/components/BalanceCard";
 import QuickActions from "@/components/QuickActions";
 import Assets from "@/components/Assets";
 import People from "@/components/People";
-import ValidatorPanel from "@/components/ValidatorPanel";
 
 
-export default function Home() {
-  const [isValidator, setIsValidator] = useState(false);
-
-useEffect(() => {
-  setIsValidator(
-    localStorage.getItem("stbx_uid") === "STBX-FOUNDER"
-  );
-}, []);
+export default function Home() {  
   return (
     <main className="min-h-screen bg-[#f6f7f9] text-slate-900 dark:bg-[#0b0b0d] dark:text-white">
       <div className="mx-auto min-h-screen w-full max-w-md pb-28">
@@ -28,9 +20,7 @@ useEffect(() => {
         <QuickActions />
         <Assets />
         <People />
-        {isValidator && <ValidatorPanel />}
       </div>
-
     </main>
   );
 }

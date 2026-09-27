@@ -75,7 +75,6 @@ const balanceRoutes = require("./routes/balanceRoutes");
 const depositRoutes = require("./routes/depositRoutes");
 const withdrawRoutes = require("./routes/withdrawRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-const validatorRoutes = require("./routes/validatorRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const blockRoutes = require("./routes/blockRoutes");
 const chatRoutes = require("./routes/chatRoutes");
@@ -89,7 +88,6 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/withdraws", withdrawRoutes);
 app.use("/api/admin",adminRoutes);
 app.use("/api/balance", balanceRoutes);
-app.use("/api/validator", validatorRoutes);
 app.use("/api/blocks", blockRoutes);
 app.use("/api/chat-settings", chatRoutes);
 

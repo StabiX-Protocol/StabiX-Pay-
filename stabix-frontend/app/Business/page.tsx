@@ -146,21 +146,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ================= VALIDATOR ================= */}
-      <section className="px-5 pt-8">
-        <div className="border-t border-slate-200 pt-7 dark:border-white/10">
-          <h2 className="text-2xl font-bold">
-            Validator Panel
-          </h2>
-
-          <input
-            type="text"
-            placeholder="Target STBX UID (STBXX..)"
-            className="mt-5 w-full rounded-[22px] border border-slate-200 bg-white px-5 py-5 text-sm outline-none placeholder:text-slate-400 focus:border-slate-900 dark:border-white/10 dark:bg-[#18181b] dark:focus:border-white"
-          />
-        </div>
-      </section>
-
       {/* ================= BOTTOM NAV ================= */}
       <nav className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-slate-200 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+10px)] pt-2.5 backdrop-blur-xl dark:border-white/10 dark:bg-[#111113]/95">
         <div className="grid grid-cols-5 items-end">
