@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">StabiX</string>
+    <string name="title_activity_main">StabiX</string>
+    <string name="package_name">xyz.stabix</string>
+    <string name="custom_url_scheme">xyz.stabix</string>
+</resources>
