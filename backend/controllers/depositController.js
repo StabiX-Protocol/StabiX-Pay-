@@ -1,5 +1,6 @@
 const pool = require("../config/db");
 
+/* old deposit manual flow
 const createDeposit = async (req, res) => {
 
 const client = await pool.connect();
@@ -127,7 +128,7 @@ message: "Internal Server Error"
 client.release();
 }
 };
-
+*/
 
 const getDepositAddress = async (req, res) => {
   try {
